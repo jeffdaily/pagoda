@@ -9,6 +9,7 @@ AC_CONFIG_MACRO_DIR([config])
 # Checks for compilers and compiler characteristics.
 AC_PROG_CC([mpicc hcc mpxlc_r mpxlc mpcc cmpicc cc])
 AC_PROG_CXX([mpic++ mpicxx mpiCC hcp mpxlC_r mpxlC mpCC cmpic++ CC])
+AC_PROG_FC([mpif90 mpxlf95_r mpxlf90_r mpxlf95 mpxlf90 mpf90 cmpif90c ftn])
 AC_FC_LIBRARY_LDFLAGS
 
 # Initialize automake and libtool.
