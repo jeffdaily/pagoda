@@ -1,5 +1,6 @@
 #include <sstream>
   using std::istringstream;
+#include <stdlib.h>
 #include <string>
   using std::string;
 #include <vector>

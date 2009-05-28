@@ -1,5 +1,6 @@
 // C includes, std and otherwise
 #include <ga.h>
+#include <limits.h> // for INT_MAX
 #include <macdecls.h>
 #include <math.h> // for M_PI
 #include <mpi.h>
