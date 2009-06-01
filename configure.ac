@@ -42,6 +42,7 @@ AC_SUBST([GA_LIBS])
 AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AM_PROG_CC_C_O
 AC_HEADER_STDBOOL
 AC_TYPE_INT64_T
 AC_TYPE_SIZE_T
