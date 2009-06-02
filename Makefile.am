@@ -13,3 +13,4 @@ psubsetter_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
 check_PROGRAMS = r12_smaller
 r12_smaller_SOURCES = r12_smaller.c
 r12_smaller_CFLAGS = -I/home/d3n000/gcrm/local/include
+r12_smaller_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf

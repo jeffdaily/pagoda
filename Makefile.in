@@ -69,7 +69,7 @@ r12_smaller_OBJECTS = $(am_r12_smaller_OBJECTS)
 r12_smaller_LDADD = $(LDADD)
 r12_smaller_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(r12_smaller_CFLAGS) \
-	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(CFLAGS) $(r12_smaller_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -237,6 +237,7 @@ AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
 psubsetter_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
 r12_smaller_SOURCES = r12_smaller.c
 r12_smaller_CFLAGS = -I/home/d3n000/gcrm/local/include
+r12_smaller_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf
 all: all-am
 
 .SUFFIXES:
