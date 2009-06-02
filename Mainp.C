@@ -78,11 +78,11 @@ throw SubsetterException(__os.str()); }
   }
 
 
-#ifdef FC_DUMMY_MAIN
+#ifdef F77_DUMMY_MAIN
 #  ifdef __cplusplus
      extern "C"
 #  endif
-   int FC_DUMMY_MAIN() { return 1; }
+   int F77_DUMMY_MAIN() { return 1; }
 #endif
 
 

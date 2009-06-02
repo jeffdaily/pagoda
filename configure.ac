@@ -9,9 +9,12 @@ AC_CONFIG_MACRO_DIR([config])
 # Checks for compilers and compiler characteristics.
 AC_PROG_CC([mpicc hcc mpxlc_r mpxlc mpcc cmpicc cc])
 AC_PROG_CXX([mpic++ mpicxx mpiCC hcp mpxlC_r mpxlC mpCC cmpic++ CC])
-AC_PROG_FC([mpif90 mpxlf95_r mpxlf90_r mpxlf95 mpxlf90 mpf90 cmpif90c ftn])
-AC_FC_LIBRARY_LDFLAGS
-AC_FC_DUMMY_MAIN
+AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
+#AC_PROG_FC([mpif90 mpxlf95_r mpxlf90_r mpxlf95 mpxlf90 mpf90 cmpif90c ftn])
+#AC_FC_LIBRARY_LDFLAGS
+#AC_FC_DUMMY_MAIN
+AC_F77_LIBRARY_LDFLAGS
+AC_F77_DUMMY_MAIN
 
 # Initialize automake and libtool.
 AM_INIT_AUTOMAKE
@@ -26,14 +29,6 @@ GCRM_CHECK_PACKAGE([pnetcdf], [ncmpi_open], [pnetcdf], [pnetcdf.h],
   [AC_MSG_FAILURE([--with-pnetcdf was given, but test for pnetcdf failed])]
 )
 
-#GCRM_CHECK_PACKAGE([ga], [NGA_Create], [global], [ga.h],
-#  [AC_SUBST([LIBGA], [-lglobal -lma -llinalg -larmci -lm])
-#   AC_DEFINE([HAVE_LIBGA], [1], [Define if you have Global Arrays])
-#  ],
-#  [AC_MSG_FAILURE([--with-ga was given, but test for ga failed])],
-#  [-lma -llinalg -larmci -lm]
-#)
-
 AC_ARG_VAR([GA_INCS], [Global Arrays include directives])
 AC_SUBST([GA_INCS])
 AC_ARG_VAR([GA_LIBS], [Global Arrays C linker directives])
@@ -42,11 +37,29 @@ AC_SUBST([GA_LIBS])
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
 
+#
+# Check for some types
+#
+
+AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
+gcrm_saveCFLAGS=$CFLAGS
+CFLAGS=$GA_INCS
+AC_CHECK_TYPE([Integer], [], [], [[#include <typesf2c.h>]])
+CFLAGS=$gcrm_saveCFLAGS
+
+#
+# Check for type sizes
+#
+
+AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])
+gcrm_saveCFLAGS=$CFLAGS
+CFLAGS=$GA_INCS
+AC_CHECK_SIZEOF([Integer], [], [[#include <typesf2c.h>]])
+CFLAGS=$gcrm_saveCFLAGS
+
 # Checks for typedefs, structures, and compiler characteristics.
 AM_PROG_CC_C_O
 AC_HEADER_STDBOOL
-AC_TYPE_INT64_T
-AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([strtol])

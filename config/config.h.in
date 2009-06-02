@@ -2,7 +2,7 @@
 
 /* Define to dummy `main' function (if any) required to link to the Fortran
    libraries. */
-#undef FC_DUMMY_MAIN
+#undef F77_DUMMY_MAIN
 
 /* Define if F77 and FC dummy `main' functions are identical. */
 #undef FC_DUMMY_MAIN_EQ_F77
@@ -77,15 +77,14 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* The size of `Integer', as computed by sizeof. */
+#undef SIZEOF_INTEGER
+
+/* The size of `MPI_Offset', as computed by sizeof. */
+#undef SIZEOF_MPI_OFFSET
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
 /* Version number of package */
 #undef VERSION
-
-/* Define to the type of a signed integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-#undef int64_t
-
-/* Define to `unsigned int' if <sys/types.h> does not define. */
-#undef size_t

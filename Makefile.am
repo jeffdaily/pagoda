@@ -5,7 +5,8 @@ SOURCE = Mainp.C LatLonRange.C DimensionSlice64.C
 
 AM_CFLAGS = $(GA_INCS)
 AM_CXXFLAGS = $(GA_INCS)
-AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
+#AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
+AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
 
 bin_PROGRAMS = psubsetter
 psubsetter_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
