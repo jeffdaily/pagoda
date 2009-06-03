@@ -77,6 +77,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* The size of `int64_t', as computed by sizeof. */
+#undef SIZEOF_INT64_T
+
 /* The size of `Integer', as computed by sizeof. */
 #undef SIZEOF_INTEGER
 

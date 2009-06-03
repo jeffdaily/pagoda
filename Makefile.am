@@ -4,7 +4,7 @@ HEADERS_PRIVATE = LatLonRange.H DimensionSlice64.H
 SOURCE = Mainp.C LatLonRange.C DimensionSlice64.C
 
 AM_CFLAGS = $(GA_INCS)
-AM_CXXFLAGS = $(GA_INCS)
+AM_CXXFLAGS = $(GA_INCS) $(CFLAGS)
 #AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
 

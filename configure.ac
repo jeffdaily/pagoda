@@ -46,6 +46,7 @@ gcrm_saveCFLAGS=$CFLAGS
 CFLAGS=$GA_INCS
 AC_CHECK_TYPE([Integer], [], [], [[#include <typesf2c.h>]])
 CFLAGS=$gcrm_saveCFLAGS
+AC_CHECK_TYPE([int64_t])
 
 #
 # Check for type sizes
@@ -56,6 +57,7 @@ gcrm_saveCFLAGS=$CFLAGS
 CFLAGS=$GA_INCS
 AC_CHECK_SIZEOF([Integer], [], [[#include <typesf2c.h>]])
 CFLAGS=$gcrm_saveCFLAGS
+AC_CHECK_SIZEOF([int64_t])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AM_PROG_CC_C_O

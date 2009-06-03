@@ -578,7 +578,7 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
   for (DimInfoMap::iterator dim=dims.begin(); dim!=dims.end(); ++dim) {
     string name = dim->first;
     DimInfo info = dim->second;
-    MPI_Offset size = info.size;
+    int64_t size = info.size;
     if (size == 0) continue; // protect against a time.size == 0
     Mask mask;
     mask.dim = info;
@@ -672,17 +672,19 @@ void adjust_cell_masks(MaskMap &masks, LatLonRange box, FileInfo gridfile)
                &cells_mask.data, NULL);
 
   // read local portion of the grid_center_lon variable
+  MPI_Offset cells_mask_lo = cells_mask.lo;
+  MPI_Offset cells_mask_local_size = cells_mask.local_size;
   lon = new float[cells_mask.local_size];
   error = ncmpi_get_vara_float_all(gridfile.id,
           gridfile.vars_map["grid_center_lon"].id,
-          &cells_mask.lo, &cells_mask.local_size, &lon[0]);
+          &cells_mask_lo, &cells_mask_local_size, &lon[0]);
   ERRNO_CHECK(error);
 
   // read local portion of the grid_center_lat variable
   lat = new float[cells_mask.local_size];
   error = ncmpi_get_vara_float_all(gridfile.id,
           gridfile.vars_map["grid_center_lat"].id,
-          &cells_mask.lo, &cells_mask.local_size, &lat[0]);
+          &cells_mask_lo, &cells_mask_local_size, &lat[0]);
   ERRNO_CHECK(error);
 
   // the actual cells mask construction
@@ -712,18 +714,18 @@ void adjust_cell_masks(MaskMap &masks, LatLonRange box, FileInfo gridfile)
     // The following scatter accumulate expects the index array to be int**
     // so create that array while we're at it...
     int *local_mask = new int[local_size];
-    int **subs = new int*[local_size];
+    int64_t **subs = new int64_t*[local_size];
     size_t local_index = 0;
     for (int64_t cellidx=0; cellidx<cells_mask.local_size; ++cellidx) {
       for (int corneridx=0; corneridx<corners_per_cell; ++corneridx) {
-        subs[local_index] = new int[1];
+        subs[local_index] = new int64_t[1];
         subs[local_index][0] = cell_corners[local_index];
         local_mask[local_index++] = cells_mask.data[cellidx];
       }
     }
 
     // Scatter/accumulate the local_mask into the corners_mask
-    NGA_Scatter_acc(corners_mask.handle, local_mask, subs, local_size, &ONE);
+    NGA_Scatter_acc64(corners_mask.handle, local_mask, subs, local_size, &ONE);
 
     // Clean up!
     delete [] cell_corners;
@@ -840,20 +842,20 @@ Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
 
   // create and access the new composite mask
   string name = composite_name(dims);
-  MPI_Offset size = dims[0].size * dims[1].size;
-  MPI_Offset chunk = dims[1].size;
+  int64_t size = dims[0].size * dims[1].size;
+  int64_t chunk = dims[1].size;
   int g_the_mask = NGA_Create64(MT_INT, 1, &size, (char*)name.c_str(), &chunk);
-  MPI_Offset the_mask_lo;
-  MPI_Offset the_mask_hi;
+  int64_t the_mask_lo;
+  int64_t the_mask_hi;
   int *the_mask;
   NGA_Distribution64(g_the_mask, ME, &the_mask_lo, &the_mask_hi);
   NGA_Access64(g_the_mask, &the_mask_lo, &the_mask_hi, &the_mask, NULL);
 
   // get the data for the first dimension, but only the data we need
   // since this first mask dimension corresponds to what we accessed above
-  MPI_Offset mask1_lo = the_mask_lo / dims[1].size;
-  MPI_Offset mask1_hi = (the_mask_hi - dims[1].size + 1) / dims[1].size;
-  MPI_Offset mask1_size = mask1_hi - mask1_lo + 1;
+  int64_t mask1_lo = the_mask_lo / dims[1].size;
+  int64_t mask1_hi = (the_mask_hi - dims[1].size + 1) / dims[1].size;
+  int64_t mask1_size = mask1_hi - mask1_lo + 1;
   int *mask1 = new int[mask1_size];
   NGA_Get64(masks[dims[0].name].handle, &mask1_lo, &mask1_hi, mask1, NULL);
 
@@ -863,7 +865,7 @@ Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
 
   // iterate over the dimensions, writing values into the composite mask
   // based on the dimension masks we have
-  for (MPI_Offset idx=0; idx<mask1_size; ++idx) {
+  for (int64_t idx=0; idx<mask1_size; ++idx) {
     if (mask1[idx] > 0) {
       for (MPI_Offset jdx=0; jdx<mask2_size; ++jdx) {
         the_mask[idx*mask2_size + jdx] = mask2[jdx];
@@ -992,12 +994,12 @@ void copy_record_var(
   int *record_mask = mask_get_data_all(the_record_mask);
   string name = var_in.name;
   int ndim = var_in.ndim;
-  MPI_Offset chunk_in, chunk_out;
-  MPI_Offset lo_in, lo_out;
-  MPI_Offset hi_in, hi_out;
+  int64_t chunk_in, chunk_out;
+  int64_t lo_in, lo_out;
+  int64_t hi_in, hi_out;
   MPI_Offset start_in[ndim], start_out[ndim];
   MPI_Offset count_in[ndim], count_out[ndim];
-  MPI_Offset size_in, size_out;
+  int64_t size_in, size_out;
   // Recall we're linearizing these arrays so that GA_Pack works.
   // Due to the linearization, we must specify a chunk size that equates
   // to the product of all but the first dim, otherwise we'd get unpredictable 
@@ -1103,12 +1105,12 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
 {
   string name = var_in.name;
   int ndim = var_in.ndim;
-  MPI_Offset chunk_in, chunk_out;
-  MPI_Offset lo_in, lo_out;
-  MPI_Offset hi_in, hi_out;
+  int64_t chunk_in, chunk_out;
+  int64_t lo_in, lo_out;
+  int64_t hi_in, hi_out;
   MPI_Offset start_in[ndim], start_out[ndim];
   MPI_Offset count_in[ndim], count_out[ndim];
-  MPI_Offset size_in, size_out;
+  int64_t size_in, size_out;
   // Recall we're linearizing these arrays so that GA_Pack works.
   // Due to the linearization, we must specify a chunk size that equates
   // to all but the first dim, otherwise we'd get unpredictable 
