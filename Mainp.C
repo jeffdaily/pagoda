@@ -4,6 +4,7 @@
 
 // C includes, std and otherwise
 #include <ga.h>
+#include <limits.h> // for INT_MAX
 #include <macdecls.h>
 #include <math.h> // for M_PI
 #include <mpi.h>
@@ -47,7 +48,7 @@ static string COMPOSITE_PREFIX("GCRM_COMPOSITE");
 int error;
 
 
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
 #include <assert.h>
 //#define DEBUG_MASKS
@@ -60,6 +61,9 @@ int error;
 
 
 #define MAX_NAME 80
+char GOP_SUM[] = "+";
+char NAME_VAR_IN[] = "var_in";
+char NAME_VAR_OUT[] = "var_out";
 
 
 #define ERR(e) { \
@@ -172,7 +176,6 @@ int main(int argc, char **argv)
 {
   MPI_Init(&argc, &argv);
   GA_Initialize();
-  MA_init(MT_DBL, 200000, 200000);
 
   int ncid_in = -1;
   int ncid_grid = -1;
@@ -278,6 +281,34 @@ int main(int argc, char **argv)
     error = ncmpi_create(MPI_COMM_WORLD, output_filename.c_str(), NC_WRITE,
             MPI_INFO_NULL, &ncid_out);
     ERRNO_CHECK(error);
+
+    // Attempt to calculate the largest amount of memory needed per-process.
+    // This has to do with our use of GA_Pack.  Each process needs roughly
+    // at least as much memory as the largest variable in our input netcdf
+    // files divided by the total number of processes.
+    MPI_Offset max = 0;
+    string max_name;
+    for (VarInfoVec::iterator var=infile.vars.begin(); var!=infile.vars.end(); ++var) {
+      MPI_Offset var_size = 1;
+      for (DimInfoVec::iterator dim=var->dims.begin(); dim!=var->dims.end(); ++dim) {
+        // TODO calculate the largest variable size (skipping record dimension)
+        if (! dim->is_unlimited) {
+          var_size *= dim->size;
+        }
+      }
+      if (var_size > max) {
+        max = var_size;
+        max_name = var->name;
+      }
+    }
+    // MA_init values based on max size / #procs
+    int64_t max_size = max / GA_Nnodes();
+    DEBUG_PRINT_ME("MA max memory %llu bytes\n", max_size*8);
+    DEBUG_PRINT_ME("MA max variable %s\n", max_name.c_str());
+    if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
+      char msg[] = "MA_init failed";
+      GA_Error(msg, 0);
+    };
 
     // Iterate over our input's dimensions and create masks based on them.
     // This simultaneously adjusts masks based on command-line params.
@@ -757,18 +788,18 @@ void adjust_cell_masks(MaskMap &masks, LatLonRange box, FileInfo gridfile)
     // The following scatter accumulate expects the index array to be int**
     // so create that array while we're at it...
     int *local_mask = new int[local_size];
-    int **subs = new int*[local_size];
+    int64_t **subs = new int64_t*[local_size];
     size_t local_index = 0;
     for (int64_t cellidx=0; cellidx<cells_mask.local_size; ++cellidx) {
       for (int edgeidx=0; edgeidx<edges_per_cell; ++edgeidx) {
-        subs[local_index] = new int[1];
+        subs[local_index] = new int64_t[1];
         subs[local_index][0] = cell_edges[local_index];
         local_mask[local_index++] = cells_mask.data[cellidx];
       }
     }
 
     // Scatter/accumulate the local_mask into the edges_mask
-    NGA_Scatter_acc(edges_mask.handle, local_mask, subs, local_size, &ONE);
+    NGA_Scatter_acc64(edges_mask.handle, local_mask, subs, local_size, &ONE);
 
     // Clean up!
     delete [] cell_edges;
@@ -975,7 +1006,7 @@ void count_masks(MaskMap &masks)
       NGA_Release_update64(mask.handle, &mask.lo, &mask.hi);
       mask.data = NULL;
       mask.global_count = mask.local_count;
-      GA_Lgop(&mask.global_count, 1, "+");
+      GA_Lgop(&mask.global_count, 1, GOP_SUM);
     }
   }
 
@@ -1014,7 +1045,7 @@ void copy_record_var(
     chunk_in  *=   var_in.edges[idx];
     chunk_out *=  var_out.edges[idx];
   }
-  int g_var_in = NGA_Create64(nc_to_mt(var_in.type), 1, &size_in, "var_in", &chunk_in);
+  int g_var_in = NGA_Create64(nc_to_mt(var_in.type), 1, &size_in, NAME_VAR_IN, &chunk_in);
   // we must now translate from this linearized representation to the
   // start/count representation expected by pnetcdf
   NGA_Distribution64(g_var_in, ME, &lo_in, &hi_in);
@@ -1026,7 +1057,7 @@ void copy_record_var(
     start_in[idx] = 0;
     count_in[idx] = var_in.edges[idx];           // read entire dims thereafter
   }
-  int g_var_out = NGA_Create64(nc_to_mt(var_in.type), 1, &size_out, "var_out", &chunk_out);
+  int g_var_out = NGA_Create64(nc_to_mt(var_in.type), 1, &size_out, NAME_VAR_OUT, &chunk_out);
   NGA_Distribution64(g_var_out, ME, &lo_out, &hi_out);
   start_out[0] = 0;                                 // start at first record
   start_out[1] = lo_out / chunk_out;                // again, after record dim
@@ -1036,6 +1067,31 @@ void copy_record_var(
     start_out[idx] = 0;
     count_out[idx] = var_out.edges[idx]; // write entire dims thereafter
   }
+#ifdef DEBUG
+  // each proc takes turns with output so get ordered output
+  for (int who=0; who<GA_Nnodes(); ++who) {
+    if (who == ME) {
+      if (ME == 0) {
+        printf("======= %s ==== copy_record_var\n", name.c_str());
+      }
+      printf("[%d] chunk_in=%lld\n", ME, chunk_in);
+      printf("[%d] lo_in=%lld\n", ME, lo_in);
+      printf("[%d] hi_in=%lld\n", ME, hi_in);
+      printf("[%d] size_in=%lld\n", ME, size_in);
+      printf("[%d] start_in=(", ME);
+      for (int idx=0; idx<ndim; ++idx) {
+        printf("%lld,", start_in[idx]);
+      }
+      printf(")\n");
+      printf("[%d] count_in=(", ME);
+      for (int idx=0; idx<ndim; ++idx) {
+        printf("%lld,", count_in[idx]);
+      }
+      printf(")\n");
+    }
+    GA_Sync();
+  }
+#endif
   for (MPI_Offset record=0; record<num_records; ++record) {
     if (record_mask[record] == 0) continue; // skip if masked out
 
@@ -1125,8 +1181,8 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
     chunk_in  *=   var_in.edges[idx];
     chunk_out *=  var_out.edges[idx];
   }
-  int g_var_in  = NGA_Create64(nc_to_mt(var_in.type), 1, &size_in,  "var_in",  &chunk_in);
-  int g_var_out = NGA_Create64(nc_to_mt(var_in.type), 1, &size_out, "var_out", &chunk_out);
+  int g_var_in  = NGA_Create64(nc_to_mt(var_in.type), 1, &size_in,  NAME_VAR_IN,  &chunk_in);
+  int g_var_out = NGA_Create64(nc_to_mt(var_in.type), 1, &size_out, NAME_VAR_OUT, &chunk_out);
   // we must now translate from this linearized representation to the
   // start/count representation expected by pnetcdf
   NGA_Distribution64(g_var_in, ME, &lo_in, &hi_in);
@@ -1148,7 +1204,7 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
   for (int who=0; who<GA_Nnodes(); ++who) {
     if (who == ME) {
       if (ME == 0) {
-        printf("======= %s\n", name.c_str());
+        printf("======= %s ==== copy_var\n", name.c_str());
       }
       printf("[%d] chunk_in=%lld\n", ME, chunk_in);
       printf("[%d] lo_in=%lld\n", ME, lo_in);
@@ -1164,10 +1220,8 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         printf("%lld,", count_in[idx]);
       }
       printf(")\n");
-      GA_Sync();
-    } else {
-      GA_Sync();
     }
+    GA_Sync();
   }
 #endif
   // read from file to local memory
