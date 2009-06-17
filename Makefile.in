@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -33,7 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = psubsetter$(EXEEXT)
-check_PROGRAMS = r12_smaller$(EXEEXT)
+check_PROGRAMS = r12_smaller$(EXEEXT) TestOpen$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/config/config.h.in \
@@ -55,15 +56,33 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config/config.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
+libLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(lib_LTLIBRARIES)
+libsubsetter_la_LIBADD =
+am__objects_1 = Attribute.lo CommandLineParser.lo Dataset.lo \
+	DataType.lo Dimension.lo FileManager.lo LatLonBox.lo Util.lo \
+	Variable.lo
+am__objects_2 =
+am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
+libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_1 = Mainp.$(OBJEXT) LatLonRange.$(OBJEXT) \
-	DimensionSlice64.$(OBJEXT)
-am__objects_2 =
-am_psubsetter_OBJECTS = $(am__objects_1) $(am__objects_2)
+am_TestOpen_OBJECTS = TestOpen-TestOpen.$(OBJEXT)
+TestOpen_OBJECTS = $(am_TestOpen_OBJECTS)
+TestOpen_LDADD = $(LDADD)
+TestOpen_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestOpen_CXXFLAGS) \
+	$(CXXFLAGS) $(TestOpen_LDFLAGS) $(LDFLAGS) -o $@
+am_psubsetter_OBJECTS = Mainp.$(OBJEXT)
 psubsetter_OBJECTS = $(am_psubsetter_OBJECTS)
-psubsetter_LDADD = $(LDADD)
+psubsetter_DEPENDENCIES = libsubsetter.la
 am_r12_smaller_OBJECTS = r12_smaller-r12_smaller.$(OBJEXT)
 r12_smaller_OBJECTS = $(am_r12_smaller_OBJECTS)
 r12_smaller_LDADD = $(LDADD)
@@ -91,8 +110,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(psubsetter_SOURCES) $(r12_smaller_SOURCES)
-DIST_SOURCES = $(psubsetter_SOURCES) $(r12_smaller_SOURCES)
+SOURCES = $(libsubsetter_la_SOURCES) $(TestOpen_SOURCES) \
+	$(psubsetter_SOURCES) $(r12_smaller_SOURCES)
+DIST_SOURCES = $(libsubsetter_la_SOURCES) $(TestOpen_SOURCES) \
+	$(psubsetter_SOURCES) $(r12_smaller_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -229,16 +250,46 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I config
-HEADERS_PRIVATE = LatLonRange.H DimensionSlice64.H
-SOURCE = Mainp.C LatLonRange.C DimensionSlice64.C
+HEADERS_PRIVATE = \
+  Attribute.H \
+  CommandLineParser.H \
+  Dataset.H \
+  DataType.H \
+  Dimension.H \
+  DimensionSlice.H \
+  FileManager.H \
+  LatLonBox.H \
+  RangeException.H \
+  Slice.H \
+  SubsetterException.H \
+  Util.H \
+  Variable.H
+
+SOURCE = \
+  Attribute.C \
+  CommandLineParser.C \
+  Dataset.C \
+  DataType.C \
+  Dimension.C \
+  FileManager.C \
+  LatLonBox.C \
+  Util.C \
+  Variable.C
+
 AM_CFLAGS = $(GA_INCS)
 AM_CXXFLAGS = $(GA_INCS) $(CFLAGS)
 #AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
-psubsetter_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
+lib_LTLIBRARIES = libsubsetter.la
+libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
+psubsetter_SOURCES = Mainp.C
+psubsetter_LDADD = libsubsetter.la
 r12_smaller_SOURCES = r12_smaller.c
 r12_smaller_CFLAGS = -I/home/d3n000/gcrm/local/include
 r12_smaller_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf
+TestOpen_SOURCES = TestOpen.C
+TestOpen_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestOpen_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -293,6 +344,35 @@ $(top_srcdir)/config/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config/config.h config/stamp-h1
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
+	    $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libsubsetter.la: $(libsubsetter_la_OBJECTS) $(libsubsetter_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libsubsetter_la_OBJECTS) $(libsubsetter_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -328,6 +408,9 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+TestOpen$(EXEEXT): $(TestOpen_OBJECTS) $(TestOpen_DEPENDENCIES) 
+	@rm -f TestOpen$(EXEEXT)
+	$(TestOpen_LINK) $(TestOpen_OBJECTS) $(TestOpen_LDADD) $(LIBS)
 psubsetter$(EXEEXT): $(psubsetter_OBJECTS) $(psubsetter_DEPENDENCIES) 
 	@rm -f psubsetter$(EXEEXT)
 	$(CXXLINK) $(psubsetter_OBJECTS) $(psubsetter_LDADD) $(LIBS)
@@ -341,9 +424,17 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DimensionSlice64.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonRange.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Attribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommandLineParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileManager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestOpen-TestOpen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/r12_smaller-r12_smaller.Po@am__quote@
 
 .C.o:
@@ -366,6 +457,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+TestOpen-TestOpen.o: TestOpen.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -MT TestOpen-TestOpen.o -MD -MP -MF $(DEPDIR)/TestOpen-TestOpen.Tpo -c -o TestOpen-TestOpen.o `test -f 'TestOpen.C' || echo '$(srcdir)/'`TestOpen.C
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestOpen-TestOpen.Tpo $(DEPDIR)/TestOpen-TestOpen.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestOpen.C' object='TestOpen-TestOpen.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -c -o TestOpen-TestOpen.o `test -f 'TestOpen.C' || echo '$(srcdir)/'`TestOpen.C
+
+TestOpen-TestOpen.obj: TestOpen.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -MT TestOpen-TestOpen.obj -MD -MP -MF $(DEPDIR)/TestOpen-TestOpen.Tpo -c -o TestOpen-TestOpen.obj `if test -f 'TestOpen.C'; then $(CYGPATH_W) 'TestOpen.C'; else $(CYGPATH_W) '$(srcdir)/TestOpen.C'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestOpen-TestOpen.Tpo $(DEPDIR)/TestOpen-TestOpen.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestOpen.C' object='TestOpen-TestOpen.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -c -o TestOpen-TestOpen.obj `if test -f 'TestOpen.C'; then $(CYGPATH_W) 'TestOpen.C'; else $(CYGPATH_W) '$(srcdir)/TestOpen.C'; fi`
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -592,9 +697,11 @@ distcleancheck: distclean
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -624,7 +731,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
-	clean-libtool mostlyclean-am
+	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -647,7 +754,7 @@ install-data-am:
 
 install-dvi: install-dvi-am
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
 install-html: install-html-am
 
@@ -681,26 +788,27 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
-	clean-libtool ctags dist dist-all dist-bzip2 dist-gzip \
-	dist-lzma dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-data \
+	clean-libLTLIBRARIES clean-libtool ctags dist dist-all \
+	dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ dist-zip \
+	distcheck distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-tags distcleancheck \
+	distdir distuninstallcheck dvi dvi-am html html-am info \
+	info-am install install-am install-binPROGRAMS install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-info-am install-libLTLIBRARIES install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS
+	tags uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

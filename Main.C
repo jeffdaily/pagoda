@@ -19,7 +19,7 @@
 #include <netcdfcpp.h>
 
 #include "DimensionSlice.H"
-#include "LatLonRange.H"
+#include "LatLonBox.H"
 #include "RangeException.H"
 
 double DEG2RAD = M_PI / 180.0;
@@ -50,7 +50,7 @@ template <class T> void _read_var_recursive(T *out, long& out_idx,
 // adjust the masks based on the command-line input
 void create_masks(MaskMap &masks, DimMap &dims);
 void adjust_masks(MaskMap &masks, DimMap &dims, DimSlices slices);
-void adjust_cells_mask(MaskMap &masks, DimMap &dims, LatLonRange box,
+void adjust_cells_mask(MaskMap &masks, DimMap &dims, LatLonBox box,
                        NcFile *gridfile);
 
 // these functions copy attributes, dimensions, and variable sizes
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   string output_filename = "";
   string grid_filename = "";
   bool wants_region = false;
-  LatLonRange box;
+  LatLonBox box;
   int c;
   opterr = 0;
 
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
         exit(EXIT_SUCCESS);
       case 'b':
         wants_region = true;
-        box = LatLonRange(optarg);
+        box = LatLonBox(optarg);
         break;
       case 'g':
         grid_filename = optarg;
@@ -463,7 +463,7 @@ void adjust_masks(MaskMap &masks, DimMap &dims, DimSlices slices)
 }
 
 
-void adjust_cells_mask(MaskMap &masks, DimMap &dims, LatLonRange box,
+void adjust_cells_mask(MaskMap &masks, DimMap &dims, LatLonBox box,
                        NcFile *gridfile)
 {
   // First we need the grid_center_lon/lat variables from the gridfile.

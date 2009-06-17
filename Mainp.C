@@ -30,8 +30,8 @@ using std::string;
 using std::vector;
 
 // C++ includes
-#include "DimensionSlice64.H"
-#include "LatLonRange.H"
+#include "DimensionSlice.H"
+#include "LatLonBox.H"
 #include "RangeException.H"
 #include "SubsetterException.H"
 
@@ -147,7 +147,7 @@ typedef map<string,Mask> MaskMap;
 typedef vector<Mask> MaskVec;
 
 
-typedef multimap<string,DimensionSlice64> DimSliceMMap;
+typedef multimap<string,DimensionSlice<int64_t> > DimSliceMMap;
 typedef map<int,int> IndexMap;
 
 
@@ -156,7 +156,7 @@ VarInfo create_var_info(int ncid, int varid);
 FileInfo create_file_info(int ncid);
 int nc_to_mt(nc_type type);
 MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices);
-void adjust_cell_masks(MaskMap &masks, LatLonRange box, FileInfo gridfile);
+void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile);
 int* mask_get_data_local(Mask mask);
 int* mask_get_data_all(Mask mask);
 string composite_name(DimInfoVec dims);
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
   string output_filename = "";
   string grid_filename = "";
   bool wants_region = false;
-  LatLonRange box;
+  LatLonBox box;
   DimSliceMMap slices; /* specified dimension subsetting */
   int c;
   opterr = 0;
@@ -217,7 +217,7 @@ int main(int argc, char **argv)
           throw SubsetterException(usage);
         case 'b':
           wants_region = true;
-          box = LatLonRange(optarg);
+          box = LatLonBox(optarg);
           // HACK - we know our stuff is in radians
           box.scale(DEG2RAD);
           break;
@@ -226,8 +226,8 @@ int main(int argc, char **argv)
           break;
         case 'd':
           try {
-            DimensionSlice64 slice(optarg);
-            slices.insert(make_pair(slice.name,slice));
+            DimensionSlice<int64_t> slice(optarg);
+            slices.insert(make_pair(slice.get_name(),slice));
           } catch (RangeException &ex) {
             ERR("Bad dimension slice");
           }
@@ -649,8 +649,8 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
 
   // Now we iterate over the slices and adjust the masks as needed.
   for (DimSliceMMap::iterator it=slices.begin(); it!=slices.end(); ++it) {
-    DimensionSlice64 slice = it->second;
-    string name = slice.name;
+    DimensionSlice<int64_t> slice = it->second;
+    string name = slice.get_name();
     MaskMap::iterator mask_iter = masks.find(name);
     if (mask_iter == masks.end()) {
       ERR("Sliced dimension '"+name+"' does not exist");
@@ -696,7 +696,7 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
 }
 
 
-void adjust_cell_masks(MaskMap &masks, LatLonRange box, FileInfo gridfile)
+void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile)
 {
   DEBUG_PRINT_ME(stderr, "adjust_cell_masks BEGIN\n");
 
