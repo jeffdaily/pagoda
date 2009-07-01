@@ -8,41 +8,31 @@
 #include <vector>
     using std::vector;
 
-#include "Attribute.H"
 #include "DataType.H"
-#include "Dimension.H"
+
+class Attribute;
+class Dimension;
 
 
 class Variable
 {
     public:
         Variable();
-        Variable(int ncid, int varid, string file="");
-        Variable(const Variable &copy);
         virtual ~Variable();
 
-        Variable& operator = (const Variable &other);
-        bool operator == (const Variable &other) const;
+        virtual string get_name() const = 0;
 
-        string get_name() const;
+        virtual bool has_record() const = 0;
+        virtual size_t num_dims() const = 0;
+        virtual vector<Dimension*> get_dims() const = 0;
 
-        bool has_record() const;
-        size_t num_dimensions() const;
-        vector<Dimension> get_dimensions() const;
+        virtual size_t num_atts() const = 0;
+        virtual vector<Attribute*> get_atts() const = 0;
 
-        size_t num_attributes() const;
-        vector<Attribute> get_attributes() const;
+        virtual DataType get_type() const = 0;
 
-        DataType get_type() const;
-
-        friend ostream& operator << (ostream &os, const Variable &other);
-
-    private:
-        string name;
-        vector<Dimension> dimensions;
-        vector<Attribute> attributes;
-        string file;
-        DataType type;
+        virtual ostream& print(ostream &os) const = 0;
+        friend ostream& operator << (ostream &os, const Variable *other);
 };
 
 #endif // VARIABLE_H_

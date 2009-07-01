@@ -40,7 +40,7 @@ AC_ARG_WITH($1,
   [AS_HELP_STRING([--with-$1[[=DIR]]],
     [root directory of $1 installation])],
   [],
-  [with_$1=no])
+  [with_$1=yes])
 if test "${with_$1}" != yes -a "${with_$1}" != no ; then
   $1_include="${with_$1}/include"
   $1_lib="${with_$1}/lib"

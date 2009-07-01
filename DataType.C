@@ -5,6 +5,7 @@ const DataType DataType::BYTE;
 const DataType DataType::CHAR;
 const DataType DataType::SHORT;
 const DataType DataType::INT;
+const DataType DataType::LONG;
 const DataType DataType::FLOAT;
 const DataType DataType::DOUBLE;
 

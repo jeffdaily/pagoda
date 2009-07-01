@@ -6,34 +6,25 @@
 #include <string>
     using std::string;
 
-#include <pnetcdf.h>
-
 #include "DataType.H"
 
+class Attribute;
+class Values;
 
 class Attribute
 {
     public:
         Attribute();
-        Attribute(int ncid, int attid, int varid=NC_GLOBAL, string file="");
-        Attribute(const Attribute &copy);
         virtual ~Attribute();
 
-        string get_name() const;
-        DataType get_type() const;
-        long get_count() const;
-        bool is_global() const;
+        virtual string get_name() const = 0;
+        virtual DataType get_type() const = 0;
+        virtual size_t get_count() const = 0;
+        virtual bool is_global() const = 0;
+        virtual Values* get_values() const = 0;
 
-        bool operator == (const Attribute &other) const;
-        friend ostream& operator << (ostream &os, const Attribute &other);
-
-    private:
-        string name;
-        DataType type;
-        long count;
-        bool global;
-        string file;
-        string variable;
+        virtual ostream& print(ostream &os) const = 0;
+        friend ostream& operator << (ostream &os, const Attribute *other);
 };
 
 #endif // ATTRIBUTE_H_

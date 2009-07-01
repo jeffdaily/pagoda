@@ -34,7 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = psubsetter$(EXEEXT)
-check_PROGRAMS = r12_smaller$(EXEEXT) TestOpen$(EXEEXT)
+check_PROGRAMS = r12_smaller$(EXEEXT) TestOpen$(EXEEXT) \
+	TestAttribute$(EXEEXT) TestDimension$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/config/config.h.in \
@@ -67,13 +68,26 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libsubsetter_la_LIBADD =
 am__objects_1 = Attribute.lo CommandLineParser.lo Dataset.lo \
-	DataType.lo Dimension.lo FileManager.lo LatLonBox.lo Util.lo \
-	Variable.lo
+	DataType.lo Dimension.lo LatLonBox.lo NetcdfAttribute.lo \
+	NetcdfDataset.lo NetcdfDimension.lo NetcdfVariable.lo Util.lo \
+	Values.lo Variable.lo
 am__objects_2 =
 am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am_TestAttribute_OBJECTS = TestAttribute-TestAttribute.$(OBJEXT)
+TestAttribute_OBJECTS = $(am_TestAttribute_OBJECTS)
+TestAttribute_DEPENDENCIES = libsubsetter.la
+TestAttribute_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestAttribute_CXXFLAGS) \
+	$(CXXFLAGS) $(TestAttribute_LDFLAGS) $(LDFLAGS) -o $@
+am_TestDimension_OBJECTS = TestDimension-TestDimension.$(OBJEXT)
+TestDimension_OBJECTS = $(am_TestDimension_OBJECTS)
+TestDimension_DEPENDENCIES = libsubsetter.la
+TestDimension_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestDimension_CXXFLAGS) \
+	$(CXXFLAGS) $(TestDimension_LDFLAGS) $(LDFLAGS) -o $@
 am_TestOpen_OBJECTS = TestOpen-TestOpen.$(OBJEXT)
 TestOpen_OBJECTS = $(am_TestOpen_OBJECTS)
 TestOpen_LDADD = $(LDADD)
@@ -110,9 +124,11 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsubsetter_la_SOURCES) $(TestOpen_SOURCES) \
+SOURCES = $(libsubsetter_la_SOURCES) $(TestAttribute_SOURCES) \
+	$(TestDimension_SOURCES) $(TestOpen_SOURCES) \
 	$(psubsetter_SOURCES) $(r12_smaller_SOURCES)
-DIST_SOURCES = $(libsubsetter_la_SOURCES) $(TestOpen_SOURCES) \
+DIST_SOURCES = $(libsubsetter_la_SOURCES) $(TestAttribute_SOURCES) \
+	$(TestDimension_SOURCES) $(TestOpen_SOURCES) \
 	$(psubsetter_SOURCES) $(r12_smaller_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -257,12 +273,16 @@ HEADERS_PRIVATE = \
   DataType.H \
   Dimension.H \
   DimensionSlice.H \
-  FileManager.H \
+  NetcdfAttribute.H \
+  NetcdfDataset.H \
+  NetcdfDimension.H \
+  NetcdfVariable.H \
   LatLonBox.H \
   RangeException.H \
   Slice.H \
   SubsetterException.H \
   Util.H \
+  Values.H \
   Variable.H
 
 SOURCE = \
@@ -271,9 +291,13 @@ SOURCE = \
   Dataset.C \
   DataType.C \
   Dimension.C \
-  FileManager.C \
   LatLonBox.C \
+  NetcdfAttribute.C \
+  NetcdfDataset.C \
+  NetcdfDimension.C \
+  NetcdfVariable.C \
   Util.C \
+  Values.C \
   Variable.C
 
 AM_CFLAGS = $(GA_INCS)
@@ -290,6 +314,14 @@ r12_smaller_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf
 TestOpen_SOURCES = TestOpen.C
 TestOpen_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestOpen_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestAttribute_SOURCES = TestAttribute.C
+TestAttribute_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestAttribute_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestAttribute_LDADD = libsubsetter.la
+TestDimension_SOURCES = TestDimension.C
+TestDimension_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestDimension_LDADD = libsubsetter.la
 all: all-am
 
 .SUFFIXES:
@@ -408,6 +440,12 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+TestAttribute$(EXEEXT): $(TestAttribute_OBJECTS) $(TestAttribute_DEPENDENCIES) 
+	@rm -f TestAttribute$(EXEEXT)
+	$(TestAttribute_LINK) $(TestAttribute_OBJECTS) $(TestAttribute_LDADD) $(LIBS)
+TestDimension$(EXEEXT): $(TestDimension_OBJECTS) $(TestDimension_DEPENDENCIES) 
+	@rm -f TestDimension$(EXEEXT)
+	$(TestDimension_LINK) $(TestDimension_OBJECTS) $(TestDimension_LDADD) $(LIBS)
 TestOpen$(EXEEXT): $(TestOpen_OBJECTS) $(TestOpen_DEPENDENCIES) 
 	@rm -f TestOpen$(EXEEXT)
 	$(TestOpen_LINK) $(TestOpen_OBJECTS) $(TestOpen_LDADD) $(LIBS)
@@ -429,11 +467,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileManager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfAttribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestAttribute-TestAttribute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDimension-TestDimension.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestOpen-TestOpen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Values.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/r12_smaller-r12_smaller.Po@am__quote@
 
@@ -457,6 +501,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+TestAttribute-TestAttribute.o: TestAttribute.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -MT TestAttribute-TestAttribute.o -MD -MP -MF $(DEPDIR)/TestAttribute-TestAttribute.Tpo -c -o TestAttribute-TestAttribute.o `test -f 'TestAttribute.C' || echo '$(srcdir)/'`TestAttribute.C
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestAttribute-TestAttribute.Tpo $(DEPDIR)/TestAttribute-TestAttribute.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestAttribute.C' object='TestAttribute-TestAttribute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute-TestAttribute.o `test -f 'TestAttribute.C' || echo '$(srcdir)/'`TestAttribute.C
+
+TestAttribute-TestAttribute.obj: TestAttribute.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -MT TestAttribute-TestAttribute.obj -MD -MP -MF $(DEPDIR)/TestAttribute-TestAttribute.Tpo -c -o TestAttribute-TestAttribute.obj `if test -f 'TestAttribute.C'; then $(CYGPATH_W) 'TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/TestAttribute.C'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestAttribute-TestAttribute.Tpo $(DEPDIR)/TestAttribute-TestAttribute.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestAttribute.C' object='TestAttribute-TestAttribute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute-TestAttribute.obj `if test -f 'TestAttribute.C'; then $(CYGPATH_W) 'TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/TestAttribute.C'; fi`
+
+TestDimension-TestDimension.o: TestDimension.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -MT TestDimension-TestDimension.o -MD -MP -MF $(DEPDIR)/TestDimension-TestDimension.Tpo -c -o TestDimension-TestDimension.o `test -f 'TestDimension.C' || echo '$(srcdir)/'`TestDimension.C
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestDimension-TestDimension.Tpo $(DEPDIR)/TestDimension-TestDimension.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestDimension.C' object='TestDimension-TestDimension.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension-TestDimension.o `test -f 'TestDimension.C' || echo '$(srcdir)/'`TestDimension.C
+
+TestDimension-TestDimension.obj: TestDimension.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -MT TestDimension-TestDimension.obj -MD -MP -MF $(DEPDIR)/TestDimension-TestDimension.Tpo -c -o TestDimension-TestDimension.obj `if test -f 'TestDimension.C'; then $(CYGPATH_W) 'TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/TestDimension.C'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestDimension-TestDimension.Tpo $(DEPDIR)/TestDimension-TestDimension.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestDimension.C' object='TestDimension-TestDimension.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension-TestDimension.obj `if test -f 'TestDimension.C'; then $(CYGPATH_W) 'TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/TestDimension.C'; fi`
 
 TestOpen-TestOpen.o: TestOpen.C
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -MT TestOpen-TestOpen.o -MD -MP -MF $(DEPDIR)/TestOpen-TestOpen.Tpo -c -o TestOpen-TestOpen.o `test -f 'TestOpen.C' || echo '$(srcdir)/'`TestOpen.C

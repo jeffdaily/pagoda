@@ -18668,7 +18668,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 if test "${with_pnetcdf+set}" = set; then
   withval=$with_pnetcdf;
 else
-  with_pnetcdf=no
+  with_pnetcdf=yes
 fi
 
 if test "${with_pnetcdf}" != yes -a "${with_pnetcdf}" != no ; then

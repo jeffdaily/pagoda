@@ -3,36 +3,25 @@
 
 #include <iostream>
     using std::ostream;
-#include <string>
-    using std::string;
 #include <vector>
     using std::vector;
 
-#include "Attribute.H"
-#include "Dimension.H"
-#include "Variable.H"
+class Attribute;
+class Dimension;
+class Variable;
 
 class Dataset
 {
     public:
         Dataset();
-        Dataset(const Dataset &copy);
         virtual ~Dataset();
 
-        void add_file(string file);
+        virtual vector<Attribute*> get_atts() = 0;
+        virtual vector<Dimension*> get_dims() = 0;
+        virtual vector<Variable*> get_vars() = 0;
 
-        friend ostream& operator << (ostream &os, const Dataset &other);
-
-    protected:
-        bool has_dimension(Dimension dimension) const;
-        bool has_variable(Variable variable) const;
-        bool has_attribute(Attribute attribute) const;
-
-    private:
-        string name;
-        vector<Attribute> attributes;
-        vector<Dimension> dimensions;
-        vector<Variable> variables;
+        virtual ostream& print(ostream &os) const = 0;
+        friend ostream& operator << (ostream &os, const Dataset *dataset);
 };
 
 #endif // DATASET_H_
