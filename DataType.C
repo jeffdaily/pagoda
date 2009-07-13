@@ -5,7 +5,7 @@ const DataType DataType::BYTE;
 const DataType DataType::CHAR;
 const DataType DataType::SHORT;
 const DataType DataType::INT;
-const DataType DataType::LONG;
+//const DataType DataType::LONG;
 const DataType DataType::FLOAT;
 const DataType DataType::DOUBLE;
 
@@ -36,10 +36,10 @@ DataType::operator nc_type() const
 
 int DataType::as_mt() const
 {
-    if (*this == DataType::BYTE) return MT_CHAR;
+    //if (*this == DataType::BYTE) return MT_CHAR;
     if (*this == DataType::CHAR) return MT_CHAR;
-    if (*this == DataType::SHORT) return MT_INT;
-    if (*this == DataType::INT) return MT_LONGINT;
+    //if (*this == DataType::SHORT) return MT_INT;
+    if (*this == DataType::INT) return MT_INT;
     if (*this == DataType::FLOAT) return MT_REAL;
     if (*this == DataType::DOUBLE) return MT_DBL;
     return MT_CHAR;
@@ -61,6 +61,25 @@ DataType& DataType::operator = (const nc_type &type)
         case NC_INT: value = DataType::INT; break;
         case NC_FLOAT: value = DataType::FLOAT; break;
         case NC_DOUBLE: value = DataType::DOUBLE; break;
+    }
+
+    return *this;
+}
+
+
+DataType& DataType::operator = (int value)
+{
+    switch (value) {
+        case 0: value = DataType::BYTE; break;
+        case 1: value = DataType::CHAR; break;
+        case 2: value = DataType::SHORT; break;
+        case 3: value = DataType::INT; break;
+        case 4: value = DataType::FLOAT; break;
+        case 5: value = DataType::DOUBLE; break;
+        case MT_CHAR: value = DataType::CHAR; break;
+        case MT_INT:  value = DataType::INT; break;
+        case MT_REAL: value = DataType::FLOAT; break;
+        case MT_DBL:  value = DataType::DOUBLE; break;
     }
 
     return *this;

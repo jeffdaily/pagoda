@@ -35,7 +35,7 @@ NetcdfAttribute::NetcdfAttribute(int ncid, int attid, int varid)
     get_attr_values(DataType::CHAR, char, text)
     get_attr_values(DataType::SHORT, short, short)
     get_attr_values(DataType::INT, int, int)
-    get_attr_values(DataType::LONG, long, long)
+    //get_attr_values(DataType::LONG, long, long)
     get_attr_values(DataType::FLOAT, float, float)
     get_attr_values(DataType::DOUBLE, double, double)
 #undef get_attr_values

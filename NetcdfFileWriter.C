@@ -1,5 +1,5 @@
 #include <iostream>
-    using std::cerr;
+    using std::cout;
     using std::endl;
 #include <vector>
     using std::vector;
@@ -38,7 +38,9 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
             MPI_INFO_NULL, &ncid);
     ERRNO_CHECK(err);
 
+    //////////////
     // define it
+    //////////////
 
     // copy global attributes
     copy_atts(dataset->get_atts(), ncid, NC_GLOBAL);
@@ -96,7 +98,9 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     err = ncmpi_enddef(ncid);
     ERRNO_CHECK(err);
 
+    //////////////
     // write it
+    //////////////
     
     // copy var data
     for (vars_out_it=vars_out.begin(); vars_out_it!=vars_out.end(); ++vars_out_it) {
@@ -135,7 +139,7 @@ void NetcdfFileWriter::copy_att(Attribute *attr, int ncid, int varid)
     put_attr_values(DataType::BYTE, unsigned char, uchar)
     put_attr_values(DataType::SHORT, short, short)
     put_attr_values(DataType::INT, int, int)
-    put_attr_values(DataType::LONG, long, long)
+    //put_attr_values(DataType::LONG, long, long)
     put_attr_values(DataType::FLOAT, float, float)
     put_attr_values(DataType::DOUBLE, double, double)
 #undef put_attr_values
@@ -168,7 +172,7 @@ void NetcdfFileWriter::copy_var(
 
 void NetcdfFileWriter::copy_var(Variable *var_in, NetcdfVariable *var_out)
 {
-    cerr << "NetcdfFileWriter::copy_var " << var_in->get_name() << endl;
+    cout << "NetcdfFileWriter::copy_var " << var_in->get_name() << endl;
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_var_out = var_out->get_handle();
@@ -176,7 +180,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, NetcdfVariable *var_out)
     var_in->read();
 
     if (var_in->num_masks() > 0) {
-        cerr << "\tMASK PRESENT" << endl;
+        cout << "\tMASK PRESENT" << endl;
         if (var_in->has_record()) {
         } else {
             if (ndim == 1) {
@@ -185,32 +189,9 @@ void NetcdfFileWriter::copy_var(Variable *var_in, NetcdfVariable *var_out)
             }
         }
     } else {
-        cerr << "\tno masks, so a direct copy" << endl;
+        cout << "\tno masks, so a direct copy" << endl;
         // no masks, so a direct copy
-        DataType type = var_in->get_type();
-        int64_t lo[ndim];
-        int64_t hi[ndim];
-        int64_t ld[ndim-1];
-        MPI_Offset start[ndim];
-        MPI_Offset count[ndim];
-        int err;
-
-        NGA_Distribution64(ga_var_in, ME, lo, hi);
-        for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
-            start[dimidx] = lo[dimidx];
-            count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
-        }
-#define write_var_all(TYPE, NC_TYPE) \
-        if (type == NC_TYPE) { \
-            TYPE *ptr; \
-            NGA_Access64(ga_var_in, lo, hi, &ptr, ld); \
-            err = ncmpi_put_vara_##TYPE##_all(var_out->get_ncid(), var_out->get_id(), start, count, ptr); \
-        } else
-        write_var_all(long, NC_INT)
-        write_var_all(float, NC_FLOAT)
-        write_var_all(double, NC_DOUBLE)
-        ; // for last else above
-#undef write_var_all
+        write(var_in->get_handle(), var_out->get_ncid(), var_out->get_id());
     }
 
     var_in->release_handle();
@@ -222,6 +203,42 @@ void NetcdfFileWriter::copy_record_var(
         Variable *var_in,
         NetcdfVariable *var_out)
 {
-    cerr << "NetcdfFileWriter::copy_record_var " << var_in->get_name() << endl;
+    cout << "NetcdfFileWriter::copy_record_var " << var_in->get_name() << endl;
+}
+
+
+void NetcdfFileWriter::write(int handle, int ncid, int varid)
+{
+    cout << "NetcdfFileWriter::write" << endl;
+    int mt_type;
+    int ndim;
+    int64_t dim_sizes[GA_MAX_DIM];
+
+    NGA_Inquire64(handle, &mt_type, &ndim, dim_sizes);
+
+    DataType type = DataType::CHAR; type = mt_type;
+    int64_t lo[ndim];
+    int64_t hi[ndim];
+    int64_t ld[ndim-1];
+    MPI_Offset start[ndim];
+    MPI_Offset count[ndim];
+    int err;
+
+    NGA_Distribution64(handle, ME, lo, hi);
+    for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
+        start[dimidx] = lo[dimidx];
+        count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+    }
+#define write_var_all(TYPE, NC_TYPE) \
+    if (type == NC_TYPE) { \
+        TYPE *ptr; \
+        NGA_Access64(handle, lo, hi, &ptr, ld); \
+        err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \
+    } else
+    write_var_all(int, NC_INT)
+    write_var_all(float, NC_FLOAT)
+    write_var_all(double, NC_DOUBLE)
+    ; // for last else above
+#undef write_var_all
 }
 

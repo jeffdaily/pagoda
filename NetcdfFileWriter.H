@@ -25,6 +25,7 @@ class NetcdfFileWriter
                 NetcdfVariable *var_out);
         static void copy_var(Variable *var_in, NetcdfVariable *var_out);
         static void copy_record_var(Variable *var_in, NetcdfVariable *var_out);
+        static void write(int handle, int ncid, int varid);
 };
 
 #endif // NETCDFFILEWRITER_H_

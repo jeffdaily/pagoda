@@ -19,6 +19,7 @@ class DataType
     public:
         bool operator == (const DataType &other) const;
         DataType& operator = (const nc_type &type);
+        DataType& operator = (int value);
         operator int () const;
         operator nc_type () const;
         int as_mt() const;
@@ -28,7 +29,7 @@ class DataType
         static const DataType CHAR;
         static const DataType SHORT;
         static const DataType INT;
-        static const DataType LONG;
+        //static const DataType LONG;
         static const DataType FLOAT;
         static const DataType DOUBLE;
 };

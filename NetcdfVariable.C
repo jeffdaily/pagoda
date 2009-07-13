@@ -87,6 +87,7 @@ void NetcdfVariable::read()
 {
     DataType type = get_type();
     size_t ndim = num_dims();
+    size_t dimidx = 0;
     int64_t lo[ndim];
     int64_t hi[ndim];
     int64_t ld[ndim-1];
@@ -94,6 +95,12 @@ void NetcdfVariable::read()
     MPI_Offset count[ndim];
     int err;
 
+    if (has_record()) {
+        dimidx = 1;
+        start[0] = record_index;
+    } else {
+        dimidx = 0;
+    }
     NGA_Distribution64(handle, ME, lo, hi);
     for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
         start[dimidx] = lo[dimidx];
