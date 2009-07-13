@@ -24,48 +24,9 @@ using std::vector;
 #include "Attribute.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfVariable.H"
-#include "SubsetterException.H"
+#include "Util.H"
+#include "Values.H"
 #include "Variable.H"
-
-
-#define ME GA_Nodeid()
-int err;
-
-
-#define DEBUG
-#ifdef DEBUG
-#include <assert.h>
-//#define DEBUG_MASKS
-#define DEBUG_PRINT fprintf
-#define DEBUG_PRINT_ME if (ME == 0) fprintf
-#else
-#define DEBUG_PRINT
-#define DEBUG_PRINT_ME
-#endif
-
-
-#define ERR(e) { \
-ostringstream __os; \
-__os << "Error: " << e << endl; \
-throw SubsetterException(__os.str()); }
-
-#define ERRNO(n) { \
-ostringstream __os; \
-__os << "Error: " << ncmpi_strerror(n) << endl; \
-throw SubsetterException(__os.str()); }
-
-#define ERRNO_CHECK(n) \
-  if (n != NC_NOERR) { \
-    ERRNO(n); \
-  }
-
-
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
 
 
 int main(int argc, char **argv)
@@ -79,7 +40,7 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    int ncid, natt, nvar;
+    int err, ncid, natt, nvar;
     err = ncmpi_open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &ncid);
     ERRNO_CHECK(err);
 
@@ -90,6 +51,16 @@ int main(int argc, char **argv)
     for (int attid=0; attid<natt; ++attid) {
         Attribute *att = new NetcdfAttribute(ncid, attid, NC_GLOBAL);
         cout << att << endl;
+
+        cout << "TEST OF as(), size=" << att->get_count() << endl;
+        char *test;
+        att->get_values()->as(test);
+        for (size_t i=0,limit=att->get_count(); i<limit; ++i) {
+            cout << test[i] << " ";
+        }
+        cout << endl;
+        delete [] test;
+
         delete att;
     }
 

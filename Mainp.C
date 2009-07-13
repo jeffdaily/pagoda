@@ -30,9 +30,9 @@ using std::string;
 using std::vector;
 
 // C++ includes
-#include "DimensionSlice.H"
 #include "LatLonBox.H"
 #include "RangeException.H"
+#include "Slice.H"
 #include "SubsetterException.H"
 
 
@@ -147,7 +147,7 @@ typedef map<string,Mask> MaskMap;
 typedef vector<Mask> MaskVec;
 
 
-typedef multimap<string,DimensionSlice<int64_t> > DimSliceMMap;
+typedef multimap<string,DimSlice> DimSliceMMap;
 typedef map<int,int> IndexMap;
 
 
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
           break;
         case 'd':
           try {
-            DimensionSlice<int64_t> slice(optarg);
+            DimSlice slice(optarg);
             slices.insert(make_pair(slice.get_name(),slice));
           } catch (RangeException &ex) {
             ERR("Bad dimension slice");
@@ -649,7 +649,7 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
 
   // Now we iterate over the slices and adjust the masks as needed.
   for (DimSliceMMap::iterator it=slices.begin(); it!=slices.end(); ++it) {
-    DimensionSlice<int64_t> slice = it->second;
+    DimSlice slice = it->second;
     string name = slice.get_name();
     MaskMap::iterator mask_iter = masks.find(name);
     if (mask_iter == masks.end()) {

@@ -1,18 +1,46 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <iostream>
-    using std::endl;
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif // HAVE_CONFIG_H
+
+#include <algorithm>
+    using std::reverse;
+    using std::reverse_copy;
+    using std::rotate;
+    using std::transform;
+#include <cmath>
+#include <functional>
+    using std::bind2nd;
+    using std::divides;
+    using std::modulus;
+    using std::multiplies;
+    using std::ptr_fun;
+#include <numeric>
+    using std::partial_sum;
 #include <sstream>
+    using std::endl;
     using std::ostringstream;
 #include <string>
     using std::string;
+#include <vector>
+    using std::vector;
 
+#include <ga.h>
+
+#include "StringComparator.H"
 #include "SubsetterException.H"
 
+class Attribute;
+class Dimension;
+class Variable;
+
 #define ME GA_Nodeid()
+#define NPROC GA_Nnodes()
 #define MAX_NAME 80
 #define MAX_DIM 8
+#define DEG2RAD (M_PI / 180.0)
 
 #define ERR(e) { \
 ostringstream __os; \
@@ -31,21 +59,137 @@ throw SubsetterException(__os.str()); }
 
 //#define DEBUG
 #ifdef DEBUG
-#include <assert.h>
-//#define DEBUG_MASKS
-#define DEBUG_PRINT fprintf
-#define DEBUG_PRINT_ME if (ME == 0) fprintf
+#  include <assert.h>
+//#  define DEBUG_MASKS
+#  define DEBUG_PRINT fprintf
+#  define DEBUG_PRINT_ME if (ME == 0) fprintf
 #else
-#define DEBUG_PRINT
-#define DEBUG_PRINT_ME
+#  define DEBUG_PRINT
+#  define DEBUG_PRINT_ME
 #endif
 
 
-
-class StringUtil
+namespace Util
 {
-    public:
-        static bool ends_with(const string &str, const string &end);
-};
+
+
+bool ends_with(const string &str, const string &end);
+void calculate_required_memory(const vector<Variable*> &vars);
+
+
+template <class T>
+bool cmp_name(T ptr_to_thing, StringComparator comparator)
+{
+    return comparator(ptr_to_thing->get_name());
+}
+
+
+/**
+ * Generic "find" based on a "get_name()" function and a given string.
+ */
+template <class T>
+typename vector<T>::iterator
+find(vector<T> &vec, const string &name, bool ignore_case=true)
+{
+    StringComparator cmp(name, ignore_case);
+    return find_if(vec.begin(), vec.end(), bind2nd(ptr_fun(cmp_name<T>), cmp));
+}
+
+
+/**
+ * Generic "find" based on a "get_name()" function and a given string.
+ * Takes multiple names to match.
+ */
+template <class T>
+typename vector<T>::iterator
+find(vector<T> &vec, const vector<string> &names, bool ignore_case=true)
+{
+    typename vector<T>::iterator result;
+    vector<string>::const_iterator it;
+    for (it=names.begin(); it!=names.end(); ++it) {
+        result = find(vec, *it, ignore_case);
+        if (result != vec.end())
+            return result;
+    }
+    return vec.end();
+}
+
+
+/**
+ * Generic unary function for calling "delete" on the given object.
+ *
+ * The class T is assumed to be a pointer.
+ */
+template <class T>
+T ptr_deleter(T object)
+{
+    delete object;
+    return NULL;
+}
+
+
+/**
+ * Generic binary test for equality of the "get_name()" accessor.
+ */
+template <class T>
+bool same_name(const T *first, const T *second)
+{
+    return first->get_name() == second->get_name();
+}
+
+
+/**
+ * Given a 1-D index, determine its equivalent n-D index based on dims.
+ *
+ * Adapted from Python's NumPy.
+ */
+template <class T>
+vector<T> unravel_index(T x, const vector<T> &dims)
+{
+    vector<T> result(dims.rbegin(), dims.rend());
+    // [d,c,b,a]
+    rotate(result.begin(), result.end()-1, result.end());
+    // [a,d,c,b]
+    *(result.begin()) = 1;
+    // [1,d,c,b]
+    partial_sum(result.begin(), result.end(), result.begin(), multiplies<T>());
+    // [1,d,dc,dcb]
+    reverse(result.begin(), result.end());
+    // [dcb,dc,d,1]
+    transform(result.begin(), result.end(), result.begin(),
+            bind1st(divides<T>(),x));
+    // [x/dcb, x/dc, x/d, x/1]
+    transform(result.begin(), result.end(), dims.begin(), result.begin(),
+            modulus<T>());
+    // [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
+    return result;
+}
+
+
+/**
+ * Given an n-D index, determine its equivalent 1-D index based on dims.
+ *
+ * Adapted from Python's NumPy.
+ */
+template <class T>
+T ravel_index(vector<T> indices, const vector<T> &dims)
+{
+    // indices [w,x,y,z], dims [a,b,c,d]
+    vector<T> offsets(dims.begin()+1, dims.end());
+    // [b,c,d]
+    reverse(offsets.begin(), offsets.end());
+    // [d,c,b]
+    partial_sum(offsets.begin(), offsets.end(), offsets.begin(),
+            multiplies<T>());
+    // [d,cd,bcd]
+    reverse(offsets.begin(), offsets.end());
+    // [bcd,cd,d]
+    transform(indices.begin(), indices.end()-1, offsets.begin(),
+            indices.begin(), multiplies<T>());
+    // [wd,xcd,ybcd,z]
+    return accumulate(indices.begin(), indices.end()-1, 0) + indices.back();
+}
+
+} // namespace Util
 
 #endif // UTIL_H_

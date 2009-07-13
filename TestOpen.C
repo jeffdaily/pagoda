@@ -1,93 +1,26 @@
+/**
+ * This program helped me determine whether pnetcdf maintains a single
+ * integer handle per open file. The results were that no, each ncmpi_open
+ * generates the next available positive integer handle.
+ * Closing open files releases their particular handle.
+ */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif // HAVE_CONFIG_H
 
 // C includes, std and otherwise
 #include <ga.h>
-#include <limits.h> // for INT_MAX
 #include <macdecls.h>
-#include <math.h> // for M_PI
 #include <mpi.h>
 #include <pnetcdf.h>
-#include <unistd.h>
 
 // C++ includes, std and otherwise
-#include <algorithm>
-using std::copy;
-using std::fill;
 #include <iostream>
 using std::cout;
 using std::endl;
-#include <map>
-using std::make_pair;
-using std::map;
-using std::multimap;
-#include <sstream>
-using std::ostringstream;
-#include <string>
-using std::string;
-#include <vector>
-using std::vector;
 
 // C++ includes
-#include "DimensionSlice.H"
-#include "LatLonBox.H"
-#include "RangeException.H"
-#include "SubsetterException.H"
-
-
-static double DEG2RAD = M_PI / 180.0;
-//static double RAD2DEG = 180.0 / M_PI;
-static int ZERO = 0;
-static int64_t ZERO64 = 0;
-static int ONE = 1;
-static string COMPOSITE_PREFIX("GCRM_COMPOSITE");
-
-
-#define ME GA_Nodeid()
-int error;
-
-
-#define DEBUG
-#ifdef DEBUG
-#include <assert.h>
-//#define DEBUG_MASKS
-#define DEBUG_PRINT fprintf
-#define DEBUG_PRINT_ME if (ME == 0) fprintf
-#else
-#define DEBUG_PRINT
-#define DEBUG_PRINT_ME
-#endif
-
-
-#define MAX_NAME 80
-char GOP_SUM[] = "+";
-char NAME_VAR_IN[] = "var_in";
-char NAME_VAR_OUT[] = "var_out";
-
-
-#define ERR(e) { \
-ostringstream __os; \
-__os << "Error: " << e << endl; \
-throw SubsetterException(__os.str()); }
-
-#define ERRNO(n) { \
-ostringstream __os; \
-__os << "Error: " << ncmpi_strerror(n) << endl; \
-throw SubsetterException(__os.str()); }
-
-#define ERRNO_CHECK(n) \
-  if (n != NC_NOERR) { \
-    ERRNO(n); \
-  }
-
-
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
+#include "Util.H"
 
 
 int main(int argc, char **argv)

@@ -8,7 +8,7 @@
 
 
 NetcdfVariable::NetcdfVariable(int ncid, int varid)
-    :   Variable()
+    :   AbstractVariable()
     ,   ncid(ncid)
     ,   id(varid)
     ,   name("")
@@ -27,8 +27,8 @@ NetcdfVariable::NetcdfVariable(int ncid, int varid)
     ERRNO_CHECK(err);
     name = string(cname);
     type = type_tmp;
-    for (int dimid=0; dimid<ndim; ++dimid) {
-        dims.push_back(new NetcdfDimension(ncid, dimid));
+    for (int dimidx=0; dimidx<ndim; ++dimidx) {
+        dims.push_back(new NetcdfDimension(ncid, dim_ids[dimidx]));
     }
     for (int attid=0; attid<natt; ++attid) {
         atts.push_back(new NetcdfAttribute(ncid, attid, varid));
@@ -36,32 +36,8 @@ NetcdfVariable::NetcdfVariable(int ncid, int varid)
 }
 
 
-NetcdfVariable::NetcdfVariable(const NetcdfVariable &other)
-    :   Variable(other)
-    ,   ncid(other.ncid)
-    ,   id(other.id)
-    ,   name(other.name)
-    ,   dims(other.dims)
-    ,   atts(other.atts)
-    ,   type(other.type)
-{
-}
-
-
 NetcdfVariable::~NetcdfVariable()
 {
-}
-
-
-NetcdfVariable& NetcdfVariable::operator = (const NetcdfVariable &other)
-{
-    ncid = other.ncid;
-    id = other.id;
-    name = other.name;
-    dims = other.dims;
-    atts = other.atts;
-    type = other.type;
-    return *this;
 }
 
 
@@ -104,6 +80,39 @@ vector<Attribute*> NetcdfVariable::get_atts() const
 DataType NetcdfVariable::get_type() const
 {
     return type;
+}
+
+
+void NetcdfVariable::read()
+{
+    DataType type = get_type();
+    size_t ndim = num_dims();
+    int64_t lo[ndim];
+    int64_t hi[ndim];
+    int64_t ld[ndim-1];
+    MPI_Offset start[ndim];
+    MPI_Offset count[ndim];
+    int err;
+
+    NGA_Distribution64(handle, ME, lo, hi);
+    for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
+        start[dimidx] = lo[dimidx];
+        count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+    }
+
+#define read_var_all(TYPE, NC_TYPE) \
+    if (type == NC_TYPE) { \
+        TYPE *ptr; \
+        NGA_Access64(handle, lo, hi, &ptr, ld); \
+        err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
+    } else
+    read_var_all(long, NC_INT)
+    read_var_all(float, NC_FLOAT)
+    read_var_all(double, NC_DOUBLE)
+    ; // for last else above
+#undef read_var_all
+    ERRNO_CHECK(err);
+    NGA_Release_update64(handle, lo, hi);
 }
 
 

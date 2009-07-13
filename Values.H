@@ -17,13 +17,25 @@ class Values
 
         virtual size_t size() const = 0;
 
-        virtual void as(size_t n, char &val) const = 0;   // nth value as char
-        virtual void as(size_t n, short &val) const = 0;  // nth value as short
-        virtual void as(size_t n, int &val) const = 0;    // nth value as int
-        virtual void as(size_t n, long &val) const = 0;   // nth value as long
-        virtual void as(size_t n, float &val) const = 0;  // nth value as float
-        virtual void as(size_t n, double &val) const = 0; // nth value as double
-        virtual void as(size_t n, string &val) const = 0; // value as string
+        virtual void as(size_t n, char &val) const = 0;
+        virtual void as(size_t n, signed char &val) const = 0;
+        virtual void as(size_t n, unsigned char &val) const = 0;
+        virtual void as(size_t n, short &val) const = 0;
+        virtual void as(size_t n, int &val) const = 0;
+        virtual void as(size_t n, long &val) const = 0;
+        virtual void as(size_t n, float &val) const = 0;
+        virtual void as(size_t n, double &val) const = 0;
+        virtual void as(size_t n, string &val) const = 0;
+
+        virtual void as(char* &values) const;
+        virtual void as(signed char* &values) const;
+        virtual void as(unsigned char* &values) const;
+        virtual void as(short* &values) const;
+        virtual void as(int* &values) const;
+        virtual void as(long* &values) const;
+        virtual void as(float* &values) const;
+        virtual void as(double* &values) const;
+        virtual void as(string &values) const;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Values *values);

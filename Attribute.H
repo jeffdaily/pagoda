@@ -22,6 +22,7 @@ class Attribute
         virtual size_t get_count() const = 0;
         virtual bool is_global() const = 0;
         virtual Values* get_values() const = 0;
+        virtual string get_string() const;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Attribute *other);

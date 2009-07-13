@@ -24,46 +24,7 @@ using std::vector;
 #include "Dimension.H"
 #include "NetcdfDimension.H"
 #include "SubsetterException.H"
-
-
-#define ME GA_Nodeid()
-int err;
-
-
-#define DEBUG
-#ifdef DEBUG
-#include <assert.h>
-//#define DEBUG_MASKS
-#define DEBUG_PRINT fprintf
-#define DEBUG_PRINT_ME if (ME == 0) fprintf
-#else
-#define DEBUG_PRINT
-#define DEBUG_PRINT_ME
-#endif
-
-
-#define ERR(e) { \
-ostringstream __os; \
-__os << "Error: " << e << endl; \
-throw SubsetterException(__os.str()); }
-
-#define ERRNO(n) { \
-ostringstream __os; \
-__os << "Error: " << ncmpi_strerror(n) << endl; \
-throw SubsetterException(__os.str()); }
-
-#define ERRNO_CHECK(n) \
-  if (n != NC_NOERR) { \
-    ERRNO(n); \
-  }
-
-
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-#endif
+#include "Util.H"
 
 
 int main(int argc, char **argv)
@@ -77,7 +38,7 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    int ncid, ndim, nvar;
+    int err, ncid, ndim, nvar;
     err = ncmpi_open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &ncid);
     ERRNO_CHECK(err);
 

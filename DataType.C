@@ -22,6 +22,30 @@ DataType::operator int () const
 }
 
 
+DataType::operator nc_type() const
+{
+    if (*this == DataType::BYTE) return NC_BYTE;
+    if (*this == DataType::CHAR) return NC_CHAR;
+    if (*this == DataType::SHORT) return NC_SHORT;
+    if (*this == DataType::INT) return NC_INT;
+    if (*this == DataType::FLOAT) return NC_FLOAT;
+    if (*this == DataType::DOUBLE) return NC_DOUBLE;
+    return NC_BYTE;
+}
+
+
+int DataType::as_mt() const
+{
+    if (*this == DataType::BYTE) return MT_CHAR;
+    if (*this == DataType::CHAR) return MT_CHAR;
+    if (*this == DataType::SHORT) return MT_INT;
+    if (*this == DataType::INT) return MT_LONGINT;
+    if (*this == DataType::FLOAT) return MT_REAL;
+    if (*this == DataType::DOUBLE) return MT_DBL;
+    return MT_CHAR;
+}
+
+
 bool DataType::operator == (const DataType &other) const
 {
     return value == other.value;

@@ -1,4 +1,7 @@
+#include "Attribute.H"
+#include "Dimension.H"
 #include "Variable.H"
+#include "Util.H"
 
 
 Variable::Variable()

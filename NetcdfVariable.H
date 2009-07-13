@@ -8,8 +8,8 @@
 #include <vector>
     using std::vector;
 
+#include "AbstractVariable.H"
 #include "DataType.H"
-#include "Variable.H"
 
 class Attribute;
 class Dimension;
@@ -17,14 +17,11 @@ class NetcdfAttribute;
 class NetcdfDimension;
 
 
-class NetcdfVariable : public Variable
+class NetcdfVariable : public AbstractVariable
 {
     public:
         NetcdfVariable(int ncid, int varid);
-        NetcdfVariable(const NetcdfVariable &copy);
         virtual ~NetcdfVariable();
-
-        NetcdfVariable& operator = (const NetcdfVariable &other);
 
         virtual string get_name() const;
 
@@ -37,9 +34,14 @@ class NetcdfVariable : public Variable
 
         DataType get_type() const;
 
+        virtual void read();
+
         virtual ostream& print(ostream &os) const;
 
-    private:
+        int get_ncid() const { return ncid; }
+        int get_id() const { return id; }
+
+    protected:
         int ncid;
         int id;
         string name;

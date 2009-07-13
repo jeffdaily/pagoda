@@ -4,6 +4,7 @@
 #include <iostream>
     using std::ostream;
 
+#include <macdecls.h>
 #include <pnetcdf.h>
 
 
@@ -19,6 +20,8 @@ class DataType
         bool operator == (const DataType &other) const;
         DataType& operator = (const nc_type &type);
         operator int () const;
+        operator nc_type () const;
+        int as_mt() const;
         friend ostream& operator << (ostream &os, const DataType &other);
 
         static const DataType BYTE;

@@ -31,7 +31,7 @@ NetcdfAttribute::NetcdfAttribute(int ncid, int attid, int varid)
         ERRNO_CHECK(err); \
         values = new TypedValues<CT>(data, len); \
     } else
-    get_attr_values(DataType::BYTE, signed char, schar)
+    get_attr_values(DataType::BYTE, unsigned char, uchar)
     get_attr_values(DataType::CHAR, char, text)
     get_attr_values(DataType::SHORT, short, short)
     get_attr_values(DataType::INT, int, int)

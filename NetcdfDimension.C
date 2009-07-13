@@ -5,7 +5,8 @@
 
 
 NetcdfDimension::NetcdfDimension(int ncid, int dimid)
-    :   ncid(ncid)
+    :   Dimension()
+    ,   ncid(ncid)
     ,   id(dimid)
     ,   name("")
     ,   size(0)
@@ -25,7 +26,8 @@ NetcdfDimension::NetcdfDimension(int ncid, int dimid)
 
 
 NetcdfDimension::NetcdfDimension(const NetcdfDimension &copy)
-    :   ncid(copy.ncid)
+    :   Dimension(copy)
+    ,   ncid(copy.ncid)
     ,   id(copy.id)
     ,   name(copy.name)
     ,   size(copy.size)
@@ -41,11 +43,14 @@ NetcdfDimension::~NetcdfDimension()
 
 NetcdfDimension& NetcdfDimension::operator = (const NetcdfDimension &other)
 {
-    ncid = other.ncid;
-    id = other.id;
-    name = other.name;
-    size = other.size;
-    unlimited = other.unlimited;
+    if (&other != this) {
+        this->Dimension::operator=(other);
+        ncid = other.ncid;
+        id = other.id;
+        name = other.name;
+        size = other.size;
+        unlimited = other.unlimited;
+    }
     return *this;
 }
 
@@ -65,6 +70,12 @@ int64_t NetcdfDimension::get_size() const
 bool NetcdfDimension::is_unlimited() const
 {
     return unlimited;
+}
+
+
+int NetcdfDimension::get_id() const
+{
+    return id;
 }
 
 

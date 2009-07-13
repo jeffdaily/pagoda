@@ -9,11 +9,12 @@
 
 NetcdfDataset::NetcdfDataset(const string &filename)
     :   Dataset()
+    ,   filename(filename)
     ,   ncid(-1)
     ,   udim(-1)
     ,   atts()
     ,   dims()
-,   vars()
+    ,   vars()
 {
     int err;
     int ndim;
@@ -24,7 +25,7 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ERRNO_CHECK(err);
     err = ncmpi_inq(ncid, &ndim, &nvar, &natt, &udim);
     ERRNO_CHECK(err);
-    for (int attid=0; attid<ndim; ++attid) {
+    for (int attid=0; attid<natt; ++attid) {
         atts.push_back(new NetcdfAttribute(ncid, attid, NC_GLOBAL));
     }
     for (int dimid=0; dimid<ndim; ++dimid) {
@@ -36,26 +37,36 @@ NetcdfDataset::NetcdfDataset(const string &filename)
 }
 
 
-vector<Attribute*> NetcdfDataset::get_atts()
+NetcdfDataset::~NetcdfDataset()
 {
-    return vector<Attribute*>(atts.begin(), atts.end());
+    using Util::ptr_deleter;
+    transform(atts.begin(), atts.end(), atts.begin(), ptr_deleter<Attribute*>);
+    transform(dims.begin(), dims.end(), dims.begin(), ptr_deleter<Dimension*>);
+    transform(vars.begin(), vars.end(), vars.begin(), ptr_deleter<Variable*>);
+    ERRNO_CHECK(ncmpi_close(ncid));
 }
 
 
-vector<Dimension*> NetcdfDataset::get_dims()
+vector<Attribute*>& NetcdfDataset::get_atts()
 {
-    return vector<Dimension*>(dims.begin(), dims.end());
+    return atts;
 }
 
 
-vector<Variable*> NetcdfDataset::get_vars()
+vector<Dimension*>& NetcdfDataset::get_dims()
 {
-    return vector<Variable*>(vars.begin(), vars.end());
+    return dims;
+}
+
+
+vector<Variable*>& NetcdfDataset::get_vars()
+{
+    return vars;
 }
 
 
 ostream& NetcdfDataset::print(ostream &os) const
 {
-    return os;
+    return os << "NetcdfDataset(" << filename << ")";
 }
 
