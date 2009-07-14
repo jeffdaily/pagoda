@@ -1,5 +1,7 @@
 ACLOCAL_AMFLAGS = -I config
 
+SUBDIRS = tests
+
 HEADERS_PRIVATE = \
   AbstractVariable.H \
   Aggregation.H \
@@ -12,13 +14,14 @@ HEADERS_PRIVATE = \
   DataType.H \
   Dimension.H \
   DimensionSlice.H \
+  LatLonBox.H \
   Mask.H \
   NetcdfAttribute.H \
   NetcdfDataset.H \
   NetcdfDimension.H \
   NetcdfFileWriter.H \
   NetcdfVariable.H \
-  LatLonBox.H \
+  Pack.H \
   RangeException.H \
   Slice.H \
   StringComparator.H \
@@ -47,6 +50,7 @@ SOURCE = \
   NetcdfDimension.C \
   NetcdfFileWriter.C \
   NetcdfVariable.C \
+  Pack.C \
   StringComparator.C \
   SubsetterCommands.C \
   Util.C \
@@ -68,51 +72,4 @@ subsetter_old_LDADD = libsubsetter.la
 
 subsetter_SOURCES = SubsetterMain.C
 subsetter_LDADD = libsubsetter.la
-
-check_PROGRAMS = \
-  r12_smaller \
-  Test \
-  TestOpen \
-  TestAttribute \
-  TestDimension \
-  TestNetcdfDataset \
-  TestUnion \
-  TestRavel
-
-r12_smaller_SOURCES = r12_smaller.c
-r12_smaller_CFLAGS = -I/home/d3n000/gcrm/local/include
-r12_smaller_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf
-
-Test_SOURCES = Test.C
-Test_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-Test_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-
-TestOpen_SOURCES = TestOpen.C
-TestOpen_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestOpen_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-
-TestAttribute_SOURCES = TestAttribute.C
-TestAttribute_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestAttribute_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestAttribute_LDADD = libsubsetter.la
-
-TestDimension_SOURCES = TestDimension.C
-TestDimension_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestDimension_LDADD = libsubsetter.la
-
-TestNetcdfDataset_SOURCES = TestNetcdfDataset.C
-TestNetcdfDataset_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestNetcdfDataset_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestNetcdfDataset_LDADD = libsubsetter.la
-
-TestUnion_SOURCES = TestUnion.C
-TestUnion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestUnion_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestUnion_LDADD = libsubsetter.la
-
-TestRavel_SOURCES = TestRavel.C
-TestRavel_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestRavel_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestRavel_LDADD = libsubsetter.la
 

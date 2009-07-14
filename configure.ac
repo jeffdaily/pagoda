@@ -66,6 +66,7 @@ AC_HEADER_STDBOOL
 # Checks for library functions.
 AC_CHECK_FUNCS([strtol])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+                 tests/Makefile])
 AC_OUTPUT
 

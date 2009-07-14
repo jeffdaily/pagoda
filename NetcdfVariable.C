@@ -113,7 +113,7 @@ void NetcdfVariable::read()
         NGA_Access64(handle, lo, hi, &ptr, ld); \
         err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
     } else
-    read_var_all(long, NC_INT)
+    read_var_all(int, NC_INT)
     read_var_all(float, NC_FLOAT)
     read_var_all(double, NC_DOUBLE)
     ; // for last else above

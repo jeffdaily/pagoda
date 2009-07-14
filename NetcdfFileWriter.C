@@ -181,12 +181,9 @@ void NetcdfFileWriter::copy_var(Variable *var_in, NetcdfVariable *var_out)
 
     if (var_in->num_masks() > 0) {
         cout << "\tMASK PRESENT" << endl;
-        if (var_in->has_record()) {
+        if (ndim == 1) {
+            //GA_Pack64(ga_var_in, ga_var_out, TODO_MASK_HANDLE, 0,
         } else {
-            if (ndim == 1) {
-                //GA_Pack64(ga_var_in, ga_var_out, TODO_MASK_HANDLE, 0,
-            } else {
-            }
         }
     } else {
         cout << "\tno masks, so a direct copy" << endl;
@@ -209,7 +206,6 @@ void NetcdfFileWriter::copy_record_var(
 
 void NetcdfFileWriter::write(int handle, int ncid, int varid)
 {
-    cout << "NetcdfFileWriter::write" << endl;
     int mt_type;
     int ndim;
     int64_t dim_sizes[GA_MAX_DIM];

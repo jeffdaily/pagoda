@@ -34,10 +34,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = subsetter_old$(EXEEXT) subsetter$(EXEEXT)
-check_PROGRAMS = r12_smaller$(EXEEXT) Test$(EXEEXT) TestOpen$(EXEEXT) \
-	TestAttribute$(EXEEXT) TestDimension$(EXEEXT) \
-	TestNetcdfDataset$(EXEEXT) TestUnion$(EXEEXT) \
-	TestRavel$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/config/config.h.in \
@@ -74,63 +70,13 @@ am__objects_1 = AbstractVariable.lo Aggregation.lo AggregationUnion.lo \
 	CoordinateVariable.lo Dataset.lo DataType.lo Dimension.lo \
 	LatLonBox.lo Mask.lo NetcdfAttribute.lo NetcdfDataset.lo \
 	NetcdfDimension.lo NetcdfFileWriter.lo NetcdfVariable.lo \
-	StringComparator.lo SubsetterCommands.lo Util.lo Values.lo \
-	Variable.lo VariableDecorator.lo
+	Pack.lo StringComparator.lo SubsetterCommands.lo Util.lo \
+	Values.lo Variable.lo VariableDecorator.lo
 am__objects_2 =
 am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_Test_OBJECTS = Test-Test.$(OBJEXT)
-Test_OBJECTS = $(am_Test_OBJECTS)
-Test_LDADD = $(LDADD)
-Test_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CXXLD) $(Test_CXXFLAGS) $(CXXFLAGS) \
-	$(Test_LDFLAGS) $(LDFLAGS) -o $@
-am_TestAttribute_OBJECTS = TestAttribute-TestAttribute.$(OBJEXT)
-TestAttribute_OBJECTS = $(am_TestAttribute_OBJECTS)
-TestAttribute_DEPENDENCIES = libsubsetter.la
-TestAttribute_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestAttribute_CXXFLAGS) \
-	$(CXXFLAGS) $(TestAttribute_LDFLAGS) $(LDFLAGS) -o $@
-am_TestDimension_OBJECTS = TestDimension-TestDimension.$(OBJEXT)
-TestDimension_OBJECTS = $(am_TestDimension_OBJECTS)
-TestDimension_DEPENDENCIES = libsubsetter.la
-TestDimension_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestDimension_CXXFLAGS) \
-	$(CXXFLAGS) $(TestDimension_LDFLAGS) $(LDFLAGS) -o $@
-am_TestNetcdfDataset_OBJECTS =  \
-	TestNetcdfDataset-TestNetcdfDataset.$(OBJEXT)
-TestNetcdfDataset_OBJECTS = $(am_TestNetcdfDataset_OBJECTS)
-TestNetcdfDataset_DEPENDENCIES = libsubsetter.la
-TestNetcdfDataset_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(TestNetcdfDataset_CXXFLAGS) $(CXXFLAGS) \
-	$(TestNetcdfDataset_LDFLAGS) $(LDFLAGS) -o $@
-am_TestOpen_OBJECTS = TestOpen-TestOpen.$(OBJEXT)
-TestOpen_OBJECTS = $(am_TestOpen_OBJECTS)
-TestOpen_LDADD = $(LDADD)
-TestOpen_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestOpen_CXXFLAGS) \
-	$(CXXFLAGS) $(TestOpen_LDFLAGS) $(LDFLAGS) -o $@
-am_TestRavel_OBJECTS = TestRavel-TestRavel.$(OBJEXT)
-TestRavel_OBJECTS = $(am_TestRavel_OBJECTS)
-TestRavel_DEPENDENCIES = libsubsetter.la
-TestRavel_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestRavel_CXXFLAGS) \
-	$(CXXFLAGS) $(TestRavel_LDFLAGS) $(LDFLAGS) -o $@
-am_TestUnion_OBJECTS = TestUnion-TestUnion.$(OBJEXT)
-TestUnion_OBJECTS = $(am_TestUnion_OBJECTS)
-TestUnion_DEPENDENCIES = libsubsetter.la
-TestUnion_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestUnion_CXXFLAGS) \
-	$(CXXFLAGS) $(TestUnion_LDFLAGS) $(LDFLAGS) -o $@
-am_r12_smaller_OBJECTS = r12_smaller-r12_smaller.$(OBJEXT)
-r12_smaller_OBJECTS = $(am_r12_smaller_OBJECTS)
-r12_smaller_LDADD = $(LDADD)
-r12_smaller_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(r12_smaller_CFLAGS) \
-	$(CFLAGS) $(r12_smaller_LDFLAGS) $(LDFLAGS) -o $@
 am_subsetter_OBJECTS = SubsetterMain.$(OBJEXT)
 subsetter_OBJECTS = $(am_subsetter_OBJECTS)
 subsetter_DEPENDENCIES = libsubsetter.la
@@ -158,20 +104,22 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsubsetter_la_SOURCES) $(Test_SOURCES) \
-	$(TestAttribute_SOURCES) $(TestDimension_SOURCES) \
-	$(TestNetcdfDataset_SOURCES) $(TestOpen_SOURCES) \
-	$(TestRavel_SOURCES) $(TestUnion_SOURCES) \
-	$(r12_smaller_SOURCES) $(subsetter_SOURCES) \
+SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(subsetter_old_SOURCES)
-DIST_SOURCES = $(libsubsetter_la_SOURCES) $(Test_SOURCES) \
-	$(TestAttribute_SOURCES) $(TestDimension_SOURCES) \
-	$(TestNetcdfDataset_SOURCES) $(TestOpen_SOURCES) \
-	$(TestRavel_SOURCES) $(TestUnion_SOURCES) \
-	$(r12_smaller_SOURCES) $(subsetter_SOURCES) \
+DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(subsetter_old_SOURCES)
+RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
+	html-recursive info-recursive install-data-recursive \
+	install-dvi-recursive install-exec-recursive \
+	install-html-recursive install-info-recursive \
+	install-pdf-recursive install-ps-recursive install-recursive \
+	installcheck-recursive installdirs-recursive pdf-recursive \
+	ps-recursive uninstall-recursive
+RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+  distclean-recursive maintainer-clean-recursive
 ETAGS = etags
 CTAGS = ctags
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -306,6 +254,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I config
+SUBDIRS = tests
 HEADERS_PRIVATE = \
   AbstractVariable.H \
   Aggregation.H \
@@ -318,13 +267,14 @@ HEADERS_PRIVATE = \
   DataType.H \
   Dimension.H \
   DimensionSlice.H \
+  LatLonBox.H \
   Mask.H \
   NetcdfAttribute.H \
   NetcdfDataset.H \
   NetcdfDimension.H \
   NetcdfFileWriter.H \
   NetcdfVariable.H \
-  LatLonBox.H \
+  Pack.H \
   RangeException.H \
   Slice.H \
   StringComparator.H \
@@ -353,6 +303,7 @@ SOURCE = \
   NetcdfDimension.C \
   NetcdfFileWriter.C \
   NetcdfVariable.C \
+  Pack.C \
   StringComparator.C \
   SubsetterCommands.C \
   Util.C \
@@ -370,39 +321,10 @@ subsetter_old_SOURCES = Mainp.C
 subsetter_old_LDADD = libsubsetter.la
 subsetter_SOURCES = SubsetterMain.C
 subsetter_LDADD = libsubsetter.la
-r12_smaller_SOURCES = r12_smaller.c
-r12_smaller_CFLAGS = -I/home/d3n000/gcrm/local/include
-r12_smaller_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf
-Test_SOURCES = Test.C
-Test_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-Test_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestOpen_SOURCES = TestOpen.C
-TestOpen_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestOpen_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestAttribute_SOURCES = TestAttribute.C
-TestAttribute_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestAttribute_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestAttribute_LDADD = libsubsetter.la
-TestDimension_SOURCES = TestDimension.C
-TestDimension_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestDimension_LDADD = libsubsetter.la
-TestNetcdfDataset_SOURCES = TestNetcdfDataset.C
-TestNetcdfDataset_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestNetcdfDataset_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestNetcdfDataset_LDADD = libsubsetter.la
-TestUnion_SOURCES = TestUnion.C
-TestUnion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestUnion_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestUnion_LDADD = libsubsetter.la
-TestRavel_SOURCES = TestRavel.C
-TestRavel_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestRavel_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
-TestRavel_LDADD = libsubsetter.la
-all: all-am
+all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .C .c .lo .o .obj
+.SUFFIXES: .C .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -510,37 +432,6 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-
-clean-checkPROGRAMS:
-	@list='$(check_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
-Test$(EXEEXT): $(Test_OBJECTS) $(Test_DEPENDENCIES) 
-	@rm -f Test$(EXEEXT)
-	$(Test_LINK) $(Test_OBJECTS) $(Test_LDADD) $(LIBS)
-TestAttribute$(EXEEXT): $(TestAttribute_OBJECTS) $(TestAttribute_DEPENDENCIES) 
-	@rm -f TestAttribute$(EXEEXT)
-	$(TestAttribute_LINK) $(TestAttribute_OBJECTS) $(TestAttribute_LDADD) $(LIBS)
-TestDimension$(EXEEXT): $(TestDimension_OBJECTS) $(TestDimension_DEPENDENCIES) 
-	@rm -f TestDimension$(EXEEXT)
-	$(TestDimension_LINK) $(TestDimension_OBJECTS) $(TestDimension_LDADD) $(LIBS)
-TestNetcdfDataset$(EXEEXT): $(TestNetcdfDataset_OBJECTS) $(TestNetcdfDataset_DEPENDENCIES) 
-	@rm -f TestNetcdfDataset$(EXEEXT)
-	$(TestNetcdfDataset_LINK) $(TestNetcdfDataset_OBJECTS) $(TestNetcdfDataset_LDADD) $(LIBS)
-TestOpen$(EXEEXT): $(TestOpen_OBJECTS) $(TestOpen_DEPENDENCIES) 
-	@rm -f TestOpen$(EXEEXT)
-	$(TestOpen_LINK) $(TestOpen_OBJECTS) $(TestOpen_LDADD) $(LIBS)
-TestRavel$(EXEEXT): $(TestRavel_OBJECTS) $(TestRavel_DEPENDENCIES) 
-	@rm -f TestRavel$(EXEEXT)
-	$(TestRavel_LINK) $(TestRavel_OBJECTS) $(TestRavel_LDADD) $(LIBS)
-TestUnion$(EXEEXT): $(TestUnion_OBJECTS) $(TestUnion_DEPENDENCIES) 
-	@rm -f TestUnion$(EXEEXT)
-	$(TestUnion_LINK) $(TestUnion_OBJECTS) $(TestUnion_LDADD) $(LIBS)
-r12_smaller$(EXEEXT): $(r12_smaller_OBJECTS) $(r12_smaller_DEPENDENCIES) 
-	@rm -f r12_smaller$(EXEEXT)
-	$(r12_smaller_LINK) $(r12_smaller_OBJECTS) $(r12_smaller_LDADD) $(LIBS)
 subsetter$(EXEEXT): $(subsetter_OBJECTS) $(subsetter_DEPENDENCIES) 
 	@rm -f subsetter$(EXEEXT)
 	$(CXXLINK) $(subsetter_OBJECTS) $(subsetter_LDADD) $(LIBS)
@@ -572,21 +463,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfFileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterMain.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Test-Test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestAttribute-TestAttribute.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDimension-TestDimension.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestOpen-TestOpen.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestRavel-TestRavel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnion-TestUnion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Values.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VariableDecorator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/r12_smaller-r12_smaller.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -609,139 +493,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-Test-Test.o: Test.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(Test_CXXFLAGS) $(CXXFLAGS) -MT Test-Test.o -MD -MP -MF $(DEPDIR)/Test-Test.Tpo -c -o Test-Test.o `test -f 'Test.C' || echo '$(srcdir)/'`Test.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/Test-Test.Tpo $(DEPDIR)/Test-Test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Test.C' object='Test-Test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(Test_CXXFLAGS) $(CXXFLAGS) -c -o Test-Test.o `test -f 'Test.C' || echo '$(srcdir)/'`Test.C
-
-Test-Test.obj: Test.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(Test_CXXFLAGS) $(CXXFLAGS) -MT Test-Test.obj -MD -MP -MF $(DEPDIR)/Test-Test.Tpo -c -o Test-Test.obj `if test -f 'Test.C'; then $(CYGPATH_W) 'Test.C'; else $(CYGPATH_W) '$(srcdir)/Test.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/Test-Test.Tpo $(DEPDIR)/Test-Test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Test.C' object='Test-Test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(Test_CXXFLAGS) $(CXXFLAGS) -c -o Test-Test.obj `if test -f 'Test.C'; then $(CYGPATH_W) 'Test.C'; else $(CYGPATH_W) '$(srcdir)/Test.C'; fi`
-
-TestAttribute-TestAttribute.o: TestAttribute.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -MT TestAttribute-TestAttribute.o -MD -MP -MF $(DEPDIR)/TestAttribute-TestAttribute.Tpo -c -o TestAttribute-TestAttribute.o `test -f 'TestAttribute.C' || echo '$(srcdir)/'`TestAttribute.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestAttribute-TestAttribute.Tpo $(DEPDIR)/TestAttribute-TestAttribute.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestAttribute.C' object='TestAttribute-TestAttribute.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute-TestAttribute.o `test -f 'TestAttribute.C' || echo '$(srcdir)/'`TestAttribute.C
-
-TestAttribute-TestAttribute.obj: TestAttribute.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -MT TestAttribute-TestAttribute.obj -MD -MP -MF $(DEPDIR)/TestAttribute-TestAttribute.Tpo -c -o TestAttribute-TestAttribute.obj `if test -f 'TestAttribute.C'; then $(CYGPATH_W) 'TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/TestAttribute.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestAttribute-TestAttribute.Tpo $(DEPDIR)/TestAttribute-TestAttribute.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestAttribute.C' object='TestAttribute-TestAttribute.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestAttribute_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute-TestAttribute.obj `if test -f 'TestAttribute.C'; then $(CYGPATH_W) 'TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/TestAttribute.C'; fi`
-
-TestDimension-TestDimension.o: TestDimension.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -MT TestDimension-TestDimension.o -MD -MP -MF $(DEPDIR)/TestDimension-TestDimension.Tpo -c -o TestDimension-TestDimension.o `test -f 'TestDimension.C' || echo '$(srcdir)/'`TestDimension.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestDimension-TestDimension.Tpo $(DEPDIR)/TestDimension-TestDimension.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestDimension.C' object='TestDimension-TestDimension.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension-TestDimension.o `test -f 'TestDimension.C' || echo '$(srcdir)/'`TestDimension.C
-
-TestDimension-TestDimension.obj: TestDimension.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -MT TestDimension-TestDimension.obj -MD -MP -MF $(DEPDIR)/TestDimension-TestDimension.Tpo -c -o TestDimension-TestDimension.obj `if test -f 'TestDimension.C'; then $(CYGPATH_W) 'TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/TestDimension.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestDimension-TestDimension.Tpo $(DEPDIR)/TestDimension-TestDimension.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestDimension.C' object='TestDimension-TestDimension.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension-TestDimension.obj `if test -f 'TestDimension.C'; then $(CYGPATH_W) 'TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/TestDimension.C'; fi`
-
-TestNetcdfDataset-TestNetcdfDataset.o: TestNetcdfDataset.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestNetcdfDataset_CXXFLAGS) $(CXXFLAGS) -MT TestNetcdfDataset-TestNetcdfDataset.o -MD -MP -MF $(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Tpo -c -o TestNetcdfDataset-TestNetcdfDataset.o `test -f 'TestNetcdfDataset.C' || echo '$(srcdir)/'`TestNetcdfDataset.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Tpo $(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestNetcdfDataset.C' object='TestNetcdfDataset-TestNetcdfDataset.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestNetcdfDataset_CXXFLAGS) $(CXXFLAGS) -c -o TestNetcdfDataset-TestNetcdfDataset.o `test -f 'TestNetcdfDataset.C' || echo '$(srcdir)/'`TestNetcdfDataset.C
-
-TestNetcdfDataset-TestNetcdfDataset.obj: TestNetcdfDataset.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestNetcdfDataset_CXXFLAGS) $(CXXFLAGS) -MT TestNetcdfDataset-TestNetcdfDataset.obj -MD -MP -MF $(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Tpo -c -o TestNetcdfDataset-TestNetcdfDataset.obj `if test -f 'TestNetcdfDataset.C'; then $(CYGPATH_W) 'TestNetcdfDataset.C'; else $(CYGPATH_W) '$(srcdir)/TestNetcdfDataset.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Tpo $(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestNetcdfDataset.C' object='TestNetcdfDataset-TestNetcdfDataset.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestNetcdfDataset_CXXFLAGS) $(CXXFLAGS) -c -o TestNetcdfDataset-TestNetcdfDataset.obj `if test -f 'TestNetcdfDataset.C'; then $(CYGPATH_W) 'TestNetcdfDataset.C'; else $(CYGPATH_W) '$(srcdir)/TestNetcdfDataset.C'; fi`
-
-TestOpen-TestOpen.o: TestOpen.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -MT TestOpen-TestOpen.o -MD -MP -MF $(DEPDIR)/TestOpen-TestOpen.Tpo -c -o TestOpen-TestOpen.o `test -f 'TestOpen.C' || echo '$(srcdir)/'`TestOpen.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestOpen-TestOpen.Tpo $(DEPDIR)/TestOpen-TestOpen.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestOpen.C' object='TestOpen-TestOpen.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -c -o TestOpen-TestOpen.o `test -f 'TestOpen.C' || echo '$(srcdir)/'`TestOpen.C
-
-TestOpen-TestOpen.obj: TestOpen.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -MT TestOpen-TestOpen.obj -MD -MP -MF $(DEPDIR)/TestOpen-TestOpen.Tpo -c -o TestOpen-TestOpen.obj `if test -f 'TestOpen.C'; then $(CYGPATH_W) 'TestOpen.C'; else $(CYGPATH_W) '$(srcdir)/TestOpen.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestOpen-TestOpen.Tpo $(DEPDIR)/TestOpen-TestOpen.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestOpen.C' object='TestOpen-TestOpen.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestOpen_CXXFLAGS) $(CXXFLAGS) -c -o TestOpen-TestOpen.obj `if test -f 'TestOpen.C'; then $(CYGPATH_W) 'TestOpen.C'; else $(CYGPATH_W) '$(srcdir)/TestOpen.C'; fi`
-
-TestRavel-TestRavel.o: TestRavel.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestRavel_CXXFLAGS) $(CXXFLAGS) -MT TestRavel-TestRavel.o -MD -MP -MF $(DEPDIR)/TestRavel-TestRavel.Tpo -c -o TestRavel-TestRavel.o `test -f 'TestRavel.C' || echo '$(srcdir)/'`TestRavel.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestRavel-TestRavel.Tpo $(DEPDIR)/TestRavel-TestRavel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestRavel.C' object='TestRavel-TestRavel.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestRavel_CXXFLAGS) $(CXXFLAGS) -c -o TestRavel-TestRavel.o `test -f 'TestRavel.C' || echo '$(srcdir)/'`TestRavel.C
-
-TestRavel-TestRavel.obj: TestRavel.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestRavel_CXXFLAGS) $(CXXFLAGS) -MT TestRavel-TestRavel.obj -MD -MP -MF $(DEPDIR)/TestRavel-TestRavel.Tpo -c -o TestRavel-TestRavel.obj `if test -f 'TestRavel.C'; then $(CYGPATH_W) 'TestRavel.C'; else $(CYGPATH_W) '$(srcdir)/TestRavel.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestRavel-TestRavel.Tpo $(DEPDIR)/TestRavel-TestRavel.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestRavel.C' object='TestRavel-TestRavel.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestRavel_CXXFLAGS) $(CXXFLAGS) -c -o TestRavel-TestRavel.obj `if test -f 'TestRavel.C'; then $(CYGPATH_W) 'TestRavel.C'; else $(CYGPATH_W) '$(srcdir)/TestRavel.C'; fi`
-
-TestUnion-TestUnion.o: TestUnion.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnion_CXXFLAGS) $(CXXFLAGS) -MT TestUnion-TestUnion.o -MD -MP -MF $(DEPDIR)/TestUnion-TestUnion.Tpo -c -o TestUnion-TestUnion.o `test -f 'TestUnion.C' || echo '$(srcdir)/'`TestUnion.C
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestUnion-TestUnion.Tpo $(DEPDIR)/TestUnion-TestUnion.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestUnion.C' object='TestUnion-TestUnion.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnion_CXXFLAGS) $(CXXFLAGS) -c -o TestUnion-TestUnion.o `test -f 'TestUnion.C' || echo '$(srcdir)/'`TestUnion.C
-
-TestUnion-TestUnion.obj: TestUnion.C
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnion_CXXFLAGS) $(CXXFLAGS) -MT TestUnion-TestUnion.obj -MD -MP -MF $(DEPDIR)/TestUnion-TestUnion.Tpo -c -o TestUnion-TestUnion.obj `if test -f 'TestUnion.C'; then $(CYGPATH_W) 'TestUnion.C'; else $(CYGPATH_W) '$(srcdir)/TestUnion.C'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestUnion-TestUnion.Tpo $(DEPDIR)/TestUnion-TestUnion.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestUnion.C' object='TestUnion-TestUnion.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnion_CXXFLAGS) $(CXXFLAGS) -c -o TestUnion-TestUnion.obj `if test -f 'TestUnion.C'; then $(CYGPATH_W) 'TestUnion.C'; else $(CYGPATH_W) '$(srcdir)/TestUnion.C'; fi`
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-r12_smaller-r12_smaller.o: r12_smaller.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(r12_smaller_CFLAGS) $(CFLAGS) -MT r12_smaller-r12_smaller.o -MD -MP -MF $(DEPDIR)/r12_smaller-r12_smaller.Tpo -c -o r12_smaller-r12_smaller.o `test -f 'r12_smaller.c' || echo '$(srcdir)/'`r12_smaller.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/r12_smaller-r12_smaller.Tpo $(DEPDIR)/r12_smaller-r12_smaller.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='r12_smaller.c' object='r12_smaller-r12_smaller.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(r12_smaller_CFLAGS) $(CFLAGS) -c -o r12_smaller-r12_smaller.o `test -f 'r12_smaller.c' || echo '$(srcdir)/'`r12_smaller.c
-
-r12_smaller-r12_smaller.obj: r12_smaller.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(r12_smaller_CFLAGS) $(CFLAGS) -MT r12_smaller-r12_smaller.obj -MD -MP -MF $(DEPDIR)/r12_smaller-r12_smaller.Tpo -c -o r12_smaller-r12_smaller.obj `if test -f 'r12_smaller.c'; then $(CYGPATH_W) 'r12_smaller.c'; else $(CYGPATH_W) '$(srcdir)/r12_smaller.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/r12_smaller-r12_smaller.Tpo $(DEPDIR)/r12_smaller-r12_smaller.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='r12_smaller.c' object='r12_smaller-r12_smaller.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(r12_smaller_CFLAGS) $(CFLAGS) -c -o r12_smaller-r12_smaller.obj `if test -f 'r12_smaller.c'; then $(CYGPATH_W) 'r12_smaller.c'; else $(CYGPATH_W) '$(srcdir)/r12_smaller.c'; fi`
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -750,6 +501,76 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+$(RECURSIVE_TARGETS):
+	@failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
+
+$(RECURSIVE_CLEAN_TARGETS):
+	@failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	case "$@" in \
+	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
+	  *) list='$(SUBDIRS)' ;; \
+	esac; \
+	rev=''; for subdir in $$list; do \
+	  if test "$$subdir" = "."; then :; else \
+	    rev="$$subdir $$rev"; \
+	  fi; \
+	done; \
+	rev="$$rev ."; \
+	target=`echo $@ | sed s/-recursive//`; \
+	for subdir in $$rev; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
+	done
+ctags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -761,10 +582,23 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
+	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
+	  include_option=--etags-include; \
+	  empty_fix=.; \
+	else \
+	  include_option=--include; \
+	  empty_fix=; \
+	fi; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test ! -f $$subdir/TAGS || \
+	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
+	  fi; \
+	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -777,7 +611,7 @@ TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
@@ -824,6 +658,23 @@ distdir: $(DISTFILES)
 	    test -f $(distdir)/$$file \
 	    || cp -p $$d/$$file $(distdir)/$$file \
 	    || exit 1; \
+	  fi; \
+	done
+	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test -d "$(distdir)/$$subdir" \
+	    || $(MKDIR_P) "$(distdir)/$$subdir" \
+	    || exit 1; \
+	    distdir=`$(am__cd) $(distdir) && pwd`; \
+	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
+	    (cd $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$$top_distdir" \
+	        distdir="$$distdir/$$subdir" \
+		am__remove_distdir=: \
+		am__skip_length_check=: \
+	        distdir) \
+	      || exit 1; \
 	  fi; \
 	done
 	-find $(distdir) -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
@@ -930,24 +781,24 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
-check: check-am
+check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
-installdirs:
+installdirs: installdirs-recursive
+installdirs-am:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
-install-exec: install-exec-am
-install-data: install-data-am
-uninstall: uninstall-am
+install: install-recursive
+install-exec: install-exec-recursive
+install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-am
+installcheck: installcheck-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -963,87 +814,89 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
+clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
-	clean-libLTLIBRARIES clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool mostlyclean-am
 
-distclean: distclean-am
+distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
 
-dvi: dvi-am
+dvi: dvi-recursive
 
 dvi-am:
 
-html: html-am
+html: html-recursive
 
-info: info-am
+info: info-recursive
 
 info-am:
 
 install-data-am:
 
-install-dvi: install-dvi-am
+install-dvi: install-dvi-recursive
 
 install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
-install-html: install-html-am
+install-html: install-html-recursive
 
-install-info: install-info-am
+install-info: install-info-recursive
 
 install-man:
 
-install-pdf: install-pdf-am
+install-pdf: install-pdf-recursive
 
-install-ps: install-ps-am
+install-ps: install-ps-recursive
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-am
+maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-am
+mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-am
+pdf: pdf-recursive
 
 pdf-am:
 
-ps: ps-am
+ps: ps-recursive
 
 ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
-.MAKE: install-am install-strip
+.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) install-am \
+	install-strip
 
-.PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags dist dist-all \
-	dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ dist-zip \
-	distcheck distclean distclean-compile distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags distcleancheck \
-	distdir distuninstallcheck dvi dvi-am html html-am info \
-	info-am install install-am install-binPROGRAMS install-data \
+.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
+	all all-am am--refresh check check-am clean clean-binPROGRAMS \
+	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
+	ctags-recursive dist dist-all dist-bzip2 dist-gzip dist-lzma \
+	dist-shar dist-tarZ dist-zip distcheck distclean \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-libLTLIBRARIES install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-libLTLIBRARIES
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
