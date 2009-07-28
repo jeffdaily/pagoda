@@ -23,6 +23,7 @@ using std::vector;
 // C++ includes
 #include "Attribute.H"
 #include "NetcdfAttribute.H"
+#include "NetcdfDataset.H"
 #include "NetcdfVariable.H"
 #include "Util.H"
 #include "Values.H"
@@ -40,16 +41,12 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    int err, ncid, natt, nvar;
-    err = ncmpi_open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &ncid);
-    ERRNO_CHECK(err);
-
-    err = ncmpi_inq_natts(ncid, &natt);
-    ERRNO_CHECK(err);
+    NetcdfDataset *dataset = new NetcdfDataset(argv[1]);
 
     cout << "@@@@@@@@@@@@@@@@@@@ GLOBAL ATTRIBUTES" << endl;
-    for (int attid=0; attid<natt; ++attid) {
-        Attribute *att = new NetcdfAttribute(ncid, attid, NC_GLOBAL);
+    vector<Attribute*> atts = dataset->get_atts();
+    for (size_t attid=0,natt=atts.size(); attid<natt; ++attid) {
+        Attribute *att = atts[attid];
         cout << att << endl;
 
         cout << "TEST OF as(), size=" << att->get_count() << endl;
@@ -60,26 +57,20 @@ int main(int argc, char **argv)
         }
         cout << endl;
         delete [] test;
-
-        delete att;
     }
-
-    err = ncmpi_inq_nvars(ncid, &nvar);
-    ERRNO_CHECK(err);
 
     cout << "@@@@@@@@@@@@@@@@@@@ VARIABLE ATTRIBUTES" << endl;
-    for (int varid=0; varid<nvar; ++varid) {
-        Variable *var = new NetcdfVariable(ncid, varid);
+    vector<Variable*> vars = dataset->get_vars();
+    for (size_t varid=0,nvar=vars.size(); varid<nvar; ++varid) {
+        Variable *var = vars[varid];
         cout << var->get_name() << endl;
-        vector<Attribute*> atts = var->get_atts();
-        for (int attid=0,limit=atts.size(); attid<limit; ++attid) {
+        atts = var->get_atts();
+        for (int attid=0,natt=atts.size(); attid<natt; ++attid) {
             cout << "\t" << atts.at(attid) << endl;
         }
-        delete var;
     }
 
-    err = ncmpi_close(ncid);
-    ERRNO_CHECK(err);
+    delete dataset;
 
     // Must always call these to exit cleanly.
     GA_Terminate();

@@ -21,7 +21,9 @@ class AbstractVariable : public Variable
 
         virtual int64_t get_size() const;
         virtual int64_t* get_sizes() const;
+        virtual long* get_mask_sizes() const;
         virtual size_t num_masks() const;
+        virtual size_t num_cleared_masks() const;
 
         virtual string get_long_name() const;
         virtual Attribute* find_att(const string &name,
@@ -33,6 +35,8 @@ class AbstractVariable : public Variable
         virtual void release_handle();
         virtual void set_record_index(size_t index);
         virtual size_t get_record_index() const;
+
+        virtual void reindex();
 
         virtual ostream& print(ostream &os) const;
 

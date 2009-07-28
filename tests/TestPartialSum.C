@@ -37,9 +37,9 @@ int main(int argc, char **argv)
         int ZERO = 0;
         NGA_Put(g_src, &lo, &hi, vals, NULL);
     }
-    PartialSum(g_src, g_dst0, 0);
+    partial_sum(g_src, g_dst0, 0);
     GA_Sync();
-    PartialSum(g_src, g_dst1, 1);
+    partial_sum(g_src, g_dst1, 1);
     GA_Sync();
 
     if (0 == me) {

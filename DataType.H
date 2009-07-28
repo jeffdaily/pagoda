@@ -23,6 +23,7 @@ class DataType
         operator int () const;
         operator nc_type () const;
         int as_mt() const;
+        void from_mt(int mt);
         friend ostream& operator << (ostream &os, const DataType &other);
 
         static const DataType BYTE;

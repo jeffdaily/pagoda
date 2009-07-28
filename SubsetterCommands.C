@@ -50,7 +50,8 @@ void SubsetterCommands::parse(int argc, char **argv)
                 _has_box = true;
                 box = LatLonBox(optarg);
                 // HACK - we know our stuff is in radians
-                box.scale(DEG2RAD);
+                // so convert the degrees from cmd line to radians
+                box.scale(RAD_PER_DEG);
                 break;
             case 'd':
                 try {

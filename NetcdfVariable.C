@@ -2,20 +2,22 @@
 
 #include "Attribute.H"
 #include "NetcdfAttribute.H"
+#include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "NetcdfVariable.H"
 #include "Util.H"
 
 
-NetcdfVariable::NetcdfVariable(int ncid, int varid)
+NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
     :   AbstractVariable()
-    ,   ncid(ncid)
+    ,   dataset(dataset)
     ,   id(varid)
     ,   name("")
     ,   dims()
     ,   atts()
     ,   type(DataType::CHAR)
 {
+    int ncid = dataset->get_id();
     int ndim;
     int err = ncmpi_inq_ndims(ncid, &ndim);
     ERRNO_CHECK(err);
@@ -28,10 +30,10 @@ NetcdfVariable::NetcdfVariable(int ncid, int varid)
     name = string(cname);
     type = type_tmp;
     for (int dimidx=0; dimidx<ndim; ++dimidx) {
-        dims.push_back(new NetcdfDimension(ncid, dim_ids[dimidx]));
+        dims.push_back(dataset->get_dim(dim_ids[dimidx]));
     }
     for (int attid=0; attid<natt; ++attid) {
-        atts.push_back(new NetcdfAttribute(ncid, attid, varid));
+        atts.push_back(new NetcdfAttribute(dataset, attid, this));
     }
 }
 
@@ -85,6 +87,7 @@ DataType NetcdfVariable::get_type() const
 
 void NetcdfVariable::read()
 {
+    int ncid = dataset->get_id();
     DataType type = get_type();
     size_t ndim = num_dims();
     size_t dimidx = 0;
@@ -102,7 +105,7 @@ void NetcdfVariable::read()
         dimidx = 0;
     }
     NGA_Distribution64(handle, ME, lo, hi);
-    for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
+    for (; dimidx<ndim; ++dimidx) {
         start[dimidx] = lo[dimidx];
         count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
     }
@@ -127,5 +130,17 @@ ostream& NetcdfVariable::print(ostream &os) const
 {
     os << "NetcdfVariable(" << name << ")";
     return os;
+}
+
+
+NetcdfDataset* NetcdfVariable::get_dataset() const
+{
+    return dataset;
+}
+
+
+int NetcdfVariable::get_id() const
+{
+    return id;
 }
 

@@ -1,6 +1,7 @@
+#include "AbstractVariable.H"
 #include "Attribute.H"
 #include "Dimension.H"
-#include "AbstractVariable.H"
+#include "Mask.H"
 #include "Util.H"
 
 
@@ -47,6 +48,26 @@ int64_t* AbstractVariable::get_sizes() const
 }
 
 
+long* AbstractVariable::get_mask_sizes() const
+{
+    size_t dimidx;
+    size_t ndim = num_dims();
+    long *sizes = new long[ndim];
+    vector<Dimension*> dims = get_dims();
+
+    for (dimidx=0; dimidx<ndim; ++dimidx) {
+        Mask *mask = dims[dimidx]->get_mask();
+        if (mask) {
+            sizes[dimidx] = mask->get_count();
+        } else {
+            sizes[dimidx] = dims[dimidx]->get_size();
+        }
+    }
+
+    return sizes;
+}
+
+
 size_t AbstractVariable::num_masks() const
 {
     size_t result = 0;
@@ -56,6 +77,25 @@ size_t AbstractVariable::num_masks() const
     for (it=dims.begin(); it!=dims.end(); ++it) {
         if (((*it)->get_mask())) {
             ++result;
+        }
+    }
+
+    return result;
+}
+
+
+size_t AbstractVariable::num_cleared_masks() const
+{
+    size_t result = 0;
+    vector<Dimension*> dims = get_dims();
+    vector<Dimension*>::const_iterator it;
+
+    for (it=dims.begin(); it!=dims.end(); ++it) {
+        Mask *mask;
+        if ((mask = (*it)->get_mask())) {
+            if (mask->was_cleared()) {
+                ++result;
+            }
         }
     }
 
@@ -133,6 +173,13 @@ void AbstractVariable::set_record_index(size_t index)
 size_t AbstractVariable::get_record_index() const
 {
     return record_index;
+}
+
+
+void AbstractVariable::reindex()
+{
+    std::cout << "AbstractVariable::reindex() " << get_name() << std::endl;
+    std::cout << this << std::endl;
 }
 
 

@@ -1,18 +1,14 @@
 #ifndef MASK_H_
 #define MASK_H_
 
-#include <map>
-    using std::map;
 #include <string>
     using std::string;
-#include <vector>
-    using std::vector;
 
 #include "LatLonBox.H"
 #include "Slice.H"
 
 class Dimension;
-
+class Variable;
 
 
 class Mask
@@ -27,57 +23,22 @@ class Mask
 
         virtual int* get_data() const = 0;
         virtual int* get_data(int64_t lo, int64_t hi) = 0;
+        virtual void clear() = 0;
         virtual void adjust(const DimSlice &slice) = 0;
+        virtual void adjust(const LatLonBox &box,
+                Variable *lat, Variable *lon) = 0;
+        virtual void adjust(double low, double hi, Variable *var,
+                bool bitwise_or=true) = 0;
         virtual void recount() = 0;
+        virtual void reindex() = 0;
+
+        virtual bool was_cleared() { return cleared; }
 
     protected:
-        Mask(const Mask &other);
-        Mask& operator = (const Mask &other);
-
         Dimension *dim;
         bool dirty;
+        bool cleared;
         long count;
-};
-
-
-class LocalMask : public Mask
-{
-    public:
-        LocalMask(Dimension *dim);
-        virtual ~LocalMask();
-
-        virtual int* get_data() const;
-        virtual int* get_data(int64_t lo, int64_t hi);
-        virtual void adjust(const DimSlice &slice);
-        virtual void recount();
-
-    protected:
-        LocalMask(const LocalMask &other);
-        LocalMask& operator = (const LocalMask &other);
-
-        int *data;
-};
-
-
-class DistributedMask : public Mask
-{
-    public:
-        DistributedMask(Dimension *dim);
-        virtual ~DistributedMask();
-
-        virtual int* get_data() const;
-        virtual int* get_data(int64_t lo, int64_t hi);
-        virtual void adjust(const DimSlice &slice);
-        virtual void recount();
-
-    protected:
-        DistributedMask(const DistributedMask &other);
-        DistributedMask& operator = (const DistributedMask &other);
-
-        int handle;
-        int64_t lo;
-        int64_t hi;
-        long *counts;
 };
 
 #endif // MASK_H_

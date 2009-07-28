@@ -21,10 +21,8 @@ class NetcdfFileWriter
     protected:
         static void copy_att(Attribute *attr, int ncid, int varid);
         static void copy_atts(const vector<Attribute*> &atts, int ncid, int varid);
-        static void copy_var(ConnectivityVariable *var_in,
-                NetcdfVariable *var_out);
-        static void copy_var(Variable *var_in, NetcdfVariable *var_out);
-        static void copy_record_var(Variable *var_in, NetcdfVariable *var_out);
+        static void copy_var(Variable *var_in, int ncid, int varid);
+        static void copy_record_var(Variable *var_in, int ncid, int varid);
         static void write(int handle, int ncid, int varid);
 };
 

@@ -13,8 +13,9 @@ HEADERS_PRIVATE = \
   Dataset.H \
   DataType.H \
   Dimension.H \
-  DimensionSlice.H \
+  DistributedMask.H \
   LatLonBox.H \
+  LocalMask.H \
   Mask.H \
   NetcdfAttribute.H \
   NetcdfDataset.H \
@@ -43,7 +44,9 @@ SOURCE = \
   Dataset.C \
   DataType.C \
   Dimension.C \
+  DistributedMask.C \
   LatLonBox.C \
+  LocalMask.C \
   Mask.C \
   NetcdfAttribute.C \
   NetcdfDataset.C \
@@ -72,4 +75,3 @@ subsetter_old_LDADD = libsubsetter.la
 
 subsetter_SOURCES = SubsetterMain.C
 subsetter_LDADD = libsubsetter.la
-

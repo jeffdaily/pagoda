@@ -68,10 +68,11 @@ libsubsetter_la_LIBADD =
 am__objects_1 = AbstractVariable.lo Aggregation.lo AggregationUnion.lo \
 	Attribute.lo BoundaryVariable.lo ConnectivityVariable.lo \
 	CoordinateVariable.lo Dataset.lo DataType.lo Dimension.lo \
-	LatLonBox.lo Mask.lo NetcdfAttribute.lo NetcdfDataset.lo \
-	NetcdfDimension.lo NetcdfFileWriter.lo NetcdfVariable.lo \
-	Pack.lo StringComparator.lo SubsetterCommands.lo Util.lo \
-	Values.lo Variable.lo VariableDecorator.lo
+	DistributedMask.lo LatLonBox.lo LocalMask.lo Mask.lo \
+	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
+	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo \
+	StringComparator.lo SubsetterCommands.lo Util.lo Values.lo \
+	Variable.lo VariableDecorator.lo
 am__objects_2 =
 am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
@@ -266,8 +267,9 @@ HEADERS_PRIVATE = \
   Dataset.H \
   DataType.H \
   Dimension.H \
-  DimensionSlice.H \
+  DistributedMask.H \
   LatLonBox.H \
+  LocalMask.H \
   Mask.H \
   NetcdfAttribute.H \
   NetcdfDataset.H \
@@ -296,7 +298,9 @@ SOURCE = \
   Dataset.C \
   DataType.C \
   Dimension.C \
+  DistributedMask.C \
   LatLonBox.C \
+  LocalMask.C \
   Mask.C \
   NetcdfAttribute.C \
   NetcdfDataset.C \
@@ -455,7 +459,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DistributedMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LocalMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfAttribute.Plo@am__quote@

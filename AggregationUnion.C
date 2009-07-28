@@ -36,19 +36,19 @@ AggregationUnion::~AggregationUnion()
 }
 
 
-vector<Attribute*>& AggregationUnion::get_atts()
+vector<Attribute*> AggregationUnion::get_atts()
 {
     return atts;
 }
 
 
-vector<Dimension*>& AggregationUnion::get_dims()
+vector<Dimension*> AggregationUnion::get_dims()
 {
     return dims;
 }
 
 
-vector<Variable*>& AggregationUnion::get_vars()
+vector<Variable*> AggregationUnion::get_vars()
 {
     return vars;
 }
@@ -107,4 +107,9 @@ ostream& AggregationUnion::print(ostream &os) const
     return os << "AggregationUnion()";
 }
 
+
+void AggregationUnion::decorate(const vector<Variable*> &vars)
+{
+    this->vars = vars;
+}
 

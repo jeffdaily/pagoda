@@ -19,14 +19,17 @@ class AggregationUnion : public Aggregation
         AggregationUnion();
         virtual ~AggregationUnion();
 
-        virtual vector<Attribute*>& get_atts();
-        virtual vector<Dimension*>& get_dims();
-        virtual vector<Variable*>& get_vars();
+        virtual vector<Attribute*> get_atts();
+        virtual vector<Dimension*> get_dims();
+        virtual vector<Variable*> get_vars();
 
         virtual void add(Dataset *dataset);
         virtual void add(const vector<Dataset*> &datasets);
 
         virtual ostream& print(ostream &os) const;
+
+    protected:
+        virtual void decorate(const vector<Variable*> &vars);
 
     private:
         vector<Dataset*> datasets;

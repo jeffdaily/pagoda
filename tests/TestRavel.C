@@ -8,6 +8,8 @@
 #include <mpi.h>
 
 // C++ includes, std and otherwise
+#include <iomanip>
+using std::setw;
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -22,6 +24,7 @@ using std::vector;
 #include "Attribute.H"
 #include "Dimension.H"
 #include "NetcdfDataset.H"
+#include "Pack.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -44,18 +47,31 @@ int main(int argc, char **argv)
     MPI_Init(&argc, &argv);
     GA_Initialize();
 
-    vector<size_t> dims;
-    dims.push_back(2);
-    dims.push_back(3);
-    dims.push_back(4);
+    int ndim = 3;
+    int64_t *dims1 = new int64_t[ndim];
+    int64_t *result1 = new int64_t[ndim];
+    vector<size_t> dims2;
+    vector<size_t> result2;
+    dims1[0] = 2; dims2.push_back(2);
+    dims1[1] = 3; dims2.push_back(3);
+    dims1[2] = 4; dims2.push_back(4);
 
-    cout << "dims=" << dims << endl;
+    //cout << "dims=" << dims2 << endl;
+    //printf("dims=[%lld,%lld,%lld]\n", dims1[0], dims1[1], dims1[2]);
     for (size_t i=0; i<26; ++i) {
-        vector<size_t> result = Util::unravel_index(i, dims);
-        size_t result2 = Util::ravel_index(result, dims);
-        cout << i << " --> " << result << " --> " << result2 << endl;
+        unravel64(i, 3, dims1, result1);
+        //printf("unravel64(%zd, %d, [%lld,%lld,%lld], [%lld,%lld,%lld])\n",
+        //        i, ndim,
+        //        dims1[0], dims1[1], dims1[2],
+        //        result1[0], result1[1], result1[2]);
+        result2 = Util::unravel_index(i, dims2);
+        cout << setw(2) << i << " --> " << result2 << " ";
+        printf("[%lld,%lld,%lld]", result1[0], result1[1], result1[2]);
+        cout << " --> " << setw(2) << Util::ravel_index(result2, dims2) << endl;
     }
 
+    delete [] dims1;
+    delete [] result1;
     // Must always call these to exit cleanly.
     GA_Terminate();
     MPI_Finalize();

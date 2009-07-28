@@ -136,7 +136,7 @@ bool LatLonBox::operator >= (const LatLonBox &that) const
 
 
 
-bool LatLonBox::contains(const double &lat, const double &lon)
+bool LatLonBox::contains(const double &lat, const double &lon) const
 {
     return s<lat && lat<n && w<lon && lon<e;
 }

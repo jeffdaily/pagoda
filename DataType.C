@@ -36,13 +36,22 @@ DataType::operator nc_type() const
 
 int DataType::as_mt() const
 {
-    //if (*this == DataType::BYTE) return MT_CHAR;
     if (*this == DataType::CHAR) return MT_CHAR;
-    //if (*this == DataType::SHORT) return MT_INT;
-    if (*this == DataType::INT) return MT_INT;
-    if (*this == DataType::FLOAT) return MT_REAL;
-    if (*this == DataType::DOUBLE) return MT_DBL;
-    return MT_CHAR;
+    else if (*this == DataType::INT) return MT_INT;
+    else if (*this == DataType::FLOAT) return MT_REAL;
+    else if (*this == DataType::DOUBLE) return MT_DBL;
+    else return MT_CHAR;
+}
+
+
+void DataType::from_mt(int mt)
+{
+    switch (mt) {
+        case MT_CHAR: value = DataType::CHAR.value; break;
+        case MT_INT: value = DataType::INT.value; break;
+        case MT_REAL: value = DataType::FLOAT.value; break;
+        case MT_DBL: value = DataType::DOUBLE.value; break;
+    }
 }
 
 
@@ -89,11 +98,12 @@ DataType& DataType::operator = (int value)
 ostream& operator << (ostream &os, const DataType &other)
 {
     if (other == DataType::BYTE) os << "byte";
-    if (other == DataType::CHAR) os << "char";
-    if (other == DataType::SHORT) os << "short";
-    if (other == DataType::INT) os << "int";
-    if (other == DataType::FLOAT) os << "float";
-    if (other == DataType::DOUBLE) os << "double";
+    else if (other == DataType::CHAR) os << "char";
+    else if (other == DataType::SHORT) os << "short";
+    else if (other == DataType::INT) os << "int";
+    else if (other == DataType::FLOAT) os << "float";
+    else if (other == DataType::DOUBLE) os << "double";
+    else os << "UNKNOWN (" << other.value << ")";
     return os;
 }
 

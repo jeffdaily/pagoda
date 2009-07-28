@@ -1,4 +1,7 @@
 #include "ConnectivityVariable.H"
+#include "Dimension.H"
+#include "DistributedMask.H"
+#include <ga.h>
 
 
 ConnectivityVariable::ConnectivityVariable(Variable *var, Dimension *to)
@@ -26,8 +29,24 @@ Dimension* ConnectivityVariable::get_to_dim() const
 }
 
 
+void ConnectivityVariable::reindex()
+{
+    std::cout << "ConnectivityVariable::reindex BEGIN" << std::endl;
+    if (to->get_mask() && to->get_mask()->was_cleared()) {
+        std::cout << "reindexing" << std::endl;
+        to->get_mask()->reindex();
+        DistributedMask *mask = dynamic_cast<DistributedMask*>(to->get_mask());
+        if (mask) {
+            //std::cout << "printint mask" << std::endl;
+            //GA_Print(mask->get_handle_index());
+        }
+    }
+    std::cout << "ConnectivityVariable::reindex END" << std::endl;
+}
+
+
 ostream& ConnectivityVariable::print(ostream &os) const
 {
-    os << "ConnectivityVariable(" << var->get_name() << ")";
+    return os << "ConnectivityVariable(" << var->get_name() << ")";
 }
 

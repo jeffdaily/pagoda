@@ -26,7 +26,9 @@ class Variable
         virtual vector<Dimension*> get_dims() const = 0;
         virtual int64_t get_size() const = 0;
         virtual int64_t* get_sizes() const = 0;
+        virtual long* get_mask_sizes() const = 0;
         virtual size_t num_masks() const = 0;
+        virtual size_t num_cleared_masks() const = 0;
 
         virtual size_t num_atts() const = 0;
         virtual vector<Attribute*> get_atts() const = 0;
@@ -43,6 +45,8 @@ class Variable
         virtual void read() = 0;
         virtual void set_record_index(size_t index) = 0;
         virtual size_t get_record_index() const = 0;
+
+        virtual void reindex() = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Variable *other);

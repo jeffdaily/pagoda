@@ -8,26 +8,26 @@
 
 #include "Dimension.H"
 
+class NetcdfDataset;
+
 
 class NetcdfDimension : public Dimension
 {
     public:
-        NetcdfDimension(int ncid, int dimid);
+        NetcdfDimension(NetcdfDataset *dataset, int dimid);
         virtual ~NetcdfDimension();
 
         virtual string get_name() const;
         virtual int64_t get_size() const;
         virtual bool is_unlimited() const;
 
+        NetcdfDataset* get_dataset() const;
         int get_id() const;
 
         virtual ostream& print(ostream &os) const;
 
     protected:
-        NetcdfDimension(const NetcdfDimension &copy);
-        NetcdfDimension& operator = (const NetcdfDimension &other);
-
-        int ncid;
+        NetcdfDataset *dataset;
         int id;
         string name;
         int64_t size;

@@ -20,7 +20,7 @@ class NetcdfDimension;
 class NetcdfVariable : public AbstractVariable
 {
     public:
-        NetcdfVariable(int ncid, int varid);
+        NetcdfVariable(NetcdfDataset *dataset, int varid);
         virtual ~NetcdfVariable();
 
         virtual string get_name() const;
@@ -38,11 +38,11 @@ class NetcdfVariable : public AbstractVariable
 
         virtual ostream& print(ostream &os) const;
 
-        int get_ncid() const { return ncid; }
-        int get_id() const { return id; }
+        NetcdfDataset* get_dataset() const;
+        int get_id() const;
 
     protected:
-        int ncid;
+        NetcdfDataset *dataset;
         int id;
         string name;
         vector<NetcdfDimension*> dims;

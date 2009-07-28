@@ -28,7 +28,9 @@ class VariableDecorator : public Variable
         virtual vector<Dimension*> get_dims() const;
         virtual int64_t get_size() const;
         virtual int64_t* get_sizes() const;
+        virtual long* get_mask_sizes() const;
         virtual size_t num_masks() const;
+        virtual size_t num_cleared_masks() const;
 
         virtual size_t num_atts() const;
         virtual vector<Attribute*> get_atts() const;
@@ -45,6 +47,8 @@ class VariableDecorator : public Variable
         virtual void read();
         virtual void set_record_index(size_t index);
         virtual size_t get_record_index() const;
+
+        virtual void reindex();
 
         virtual ostream& print(ostream &os) const;
 

@@ -2,13 +2,16 @@ check_PROGRAMS = \
   Test \
   TestAttribute \
   TestDimension \
+  TestEnum \
+  TestGet \
   TestLocateRegion \
   TestNetcdfDataset \
   TestOpen \
   TestPartialSum \
   TestRavel \
   TestScanAdd \
-  TestUnion
+  TestUnion \
+  TestUnpack
 
 AM_CFLAGS = $(GA_INCS) -I$(top_srcdir)
 AM_CXXFLAGS = $(GA_INCS) -I$(top_srcdir) $(CFLAGS) 
@@ -28,6 +31,16 @@ TestDimension_SOURCES = TestDimension.C
 TestDimension_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestDimension_LDADD = ../libsubsetter.la
+
+TestEnum_SOURCES = TestEnum.C
+TestEnum_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestEnum_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestEnum_LDADD = ../libsubsetter.la
+
+TestGet_SOURCES = TestGet.C
+TestGet_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestGet_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
+TestGet_LDADD = ../libsubsetter.la
 
 TestLocateRegion_SOURCES = TestLocateRegion.C
 TestLocateRegion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
@@ -53,8 +66,8 @@ TestRavel_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestRavel_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestRavel_LDADD = ../libsubsetter.la
 
-TestScanAdd_SOURCES = TestScanAdd.c
-TestScanAdd_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
+TestScanAdd_SOURCES = TestScanAdd.C
+TestScanAdd_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestScanAdd_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestScanAdd_LDADD = ../libsubsetter.la
 
@@ -62,4 +75,8 @@ TestUnion_SOURCES = TestUnion.C
 TestUnion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestUnion_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestUnion_LDADD = ../libsubsetter.la
+
+TestUnpack_SOURCES = TestUnpack.c
+TestUnpack_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
+TestUnpack_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 

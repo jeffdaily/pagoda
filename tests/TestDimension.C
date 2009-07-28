@@ -22,6 +22,8 @@ using std::vector;
 
 // C++ includes
 #include "Dimension.H"
+#include "DistributedMask.H"
+#include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "SubsetterException.H"
 #include "Util.H"
@@ -38,21 +40,27 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    int err, ncid, ndim, nvar;
-    err = ncmpi_open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &ncid);
-    ERRNO_CHECK(err);
+    NetcdfDataset *dataset = new NetcdfDataset(argv[1]);
+    DistributedMask *mask = NULL;
 
-    err = ncmpi_inq_ndims(ncid, &ndim);
-    ERRNO_CHECK(err);
+    Util::calculate_required_memory(dataset->get_vars());
 
-    for (int dimid=0; dimid<ndim; ++dimid) {
-        Dimension *dim = new NetcdfDimension(ncid, dimid);
+    vector<Dimension*> dims = dataset->get_dims();
+    for (size_t dimid=0,ndim=dims.size(); dimid<ndim; ++dimid) {
+        Dimension *dim = dims[dimid];
         cout << dim << endl;
-        delete dim;
+        if (dim->get_name() == "cells") {
+            mask = new DistributedMask(dim, 1);
+        }
     }
 
-    err = ncmpi_close(ncid);
-    ERRNO_CHECK(err);
+    if (mask) {
+        mask->reindex();
+        //GA_Print(mask->get_handle_index());
+    }
+
+    delete mask;
+    delete dataset;
 
     // Must always call these to exit cleanly.
     GA_Terminate();

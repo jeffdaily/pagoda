@@ -40,7 +40,8 @@ class Variable;
 #define NPROC GA_Nnodes()
 #define MAX_NAME 80
 #define MAX_DIM 8
-#define DEG2RAD (M_PI / 180.0)
+#define RAD_PER_DEG (M_PI / 180.0)
+#define DEG_PER_RAD (180.0 / M_PI)
 
 #define ERR(e) { \
 ostringstream __os; \

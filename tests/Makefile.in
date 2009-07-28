@@ -32,10 +32,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = Test$(EXEEXT) TestAttribute$(EXEEXT) \
-	TestDimension$(EXEEXT) TestLocateRegion$(EXEEXT) \
-	TestNetcdfDataset$(EXEEXT) TestOpen$(EXEEXT) \
-	TestPartialSum$(EXEEXT) TestRavel$(EXEEXT) \
-	TestScanAdd$(EXEEXT) TestUnion$(EXEEXT)
+	TestDimension$(EXEEXT) TestEnum$(EXEEXT) TestGet$(EXEEXT) \
+	TestLocateRegion$(EXEEXT) TestNetcdfDataset$(EXEEXT) \
+	TestOpen$(EXEEXT) TestPartialSum$(EXEEXT) TestRavel$(EXEEXT) \
+	TestScanAdd$(EXEEXT) TestUnion$(EXEEXT) TestUnpack$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -68,6 +68,18 @@ TestDimension_DEPENDENCIES = ../libsubsetter.la
 TestDimension_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestDimension_CXXFLAGS) \
 	$(CXXFLAGS) $(TestDimension_LDFLAGS) $(LDFLAGS) -o $@
+am_TestEnum_OBJECTS = TestEnum-TestEnum.$(OBJEXT)
+TestEnum_OBJECTS = $(am_TestEnum_OBJECTS)
+TestEnum_DEPENDENCIES = ../libsubsetter.la
+TestEnum_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestEnum_CXXFLAGS) \
+	$(CXXFLAGS) $(TestEnum_LDFLAGS) $(LDFLAGS) -o $@
+am_TestGet_OBJECTS = TestGet-TestGet.$(OBJEXT)
+TestGet_OBJECTS = $(am_TestGet_OBJECTS)
+TestGet_DEPENDENCIES = ../libsubsetter.la
+TestGet_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(TestGet_CXXFLAGS) $(CXXFLAGS) \
+	$(TestGet_LDFLAGS) $(LDFLAGS) -o $@
 am_TestLocateRegion_OBJECTS =  \
 	TestLocateRegion-TestLocateRegion.$(OBJEXT)
 TestLocateRegion_OBJECTS = $(am_TestLocateRegion_OBJECTS)
@@ -106,15 +118,21 @@ TestRavel_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am_TestScanAdd_OBJECTS = TestScanAdd-TestScanAdd.$(OBJEXT)
 TestScanAdd_OBJECTS = $(am_TestScanAdd_OBJECTS)
 TestScanAdd_DEPENDENCIES = ../libsubsetter.la
-TestScanAdd_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(TestScanAdd_CFLAGS) \
-	$(CFLAGS) $(TestScanAdd_LDFLAGS) $(LDFLAGS) -o $@
+TestScanAdd_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestScanAdd_CXXFLAGS) \
+	$(CXXFLAGS) $(TestScanAdd_LDFLAGS) $(LDFLAGS) -o $@
 am_TestUnion_OBJECTS = TestUnion-TestUnion.$(OBJEXT)
 TestUnion_OBJECTS = $(am_TestUnion_OBJECTS)
 TestUnion_DEPENDENCIES = ../libsubsetter.la
 TestUnion_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestUnion_CXXFLAGS) \
 	$(CXXFLAGS) $(TestUnion_LDFLAGS) $(LDFLAGS) -o $@
+am_TestUnpack_OBJECTS = TestUnpack-TestUnpack.$(OBJEXT)
+TestUnpack_OBJECTS = $(am_TestUnpack_OBJECTS)
+TestUnpack_LDADD = $(LDADD)
+TestUnpack_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(TestUnpack_CFLAGS) \
+	$(CFLAGS) $(TestUnpack_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -137,15 +155,19 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(Test_SOURCES) $(TestAttribute_SOURCES) \
-	$(TestDimension_SOURCES) $(TestLocateRegion_SOURCES) \
+	$(TestDimension_SOURCES) $(TestEnum_SOURCES) \
+	$(TestGet_SOURCES) $(TestLocateRegion_SOURCES) \
 	$(TestNetcdfDataset_SOURCES) $(TestOpen_SOURCES) \
 	$(TestPartialSum_SOURCES) $(TestRavel_SOURCES) \
-	$(TestScanAdd_SOURCES) $(TestUnion_SOURCES)
+	$(TestScanAdd_SOURCES) $(TestUnion_SOURCES) \
+	$(TestUnpack_SOURCES)
 DIST_SOURCES = $(Test_SOURCES) $(TestAttribute_SOURCES) \
-	$(TestDimension_SOURCES) $(TestLocateRegion_SOURCES) \
+	$(TestDimension_SOURCES) $(TestEnum_SOURCES) \
+	$(TestGet_SOURCES) $(TestLocateRegion_SOURCES) \
 	$(TestNetcdfDataset_SOURCES) $(TestOpen_SOURCES) \
 	$(TestPartialSum_SOURCES) $(TestRavel_SOURCES) \
-	$(TestScanAdd_SOURCES) $(TestUnion_SOURCES)
+	$(TestScanAdd_SOURCES) $(TestUnion_SOURCES) \
+	$(TestUnpack_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -286,6 +308,14 @@ TestDimension_SOURCES = TestDimension.C
 TestDimension_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestDimension_LDADD = ../libsubsetter.la
+TestEnum_SOURCES = TestEnum.C
+TestEnum_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestEnum_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestEnum_LDADD = ../libsubsetter.la
+TestGet_SOURCES = TestGet.C
+TestGet_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestGet_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
+TestGet_LDADD = ../libsubsetter.la
 TestLocateRegion_SOURCES = TestLocateRegion.C
 TestLocateRegion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestLocateRegion_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
@@ -305,14 +335,17 @@ TestRavel_SOURCES = TestRavel.C
 TestRavel_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestRavel_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestRavel_LDADD = ../libsubsetter.la
-TestScanAdd_SOURCES = TestScanAdd.c
-TestScanAdd_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
+TestScanAdd_SOURCES = TestScanAdd.C
+TestScanAdd_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestScanAdd_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestScanAdd_LDADD = ../libsubsetter.la
 TestUnion_SOURCES = TestUnion.C
 TestUnion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestUnion_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestUnion_LDADD = ../libsubsetter.la
+TestUnpack_SOURCES = TestUnpack.c
+TestUnpack_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
+TestUnpack_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -362,6 +395,12 @@ TestAttribute$(EXEEXT): $(TestAttribute_OBJECTS) $(TestAttribute_DEPENDENCIES)
 TestDimension$(EXEEXT): $(TestDimension_OBJECTS) $(TestDimension_DEPENDENCIES) 
 	@rm -f TestDimension$(EXEEXT)
 	$(TestDimension_LINK) $(TestDimension_OBJECTS) $(TestDimension_LDADD) $(LIBS)
+TestEnum$(EXEEXT): $(TestEnum_OBJECTS) $(TestEnum_DEPENDENCIES) 
+	@rm -f TestEnum$(EXEEXT)
+	$(TestEnum_LINK) $(TestEnum_OBJECTS) $(TestEnum_LDADD) $(LIBS)
+TestGet$(EXEEXT): $(TestGet_OBJECTS) $(TestGet_DEPENDENCIES) 
+	@rm -f TestGet$(EXEEXT)
+	$(TestGet_LINK) $(TestGet_OBJECTS) $(TestGet_LDADD) $(LIBS)
 TestLocateRegion$(EXEEXT): $(TestLocateRegion_OBJECTS) $(TestLocateRegion_DEPENDENCIES) 
 	@rm -f TestLocateRegion$(EXEEXT)
 	$(TestLocateRegion_LINK) $(TestLocateRegion_OBJECTS) $(TestLocateRegion_LDADD) $(LIBS)
@@ -383,6 +422,9 @@ TestScanAdd$(EXEEXT): $(TestScanAdd_OBJECTS) $(TestScanAdd_DEPENDENCIES)
 TestUnion$(EXEEXT): $(TestUnion_OBJECTS) $(TestUnion_DEPENDENCIES) 
 	@rm -f TestUnion$(EXEEXT)
 	$(TestUnion_LINK) $(TestUnion_OBJECTS) $(TestUnion_LDADD) $(LIBS)
+TestUnpack$(EXEEXT): $(TestUnpack_OBJECTS) $(TestUnpack_DEPENDENCIES) 
+	@rm -f TestUnpack$(EXEEXT)
+	$(TestUnpack_LINK) $(TestUnpack_OBJECTS) $(TestUnpack_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -393,6 +435,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Test-Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestAttribute-TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDimension-TestDimension.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestEnum-TestEnum.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestGet-TestGet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestLocateRegion-TestLocateRegion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestOpen-TestOpen.Po@am__quote@
@@ -400,6 +444,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestRavel-TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestScanAdd-TestScanAdd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnion-TestUnion.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnpack-TestUnpack.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -463,6 +508,34 @@ TestDimension-TestDimension.obj: TestDimension.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestDimension.C' object='TestDimension-TestDimension.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestDimension_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension-TestDimension.obj `if test -f 'TestDimension.C'; then $(CYGPATH_W) 'TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/TestDimension.C'; fi`
+
+TestEnum-TestEnum.o: TestEnum.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestEnum_CXXFLAGS) $(CXXFLAGS) -MT TestEnum-TestEnum.o -MD -MP -MF $(DEPDIR)/TestEnum-TestEnum.Tpo -c -o TestEnum-TestEnum.o `test -f 'TestEnum.C' || echo '$(srcdir)/'`TestEnum.C
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestEnum-TestEnum.Tpo $(DEPDIR)/TestEnum-TestEnum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestEnum.C' object='TestEnum-TestEnum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestEnum_CXXFLAGS) $(CXXFLAGS) -c -o TestEnum-TestEnum.o `test -f 'TestEnum.C' || echo '$(srcdir)/'`TestEnum.C
+
+TestEnum-TestEnum.obj: TestEnum.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestEnum_CXXFLAGS) $(CXXFLAGS) -MT TestEnum-TestEnum.obj -MD -MP -MF $(DEPDIR)/TestEnum-TestEnum.Tpo -c -o TestEnum-TestEnum.obj `if test -f 'TestEnum.C'; then $(CYGPATH_W) 'TestEnum.C'; else $(CYGPATH_W) '$(srcdir)/TestEnum.C'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestEnum-TestEnum.Tpo $(DEPDIR)/TestEnum-TestEnum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestEnum.C' object='TestEnum-TestEnum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestEnum_CXXFLAGS) $(CXXFLAGS) -c -o TestEnum-TestEnum.obj `if test -f 'TestEnum.C'; then $(CYGPATH_W) 'TestEnum.C'; else $(CYGPATH_W) '$(srcdir)/TestEnum.C'; fi`
+
+TestGet-TestGet.o: TestGet.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGet_CXXFLAGS) $(CXXFLAGS) -MT TestGet-TestGet.o -MD -MP -MF $(DEPDIR)/TestGet-TestGet.Tpo -c -o TestGet-TestGet.o `test -f 'TestGet.C' || echo '$(srcdir)/'`TestGet.C
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestGet-TestGet.Tpo $(DEPDIR)/TestGet-TestGet.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestGet.C' object='TestGet-TestGet.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGet_CXXFLAGS) $(CXXFLAGS) -c -o TestGet-TestGet.o `test -f 'TestGet.C' || echo '$(srcdir)/'`TestGet.C
+
+TestGet-TestGet.obj: TestGet.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGet_CXXFLAGS) $(CXXFLAGS) -MT TestGet-TestGet.obj -MD -MP -MF $(DEPDIR)/TestGet-TestGet.Tpo -c -o TestGet-TestGet.obj `if test -f 'TestGet.C'; then $(CYGPATH_W) 'TestGet.C'; else $(CYGPATH_W) '$(srcdir)/TestGet.C'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestGet-TestGet.Tpo $(DEPDIR)/TestGet-TestGet.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestGet.C' object='TestGet-TestGet.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGet_CXXFLAGS) $(CXXFLAGS) -c -o TestGet-TestGet.obj `if test -f 'TestGet.C'; then $(CYGPATH_W) 'TestGet.C'; else $(CYGPATH_W) '$(srcdir)/TestGet.C'; fi`
 
 TestLocateRegion-TestLocateRegion.o: TestLocateRegion.C
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestLocateRegion_CXXFLAGS) $(CXXFLAGS) -MT TestLocateRegion-TestLocateRegion.o -MD -MP -MF $(DEPDIR)/TestLocateRegion-TestLocateRegion.Tpo -c -o TestLocateRegion-TestLocateRegion.o `test -f 'TestLocateRegion.C' || echo '$(srcdir)/'`TestLocateRegion.C
@@ -534,6 +607,20 @@ TestRavel-TestRavel.obj: TestRavel.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestRavel_CXXFLAGS) $(CXXFLAGS) -c -o TestRavel-TestRavel.obj `if test -f 'TestRavel.C'; then $(CYGPATH_W) 'TestRavel.C'; else $(CYGPATH_W) '$(srcdir)/TestRavel.C'; fi`
 
+TestScanAdd-TestScanAdd.o: TestScanAdd.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CXXFLAGS) $(CXXFLAGS) -MT TestScanAdd-TestScanAdd.o -MD -MP -MF $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo -c -o TestScanAdd-TestScanAdd.o `test -f 'TestScanAdd.C' || echo '$(srcdir)/'`TestScanAdd.C
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo $(DEPDIR)/TestScanAdd-TestScanAdd.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestScanAdd.C' object='TestScanAdd-TestScanAdd.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CXXFLAGS) $(CXXFLAGS) -c -o TestScanAdd-TestScanAdd.o `test -f 'TestScanAdd.C' || echo '$(srcdir)/'`TestScanAdd.C
+
+TestScanAdd-TestScanAdd.obj: TestScanAdd.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CXXFLAGS) $(CXXFLAGS) -MT TestScanAdd-TestScanAdd.obj -MD -MP -MF $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo -c -o TestScanAdd-TestScanAdd.obj `if test -f 'TestScanAdd.C'; then $(CYGPATH_W) 'TestScanAdd.C'; else $(CYGPATH_W) '$(srcdir)/TestScanAdd.C'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo $(DEPDIR)/TestScanAdd-TestScanAdd.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestScanAdd.C' object='TestScanAdd-TestScanAdd.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CXXFLAGS) $(CXXFLAGS) -c -o TestScanAdd-TestScanAdd.obj `if test -f 'TestScanAdd.C'; then $(CYGPATH_W) 'TestScanAdd.C'; else $(CYGPATH_W) '$(srcdir)/TestScanAdd.C'; fi`
+
 TestUnion-TestUnion.o: TestUnion.C
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnion_CXXFLAGS) $(CXXFLAGS) -MT TestUnion-TestUnion.o -MD -MP -MF $(DEPDIR)/TestUnion-TestUnion.Tpo -c -o TestUnion-TestUnion.o `test -f 'TestUnion.C' || echo '$(srcdir)/'`TestUnion.C
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/TestUnion-TestUnion.Tpo $(DEPDIR)/TestUnion-TestUnion.Po
@@ -569,19 +656,19 @@ TestUnion-TestUnion.obj: TestUnion.C
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-TestScanAdd-TestScanAdd.o: TestScanAdd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CFLAGS) $(CFLAGS) -MT TestScanAdd-TestScanAdd.o -MD -MP -MF $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo -c -o TestScanAdd-TestScanAdd.o `test -f 'TestScanAdd.c' || echo '$(srcdir)/'`TestScanAdd.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo $(DEPDIR)/TestScanAdd-TestScanAdd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TestScanAdd.c' object='TestScanAdd-TestScanAdd.o' libtool=no @AMDEPBACKSLASH@
+TestUnpack-TestUnpack.o: TestUnpack.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnpack_CFLAGS) $(CFLAGS) -MT TestUnpack-TestUnpack.o -MD -MP -MF $(DEPDIR)/TestUnpack-TestUnpack.Tpo -c -o TestUnpack-TestUnpack.o `test -f 'TestUnpack.c' || echo '$(srcdir)/'`TestUnpack.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/TestUnpack-TestUnpack.Tpo $(DEPDIR)/TestUnpack-TestUnpack.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TestUnpack.c' object='TestUnpack-TestUnpack.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CFLAGS) $(CFLAGS) -c -o TestScanAdd-TestScanAdd.o `test -f 'TestScanAdd.c' || echo '$(srcdir)/'`TestScanAdd.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnpack_CFLAGS) $(CFLAGS) -c -o TestUnpack-TestUnpack.o `test -f 'TestUnpack.c' || echo '$(srcdir)/'`TestUnpack.c
 
-TestScanAdd-TestScanAdd.obj: TestScanAdd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CFLAGS) $(CFLAGS) -MT TestScanAdd-TestScanAdd.obj -MD -MP -MF $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo -c -o TestScanAdd-TestScanAdd.obj `if test -f 'TestScanAdd.c'; then $(CYGPATH_W) 'TestScanAdd.c'; else $(CYGPATH_W) '$(srcdir)/TestScanAdd.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/TestScanAdd-TestScanAdd.Tpo $(DEPDIR)/TestScanAdd-TestScanAdd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TestScanAdd.c' object='TestScanAdd-TestScanAdd.obj' libtool=no @AMDEPBACKSLASH@
+TestUnpack-TestUnpack.obj: TestUnpack.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnpack_CFLAGS) $(CFLAGS) -MT TestUnpack-TestUnpack.obj -MD -MP -MF $(DEPDIR)/TestUnpack-TestUnpack.Tpo -c -o TestUnpack-TestUnpack.obj `if test -f 'TestUnpack.c'; then $(CYGPATH_W) 'TestUnpack.c'; else $(CYGPATH_W) '$(srcdir)/TestUnpack.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/TestUnpack-TestUnpack.Tpo $(DEPDIR)/TestUnpack-TestUnpack.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TestUnpack.c' object='TestUnpack-TestUnpack.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestScanAdd_CFLAGS) $(CFLAGS) -c -o TestScanAdd-TestScanAdd.obj `if test -f 'TestScanAdd.c'; then $(CYGPATH_W) 'TestScanAdd.c'; else $(CYGPATH_W) '$(srcdir)/TestScanAdd.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnpack_CFLAGS) $(CFLAGS) -c -o TestUnpack-TestUnpack.obj `if test -f 'TestUnpack.c'; then $(CYGPATH_W) 'TestUnpack.c'; else $(CYGPATH_W) '$(srcdir)/TestUnpack.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

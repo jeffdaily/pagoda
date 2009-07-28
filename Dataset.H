@@ -24,9 +24,9 @@ class Dataset
         Dataset();
         virtual ~Dataset();
 
-        virtual vector<Attribute*>& get_atts() = 0;
-        virtual vector<Dimension*>& get_dims() = 0;
-        virtual vector<Variable*>& get_vars() = 0;
+        virtual vector<Attribute*> get_atts() = 0;
+        virtual vector<Dimension*> get_dims() = 0;
+        virtual vector<Variable*> get_vars() = 0;
 
         virtual Attribute* find_att(const string &name,
                 bool ignore_case=true);
@@ -39,14 +39,16 @@ class Dataset
         virtual Variable* find_var(const string &name,
                 bool ignore_case=false);
 
-        virtual void create_masks(const vector<DimSlice> &slices);
-        virtual void create_masks(const LatLonBox &box);
+        virtual void create_masks();
+        virtual void adjust_masks(const vector<DimSlice> &slices);
+        virtual void adjust_masks(const LatLonBox &box);
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Dataset *dataset);
 
     protected:
-        void decorate();
+        virtual void decorate();
+        virtual void decorate(const vector<Variable*> &vars) = 0;
 };
 
 #endif // DATASET_H_

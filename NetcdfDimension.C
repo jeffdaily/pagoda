@@ -1,17 +1,19 @@
 #include <pnetcdf.h>
 
+#include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "Util.H"
 
 
-NetcdfDimension::NetcdfDimension(int ncid, int dimid)
+NetcdfDimension::NetcdfDimension(NetcdfDataset *dataset, int dimid)
     :   Dimension()
-    ,   ncid(ncid)
+    ,   dataset(dataset)
     ,   id(dimid)
     ,   name("")
     ,   size(0)
     ,   unlimited(false)
 {
+    int ncid = dataset->get_id();
     int udim;
     int err = ncmpi_inq_unlimdim(ncid, &udim);
     ERRNO_CHECK(err);
@@ -25,33 +27,8 @@ NetcdfDimension::NetcdfDimension(int ncid, int dimid)
 }
 
 
-NetcdfDimension::NetcdfDimension(const NetcdfDimension &copy)
-    :   Dimension(copy)
-    ,   ncid(copy.ncid)
-    ,   id(copy.id)
-    ,   name(copy.name)
-    ,   size(copy.size)
-    ,   unlimited(copy.unlimited)
-{
-}
-
-
 NetcdfDimension::~NetcdfDimension()
 {
-}
-
-
-NetcdfDimension& NetcdfDimension::operator = (const NetcdfDimension &other)
-{
-    if (&other != this) {
-        this->Dimension::operator=(other);
-        ncid = other.ncid;
-        id = other.id;
-        name = other.name;
-        size = other.size;
-        unlimited = other.unlimited;
-    }
-    return *this;
 }
 
 
@@ -70,6 +47,12 @@ int64_t NetcdfDimension::get_size() const
 bool NetcdfDimension::is_unlimited() const
 {
     return unlimited;
+}
+
+
+NetcdfDataset* NetcdfDimension::get_dataset() const
+{
+    return dataset;
 }
 
 

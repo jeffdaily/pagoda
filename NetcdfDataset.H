@@ -10,6 +10,9 @@
 
 class Attribute;
 class Dimension;
+class NetcdfAttribute;
+class NetcdfDimension;
+class NetcdfVariable;
 class Variable;
 
 
@@ -19,19 +22,30 @@ class NetcdfDataset : public Dataset
         NetcdfDataset(const string &filename);
         virtual ~NetcdfDataset();
 
-        virtual vector<Attribute*>& get_atts();
-        virtual vector<Dimension*>& get_dims();
-        virtual vector<Variable*>& get_vars();
+        virtual vector<Attribute*> get_atts();
+        virtual vector<Dimension*> get_dims();
+        virtual vector<Variable*> get_vars();
 
         virtual ostream& print(ostream &os) const;
 
-    private:
+        NetcdfAttribute* get_att(size_t i) const;
+        NetcdfDimension* get_dim(size_t i) const;
+        NetcdfVariable*  get_var(size_t i) const;
+
+        string get_filename() const;
+        int get_id() const;
+        NetcdfDimension* get_udim() const;
+
+    protected:
+        virtual void decorate(const vector<Variable*> &vars) ;
+
         string filename;
         int ncid;
         int udim;
-        vector<Attribute*> atts;
-        vector<Dimension*> dims;
-        vector<Variable*> vars;
+        vector<NetcdfAttribute*> atts;
+        vector<NetcdfDimension*> dims;
+        vector<NetcdfVariable*> vars;
+        vector<Variable*> decorated;
 };
 
 #endif // NETCDFDATASET_H_

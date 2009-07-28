@@ -50,9 +50,21 @@ int64_t* VariableDecorator::get_sizes() const
 }
 
 
+long* VariableDecorator::get_mask_sizes() const
+{
+    return var->get_mask_sizes();
+}
+
+
 size_t VariableDecorator::num_masks() const
 {
     return var->num_masks();
+}
+
+
+size_t VariableDecorator::num_cleared_masks() const
+{
+    return var->num_cleared_masks();
 }
 
 
@@ -123,6 +135,12 @@ void VariableDecorator::set_record_index(size_t index)
 size_t VariableDecorator::get_record_index() const
 {
     return var->get_record_index();
+}
+
+
+void VariableDecorator::reindex()
+{
+    return var->reindex();
 }
 
 

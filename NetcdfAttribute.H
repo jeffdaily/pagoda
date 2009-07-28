@@ -9,14 +9,16 @@
 #include "Attribute.H"
 #include "DataType.H"
 
+class NetcdfDataset;
+class NetcdfVariable;
 class Values;
 
 
 class NetcdfAttribute : public Attribute
 {
     public:
-        NetcdfAttribute(int ncid, int attid, int varid);
-        NetcdfAttribute(const NetcdfAttribute &copy);
+        NetcdfAttribute(NetcdfDataset *dataset, int attid,
+                NetcdfVariable *var=NULL);
         virtual ~NetcdfAttribute();
 
         virtual string get_name() const;
@@ -27,10 +29,14 @@ class NetcdfAttribute : public Attribute
 
         virtual ostream& print(ostream &os) const;
 
-    private:
-        int ncid;
+        NetcdfDataset* get_dataset() const;
+        virtual int get_id() const;
+        NetcdfVariable* get_var() const;
+
+    protected:
+        NetcdfDataset *dataset;
         int id;
-        int varid;
+        NetcdfVariable *var;
         string name;
         DataType type;
         bool global;
