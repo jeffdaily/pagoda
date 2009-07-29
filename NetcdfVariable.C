@@ -98,16 +98,19 @@ void NetcdfVariable::read()
     MPI_Offset count[ndim];
     int err;
 
-    if (has_record()) {
-        dimidx = 1;
-        start[0] = record_index;
-    } else {
-        dimidx = 0;
-    }
     NGA_Distribution64(handle, ME, lo, hi);
-    for (; dimidx<ndim; ++dimidx) {
-        start[dimidx] = lo[dimidx];
-        count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+    if (has_record() && ndim > 1) {
+        start[0] = record_index;
+        count[0] = 1;
+        for (dimidx=1; dimidx<ndim; ++dimidx) {
+            start[dimidx] = lo[dimidx-1];
+            count[dimidx] = hi[dimidx-1] - lo[dimidx-1] + 1;
+        }
+    } else {
+        for (dimidx=0; dimidx<ndim; ++dimidx) {
+            start[dimidx] = lo[dimidx];
+            count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+        }
     }
 
 #define read_var_all(TYPE, NC_TYPE) \

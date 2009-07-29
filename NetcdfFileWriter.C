@@ -1,6 +1,3 @@
-#include <iostream>
-    using std::cout;
-    using std::endl;
 #include <vector>
     using std::vector;
 
@@ -108,7 +105,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     // copy var data
     for (vars_out_it=vars_out.begin(); vars_out_it!=vars_out.end(); ++vars_out_it) {
         Variable *var_in = *Util::find(vars_in, vars_out_it->first);
-        if (var_in->has_record()) {
+        if (var_in->has_record() && var_in->num_dims() > 1) {
             copy_record_var(var_in, ncid, vars_out_it->second);
         } else {
             copy_var(var_in, ncid, vars_out_it->second);
@@ -161,7 +158,6 @@ void NetcdfFileWriter::copy_atts(
 
 void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 {
-    //cout << "NetcdfFileWriter::copy_var " << var_in << " " << var_in->get_type() << endl;
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_masks[ndim];
@@ -170,9 +166,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 
     var_in->read();
     var_in->reindex(); // noop if not ConnectivityVariable
-    //cout << "\tafter read" << endl;
 
-    //cout << "\tnum_cleared_masks=" << num_cleared_masks << endl;
     if (num_cleared_masks > 0) {
         int ga_var_out;
         int dim_ids[ndim];
@@ -191,9 +185,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
         ga_var_out = NGA_Create64(var_in->get_type().as_mt(), ndim, dim_lens,
                 "pack_dst", NULL);
         pack(ga_var_in, ga_var_out, ga_masks);
-        //cout << "\tafter pack" << endl;
         write(ga_var_out, ncid, varid);
-        //cout << "\tafter write" << endl;
         GA_Destroy(ga_var_out);
     } else {
         // no masks, so a direct copy
@@ -206,11 +198,48 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 
 void NetcdfFileWriter::copy_record_var(Variable *var_in, int ncid, int varid)
 {
-    //cout << "NetcdfFileWriter::copy_record_var " << var_in << endl;
+    vector<Dimension*> dims = var_in->get_dims();
+    size_t ndim = dims.size();
+    int64_t nrec = dims[0]->get_size();
+    int ga_var_in = var_in->get_handle();
+    int ga_masks[ndim];
+    // assuming currently that record dimension has a mask
+    int *rec_mask = dims[0]->get_mask()->get_data();
+    size_t recidx=0;
+    size_t packed_recidx=0;
+
+    int ga_var_out;
+    int dim_ids[ndim];
+    int64_t dim_lens[ndim];
+
+    // determine size of GA to create for packed destination
+    err = ncmpi_inq_vardimid(ncid, varid, dim_ids);
+    ERRNO_CHECK(err);
+    for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
+        MPI_Offset tmp;
+        err = ncmpi_inq_dimlen(ncid, dim_ids[dimidx], &tmp);
+        ERRNO_CHECK(err);
+        dim_lens[dimidx] = tmp;
+        ga_masks[dimidx] = ((DistributedMask*)var_in->get_dims()[dimidx]->get_mask())->get_handle();
+    }
+    ga_var_out = NGA_Create64(var_in->get_type().as_mt(), ndim-1, dim_lens+1,
+            "pack_dst", NULL);
+
+    for (recidx=0; recidx<nrec; ++recidx) {
+        if (rec_mask[recidx] != 0) {
+            var_in->set_record_index(recidx);
+            var_in->read();
+            pack(ga_var_in, ga_var_out, ga_masks+1);
+            write(ga_var_out, ncid, varid, packed_recidx++);
+        }
+    }
+
+    GA_Destroy(ga_var_out);
+    var_in->release_handle();
 }
 
 
-void NetcdfFileWriter::write(int handle, int ncid, int varid)
+void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
 {
     DataType type = DataType::CHAR;
     int mt_type;
@@ -221,14 +250,24 @@ void NetcdfFileWriter::write(int handle, int ncid, int varid)
     int64_t ld[GA_MAX_DIM-1];
     MPI_Offset start[GA_MAX_DIM];
     MPI_Offset count[GA_MAX_DIM];
+    size_t dimidx=0;
 
     NGA_Inquire64(handle, &mt_type, &ndim, dim_sizes);
     type.from_mt(mt_type);
-
     NGA_Distribution64(handle, ME, lo, hi);
-    for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
-        start[dimidx] = lo[dimidx];
-        count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+
+    if (recidx >= 0) {
+        start[0] = recidx;
+        count[0] = 1;
+        for (dimidx=0; dimidx<ndim; ++dimidx) {
+            start[dimidx+1] = lo[dimidx];
+            count[dimidx+1] = hi[dimidx] - lo[dimidx] + 1;
+        }
+    } else {
+        for (dimidx=0; dimidx<ndim; ++dimidx) {
+            start[dimidx] = lo[dimidx];
+            count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+        }
     }
 #define write_var_all(TYPE, NC_TYPE) \
     if (type == NC_TYPE) { \

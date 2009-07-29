@@ -143,7 +143,7 @@ int AbstractVariable::get_handle()
 {
     if (0 == handle) {
         int64_t *dim_sizes = get_sizes();
-        if (has_record()) {
+        if (has_record() && num_dims() > 1) {
             int64_t *size_tmp = dim_sizes + 1;
             handle = NGA_Create64(get_type().as_mt(), num_dims()-1, size_tmp,
                 (char*)get_name().c_str(), NULL);

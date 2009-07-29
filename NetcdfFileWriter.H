@@ -23,7 +23,7 @@ class NetcdfFileWriter
         static void copy_atts(const vector<Attribute*> &atts, int ncid, int varid);
         static void copy_var(Variable *var_in, int ncid, int varid);
         static void copy_record_var(Variable *var_in, int ncid, int varid);
-        static void write(int handle, int ncid, int varid);
+        static void write(int handle, int ncid, int varid, int recidx=-1);
 };
 
 #endif // NETCDFFILEWRITER_H_
