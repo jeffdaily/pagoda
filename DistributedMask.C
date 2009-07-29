@@ -240,7 +240,7 @@ void DistributedMask::recount()
 
 void DistributedMask::reindex()
 {
-    if (handle_index == 0) {
+    if (0 == handle_index) {
         int type;
         int ndim;
         int64_t dims;
@@ -254,13 +254,13 @@ void DistributedMask::reindex()
     int64_t icount;
 
     GA_Fill(handle_index, &ONE_NEG);
-    GA_Sync();
     handle_tmp = NGA_Create64(MT_INT, 1, &tmp_count, "tmp_enum", NULL);
     //GA_Patch_enum64(handle_tmp, 0, tmp_count-1, 0, 1);
     enumerate(handle_tmp, 0, 1);
-    GA_Sync();
-    GA_Unpack64(handle_tmp, handle_index, handle, 0, tmp_count-1, &icount);
-    GA_Sync();
+    //GA_Unpack64(handle_tmp, handle_index, handle, 0, tmp_count-1, &icount);
+    unpack1d(handle_tmp, handle_index, handle);
+    GA_Destroy(handle_tmp);
+    /*
     if (GA_Nnodes() == 1) {
         int64_t ZERO = 0;
         int64_t bighi = dim->get_size()-1;
@@ -273,6 +273,6 @@ void DistributedMask::reindex()
             std::cout << "[" << i << "]" << dst[i] << " " << mask[i] << std::endl;
         }
     }
-    GA_Destroy(handle_tmp);
+    */
 }
 

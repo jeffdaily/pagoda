@@ -141,7 +141,7 @@ Attribute* AbstractVariable::find_att(
 
 int AbstractVariable::get_handle()
 {
-    if (handle == 0) {
+    if (0 == handle) {
         int64_t *dim_sizes = get_sizes();
         if (has_record()) {
             int64_t *size_tmp = dim_sizes + 1;
@@ -159,8 +159,10 @@ int AbstractVariable::get_handle()
 
 void AbstractVariable::release_handle()
 {
-    GA_Destroy(handle);
-    handle = 0;
+    if (0 != handle) {
+        GA_Destroy(handle);
+        handle = 0;
+    }
 }
 
 
@@ -178,8 +180,6 @@ size_t AbstractVariable::get_record_index() const
 
 void AbstractVariable::reindex()
 {
-    std::cout << "AbstractVariable::reindex() " << get_name() << std::endl;
-    std::cout << this << std::endl;
 }
 
 

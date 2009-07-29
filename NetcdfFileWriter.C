@@ -1,3 +1,6 @@
+#include <iostream>
+    using std::cout;
+    using std::endl;
 #include <vector>
     using std::vector;
 
@@ -105,7 +108,6 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     // copy var data
     for (vars_out_it=vars_out.begin(); vars_out_it!=vars_out.end(); ++vars_out_it) {
         Variable *var_in = *Util::find(vars_in, vars_out_it->first);
-        var_in->reindex();
         if (var_in->has_record()) {
             copy_record_var(var_in, ncid, vars_out_it->second);
         } else {
@@ -159,6 +161,7 @@ void NetcdfFileWriter::copy_atts(
 
 void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 {
+    //cout << "NetcdfFileWriter::copy_var " << var_in << " " << var_in->get_type() << endl;
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_masks[ndim];
@@ -166,7 +169,10 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
     size_t num_cleared_masks = var_in->num_cleared_masks();
 
     var_in->read();
+    var_in->reindex(); // noop if not ConnectivityVariable
+    //cout << "\tafter read" << endl;
 
+    //cout << "\tnum_cleared_masks=" << num_cleared_masks << endl;
     if (num_cleared_masks > 0) {
         int ga_var_out;
         int dim_ids[ndim];
@@ -185,7 +191,9 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
         ga_var_out = NGA_Create64(var_in->get_type().as_mt(), ndim, dim_lens,
                 "pack_dst", NULL);
         pack(ga_var_in, ga_var_out, ga_masks);
+        //cout << "\tafter pack" << endl;
         write(ga_var_out, ncid, varid);
+        //cout << "\tafter write" << endl;
         GA_Destroy(ga_var_out);
     } else {
         // no masks, so a direct copy
@@ -198,6 +206,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 
 void NetcdfFileWriter::copy_record_var(Variable *var_in, int ncid, int varid)
 {
+    //cout << "NetcdfFileWriter::copy_record_var " << var_in << endl;
 }
 
 

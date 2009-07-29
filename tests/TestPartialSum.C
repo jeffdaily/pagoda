@@ -29,8 +29,9 @@ int main(int argc, char **argv)
     int hi = size - 1;
 
     if (0 == me) {
-        int vals[] = {0,0,1,0,1,1,1,0,0,1}; // 10 == size
+        //int vals[] = {0,0,1,0,1,1,1,0,0,1}; // 10 == size
         //int vals[] = {1,0,1,0,1,1,1,0,0,1}; // 10 == size
+        int vals[] = {1,1,1,1,1,1,1,1,1,1}; // 10 == size
         int lo = 0;
         int hi = size-1;
         int ONE = 1;
