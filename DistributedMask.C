@@ -225,14 +225,17 @@ void DistributedMask::adjust(
 void DistributedMask::recount()
 {
     int *data;
-    count = 0;
     fill(counts, counts+NPROC, 0);
-    NGA_Access64(handle, &lo, &hi, &data, NULL);
-    for (int64_t i=0,limit=(hi-lo+1); i<limit; ++i) {
-        if (data[i] != 0) ++count;
+    if (0 > lo || 0 > hi) {
+    } else {
+        NGA_Access64(handle, &lo, &hi, &data, NULL);
+        for (int64_t i=0,limit=(hi-lo+1); i<limit; ++i) {
+            if (data[i] != 0) {
+                ++(counts[ME]);
+            }
+        }
+        NGA_Release_update64(handle, &lo, &hi);
     }
-    NGA_Release_update64(handle, &lo, &hi);
-    counts[ME] = count;
     GA_Lgop(counts, NPROC, "+");
     count = accumulate(counts, counts+NPROC, 0);
 }

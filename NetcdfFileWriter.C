@@ -256,31 +256,49 @@ void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
     type.from_mt(mt_type);
     NGA_Distribution64(handle, ME, lo, hi);
 
-    if (recidx >= 0) {
-        start[0] = recidx;
-        count[0] = 1;
+    if (0 > lo[0] && 0 > hi[0]) {
+        // make a non-participating process a no-op
         for (dimidx=0; dimidx<ndim; ++dimidx) {
-            start[dimidx+1] = lo[dimidx];
-            count[dimidx+1] = hi[dimidx] - lo[dimidx] + 1;
+            start[dimidx] = 0;
+            count[dimidx] = 0;
         }
-    } else {
-        for (dimidx=0; dimidx<ndim; ++dimidx) {
-            start[dimidx] = lo[dimidx];
-            count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
-        }
-    }
 #define write_var_all(TYPE, NC_TYPE) \
-    if (type == NC_TYPE) { \
-        TYPE *ptr; \
-        NGA_Access64(handle, lo, hi, &ptr, ld); \
-        err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \
-        ERRNO_CHECK(err); \
-        NGA_Release64(handle, lo, hi); \
-    } else
-    write_var_all(int, NC_INT)
-    write_var_all(float, NC_FLOAT)
-    write_var_all(double, NC_DOUBLE)
-    ; // for last else above
+        if (type == NC_TYPE) { \
+            err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, NULL);\
+        } else
+        write_var_all(int, NC_INT)
+        write_var_all(float, NC_FLOAT)
+        write_var_all(double, NC_DOUBLE)
+        ; // for last else above
 #undef write_var_all
+        ERRNO_CHECK(err);
+    } else {
+        if (recidx >= 0) {
+            start[0] = recidx;
+            count[0] = 1;
+            for (dimidx=0; dimidx<ndim; ++dimidx) {
+                start[dimidx+1] = lo[dimidx];
+                count[dimidx+1] = hi[dimidx] - lo[dimidx] + 1;
+            }
+        } else {
+            for (dimidx=0; dimidx<ndim; ++dimidx) {
+                start[dimidx] = lo[dimidx];
+                count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+            }
+        }
+#define write_var_all(TYPE, NC_TYPE) \
+        if (type == NC_TYPE) { \
+            TYPE *ptr; \
+            NGA_Access64(handle, lo, hi, &ptr, ld); \
+            err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \
+        } else
+        write_var_all(int, NC_INT)
+        write_var_all(float, NC_FLOAT)
+        write_var_all(double, NC_DOUBLE)
+        ; // for last else above
+#undef write_var_all
+        ERRNO_CHECK(err);
+        NGA_Release64(handle, lo, hi);
+    }
 }
 

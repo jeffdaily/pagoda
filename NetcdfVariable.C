@@ -87,6 +87,7 @@ DataType NetcdfVariable::get_type() const
 
 void NetcdfVariable::read()
 {
+    int me = GA_Nodeid();
     int ncid = dataset->get_id();
     DataType type = get_type();
     size_t ndim = num_dims();
@@ -98,34 +99,52 @@ void NetcdfVariable::read()
     MPI_Offset count[ndim];
     int err;
 
-    NGA_Distribution64(handle, ME, lo, hi);
-    if (has_record() && ndim > 1) {
-        start[0] = record_index;
-        count[0] = 1;
-        for (dimidx=1; dimidx<ndim; ++dimidx) {
-            start[dimidx] = lo[dimidx-1];
-            count[dimidx] = hi[dimidx-1] - lo[dimidx-1] + 1;
-        }
-    } else {
-        for (dimidx=0; dimidx<ndim; ++dimidx) {
-            start[dimidx] = lo[dimidx];
-            count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
-        }
-    }
+    NGA_Distribution64(handle, me, lo, hi);
 
+    if (0 > lo[0] && 0 > hi[0]) {
+        // make a non-participating process a no-op
+        for (dimidx=0; dimidx<ndim; ++dimidx) {
+            start[dimidx] = 0;
+            count[dimidx] = 0;
+        }
 #define read_var_all(TYPE, NC_TYPE) \
-    if (type == NC_TYPE) { \
-        TYPE *ptr; \
-        NGA_Access64(handle, lo, hi, &ptr, ld); \
-        err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
-    } else
-    read_var_all(int, NC_INT)
-    read_var_all(float, NC_FLOAT)
-    read_var_all(double, NC_DOUBLE)
-    ; // for last else above
+        if (type == NC_TYPE) { \
+            err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, NULL); \
+        } else
+        read_var_all(int, NC_INT)
+        read_var_all(float, NC_FLOAT)
+        read_var_all(double, NC_DOUBLE)
+        ; // for last else above
 #undef read_var_all
-    ERRNO_CHECK(err);
-    NGA_Release_update64(handle, lo, hi);
+        ERRNO_CHECK(err);
+    } else {
+        if (has_record() && ndim > 1) {
+            start[0] = record_index;
+            count[0] = 1;
+            for (dimidx=1; dimidx<ndim; ++dimidx) {
+                start[dimidx] = lo[dimidx-1];
+                count[dimidx] = hi[dimidx-1] - lo[dimidx-1] + 1;
+            }
+        } else {
+            for (dimidx=0; dimidx<ndim; ++dimidx) {
+                start[dimidx] = lo[dimidx];
+                count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+            }
+        }
+#define read_var_all(TYPE, NC_TYPE) \
+        if (type == NC_TYPE) { \
+            TYPE *ptr; \
+            NGA_Access64(handle, lo, hi, &ptr, ld); \
+            err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
+        } else
+        read_var_all(int, NC_INT)
+        read_var_all(float, NC_FLOAT)
+        read_var_all(double, NC_DOUBLE)
+        ; // for last else above
+#undef read_var_all
+        ERRNO_CHECK(err);
+        NGA_Release_update64(handle, lo, hi);
+    }
 }
 
 
