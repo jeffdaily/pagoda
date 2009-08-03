@@ -115,20 +115,20 @@ void partial_sum(int g_src, int g_dst, int excl)
         /* no elements stored on this process */
         /* broadcast dummy value to all processes */
         switch (type_src) {
-#define partial_sum_op(MTYPE,TYPE,TYPE_MIN) \
+#define partial_sum_op(MTYPE,TYPE,GOP_TYPE,GOP_OP,TYPE_MIN) \
             case MTYPE: \
                 { \
-                    TYPE values[nproc]; \
+                    GOP_TYPE values[nproc]; \
                     for (int64_t i=0; i<nproc; ++i) { \
                         values[i] = TYPE_MIN; \
                     } \
-                    GA_Gop(MTYPE, values, nproc, "max"); \
+                    GOP_OP(values, nproc, "max"); \
                     break; \
                 }
-            partial_sum_op(MT_INT,int,INT_MIN)
-            partial_sum_op(MT_LONGINT,long,LONG_MIN)
-            partial_sum_op(MT_REAL,float,FLT_MIN)
-            partial_sum_op(MT_DBL,double,DBL_MIN)
+            partial_sum_op(MT_INT,int,long,GA_Lgop,INT_MIN)
+            partial_sum_op(MT_LONGINT,long,long,GA_Lgop,LONG_MIN)
+            partial_sum_op(MT_REAL,float,double,GA_Dgop,FLT_MIN)
+            partial_sum_op(MT_DBL,double,double,GA_Dgop,DBL_MIN)
 #undef partial_sum_op
         }
     } else {
@@ -137,11 +137,11 @@ void partial_sum(int g_src, int g_dst, int excl)
         NGA_Access64(g_src, &lo, &hi, &ptr_src, NULL);
         NGA_Access64(g_dst, &lo, &hi, &ptr_dst, NULL);
         switch (type_src) {
-#define partial_sum_op(MTYPE,TYPE,TYPE_MIN) \
+#define partial_sum_op(MTYPE,TYPE,GOP_TYPE,GOP_OP,TYPE_MIN) \
             case MTYPE: \
                 { \
                     TYPE value = 0; \
-                    TYPE values[nproc]; \
+                    GOP_TYPE values[nproc]; \
                     TYPE *src = (TYPE*)ptr_src; \
                     TYPE *dst = (TYPE*)ptr_dst; \
                     for (int64_t i=0; i<nproc; ++i) { \
@@ -151,7 +151,7 @@ void partial_sum(int g_src, int g_dst, int excl)
                     if (0 == excl) { \
                         values[me] += src[elems-1]; \
                     } \
-                    GA_Gop(MTYPE, values, nproc, "max"); \
+                    GOP_OP(values, nproc, "max"); \
                     for (int64_t i=0; i<me; ++i) { \
                         if (TYPE_MIN != values[i]) { \
                             value += values[i]; \
@@ -162,10 +162,10 @@ void partial_sum(int g_src, int g_dst, int excl)
                     } \
                     break; \
                 }
-            partial_sum_op(MT_INT,int,INT_MIN)
-            partial_sum_op(MT_LONGINT,long,LONG_MIN)
-            partial_sum_op(MT_REAL,float,FLT_MIN)
-            partial_sum_op(MT_DBL,double,DBL_MIN)
+            partial_sum_op(MT_INT,int,long,GA_Lgop,INT_MIN)
+            partial_sum_op(MT_LONGINT,long,long,GA_Lgop,LONG_MIN)
+            partial_sum_op(MT_REAL,float,double,GA_Dgop,FLT_MIN)
+            partial_sum_op(MT_DBL,double,double,GA_Dgop,DBL_MIN)
 #undef partial_sum_op
         }
         NGA_Release_update64(g_dst, &lo, &hi);
