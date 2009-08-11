@@ -6,6 +6,7 @@
 #include <macdecls.h>
 
 #include "Pack.H"
+#include "Util.H"
 
 /*
 static void print_local_masks(int *local_masks[], int64_t elems[], int n)
@@ -34,6 +35,7 @@ static void print_local_masks(int *local_masks[], int64_t elems[], int n)
 
 void partial_sum(int g_src, int g_dst, int excl)
 {
+    TRACER("partial_sum\n")
     int nproc = GA_Nnodes();
     int me = GA_Nodeid();
     int type_src;
@@ -177,7 +179,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 
 void pack(int g_src, int g_dst, int *g_masks)
 {
-    //printf("pack(%d,%d,...)\n", g_src, g_dst);
+    TRACER("pack\n")
     int nproc = GA_Nnodes();
     int me = GA_Nodeid();
 
@@ -327,6 +329,7 @@ void pack(int g_src, int g_dst, int *g_masks)
 
 void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
+    //TRACER("unravel64\n")
     // x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
     result[ndim-1] = x % dims[ndim-1];
     for (int i=ndim-2; i>=0; --i) {
@@ -349,6 +352,7 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
  */
 void enumerate(int g_src, int start, int inc)
 {
+    TRACER("enumerate\n")
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
     int64_t map[nproc*2];
@@ -392,6 +396,7 @@ void enumerate(int g_src, int start, int inc)
  */
 void unpack1d(int g_src, int g_dst, int g_msk)
 {
+    TRACER("unpack1d\n")
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
     int *mask;

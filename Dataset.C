@@ -30,7 +30,7 @@ Dataset* Dataset::open(const string &filename)
     }
     if (dataset) {
         dataset->decorate();
-        dataset->create_masks();
+        //dataset->create_masks();
     }
     return dataset;
 }

@@ -1,5 +1,8 @@
 /* config/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* stderr: unordered debug messages */
+#undef DEBUG
+
 /* Define to dummy `main' function (if any) required to link to the Fortran
    libraries. */
 #undef F77_DUMMY_MAIN
@@ -80,14 +83,14 @@
 /* The size of `int64_t', as computed by sizeof. */
 #undef SIZEOF_INT64_T
 
-/* The size of `Integer', as computed by sizeof. */
-#undef SIZEOF_INTEGER
-
 /* The size of `MPI_Offset', as computed by sizeof. */
 #undef SIZEOF_MPI_OFFSET
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* stderr: ordered function calls */
+#undef TRACE
 
 /* Version number of package */
 #undef VERSION

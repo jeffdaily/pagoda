@@ -43,22 +43,27 @@ class Variable;
 #define RAD_PER_DEG (M_PI / 180.0)
 #define DEG_PER_RAD (180.0 / M_PI)
 
-#define ERR(e) { \
-ostringstream __os; \
-__os << "Error: " << e << endl; \
-throw SubsetterException(__os.str()); }
+#define ERR(e) \
+{ \
+    ostringstream __os; \
+    __os << "Error: " << e << endl; \
+    throw SubsetterException(__os.str()); \
+}
 
-#define ERRNO(n) { \
-ostringstream __os; \
-__os << "Error: " << ncmpi_strerror(n) << endl; \
-throw SubsetterException(__os.str()); }
+#define ERRNO(n) \
+{ \
+    ostringstream __os; \
+    __os << "Error: " << ncmpi_strerror(n) << endl; \
+    throw SubsetterException(__os.str()); \
+}
 
 #define ERRNO_CHECK(n) \
-  if (n != NC_NOERR) { \
-    ERRNO(n); \
-  }
+{ \
+    if (n != NC_NOERR) { \
+        ERRNO(n); \
+    } \
+}
 
-//#define DEBUG
 #ifdef DEBUG
 #  include <assert.h>
 //#  define DEBUG_MASKS
@@ -67,6 +72,65 @@ throw SubsetterException(__os.str()); }
 #else
 #  define DEBUG_PRINT
 #  define DEBUG_PRINT_ME
+#endif
+
+#ifdef TRACE
+#   define TRACER(fmt) \
+    { \
+        for (int __i=0; __i < NPROC; ++__i) { \
+            if (__i == ME) { \
+                fprintf(stderr, "[%d] ", ME); \
+                fprintf(stderr, fmt); \
+            } \
+            GA_Sync(); \
+        } \
+    }
+#   define TRACER1(fmt, a1) \
+    { \
+        for (int __i=0; __i < NPROC; ++__i) { \
+            if (__i == ME) { \
+                fprintf(stderr, "[%d] ", ME); \
+                fprintf(stderr, fmt, a1); \
+            } \
+            GA_Sync(); \
+        } \
+    }
+#   define TRACER2(fmt, a1, a2) \
+    { \
+        for (int __i=0; __i < NPROC; ++__i) { \
+            if (__i == ME) { \
+                fprintf(stderr, "[%d] ", ME); \
+                fprintf(stderr, fmt, a1, a2); \
+            } \
+            GA_Sync(); \
+        } \
+    }
+#   define TRACER3(fmt, a1, a2, a3) \
+    { \
+        for (int __i=0; __i < NPROC; ++__i) { \
+            if (__i == ME) { \
+                fprintf(stderr, "[%d] ", ME); \
+                fprintf(stderr, fmt, a1, a2, a3); \
+            } \
+            GA_Sync(); \
+        } \
+    }
+#   define TRACER4(fmt, a1, a2, a3, a4) \
+    { \
+        for (int __i=0; __i < NPROC; ++__i) { \
+            if (__i == ME) { \
+                fprintf(stderr, "[%d] ", ME); \
+                fprintf(stderr, fmt, a1, a2, a3, a4); \
+            } \
+            GA_Sync(); \
+        } \
+    }
+#else
+#   define TRACER
+#   define TRACER1
+#   define TRACER2
+#   define TRACER3
+#   define TRACER4
 #endif
 
 

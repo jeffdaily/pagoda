@@ -22,6 +22,7 @@ static int err = 0;
 
 void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
 {
+    TRACER1("NetcdfFileWriter::write(%s)\n", filename.c_str())
     vector<Dimension*> dims_in = dataset->get_dims();
     vector<Dimension*>::const_iterator dims_in_it;
     vector<Variable*> vars_in = dataset->get_vars();
@@ -120,6 +121,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
 
 void NetcdfFileWriter::copy_att(Attribute *attr, int ncid, int varid)
 {
+    TRACER1("NetcdfFileWriter::copy_att %s\n", attr->get_name().c_str())
     string name = attr->get_name();
     DataType type = attr->get_type();
     MPI_Offset len = attr->get_count();
@@ -158,6 +160,7 @@ void NetcdfFileWriter::copy_atts(
 
 void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 {
+    TRACER1("NetcdfFileWriter::copy_var %s\n", var_in->get_name().c_str())
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_masks[ndim];
@@ -198,6 +201,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 
 void NetcdfFileWriter::copy_record_var(Variable *var_in, int ncid, int varid)
 {
+    TRACER1("NetcdfFileWriter::copy_record_var %s\n", var_in->get_name().c_str())
     vector<Dimension*> dims = var_in->get_dims();
     size_t ndim = dims.size();
     int64_t nrec = dims[0]->get_size();
@@ -241,6 +245,7 @@ void NetcdfFileWriter::copy_record_var(Variable *var_in, int ncid, int varid)
 
 void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
 {
+    TRACER4("NetcdfFileWriter::write %d %d %d %d\n", handle, ncid, varid, recidx)
     DataType type = DataType::CHAR;
     int mt_type;
     int ndim;

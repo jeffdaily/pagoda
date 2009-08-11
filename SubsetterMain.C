@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 
     Util::calculate_required_memory(dataset->get_vars());
 
+    dataset->create_masks();
     dataset->adjust_masks(cmd.get_slices());
     dataset->adjust_masks(cmd.get_box());
 

@@ -29,10 +29,21 @@ GCRM_CHECK_PACKAGE([pnetcdf], [ncmpi_open], [pnetcdf], [pnetcdf.h],
   [AC_MSG_FAILURE([--with-pnetcdf was given, but test for pnetcdf failed])]
 )
 
+# Where to find Global Arrays.
 AC_ARG_VAR([GA_INCS], [Global Arrays include directives])
 AC_SUBST([GA_INCS])
 AC_ARG_VAR([GA_LIBS], [Global Arrays C linker directives])
 AC_SUBST([GA_LIBS])
+
+# Debug helper stuff.
+msg="output unordered debug messages"
+AC_ARG_ENABLE([debug],
+    [AS_HELP_STRING([--enable-debug], [stderr: unordered debug messages])],
+    [AC_DEFINE_UNQUOTED([DEBUG], [1], [stderr: unordered debug messages])])
+msg="output ordered function calls to stderr"
+AC_ARG_ENABLE([trace],
+    [AS_HELP_STRING([--enable-trace], [stderr: ordered function calls])],
+    [AC_DEFINE_UNQUOTED([TRACE], [1], [stderr: ordered function calls])])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
@@ -42,10 +53,6 @@ AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
 #
 
 AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
-gcrm_saveCFLAGS=$CFLAGS
-CFLAGS=$GA_INCS
-AC_CHECK_TYPE([Integer], [], [], [[#include <typesf2c.h>]])
-CFLAGS=$gcrm_saveCFLAGS
 AC_CHECK_TYPE([int64_t])
 
 #
@@ -53,10 +60,6 @@ AC_CHECK_TYPE([int64_t])
 #
 
 AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])
-gcrm_saveCFLAGS=$CFLAGS
-CFLAGS=$GA_INCS
-AC_CHECK_SIZEOF([Integer], [], [[#include <typesf2c.h>]])
-CFLAGS=$gcrm_saveCFLAGS
 AC_CHECK_SIZEOF([int64_t])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -69,4 +72,3 @@ AC_CHECK_FUNCS([strtol])
 AC_CONFIG_FILES([Makefile
                  tests/Makefile])
 AC_OUTPUT
-
