@@ -312,7 +312,7 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
  */
 void enumerate(int g_src, void *start_val, void *inc_val)
 {
-    TRACER("enumerate\n")
+    TRACER("enumerate BEGIN\n")
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
     int64_t src_lo;
@@ -324,6 +324,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
     int64_t loc_hi;
     int result;
     int64_t map[nproc*2];
+    //int64_t *ptr = map;
     int procs[nproc];
     int64_t count;
     void *buf;
@@ -334,44 +335,55 @@ void enumerate(int g_src, void *start_val, void *inc_val)
     }
 
     NGA_Distribution64(g_src, me, &src_lo, &src_hi);
+    //TRACER2("enumerate lo,hi = %lld,%lld\n", src_lo, src_hi)
     if (0 > src_lo && 0 > src_hi) {
-        return;
-    }
-
-    loc_lo = 0;
-    loc_hi = src_size-1;
-    count = 0;
-    result = NGA_Locate_region64(g_src, &loc_lo, &loc_hi, map, procs);
-    for (int i=0; i<result; ++i) {
-        if (procs[i] < me) {
-            count += map[i+1]-map[i]+1;
+        //TRACER("enumerate result = N/A\n")
+        //TRACER("enumerate count = N/A\n")
+    } else {
+        loc_lo = 0;
+        loc_hi = src_size-1;
+        count = 0;
+        result = NGA_Locate_region64(g_src, &loc_lo, &loc_hi, map, procs);
+        //TRACER1("enumerate result = %d\n", result)
+        for (int i=0; i<result; ++i) {
+            if (procs[i] < me) {
+                count += map[i*2+1]-map[i*2]+1;
+            }
         }
-    }
+        /*
+        for (int i=0; procs[i]<me; ++i) {
+            count += ptr[1]-ptr[0]+1;
+            ptr += 2;
+        }
+        */
+        //TRACER1("enumerate count = %lld\n", count)
 
-    NGA_Access64(g_src, &src_lo, &src_hi, &buf, NULL);
+        NGA_Access64(g_src, &src_lo, &src_hi, &buf, NULL);
 #define enumerate_op(MTYPE,TYPE) \
-    if (MTYPE == src_type) { \
-        TYPE *src = (TYPE*)buf; \
-        TYPE start = 0; \
-        TYPE inc = 1; \
-        if (start_val) { \
-            start = *((TYPE*)start_val); \
-        } \
-        if (inc_val) { \
-            inc = *((TYPE*)inc_val); \
-        } \
-        for (int64_t i=0,limit=src_hi-src_lo+1; i<limit; ++i) { \
-            src[i] = (count+i)*inc + start; \
-        } \
-    } else
-    enumerate_op(C_INT,int)
-    enumerate_op(C_LONG,long)
-    enumerate_op(C_LONGLONG,long long)
-    enumerate_op(C_FLOAT,float)
-    enumerate_op(C_DBL,double)
-    ; // for last else above
+        if (MTYPE == src_type) { \
+            TYPE *src = (TYPE*)buf; \
+                TYPE start = 0; \
+                TYPE inc = 1; \
+                if (start_val) { \
+                    start = *((TYPE*)start_val); \
+                } \
+            if (inc_val) { \
+                inc = *((TYPE*)inc_val); \
+            } \
+            for (int64_t i=0,limit=src_hi-src_lo+1; i<limit; ++i) { \
+                src[i] = (count+i)*inc + start; \
+            } \
+        } else
+        enumerate_op(C_INT,int)
+        enumerate_op(C_LONG,long)
+        enumerate_op(C_LONGLONG,long long)
+        enumerate_op(C_FLOAT,float)
+        enumerate_op(C_DBL,double)
+        ; // for last else above
 #undef enumerate_op
-    NGA_Release_update64(g_src, &src_lo, &src_hi);
+        NGA_Release_update64(g_src, &src_lo, &src_hi);
+    }
+    TRACER("enumerate END\n")
 }
 
 
@@ -395,63 +407,64 @@ void unpack1d(int g_src, int g_dst, int g_msk)
     int ndim;
     int64_t dims;
 
-    // get type, that's all we want...
-    NGA_Inquire64(g_src, &type, &ndim, &dims);
+    if (1 == GA_Compare_distr(g_dst, g_msk)) {
+        GA_Error("unpack1d: dst and msk distributions differ", 0);
+    }
 
     // count mask bits on each proc
     bzero(counts, sizeof(long)*nproc);
     NGA_Distribution64(g_msk, me, &lo_msk, &hi_msk);
-    if (0 > lo_msk && 0 > hi_msk);
-    else {
+    if (0 > lo_msk && 0 > hi_msk) {
+        GA_Lgop(counts, nproc, "+");
+        TRACER("unpack1d lo,hi N/A 1\n")
+    } else {
         NGA_Access64(g_msk, &lo_msk, &hi_msk, &mask, NULL);
         for (int64_t i=0,limit=(hi_msk-lo_msk+1); i<limit; ++i) {
-            if (mask[i] != 0) ++(counts[me]);
+            if (0 != mask[i]) ++(counts[me]);
         }
         NGA_Release64(g_msk, &lo_msk, &hi_msk);
-    }
-    GA_Lgop(counts, nproc, "+");
-
-    // if this proc got none of the mask, we can safely (and must) return now
-    if (0 == counts[me]) {
-        return;
-    }
-    
-    // tally up where to start the 'get' of the packed array
-    for (int i=0; i<me; ++i) {
-        lo_src += counts[i];
-    }
-    hi_src = lo_src + counts[me] - 1;
-    TRACER2("unpack1d lo,hi = %lld,%lld\n", lo_src, hi_src)
-
-    // do the unpacking
-    // assumption is that dst array has same distribution as msk array
-    if (0 > lo_msk && 0 > hi_msk);
-    else {
-        switch (type) {
-#define unpack1d_op(MTYPE,TYPE) \
-            case MTYPE: { \
-                TYPE srcbuf[hi_src-lo_src+1]; \
-                TYPE *src = srcbuf; \
-                TYPE *dst; \
-                int *msk; \
-                NGA_Get64(g_src, &lo_src, &hi_src, srcbuf, NULL); \
-                NGA_Access64(g_dst, &lo_msk, &hi_msk, &dst, NULL); \
-                NGA_Access64(g_msk, &lo_msk, &hi_msk, &msk, NULL); \
-                for (size_t i=0,limit=hi_msk-lo_msk+1; i<limit; ++i) { \
-                    if (msk[i] != 0) { \
-                        dst[i] = *src; \
-                        ++src; \
-                    } \
-                } \
-                NGA_Release64(g_msk, &lo_msk, &hi_msk); \
-                NGA_Release_update64(g_dst, &lo_msk, &hi_msk); \
-                break; \
+        mask = NULL;
+        GA_Lgop(counts, nproc, "+");
+        if (0 == counts[me]) {
+            TRACER("unpack1d lo,hi N/A 2\n")
+        } else {
+            // tally up where to start the 'get' of the packed array
+            for (int i=0; i<me; ++i) {
+                lo_src += counts[i];
             }
-            unpack1d_op(C_INT,int)
-            unpack1d_op(C_LONG,long)
-            unpack1d_op(C_FLOAT,float)
-            unpack1d_op(C_DBL,double)
+            hi_src = lo_src + counts[me] - 1;
+            TRACER2("unpack1d lo,hi = %lld,%lld\n", lo_src, hi_src)
+            // do the unpacking
+            // assumption is that dst array has same distribution as msk array
+            // get src (and dst) type, that's all we want...
+            NGA_Inquire64(g_src, &type, &ndim, &dims);
+            switch (type) {
+#define unpack1d_op(MTYPE,TYPE) \
+                case MTYPE: { \
+                    TYPE srcbuf[hi_src-lo_src+1]; \
+                    TYPE *src = srcbuf; \
+                    TYPE *dst; \
+                    int *msk; \
+                    NGA_Get64(g_src, &lo_src, &hi_src, srcbuf, NULL); \
+                    NGA_Access64(g_dst, &lo_msk, &hi_msk, &dst, NULL); \
+                    NGA_Access64(g_msk, &lo_msk, &hi_msk, &msk, NULL); \
+                    for (size_t i=0,limit=hi_msk-lo_msk+1; i<limit; ++i) { \
+                        if (msk[i] != 0) { \
+                            dst[i] = *src; \
+                            ++src; \
+                        } \
+                    } \
+                    NGA_Release64(g_msk, &lo_msk, &hi_msk); \
+                    NGA_Release_update64(g_dst, &lo_msk, &hi_msk); \
+                    break; \
+                }
+                unpack1d_op(C_INT,int)
+                unpack1d_op(C_LONG,long)
+                unpack1d_op(C_LONGLONG,long long)
+                unpack1d_op(C_FLOAT,float)
+                unpack1d_op(C_DBL,double)
 #undef unpack1d_op
+            }
         }
     }
     TRACER("unpack1d END\n")

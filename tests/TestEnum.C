@@ -23,9 +23,14 @@ int main(int argc, char **argv)
     int size_src = 10;
     int size_dst = 30;
     int g_src = NGA_Create(MT_INT, 1, &size_src, "src", NULL);
+    int g_enum = NGA_Create(MT_DBL, 1, &size_dst, "enum", NULL);
     int g_dst = NGA_Create(MT_INT, 1, &size_dst, "dst", NULL);
     int g_msk = NGA_Create(MT_INT, 1, &size_dst, "msk", NULL);
     int NEG_ONE = -1;
+    int TWO = 2;
+    int THREE = 3;
+    double START = 3.15;
+    double STEP = 0.05;
 
     if (0 == me) {
         int msk[] = {0,1,1,0,0,0,0,1,1,0,
@@ -36,13 +41,15 @@ int main(int argc, char **argv)
         NGA_Put(g_msk, &ZERO, &hi, msk, NULL);
     }
 
-    GA_Fill(g_dst, &NEG_ONE);
-    enumerate(g_src, 2, 3);
-    unpack1d(g_src, g_dst, g_msk);
+    //GA_Fill(g_dst, &NEG_ONE);
+    enumerate(g_src, &TWO, &THREE);
+    enumerate(g_enum, &START, &STEP);
+    //unpack1d(g_src, g_dst, g_msk);
 
     GA_Print(g_src);
-    GA_Print(g_dst);
-    GA_Print(g_msk);
+    GA_Print(g_enum);
+    //GA_Print(g_dst);
+    //GA_Print(g_msk);
 
     GA_Terminate();
     MPI_Finalize();

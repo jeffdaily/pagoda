@@ -66,10 +66,26 @@ class Variable;
 
 #ifdef DEBUG
 //#  define DEBUG_MASKS
-#   define DEBUG_PRINT(FMT) fprintf(stderr,FMT)
-#   define DEBUG_PRINT1(FMT,A1) fprintf(stderr,FMT,A1)
-#   define DEBUG_PRINT2(FMT,A1,A2) fprintf(stderr,FMT,A1,A2)
-#   define DEBUG_PRINT3(FMT,A1,A2,A3) fprintf(stderr,FMT,A1,A2,A3)
+#   define DEBUG_PRINT(FMT) \
+    { \
+        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr,FMT); \
+    }
+#   define DEBUG_PRINT1(FMT,A1) \
+    { \
+        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr,FMT,A1); \
+    }
+#   define DEBUG_PRINT2(FMT,A1,A2) \
+    { \
+        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr,FMT,A1,A2); \
+    }
+#   define DEBUG_PRINT3(FMT,A1,A2,A3) \
+    { \
+        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr,FMT,A1,A2,A3); \
+    }
 #   define DEBUG_PRINT_ME(FMT) if (ME == 0) fprintf(FMT)
 #   define DEBUG_PRINT_ME1(FMT,A1) if (ME == 0) fprintf(FMT,A1)
 #   define DEBUG_PRINT_ME2(FMT,A1,A2) if (ME == 0) fprintf(FMT,A1,A2)
