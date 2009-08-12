@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "SubsetterCommands.H"
 #include "SubsetterException.H"
 #include "Util.H"

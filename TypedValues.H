@@ -41,7 +41,7 @@ class TypedValues
 
 
 template <class T>
-static ostream& __print(ostream &os, const TypedValues<T> &obj)
+ostream& __print(ostream &os, const TypedValues<T> &obj)
 {
     size_t i,limit;
     for (i=0,limit=obj.size(); i<limit-1; ++i) {
@@ -55,7 +55,7 @@ static ostream& __print(ostream &os, const TypedValues<T> &obj)
 
 
 template <>
-static ostream& __print(ostream &os, const TypedValues<char> &obj)
+ostream& __print(ostream &os, const TypedValues<char> &obj)
 {
     //os << '"';
     size_t i,limit;

@@ -160,6 +160,20 @@ bool cmp_name(T ptr_to_thing, StringComparator comparator)
 }
 
 
+template <class T>
+class fob_cmp_name {
+  public:
+    fob_cmp_name(StringComparator cmp)
+      : cmp(cmp)
+    { }
+    bool operator () (T ptr_to_thing) {
+      return cmp(ptr_to_thing->get_name());
+    }
+  protected:
+    StringComparator cmp;
+};
+
+
 /**
  * Generic "find" based on a "get_name()" function and a given string.
  */
@@ -168,7 +182,9 @@ typename vector<T>::iterator
 find(vector<T> &vec, const string &name, bool ignore_case=true)
 {
     StringComparator cmp(name, ignore_case);
-    return find_if(vec.begin(), vec.end(), bind2nd(ptr_fun(cmp_name<T>), cmp));
+    fob_cmp_name<T> cmp_name(cmp);
+    //return find_if(vec.begin(), vec.end(), bind2nd(ptr_fun(&cmp_name<T>), cmp));
+    return find_if(vec.begin(), vec.end(), cmp_name);
 }
 
 
