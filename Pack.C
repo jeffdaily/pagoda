@@ -308,45 +308,70 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 /**
  * A global enumeration operation.
  *
- * Assumes a 1-D integer GA (of type C_INT). Also assumes standard
- * distribution of the 1-D array.
+ * Assumes g_src is a 1D array.
  */
-void enumerate(int g_src, int start, int inc)
+void enumerate(int g_src, void *start_val, void *inc_val)
 {
     TRACER("enumerate\n")
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
+    int64_t src_lo;
+    int64_t src_hi;
+    int src_type;
+    int src_ndim;
+    int64_t src_size;
+    int64_t loc_lo;
+    int64_t loc_hi;
+    int result;
     int64_t map[nproc*2];
     int procs[nproc];
-    int64_t lo = 0;
-    int64_t hi;
-    int type;
-    int ndim;
-    int64_t size;
-    int result;
-    int64_t count = 0;
-    int64_t *ptr = map;
-    int *src;
+    int64_t count;
+    void *buf;
 
-    NGA_Inquire64(g_src, &type, &ndim, &size);
-    hi = size-1;
-    result = NGA_Locate_region64(g_src, &lo, &hi, map, procs);
-    for (int i=0; procs[i]<me; ++i) {
-        count += ptr[1]-ptr[0]+1;
-        ptr += 2;
+    NGA_Inquire64(g_src, &src_type, &src_ndim, &src_size);
+    if (src_ndim > 1) {
+        GA_Error("enumerate: expected 1D array", src_ndim);
     }
 
-    NGA_Distribution64(g_src, me, &lo, &hi);
-    if (0 > lo && 0 > hi) {
+    NGA_Distribution64(g_src, me, &src_lo, &src_hi);
+    if (0 > src_lo && 0 > src_hi) {
         return;
     }
 
-    NGA_Access64(g_src, &lo, &hi, &src, NULL);
-    *src = count*inc + start;
-    for (size_t i=1,limit=hi-lo+1; i<limit; ++i) {
-        src[i] = src[i-1] + inc;
+    loc_lo = 0;
+    loc_hi = src_size-1;
+    count = 0;
+    result = NGA_Locate_region64(g_src, &loc_lo, &loc_hi, map, procs);
+    for (int i=0; i<result; ++i) {
+        if (procs[i] < me) {
+            count += map[i+1]-map[i]+1;
+        }
     }
-    NGA_Release_update64(g_src, &lo, &hi);
+
+    NGA_Access64(g_src, &src_lo, &src_hi, &buf, NULL);
+#define enumerate_op(MTYPE,TYPE) \
+    if (MTYPE == src_type) { \
+        TYPE *src = (TYPE*)buf; \
+        TYPE start = 0; \
+        TYPE inc = 1; \
+        if (start_val) { \
+            start = *((TYPE*)start_val); \
+        } \
+        if (inc_val) { \
+            inc = *((TYPE*)inc_val); \
+        } \
+        for (int64_t i=0,limit=src_hi-src_lo+1; i<limit; ++i) { \
+            src[i] = (count+i)*inc + start; \
+        } \
+    } else
+    enumerate_op(C_INT,int)
+    enumerate_op(C_LONG,long)
+    enumerate_op(C_LONGLONG,long long)
+    enumerate_op(C_FLOAT,float)
+    enumerate_op(C_DBL,double)
+    ; // for last else above
+#undef enumerate_op
+    NGA_Release_update64(g_src, &src_lo, &src_hi);
 }
 
 

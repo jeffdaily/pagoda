@@ -27,7 +27,7 @@ DistributedMask::DistributedMask(Dimension *dim, int value)
 {
     string name = dim->get_name();
     int64_t size = dim->get_size();
-    handle = NGA_Create64(MT_INT, 1, &size, (char*)name.c_str(), NULL);
+    handle = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), NULL);
     NGA_Distribution64(handle, ME, &lo, &hi);
     GA_Fill(handle, &value);
     counts = new long[NPROC];
@@ -144,19 +144,24 @@ void DistributedMask::adjust(const LatLonBox &box, Variable *lat, Variable *lon)
     NGA_Access64(lon_handle, &lo, &hi, &lon_data, NULL);
 
     switch (type) {
-#define adjust_op(MTYPE,type) \
+#define adjust_op(MTYPE,TYPE) \
         case MTYPE: { \
-            type *plat = (type*)lat_data; \
-            type *plon = (type*)lon_data; \
+            TYPE *plat = (TYPE*)lat_data; \
+            TYPE *plon = (TYPE*)lon_data; \
+            double dlat; \
+            double dlon; \
             for (int64_t i=0; i<size; ++i) { \
-                mask_data[i] = box.contains(plat[i], plon[i]) ? 1 : 0; \
+                dlat = plat[i]; \
+                dlon = plon[i]; \
+                mask_data[i] = box.contains(dlat, dlon) ? 1 : 0; \
             } \
             break; \
         }
-        adjust_op(MT_INT,int)
-        adjust_op(MT_LONGINT,long int)
-        adjust_op(MT_REAL,float)
-        adjust_op(MT_DBL,double)
+        adjust_op(C_INT,int)
+        adjust_op(C_LONG,long)
+        adjust_op(C_LONGLONG,long long)
+        adjust_op(C_FLOAT,float)
+        adjust_op(C_DBL,double)
 #undef adjust_op
     }
 
@@ -209,10 +214,11 @@ void DistributedMask::adjust(
             } \
             break; \
         }
-        adjust_op(MT_INT,int)
-        adjust_op(MT_LONGINT,long int)
-        adjust_op(MT_REAL,float)
-        adjust_op(MT_DBL,double)
+        adjust_op(C_INT,int)
+        adjust_op(C_LONG,long)
+        adjust_op(C_LONGLONG,long long)
+        adjust_op(C_FLOAT,float)
+        adjust_op(C_DBL,double)
 #undef adjust_op
     }
 
@@ -250,7 +256,7 @@ void DistributedMask::reindex()
         int64_t dims;
 
         NGA_Inquire64(handle, &type, &ndim, &dims);
-        handle_index = NGA_Create64(MT_INT, 1, &dims, "index", NULL);
+        handle_index = NGA_Create64(C_INT, 1, &dims, "index", NULL);
     }
     int ONE_NEG = -1;
     int handle_tmp;
@@ -258,9 +264,9 @@ void DistributedMask::reindex()
     //int64_t icount;
 
     GA_Fill(handle_index, &ONE_NEG);
-    handle_tmp = NGA_Create64(MT_INT, 1, &tmp_count, "tmp_enum", NULL);
+    handle_tmp = NGA_Create64(C_INT, 1, &tmp_count, "tmp_enum", NULL);
     //GA_Patch_enum64(handle_tmp, 0, tmp_count-1, 0, 1);
-    enumerate(handle_tmp, 0, 1);
+    enumerate(handle_tmp, NULL, NULL);
     //GA_Unpack64(handle_tmp, handle_index, handle, 0, tmp_count-1, &icount);
     unpack1d(handle_tmp, handle_index, handle);
     GA_Destroy(handle_tmp);
