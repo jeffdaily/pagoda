@@ -54,8 +54,7 @@ ostream& __print(ostream &os, const TypedValues<T> &obj)
 }
 
 
-template <>
-ostream& __print(ostream &os, const TypedValues<char> &obj)
+static ostream& __print(ostream &os, const TypedValues<char> &obj)
 {
     //os << '"';
     size_t i,limit;

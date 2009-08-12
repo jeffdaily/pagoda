@@ -1,5 +1,3 @@
-#include <float.h> // for DBL_MIN
-#include <limits.h> // for LONG_MIN
 #include <strings.h> // for bzero
 
 #include <ga.h>
@@ -83,20 +81,18 @@ void partial_sum(int g_src, int g_dst, int excl)
     if (0 > lo && 0 > hi) {
         /* no elements stored on this process */
         /* broadcast dummy value to all processes */
-#define partial_sum_op(MTYPE,TYPE,TYPE_MIN,GOP_OP) \
+#define partial_sum_op(MTYPE,TYPE,GOP_OP) \
         if (MTYPE == type_dst) { \
             TYPE values[nproc]; \
-            for (int64_t i=0; i<nproc; ++i) { \
-                values[i] = TYPE_MIN; \
-            } \
-            GOP_OP(values, nproc, "max"); \
+            bzero(values, sizeof(TYPE)*nproc); \
+            GOP_OP(values, nproc, "+"); \
             TRACER("partial_sum_op N/A\n") \
         } else
-        partial_sum_op(C_INT,int,INT_MIN,armci_msg_igop)
-        partial_sum_op(C_LONG,long,LONG_MIN,armci_msg_lgop)
-        partial_sum_op(C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop)
-        partial_sum_op(C_FLOAT,float,FLT_MIN,armci_msg_fgop)
-        partial_sum_op(C_DBL,double,DBL_MIN,armci_msg_dgop)
+        partial_sum_op(C_INT,int,armci_msg_igop)
+        partial_sum_op(C_LONG,long,armci_msg_lgop)
+        partial_sum_op(C_LONGLONG,long long,armci_msg_llgop)
+        partial_sum_op(C_FLOAT,float,armci_msg_fgop)
+        partial_sum_op(C_DBL,double,armci_msg_dgop)
         ; // for last else above
 #undef partial_sum_op
     } else {
@@ -104,39 +100,35 @@ void partial_sum(int g_src, int g_dst, int excl)
         /* then sum those values and add to each element as appropriate */
         NGA_Access64(g_src, &lo, &hi, &ptr_src, NULL);
         NGA_Access64(g_dst, &lo, &hi, &ptr_dst, NULL);
-#define partial_sum_op(MTYPE_SRC,TYPE_SRC,MTYPE_DST,TYPE_DST,TYPE_MIN,GOP_OP,FMT) \
+#define partial_sum_op(MTYPE_SRC,TYPE_SRC,MTYPE_DST,TYPE_DST,GOP_OP,FMT) \
         if (MTYPE_DST == type_dst) { \
             TYPE_DST value = 0; \
             TYPE_DST values[nproc]; \
             TYPE_SRC *src = (TYPE_SRC*)ptr_src; \
             TYPE_DST *dst = (TYPE_DST*)ptr_dst; \
-            for (int64_t i=0; i<nproc; ++i) { \
-                values[i] = TYPE_MIN; \
-            } \
+            bzero(values, sizeof(TYPE_DST)*nproc); \
             values[me] = dst[elems-1]; \
             if (0 == excl) { \
                 values[me] += src[elems-1]; \
             } \
-            GOP_OP(values, nproc, "max"); \
+            GOP_OP(values, nproc, "+"); \
             for (int64_t i=0; i<me; ++i) { \
-                if (TYPE_MIN != values[i]) { \
-                    value += values[i]; \
-                } \
+                value += values[i]; \
             } \
             for (int64_t i=0; i<elems; ++i) { \
                 dst[i] += value; \
             } \
             TRACER1("partial_sum_op "#FMT"\n", value) \
         } else
-        partial_sum_op(C_INT,int,C_INT,int,INT_MIN,armci_msg_igop,%d)
-        partial_sum_op(C_INT,int,C_LONG,long,LONG_MIN,armci_msg_lgop,%ld)
-        partial_sum_op(C_INT,int,C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop,%lld)
-        partial_sum_op(C_LONG,long,C_LONG,long,LONG_MIN,armci_msg_lgop,%ld)
-        partial_sum_op(C_LONG,long,C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop,%lld)
-        partial_sum_op(C_LONGLONG,long long,C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop,%lld)
-        partial_sum_op(C_FLOAT,float,C_FLOAT,float,FLT_MIN,armci_msg_fgop,%f)
-        partial_sum_op(C_FLOAT,float,C_DBL,double,DBL_MIN,armci_msg_dgop,%f)
-        partial_sum_op(C_DBL,double,C_DBL,double,DBL_MIN,armci_msg_dgop,%f)
+        partial_sum_op(C_INT,int,C_INT,int,armci_msg_igop,%d)
+        partial_sum_op(C_INT,int,C_LONG,long,armci_msg_lgop,%ld)
+        partial_sum_op(C_INT,int,C_LONGLONG,long long,armci_msg_llgop,%lld)
+        partial_sum_op(C_LONG,long,C_LONG,long,armci_msg_lgop,%ld)
+        partial_sum_op(C_LONG,long,C_LONGLONG,long long,armci_msg_llgop,%lld)
+        partial_sum_op(C_LONGLONG,long long,C_LONGLONG,long long,armci_msg_llgop,%lld)
+        partial_sum_op(C_FLOAT,float,C_FLOAT,float,armci_msg_fgop,%f)
+        partial_sum_op(C_FLOAT,float,C_DBL,double,armci_msg_dgop,%f)
+        partial_sum_op(C_DBL,double,C_DBL,double,armci_msg_dgop,%f)
         ; // for last else above
 #undef partial_sum_op
         NGA_Release_update64(g_dst, &lo, &hi);

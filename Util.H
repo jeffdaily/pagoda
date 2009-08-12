@@ -137,11 +137,11 @@ class Variable;
         } \
     }
 #else
-#   define TRACER
-#   define TRACER1
-#   define TRACER2
-#   define TRACER3
-#   define TRACER4
+#   define TRACER(fmt)
+#   define TRACER1(fmt,a1)
+#   define TRACER2(fmt,a1,a2)
+#   define TRACER3(fmt,a1,a2,a3)
+#   define TRACER4(fmt,a1,a2,a3,a4)
 #endif
 
 
