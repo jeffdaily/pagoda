@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
     GA_Initialize();
-    DEBUG_PRINT_ME(stderr, "After GA_Initialize\n");
+    DEBUG_PRINT_ME("After GA_Initialize\n");
 
     if (argc < 3) return EXIT_FAILURE;
 
