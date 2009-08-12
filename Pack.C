@@ -4,33 +4,10 @@
 
 #include <ga.h>
 #include <macdecls.h>
+#include <message.h>
 
 #include "Pack.H"
 #include "Util.H"
-
-/*
-static void print_local_masks(int *local_masks[], int64_t elems[], int n)
-{
-    int me = GA_Nodeid();
-    int nproc = GA_Nnodes();
-    for (int i=0; i<n; ++i) {
-        if (0 == me) {
-            printf("i=%d #############################\n", i);
-        }
-        GA_Sync();
-        for (int64_t j=0; j<nproc; ++j) {
-            if (j == me) {
-                printf("proc=%d #############################\n", j);
-                for (int64_t k=0; k<elems[i]; ++k) {
-                    printf("%d,", local_masks[i][k]);
-                }
-                printf("\n");
-            }
-            GA_Sync();
-        }
-    }
-}
-*/
 
 
 void partial_sum(int g_src, int g_dst, int excl)
@@ -62,18 +39,6 @@ void partial_sum(int g_src, int g_dst, int excl)
     if (ndim>1) {
         GA_Error("partial_sum: supports 1-dim arrays only", g_dst);
     }
-    if (type_src != type_dst) {
-        GA_Error("partial_sum: src and dst array types must match", 1);
-    }
-    switch (type_src) {
-        case MT_INT:
-        case MT_LONGINT:
-        case MT_REAL:
-        case MT_DBL:
-            break;
-        default:
-            GA_Error("partial_sum: only INT,LONG,REAL,DBL types supported", 1);
-    }
 
     GA_Sync();
     
@@ -85,91 +50,95 @@ void partial_sum(int g_src, int g_dst, int excl)
     else {
         NGA_Access64(g_src, &lo, &hi, &ptr_src, NULL);
         NGA_Access64(g_dst, &lo, &hi, &ptr_dst, NULL);
-        switch (type_src) {
-#define partial_sum_op(MTYPE,TYPE) \
-            case MTYPE: \
-                { \
-                    TYPE *dst = (TYPE*)ptr_dst; \
-                    TYPE *src = (TYPE*)ptr_src; \
-                    if (0 == excl) { \
-                        dst[0] = 0; \
-                        for (int64_t i=1; i<elems; ++i) { \
-                            dst[i] = dst[i-1] + src[i-1]; \
-                        } \
-                    } else { \
-                        dst[0] = src[0]; \
-                        for (int64_t i=1; i<elems; ++i) { \
-                            dst[i] = dst[i-1] + src[i]; \
-                        } \
-                    } \
-                    break; \
-                }
-            partial_sum_op(MT_INT,int)
-            partial_sum_op(MT_LONGINT,long)
-            partial_sum_op(MT_REAL,float)
-            partial_sum_op(MT_DBL,double)
+#define partial_sum_op(MTYPE_SRC,TYPE_SRC,MTYPE_DST,TYPE_DST) \
+        if (MTYPE_SRC == type_src && MTYPE_DST == type_dst) { \
+            TYPE_DST *dst = (TYPE_DST*)ptr_dst; \
+            TYPE_SRC *src = (TYPE_SRC*)ptr_src; \
+            if (0 == excl) { \
+                dst[0] = 0; \
+                for (int64_t i=1; i<elems; ++i) { \
+                    dst[i] = dst[i-1] + src[i-1]; \
+                } \
+            } else { \
+                dst[0] = src[0]; \
+                for (int64_t i=1; i<elems; ++i) { \
+                    dst[i] = dst[i-1] + src[i]; \
+                } \
+            } \
+        } else
+        partial_sum_op(C_INT,int,C_INT,int)
+        partial_sum_op(C_INT,int,C_LONG,long)
+        partial_sum_op(C_INT,int,C_LONGLONG,long long)
+        partial_sum_op(C_LONG,long,C_LONG,long)
+        partial_sum_op(C_LONG,long,C_LONGLONG,long long)
+        partial_sum_op(C_LONGLONG,long long,C_LONGLONG,long long)
+        partial_sum_op(C_FLOAT,float,C_FLOAT,float)
+        partial_sum_op(C_FLOAT,float,C_DBL,double)
+        partial_sum_op(C_DBL,double,C_DBL,double)
+        ; // for last else above
 #undef partial_sum_op
-        }
         NGA_Release_update64(g_dst, &lo, &hi);
         NGA_Release64(g_src, &lo, &hi);
     }
     if (0 > lo && 0 > hi) {
         /* no elements stored on this process */
         /* broadcast dummy value to all processes */
-        switch (type_src) {
-#define partial_sum_op(MTYPE,TYPE,GOP_TYPE,GOP_OP,TYPE_MIN) \
-            case MTYPE: \
-                { \
-                    GOP_TYPE values[nproc]; \
-                    for (int64_t i=0; i<nproc; ++i) { \
-                        values[i] = TYPE_MIN; \
-                    } \
-                    GOP_OP(values, nproc, "max"); \
-                    break; \
-                }
-            partial_sum_op(MT_INT,int,long,GA_Lgop,INT_MIN)
-            partial_sum_op(MT_LONGINT,long,long,GA_Lgop,LONG_MIN)
-            partial_sum_op(MT_REAL,float,double,GA_Dgop,FLT_MIN)
-            partial_sum_op(MT_DBL,double,double,GA_Dgop,DBL_MIN)
+#define partial_sum_op(MTYPE,TYPE,TYPE_MIN,GOP_OP) \
+        if (MTYPE == type_dst) { \
+            TYPE values[nproc]; \
+            for (int64_t i=0; i<nproc; ++i) { \
+                values[i] = TYPE_MIN; \
+            } \
+            GOP_OP(values, nproc, "max"); \
+            TRACER("partial_sum_op N/A\n") \
+        } else
+        partial_sum_op(C_INT,int,INT_MIN,armci_msg_igop)
+        partial_sum_op(C_LONG,long,LONG_MIN,armci_msg_lgop)
+        partial_sum_op(C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop)
+        partial_sum_op(C_FLOAT,float,FLT_MIN,armci_msg_fgop)
+        partial_sum_op(C_DBL,double,DBL_MIN,armci_msg_dgop)
+        ; // for last else above
 #undef partial_sum_op
-        }
     } else {
         /* broadcast last value to all processes */
         /* then sum those values and add to each element as appropriate */
         NGA_Access64(g_src, &lo, &hi, &ptr_src, NULL);
         NGA_Access64(g_dst, &lo, &hi, &ptr_dst, NULL);
-        switch (type_src) {
-#define partial_sum_op(MTYPE,TYPE,GOP_TYPE,GOP_OP,TYPE_MIN) \
-            case MTYPE: \
-                { \
-                    TYPE value = 0; \
-                    GOP_TYPE values[nproc]; \
-                    TYPE *src = (TYPE*)ptr_src; \
-                    TYPE *dst = (TYPE*)ptr_dst; \
-                    for (int64_t i=0; i<nproc; ++i) { \
-                        values[i] = TYPE_MIN; \
-                    } \
-                    values[me] = dst[elems-1]; \
-                    if (0 == excl) { \
-                        values[me] += src[elems-1]; \
-                    } \
-                    GOP_OP(values, nproc, "max"); \
-                    for (int64_t i=0; i<me; ++i) { \
-                        if (TYPE_MIN != values[i]) { \
-                            value += values[i]; \
-                        } \
-                    } \
-                    for (int64_t i=0; i<elems; ++i) { \
-                        dst[i] += value; \
-                    } \
-                    break; \
-                }
-            partial_sum_op(MT_INT,int,long,GA_Lgop,INT_MIN)
-            partial_sum_op(MT_LONGINT,long,long,GA_Lgop,LONG_MIN)
-            partial_sum_op(MT_REAL,float,double,GA_Dgop,FLT_MIN)
-            partial_sum_op(MT_DBL,double,double,GA_Dgop,DBL_MIN)
+#define partial_sum_op(MTYPE_SRC,TYPE_SRC,MTYPE_DST,TYPE_DST,TYPE_MIN,GOP_OP,FMT) \
+        if (MTYPE_DST == type_dst) { \
+            TYPE_DST value = 0; \
+            TYPE_DST values[nproc]; \
+            TYPE_SRC *src = (TYPE_SRC*)ptr_src; \
+            TYPE_DST *dst = (TYPE_DST*)ptr_dst; \
+            for (int64_t i=0; i<nproc; ++i) { \
+                values[i] = TYPE_MIN; \
+            } \
+            values[me] = dst[elems-1]; \
+            if (0 == excl) { \
+                values[me] += src[elems-1]; \
+            } \
+            GOP_OP(values, nproc, "max"); \
+            for (int64_t i=0; i<me; ++i) { \
+                if (TYPE_MIN != values[i]) { \
+                    value += values[i]; \
+                } \
+            } \
+            for (int64_t i=0; i<elems; ++i) { \
+                dst[i] += value; \
+            } \
+            TRACER1("partial_sum_op "#FMT"\n", value) \
+        } else
+        partial_sum_op(C_INT,int,C_INT,int,INT_MIN,armci_msg_igop,%d)
+        partial_sum_op(C_INT,int,C_LONG,long,LONG_MIN,armci_msg_lgop,%ld)
+        partial_sum_op(C_INT,int,C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop,%lld)
+        partial_sum_op(C_LONG,long,C_LONG,long,LONG_MIN,armci_msg_lgop,%ld)
+        partial_sum_op(C_LONG,long,C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop,%lld)
+        partial_sum_op(C_LONGLONG,long long,C_LONGLONG,long long,LLONG_MIN,armci_msg_llgop,%lld)
+        partial_sum_op(C_FLOAT,float,C_FLOAT,float,FLT_MIN,armci_msg_fgop,%f)
+        partial_sum_op(C_FLOAT,float,C_DBL,double,DBL_MIN,armci_msg_dgop,%f)
+        partial_sum_op(C_DBL,double,C_DBL,double,DBL_MIN,armci_msg_dgop,%f)
+        ; // for last else above
 #undef partial_sum_op
-        }
         NGA_Release_update64(g_dst, &lo, &hi);
         NGA_Release64(g_src, &lo, &hi);
     }
@@ -180,7 +149,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 void pack(int g_src, int g_dst, int *g_masks)
 {
     TRACER("pack\n")
-    int nproc = GA_Nnodes();
+    //int nproc = GA_Nnodes();
     int me = GA_Nodeid();
 
     int type_src;
@@ -201,8 +170,8 @@ void pack(int g_src, int g_dst, int *g_masks)
 
     int64_t index[ndim_src];
     int g_masksums[ndim_src];
-    long local_counts[ndim_src];
-    long local_counts_product=1;
+    int64_t local_counts[ndim_src];
+    int64_t local_counts_product=1;
     int *local_masks[ndim_src];
 
     if (ndim_src != ndim_dst) {
@@ -244,7 +213,7 @@ void pack(int g_src, int g_dst, int *g_masks)
     if (0 > lo_src[0] && 0 > hi_src[0]); /* no elements on this process */
     else {
         /* Now get the portions of the masks associated with each dim */
-        bzero(local_counts, sizeof(long)*ndim_src);
+        bzero(local_counts, sizeof(int64_t)*ndim_src);
         for (int i=0; i<ndim_src; ++i) {
             elems_src[i] = hi_src[i]-lo_src[i]+1;
             elems_product_src *= elems_src[i];
@@ -304,10 +273,10 @@ void pack(int g_src, int g_dst, int *g_masks)
                         delete [] buf_dst; \
                         break; \
                     }
-                pack_bit_copy(MT_INT,int)
-                pack_bit_copy(MT_LONGINT,long)
-                pack_bit_copy(MT_REAL,float)
-                pack_bit_copy(MT_DBL,double)
+                pack_bit_copy(C_INT,int)
+                pack_bit_copy(C_LONG,long)
+                pack_bit_copy(C_FLOAT,float)
+                pack_bit_copy(C_DBL,double)
 #undef pack_bit_copy
             }
         }
@@ -347,7 +316,7 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 /**
  * A global enumeration operation.
  *
- * Assumes a 1-D integer GA (of type MT_INT). Also assumes standard
+ * Assumes a 1-D integer GA (of type C_INT). Also assumes standard
  * distribution of the 1-D array.
  */
 void enumerate(int g_src, int start, int inc)
@@ -460,10 +429,10 @@ void unpack1d(int g_src, int g_dst, int g_msk)
                 NGA_Release_update64(g_dst, &lo_msk, &hi_msk); \
                 break; \
             }
-            unpack1d_op(MT_INT,int)
-            unpack1d_op(MT_LONGINT,long)
-            unpack1d_op(MT_REAL,float)
-            unpack1d_op(MT_DBL,double)
+            unpack1d_op(C_INT,int)
+            unpack1d_op(C_LONG,long)
+            unpack1d_op(C_FLOAT,float)
+            unpack1d_op(C_DBL,double)
 #undef unpack1d_op
         }
     }

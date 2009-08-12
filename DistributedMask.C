@@ -254,7 +254,7 @@ void DistributedMask::reindex()
     int ONE_NEG = -1;
     int handle_tmp;
     int64_t tmp_count = get_count();
-    int64_t icount;
+    //int64_t icount;
 
     GA_Fill(handle_index, &ONE_NEG);
     handle_tmp = NGA_Create64(MT_INT, 1, &tmp_count, "tmp_enum", NULL);

@@ -110,13 +110,13 @@ void NetcdfVariable::read()
 #define read_var_all(TYPE, NC_TYPE) \
         if (type == NC_TYPE) { \
             err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, NULL); \
+            ERRNO_CHECK(err); \
         } else
         read_var_all(int, NC_INT)
         read_var_all(float, NC_FLOAT)
         read_var_all(double, NC_DOUBLE)
         ; // for last else above
 #undef read_var_all
-        ERRNO_CHECK(err);
     } else {
         if (has_record() && ndim > 1) {
             start[0] = record_index;
@@ -136,13 +136,13 @@ void NetcdfVariable::read()
             TYPE *ptr; \
             NGA_Access64(handle, lo, hi, &ptr, ld); \
             err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
+            ERRNO_CHECK(err); \
         } else
         read_var_all(int, NC_INT)
         read_var_all(float, NC_FLOAT)
         read_var_all(double, NC_DOUBLE)
         ; // for last else above
 #undef read_var_all
-        ERRNO_CHECK(err);
         NGA_Release_update64(handle, lo, hi);
     }
 }

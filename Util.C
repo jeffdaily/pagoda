@@ -63,8 +63,8 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
     }
 
     max_size /= GA_Nnodes();
-    DEBUG_PRINT_ME(stderr, "MA max memory %llu bytes\n", max_size*8);
-    DEBUG_PRINT_ME(stderr, "MA max variable %s\n", max_name.c_str());
+    DEBUG_PRINT_ME1("MA max memory %llu bytes\n", max_size*8);
+    DEBUG_PRINT_ME1("MA max variable %s\n", max_name.c_str());
     if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
         char msg[] = "MA_init failed";
         GA_Error(msg, 0);

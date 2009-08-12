@@ -315,8 +315,9 @@ SOURCE = \
   Variable.C \
   VariableDecorator.C
 
-AM_CFLAGS = $(GA_INCS)
-AM_CXXFLAGS = $(GA_INCS) $(CFLAGS)
+WALL = -Wall
+AM_CFLAGS = $(GA_INCS) $(WALL)
+AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL)
 #AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libsubsetter.la

@@ -72,12 +72,12 @@ void ConnectivityVariable::reindex()
                 gather = new int[count];
 
                 NGA_Access(handle, var_lo, var_hi, &buf, var_ld);
-                for (size_t i=0; i<count; ++i) {
+                for (int i=0; i<count; ++i) {
                     subs[i] = &(buf[i]);
                 }
                 NGA_Gather(mask->get_handle_index(), gather, subs, count);
                 // TODO memcpy instead??
-                for (size_t i=0; i<count; ++i) {
+                for (int i=0; i<count; ++i) {
                     buf[i] = gather[i];
                 }
                 NGA_Release_update(handle, var_lo, var_hi);

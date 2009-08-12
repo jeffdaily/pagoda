@@ -43,9 +43,11 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     //////////////
 
     // copy global attributes
+    TRACER("copy global attributes\n")
     copy_atts(dataset->get_atts(), ncid, NC_GLOBAL);
     
     // define dimensions
+    TRACER("define dimensions\n")
     for (dims_in_it=dims_in.begin(); dims_in_it!=dims_in.end(); ++dims_in_it) {
         Dimension *dim = *dims_in_it;
         string name = dim->get_name();
@@ -65,6 +67,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     }
 
     // define variables
+    TRACER("define variables\n")
     for (vars_in_it=vars_in.begin(); vars_in_it!=vars_in.end(); ++vars_in_it) {
         Variable *var = *vars_in_it;
         string var_name = var->get_name();
@@ -104,6 +107,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     //////////////
     
     // copy var data
+    TRACER("copy var data\n")
     for (vars_out_it=vars_out.begin(); vars_out_it!=vars_out.end(); ++vars_out_it) {
         Variable *var_in = *Util::find(vars_in, vars_out_it->first);
         if (var_in->has_record() && var_in->num_dims() > 1) {
@@ -114,6 +118,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     }
     
     // close it
+    TRACER("close it\n")
     err = ncmpi_close(ncid);
     ERRNO_CHECK(err);
 }
@@ -164,7 +169,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_masks[ndim];
-    size_t num_masks = var_in->num_masks();
+    //size_t num_masks = var_in->num_masks();
     size_t num_cleared_masks = var_in->num_cleared_masks();
 
     var_in->read();
@@ -255,7 +260,7 @@ void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
     int64_t ld[GA_MAX_DIM-1];
     MPI_Offset start[GA_MAX_DIM];
     MPI_Offset count[GA_MAX_DIM];
-    size_t dimidx=0;
+    int dimidx=0;
 
     NGA_Inquire64(handle, &mt_type, &ndim, dim_sizes);
     type.from_mt(mt_type);

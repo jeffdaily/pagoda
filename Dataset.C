@@ -108,7 +108,7 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
 
     // we're iterating over the command-line specified slices to create masks
     for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
-        Mask *mask;
+        //Mask *mask;
 
         // find the Dimension
         for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
