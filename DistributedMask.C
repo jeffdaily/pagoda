@@ -243,6 +243,7 @@ void DistributedMask::recount()
 
 void DistributedMask::reindex()
 {
+    TRACER("DistributedMask::reindex() BEGIN\n")
     if (0 == handle_index) {
         int type;
         int ndim;
@@ -277,5 +278,6 @@ void DistributedMask::reindex()
         }
     }
     */
+    TRACER("DistributedMask::reindex() END\n")
 }
 

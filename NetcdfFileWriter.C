@@ -165,7 +165,7 @@ void NetcdfFileWriter::copy_atts(
 
 void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 {
-    TRACER1("NetcdfFileWriter::copy_var %s\n", var_in->get_name().c_str())
+    TRACER1("NetcdfFileWriter::copy_var %s BEGIN\n", var_in->get_name().c_str())
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_masks[ndim];
@@ -201,6 +201,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
     }
 
     var_in->release_handle();
+    TRACER1("NetcdfFileWriter::copy_var %s END\n", var_in->get_name().c_str())
 }
 
 

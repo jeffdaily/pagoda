@@ -89,9 +89,11 @@ class Variable;
 #   define TRACER(fmt) \
     { \
         for (int __i=0; __i < NPROC; ++__i) { \
+            GA_Sync(); \
             if (__i == ME) { \
                 fprintf(stderr, "[%d] ", ME); \
                 fprintf(stderr, fmt); \
+                fflush(stderr); \
             } \
             GA_Sync(); \
         } \
@@ -99,9 +101,11 @@ class Variable;
 #   define TRACER1(fmt, a1) \
     { \
         for (int __i=0; __i < NPROC; ++__i) { \
+            GA_Sync(); \
             if (__i == ME) { \
                 fprintf(stderr, "[%d] ", ME); \
                 fprintf(stderr, fmt, a1); \
+                fflush(stderr); \
             } \
             GA_Sync(); \
         } \
@@ -109,9 +113,11 @@ class Variable;
 #   define TRACER2(fmt, a1, a2) \
     { \
         for (int __i=0; __i < NPROC; ++__i) { \
+            GA_Sync(); \
             if (__i == ME) { \
                 fprintf(stderr, "[%d] ", ME); \
                 fprintf(stderr, fmt, a1, a2); \
+                fflush(stderr); \
             } \
             GA_Sync(); \
         } \
@@ -119,9 +125,11 @@ class Variable;
 #   define TRACER3(fmt, a1, a2, a3) \
     { \
         for (int __i=0; __i < NPROC; ++__i) { \
+            GA_Sync(); \
             if (__i == ME) { \
                 fprintf(stderr, "[%d] ", ME); \
                 fprintf(stderr, fmt, a1, a2, a3); \
+                fflush(stderr); \
             } \
             GA_Sync(); \
         } \
@@ -129,9 +137,11 @@ class Variable;
 #   define TRACER4(fmt, a1, a2, a3, a4) \
     { \
         for (int __i=0; __i < NPROC; ++__i) { \
+            GA_Sync(); \
             if (__i == ME) { \
                 fprintf(stderr, "[%d] ", ME); \
                 fprintf(stderr, fmt, a1, a2, a3, a4); \
+                fflush(stderr); \
             } \
             GA_Sync(); \
         } \

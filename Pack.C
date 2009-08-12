@@ -357,7 +357,7 @@ void enumerate(int g_src, int start, int inc)
  */
 void unpack1d(int g_src, int g_dst, int g_msk)
 {
-    TRACER("unpack1d\n")
+    TRACER("unpack1d BEGIN\n")
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
     int *mask;
@@ -380,7 +380,7 @@ void unpack1d(int g_src, int g_dst, int g_msk)
     else {
         NGA_Access64(g_msk, &lo_msk, &hi_msk, &mask, NULL);
         for (int64_t i=0,limit=(hi_msk-lo_msk+1); i<limit; ++i) {
-            if (mask[i] != 0) ++counts[me];
+            if (mask[i] != 0) ++(counts[me]);
         }
         NGA_Release64(g_msk, &lo_msk, &hi_msk);
     }
@@ -396,6 +396,7 @@ void unpack1d(int g_src, int g_dst, int g_msk)
         lo_src += counts[i];
     }
     hi_src = lo_src + counts[me] - 1;
+    TRACER2("unpack1d lo,hi = %lld,%lld\n", lo_src, hi_src)
 
     // do the unpacking
     // assumption is that dst array has same distribution as msk array
@@ -428,5 +429,6 @@ void unpack1d(int g_src, int g_dst, int g_msk)
 #undef unpack1d_op
         }
     }
+    TRACER("unpack1d END\n")
 }
 
