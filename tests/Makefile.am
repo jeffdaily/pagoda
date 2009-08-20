@@ -3,6 +3,7 @@ check_PROGRAMS = \
   TestAttribute \
   TestDimension \
   TestEnum \
+  TestGather \
   TestGet \
   TestLocateRegion \
   TestNetcdfDataset \
@@ -36,6 +37,10 @@ TestEnum_SOURCES = TestEnum.C
 TestEnum_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestEnum_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
 TestEnum_LDADD = ../libsubsetter.la
+
+TestGather_SOURCES = TestGather.c
+TestGather_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
+TestGather_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 
 TestGet_SOURCES = TestGet.C
 TestGet_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)

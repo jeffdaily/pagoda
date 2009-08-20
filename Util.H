@@ -28,6 +28,7 @@
     using std::vector;
 
 #include <ga.h>
+#include <mpi.h>
 
 #include "StringComparator.H"
 #include "SubsetterException.H"
@@ -64,8 +65,7 @@ class Variable;
     } \
 }
 
-#ifdef DEBUG
-//#  define DEBUG_MASKS
+#if defined(DEBUG) || defined(TRACE)
 #   define DEBUG_PRINT(FMT) \
     { \
         fprintf(stderr, "[%d] ", ME); \
@@ -86,10 +86,10 @@ class Variable;
         fprintf(stderr, "[%d] ", ME); \
         fprintf(stderr,FMT,A1,A2,A3); \
     }
-#   define DEBUG_PRINT_ME(FMT) if (ME == 0) fprintf(FMT)
-#   define DEBUG_PRINT_ME1(FMT,A1) if (ME == 0) fprintf(FMT,A1)
-#   define DEBUG_PRINT_ME2(FMT,A1,A2) if (ME == 0) fprintf(FMT,A1,A2)
-#   define DEBUG_PRINT_ME3(FMT,A1,A2,A3) if (ME == 0) fprintf(FMT,A1,A2,A3)
+#   define DEBUG_PRINT_ME(FMT) if (ME == 0) fprintf(stderr, FMT)
+#   define DEBUG_PRINT_ME1(FMT,A1) if (ME == 0) fprintf(stderr, FMT,A1)
+#   define DEBUG_PRINT_ME2(FMT,A1,A2) if (ME == 0) fprintf(stderr, FMT,A1,A2)
+#   define DEBUG_PRINT_ME3(FMT,A1,A2,A3) if (ME == 0) fprintf(stderr, FMT,A1,A2,A3)
 #else
 #   define DEBUG_PRINT(FMT)
 #   define DEBUG_PRINT1(FMT,A1)
@@ -104,62 +104,97 @@ class Variable;
 #ifdef TRACE
 #   define TRACER(fmt) \
     { \
-        for (int __i=0; __i < NPROC; ++__i) { \
-            GA_Sync(); \
-            if (__i == ME) { \
-                fprintf(stderr, "[%d] ", ME); \
-                fprintf(stderr, fmt); \
-                fflush(stderr); \
+        MPI_Status stat; \
+        int count=100; \
+        char msg[count]; \
+        if (0 == ME) { \
+            fprintf(stderr, "[0] "); \
+            fprintf(stderr, fmt); \
+            for (int proc=1; proc<NPROC; ++proc) { \
+                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, msg); \
             } \
-            GA_Sync(); \
+            fflush(stderr); \
+        } else { \
+            sprintf(msg, fmt); \
+            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     }
-#   define TRACER1(fmt, a1) \
+#   define TRACER1(fmt,a1) \
     { \
-        for (int __i=0; __i < NPROC; ++__i) { \
-            GA_Sync(); \
-            if (__i == ME) { \
-                fprintf(stderr, "[%d] ", ME); \
-                fprintf(stderr, fmt, a1); \
-                fflush(stderr); \
+        MPI_Status stat; \
+        int count=100; \
+        char msg[count]; \
+        if (0 == ME) { \
+            fprintf(stderr, "[0] "); \
+            fprintf(stderr, fmt, a1); \
+            for (int proc=1; proc<NPROC; ++proc) { \
+                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, msg); \
             } \
-            GA_Sync(); \
+            fflush(stderr); \
+        } else { \
+            sprintf(msg, fmt, a1); \
+            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     }
-#   define TRACER2(fmt, a1, a2) \
+#   define TRACER2(fmt,a1,a2) \
     { \
-        for (int __i=0; __i < NPROC; ++__i) { \
-            GA_Sync(); \
-            if (__i == ME) { \
-                fprintf(stderr, "[%d] ", ME); \
-                fprintf(stderr, fmt, a1, a2); \
-                fflush(stderr); \
+        MPI_Status stat; \
+        int count=100; \
+        char msg[count]; \
+        if (0 == ME) { \
+            fprintf(stderr, "[0] "); \
+            fprintf(stderr, fmt,a1,a2); \
+            for (int proc=1; proc<NPROC; ++proc) { \
+                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, msg); \
             } \
-            GA_Sync(); \
+            fflush(stderr); \
+        } else { \
+            sprintf(msg, fmt,a1,a2); \
+            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     }
-#   define TRACER3(fmt, a1, a2, a3) \
+#   define TRACER3(fmt,a1,a2,a3) \
     { \
-        for (int __i=0; __i < NPROC; ++__i) { \
-            GA_Sync(); \
-            if (__i == ME) { \
-                fprintf(stderr, "[%d] ", ME); \
-                fprintf(stderr, fmt, a1, a2, a3); \
-                fflush(stderr); \
+        MPI_Status stat; \
+        int count=100; \
+        char msg[count]; \
+        if (0 == ME) { \
+            fprintf(stderr, "[0] "); \
+            fprintf(stderr, fmt,a1,a2,a3); \
+            for (int proc=1; proc<NPROC; ++proc) { \
+                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, msg); \
             } \
-            GA_Sync(); \
+            fflush(stderr); \
+        } else { \
+            sprintf(msg, fmt,a1,a2,a3); \
+            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     }
-#   define TRACER4(fmt, a1, a2, a3, a4) \
+#   define TRACER4(fmt,a1,a2,a3,a4) \
     { \
-        for (int __i=0; __i < NPROC; ++__i) { \
-            GA_Sync(); \
-            if (__i == ME) { \
-                fprintf(stderr, "[%d] ", ME); \
-                fprintf(stderr, fmt, a1, a2, a3, a4); \
-                fflush(stderr); \
+        MPI_Status stat; \
+        int count=100; \
+        char msg[count]; \
+        if (0 == ME) { \
+            fprintf(stderr, "[0] "); \
+            fprintf(stderr, fmt,a1,a2,a3,a4); \
+            for (int proc=1; proc<NPROC; ++proc) { \
+                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, msg); \
             } \
-            GA_Sync(); \
+            fflush(stderr); \
+        } else { \
+            sprintf(msg, fmt,a1,a2,a3,a4); \
+            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     }
 #else

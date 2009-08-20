@@ -180,7 +180,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
         int dim_ids[ndim];
         int64_t dim_lens[ndim];
 
-        // determine size of GA to create for packed destination
+        TRACER("determine size of GA to create for packed destination\n")
         err = ncmpi_inq_vardimid(ncid, varid, dim_ids);
         ERRNO_CHECK(err);
         for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
@@ -190,6 +190,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
             dim_lens[dimidx] = tmp;
             ga_masks[dimidx] = ((DistributedMask*)var_in->get_dims()[dimidx]->get_mask())->get_handle();
         }
+        TRACER("before ga_var_out (pack_dst) create\n")
         ga_var_out = NGA_Create64(var_in->get_type().as_mt(), ndim, dim_lens,
                 "pack_dst", NULL);
         pack(ga_var_in, ga_var_out, ga_masks);

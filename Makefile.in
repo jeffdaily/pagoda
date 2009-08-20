@@ -315,7 +315,8 @@ SOURCE = \
   Variable.C \
   VariableDecorator.C
 
-WALL = -Wall
+
+#WALL = -Wall
 AM_CFLAGS = $(GA_INCS) $(WALL)
 AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL)
 #AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
