@@ -10,6 +10,8 @@
 #include <vector>
     using std::vector;
 
+#include "Values.H"
+
 
 template <class T>
 class TypedValues
@@ -40,6 +42,9 @@ class TypedValues
 };
 
 
+extern ostream& __print(ostream &os, const TypedValues<char> &obj);
+
+
 template <class T>
 ostream& __print(ostream &os, const TypedValues<T> &obj)
 {
@@ -50,20 +55,6 @@ ostream& __print(ostream &os, const TypedValues<T> &obj)
     if (limit > 0) {
         os << obj.at(limit-1);
     }
-    return os;
-}
-
-
-static ostream& __print(ostream &os, const TypedValues<char> &obj)
-{
-    //os << '"';
-    size_t i,limit;
-    for (i=0,limit=obj.size(); i<limit; ++i) {
-        char val = obj.at(i);
-        if (val == '\0') break;
-        os << val;
-    }
-    //os << '"';
     return os;
 }
 

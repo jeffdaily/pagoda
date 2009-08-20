@@ -10,8 +10,8 @@ HEADERS_PRIVATE = \
   BoundaryVariable.H \
   ConnectivityVariable.H \
   CoordinateVariable.H \
-  Dataset.H \
   DataType.H \
+  Dataset.H \
   Dimension.H \
   DistributedMask.H \
   LatLonBox.H \
@@ -28,6 +28,7 @@ HEADERS_PRIVATE = \
   StringComparator.H \
   SubsetterCommands.H \
   SubsetterException.H \
+  TypedValues.H \
   Util.H \
   Values.H \
   Variable.H \
@@ -41,8 +42,8 @@ SOURCE = \
   BoundaryVariable.C \
   ConnectivityVariable.C \
   CoordinateVariable.C \
-  Dataset.C \
   DataType.C \
+  Dataset.C \
   Dimension.C \
   DistributedMask.C \
   LatLonBox.C \
@@ -56,6 +57,7 @@ SOURCE = \
   Pack.C \
   StringComparator.C \
   SubsetterCommands.C \
+  TypedValues.C \
   Util.C \
   Values.C \
   Variable.C \

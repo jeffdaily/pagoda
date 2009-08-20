@@ -84,12 +84,12 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libsubsetter_la_LIBADD =
 am__objects_1 = AbstractVariable.lo Aggregation.lo AggregationUnion.lo \
 	Attribute.lo BoundaryVariable.lo ConnectivityVariable.lo \
-	CoordinateVariable.lo Dataset.lo DataType.lo Dimension.lo \
+	CoordinateVariable.lo DataType.lo Dataset.lo Dimension.lo \
 	DistributedMask.lo LatLonBox.lo LocalMask.lo Mask.lo \
 	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
 	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo \
-	StringComparator.lo SubsetterCommands.lo Util.lo Values.lo \
-	Variable.lo VariableDecorator.lo
+	StringComparator.lo SubsetterCommands.lo TypedValues.lo \
+	Util.lo Values.lo Variable.lo VariableDecorator.lo
 am__objects_2 =
 am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
@@ -310,8 +310,8 @@ HEADERS_PRIVATE = \
   BoundaryVariable.H \
   ConnectivityVariable.H \
   CoordinateVariable.H \
-  Dataset.H \
   DataType.H \
+  Dataset.H \
   Dimension.H \
   DistributedMask.H \
   LatLonBox.H \
@@ -328,6 +328,7 @@ HEADERS_PRIVATE = \
   StringComparator.H \
   SubsetterCommands.H \
   SubsetterException.H \
+  TypedValues.H \
   Util.H \
   Values.H \
   Variable.H \
@@ -341,8 +342,8 @@ SOURCE = \
   BoundaryVariable.C \
   ConnectivityVariable.C \
   CoordinateVariable.C \
-  Dataset.C \
   DataType.C \
+  Dataset.C \
   Dimension.C \
   DistributedMask.C \
   LatLonBox.C \
@@ -356,6 +357,7 @@ SOURCE = \
   Pack.C \
   StringComparator.C \
   SubsetterCommands.C \
+  TypedValues.C \
   Util.C \
   Values.C \
   Variable.C \
@@ -541,6 +543,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterMain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TypedValues.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Values.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@

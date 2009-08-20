@@ -136,6 +136,7 @@ void NetcdfFileWriter::copy_att(Attribute *attr, int ncid, int varid)
         attr->get_values()->as(data); \
         err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), DT, len, data); \
         ERRNO_CHECK(err); \
+        delete [] data; \
     } else
     put_attr_values(DataType::BYTE, unsigned char, uchar)
     put_attr_values(DataType::SHORT, short, short)
@@ -147,6 +148,7 @@ void NetcdfFileWriter::copy_att(Attribute *attr, int ncid, int varid)
         char *data;
         attr->get_values()->as(data);
         err = ncmpi_put_att_text(ncid, varid, name.c_str(), len, data);
+        delete [] data;
     }
 }
 
