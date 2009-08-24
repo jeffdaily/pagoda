@@ -1,5 +1,5 @@
 #include <vector>
-    using std::vector;
+using std::vector;
 
 #include <mpi.h>
 #include <pnetcdf.h>
@@ -22,7 +22,7 @@ static int err = 0;
 
 void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
 {
-    TRACER1("NetcdfFileWriter::write(%s)\n", filename.c_str())
+    TRACER1("NetcdfFileWriter::write(%s)\n", filename.c_str());
     vector<Dimension*> dims_in = dataset->get_dims();
     vector<Dimension*>::const_iterator dims_in_it;
     vector<Variable*> vars_in = dataset->get_vars();
@@ -34,8 +34,8 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     map<string,int>::iterator vars_out_it;
 
     // create the output file
-    err = ncmpi_create(MPI_COMM_WORLD, filename.c_str(), NC_WRITE,
-            MPI_INFO_NULL, &ncid);
+    //err = ncmpi_create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
+    err = ncmpi_create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_DATA, MPI_INFO_NULL, &ncid);
     ERRNO_CHECK(err);
 
     //////////////
@@ -43,11 +43,11 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     //////////////
 
     // copy global attributes
-    TRACER("copy global attributes\n")
+    TRACER("copy global attributes\n");
     copy_atts(dataset->get_atts(), ncid, NC_GLOBAL);
-    
+
     // define dimensions
-    TRACER("define dimensions\n")
+    TRACER("define dimensions\n");
     for (dims_in_it=dims_in.begin(); dims_in_it!=dims_in.end(); ++dims_in_it) {
         Dimension *dim = *dims_in_it;
         string name = dim->get_name();
@@ -62,12 +62,14 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
         } else {
             size = dim->get_size();
         }
+        TRACER2("define dimension '%s'=%lld\n", name.c_str(), size);
         err = ncmpi_def_dim(ncid, name.c_str(), size, &dimid);
+        ERRNO_CHECK(err);
         dims_out[name] = dimid;
     }
 
     // define variables
-    TRACER("define variables\n")
+    TRACER("define variables\n");
     for (vars_in_it=vars_in.begin(); vars_in_it!=vars_in.end(); ++vars_in_it) {
         Variable *var = *vars_in_it;
         string var_name = var->get_name();
@@ -75,6 +77,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
         int dims[ndim];
         bool skip = false;
         int varid;
+        TRACER1("define variable '%s'\n", var_name.c_str());
 
         for (int dimidx=0; dimidx<ndim; ++dimidx) {
             string dim_name = var->get_dims()[dimidx]->get_name();
@@ -105,9 +108,9 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     //////////////
     // write it
     //////////////
-    
+
     // copy var data
-    TRACER("copy var data\n")
+    TRACER("copy var data\n");
     for (vars_out_it=vars_out.begin(); vars_out_it!=vars_out.end(); ++vars_out_it) {
         Variable *var_in = *Util::find(vars_in, vars_out_it->first);
         if (var_in->has_record() && var_in->num_dims() > 1) {
@@ -116,18 +119,18 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
             copy_var(var_in, ncid, vars_out_it->second);
         }
     }
-    
+
     // close it
-    TRACER("close it\n")
+    TRACER("close it\n");
     err = ncmpi_close(ncid);
     ERRNO_CHECK(err);
-    TRACER("after ncmpi_close\n")
+    TRACER("after ncmpi_close\n");
 }
 
 
 void NetcdfFileWriter::copy_att(Attribute *attr, int ncid, int varid)
 {
-    TRACER1("NetcdfFileWriter::copy_att %s\n", attr->get_name().c_str())
+    TRACER1("NetcdfFileWriter::copy_att %s\n", attr->get_name().c_str());
     string name = attr->get_name();
     DataType type = attr->get_type();
     MPI_Offset len = attr->get_count();
@@ -149,6 +152,7 @@ void NetcdfFileWriter::copy_att(Attribute *attr, int ncid, int varid)
         char *data;
         attr->get_values()->as(data);
         err = ncmpi_put_att_text(ncid, varid, name.c_str(), len, data);
+        ERRNO_CHECK(err);
         delete [] data;
     }
 }
@@ -168,7 +172,7 @@ void NetcdfFileWriter::copy_atts(
 
 void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
 {
-    TRACER1("NetcdfFileWriter::copy_var %s BEGIN\n", var_in->get_name().c_str())
+    TRACER1("NetcdfFileWriter::copy_var %s BEGIN\n", var_in->get_name().c_str());
     size_t ndim = var_in->num_dims();
     int ga_var_in = var_in->get_handle();
     int ga_masks[ndim];
@@ -183,7 +187,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
         int dim_ids[ndim];
         int64_t dim_lens[ndim];
 
-        TRACER("determine size of GA to create for packed destination\n")
+        TRACER("determine size of GA to create for packed destination\n");
         err = ncmpi_inq_vardimid(ncid, varid, dim_ids);
         ERRNO_CHECK(err);
         for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
@@ -193,7 +197,7 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
             dim_lens[dimidx] = tmp;
             ga_masks[dimidx] = ((DistributedMask*)var_in->get_dims()[dimidx]->get_mask())->get_handle();
         }
-        TRACER("before ga_var_out (pack_dst) create\n")
+        TRACER("before ga_var_out (pack_dst) create\n");
         ga_var_out = NGA_Create64(var_in->get_type().as_mt(), ndim, dim_lens,
                 "pack_dst", NULL);
         pack(ga_var_in, ga_var_out, ga_masks);
@@ -205,13 +209,13 @@ void NetcdfFileWriter::copy_var(Variable *var_in, int ncid, int varid)
     }
 
     var_in->release_handle();
-    TRACER1("NetcdfFileWriter::copy_var %s END\n", var_in->get_name().c_str())
+    TRACER1("NetcdfFileWriter::copy_var %s END\n", var_in->get_name().c_str());
 }
 
 
 void NetcdfFileWriter::copy_record_var(Variable *var_in, int ncid, int varid)
 {
-    TRACER1("NetcdfFileWriter::copy_record_var %s\n", var_in->get_name().c_str())
+    TRACER1("NetcdfFileWriter::copy_record_var %s\n", var_in->get_name().c_str());
     vector<Dimension*> dims = var_in->get_dims();
     size_t ndim = dims.size();
     int64_t nrec = dims[0]->get_size();
@@ -255,7 +259,7 @@ void NetcdfFileWriter::copy_record_var(Variable *var_in, int ncid, int varid)
 
 void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
 {
-    TRACER4("NetcdfFileWriter::write %d %d %d %d\n", handle, ncid, varid, recidx)
+    TRACER4("NetcdfFileWriter::write %d %d %d %d\n", handle, ncid, varid, recidx);
     DataType type = DataType::CHAR;
     int mt_type;
     int ndim;
@@ -282,9 +286,9 @@ void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
             err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, NULL);\
         } else
         write_var_all(int, NC_INT)
-        write_var_all(float, NC_FLOAT)
-        write_var_all(double, NC_DOUBLE)
-        ; // for last else above
+            write_var_all(float, NC_FLOAT)
+            write_var_all(double, NC_DOUBLE)
+            ; // for last else above
 #undef write_var_all
         ERRNO_CHECK(err);
     } else {
@@ -308,9 +312,9 @@ void NetcdfFileWriter::write(int handle, int ncid, int varid, int recidx)
             err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \
         } else
         write_var_all(int, NC_INT)
-        write_var_all(float, NC_FLOAT)
-        write_var_all(double, NC_DOUBLE)
-        ; // for last else above
+            write_var_all(float, NC_FLOAT)
+            write_var_all(double, NC_DOUBLE)
+            ; // for last else above
 #undef write_var_all
         ERRNO_CHECK(err);
         NGA_Release64(handle, lo, hi);

@@ -10,7 +10,7 @@
 
 void partial_sum(int g_src, int g_dst, int excl)
 {
-    TRACER("partial_sum\n")
+    TRACER("partial_sum\n");
     int nproc = GA_Nnodes();
     int me = GA_Nodeid();
     int type_src;
@@ -86,7 +86,7 @@ void partial_sum(int g_src, int g_dst, int excl)
             TYPE values[nproc]; \
             bzero(values, sizeof(TYPE)*nproc); \
             GOP_OP(values, nproc, "+"); \
-            TRACER("partial_sum_op N/A\n") \
+            TRACER("partial_sum_op N/A\n"); \
         } else
         partial_sum_op(C_INT,int,armci_msg_igop)
         partial_sum_op(C_LONG,long,armci_msg_lgop)
@@ -118,7 +118,7 @@ void partial_sum(int g_src, int g_dst, int excl)
             for (int64_t i=0; i<elems; ++i) { \
                 dst[i] += value; \
             } \
-            TRACER1("partial_sum_op "#FMT"\n", value) \
+            TRACER1("partial_sum_op "#FMT"\n", value); \
         } else
         partial_sum_op(C_INT,int,C_INT,int,armci_msg_igop,%d)
         partial_sum_op(C_INT,int,C_LONG,long,armci_msg_lgop,%ld)
@@ -140,7 +140,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 
 void pack(int g_src, int g_dst, int *g_masks)
 {
-    TRACER("pack\n")
+    TRACER("pack\n");
     //int nproc = GA_Nnodes();
     int me = GA_Nodeid();
 
@@ -290,7 +290,7 @@ void pack(int g_src, int g_dst, int *g_masks)
 
 void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
-    //TRACER("unravel64\n")
+    //TRACER("unravel64\n");
     // x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
     result[ndim-1] = x % dims[ndim-1];
     for (int i=ndim-2; i>=0; --i) {
@@ -312,7 +312,7 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
  */
 void enumerate(int g_src, void *start_val, void *inc_val)
 {
-    TRACER("enumerate BEGIN\n")
+    TRACER("enumerate BEGIN\n");
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
     int64_t src_lo;
@@ -335,16 +335,16 @@ void enumerate(int g_src, void *start_val, void *inc_val)
     }
 
     NGA_Distribution64(g_src, me, &src_lo, &src_hi);
-    //TRACER2("enumerate lo,hi = %lld,%lld\n", src_lo, src_hi)
+    //TRACER2("enumerate lo,hi = %lld,%lld\n", src_lo, src_hi);
     if (0 > src_lo && 0 > src_hi) {
-        //TRACER("enumerate result = N/A\n")
-        //TRACER("enumerate count = N/A\n")
+        //TRACER("enumerate result = N/A\n");
+        //TRACER("enumerate count = N/A\n");
     } else {
         loc_lo = 0;
         loc_hi = src_size-1;
         count = 0;
         result = NGA_Locate_region64(g_src, &loc_lo, &loc_hi, map, procs);
-        //TRACER1("enumerate result = %d\n", result)
+        //TRACER1("enumerate result = %d\n", result);
         for (int i=0; i<result; ++i) {
             if (procs[i] < me) {
                 count += map[i*2+1]-map[i*2]+1;
@@ -356,7 +356,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
             ptr += 2;
         }
         */
-        //TRACER1("enumerate count = %lld\n", count)
+        //TRACER1("enumerate count = %lld\n", count);
 
         NGA_Access64(g_src, &src_lo, &src_hi, &buf, NULL);
 #define enumerate_op(MTYPE,TYPE) \
@@ -383,7 +383,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
 #undef enumerate_op
         NGA_Release_update64(g_src, &src_lo, &src_hi);
     }
-    TRACER("enumerate END\n")
+    TRACER("enumerate END\n");
 }
 
 
@@ -394,7 +394,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
  */
 void unpack1d(int g_src, int g_dst, int g_msk)
 {
-    TRACER("unpack1d BEGIN\n")
+    TRACER("unpack1d BEGIN\n");
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
     int *mask;
@@ -416,7 +416,7 @@ void unpack1d(int g_src, int g_dst, int g_msk)
     NGA_Distribution64(g_msk, me, &lo_msk, &hi_msk);
     if (0 > lo_msk && 0 > hi_msk) {
         GA_Lgop(counts, nproc, "+");
-        TRACER("unpack1d lo,hi N/A 1\n")
+        TRACER("unpack1d lo,hi N/A 1\n");
     } else {
         NGA_Access64(g_msk, &lo_msk, &hi_msk, &mask, NULL);
         for (int64_t i=0,limit=(hi_msk-lo_msk+1); i<limit; ++i) {
@@ -426,14 +426,14 @@ void unpack1d(int g_src, int g_dst, int g_msk)
         mask = NULL;
         GA_Lgop(counts, nproc, "+");
         if (0 == counts[me]) {
-            TRACER("unpack1d lo,hi N/A 2\n")
+            TRACER("unpack1d lo,hi N/A 2\n");
         } else {
             // tally up where to start the 'get' of the packed array
             for (int i=0; i<me; ++i) {
                 lo_src += counts[i];
             }
             hi_src = lo_src + counts[me] - 1;
-            TRACER2("unpack1d lo,hi = %lld,%lld\n", lo_src, hi_src)
+            TRACER2("unpack1d lo,hi = %lld,%lld\n", lo_src, hi_src);
             // do the unpacking
             // assumption is that dst array has same distribution as msk array
             // get src (and dst) type, that's all we want...
@@ -467,6 +467,6 @@ void unpack1d(int g_src, int g_dst, int g_msk)
             }
         }
     }
-    TRACER("unpack1d END\n")
+    TRACER("unpack1d END\n");
 }
 

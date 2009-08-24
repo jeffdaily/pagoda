@@ -270,7 +270,19 @@ void Dataset::decorate()
         if (var->get_name() == "cell_neighbors") {
             Dimension *dim = find_dim("cells");
             if (dim) {
-                (*var_it) = new ConnectivityVariable(var, find_dim("cells"));
+                (*var_it) = new ConnectivityVariable(var, dim);
+            }
+        }
+        if (var->get_name() == "cell_corners") {
+            Dimension *dim = find_dim("cellcorners");
+            if (dim) {
+                (*var_it) = new ConnectivityVariable(var, dim);
+            }
+        }
+        if (var->get_name() == "cell_edges") {
+            Dimension *dim = find_dim("celledges");
+            if (dim) {
+                (*var_it) = new ConnectivityVariable(var, dim);
             }
         }
     }

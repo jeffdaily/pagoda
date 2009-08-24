@@ -103,7 +103,7 @@ class Variable;
 
 #ifdef TRACE
 #   define TRACER(fmt) \
-    { \
+    do { \
         MPI_Status stat; \
         int count=100; \
         char msg[count]; \
@@ -116,13 +116,14 @@ class Variable;
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
+            fflush(stdout); \
         } else { \
             sprintf(msg, fmt); \
             MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
-    }
+    } while (0)
 #   define TRACER1(fmt,a1) \
-    { \
+    do { \
         MPI_Status stat; \
         int count=100; \
         char msg[count]; \
@@ -135,13 +136,14 @@ class Variable;
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
+            fflush(stdout); \
         } else { \
             sprintf(msg, fmt, a1); \
             MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
-    }
+    } while (0)
 #   define TRACER2(fmt,a1,a2) \
-    { \
+    do { \
         MPI_Status stat; \
         int count=100; \
         char msg[count]; \
@@ -154,13 +156,14 @@ class Variable;
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
+            fflush(stdout); \
         } else { \
             sprintf(msg, fmt,a1,a2); \
             MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
-    }
+    } while (0)
 #   define TRACER3(fmt,a1,a2,a3) \
-    { \
+    do { \
         MPI_Status stat; \
         int count=100; \
         char msg[count]; \
@@ -173,13 +176,14 @@ class Variable;
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
+            fflush(stdout); \
         } else { \
             sprintf(msg, fmt,a1,a2,a3); \
             MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
-    }
+    } while (0)
 #   define TRACER4(fmt,a1,a2,a3,a4) \
-    { \
+    do { \
         MPI_Status stat; \
         int count=100; \
         char msg[count]; \
@@ -192,17 +196,18 @@ class Variable;
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
+            fflush(stdout); \
         } else { \
             sprintf(msg, fmt,a1,a2,a3,a4); \
             MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
-    }
+    } while (0)
 #else
-#   define TRACER(fmt)
-#   define TRACER1(fmt,a1)
-#   define TRACER2(fmt,a1,a2)
-#   define TRACER3(fmt,a1,a2,a3)
-#   define TRACER4(fmt,a1,a2,a3,a4)
+#   define TRACER(fmt) do {} while (0)
+#   define TRACER1(fmt,a1) do {} while (0)
+#   define TRACER2(fmt,a1,a2) do {} while (0)
+#   define TRACER3(fmt,a1,a2,a3) do {} while (0)
+#   define TRACER4(fmt,a1,a2,a3,a4) do {} while (0)
 #endif
 
 
