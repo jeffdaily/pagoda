@@ -121,6 +121,7 @@ void NetcdfFileWriter::write(const string &filename, Dataset *dataset)
     TRACER("close it\n")
     err = ncmpi_close(ncid);
     ERRNO_CHECK(err);
+    TRACER("after ncmpi_close\n")
 }
 
 

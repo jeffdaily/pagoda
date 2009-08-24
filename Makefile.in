@@ -35,7 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = subsetter_old$(EXEEXT) subsetter$(EXEEXT)
+bin_PROGRAMS = subsetter$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/config/config.h.in \
@@ -97,9 +97,6 @@ PROGRAMS = $(bin_PROGRAMS)
 am_subsetter_OBJECTS = SubsetterMain.$(OBJEXT)
 subsetter_OBJECTS = $(am_subsetter_OBJECTS)
 subsetter_DEPENDENCIES = libsubsetter.la
-am_subsetter_old_OBJECTS = Mainp.$(OBJEXT)
-subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
-subsetter_old_DEPENDENCIES = libsubsetter.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -122,10 +119,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
-	$(subsetter_old_SOURCES)
-DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
-	$(subsetter_old_SOURCES)
+SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES)
+DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -371,8 +366,8 @@ AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libsubsetter.la
 libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
-subsetter_old_SOURCES = Mainp.C
-subsetter_old_LDADD = libsubsetter.la
+#subsetter_old_SOURCES = Mainp.C
+#subsetter_old_LDADD = libsubsetter.la
 subsetter_SOURCES = SubsetterMain.C
 subsetter_LDADD = libsubsetter.la
 all: all-recursive
@@ -509,9 +504,6 @@ clean-binPROGRAMS:
 subsetter$(EXEEXT): $(subsetter_OBJECTS) $(subsetter_DEPENDENCIES) 
 	@rm -f subsetter$(EXEEXT)
 	$(CXXLINK) $(subsetter_OBJECTS) $(subsetter_LDADD) $(LIBS)
-subsetter_old$(EXEEXT): $(subsetter_old_OBJECTS) $(subsetter_old_DEPENDENCIES) 
-	@rm -f subsetter_old$(EXEEXT)
-	$(CXXLINK) $(subsetter_old_OBJECTS) $(subsetter_old_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -532,7 +524,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DistributedMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LocalMask.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfAttribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDataset.Plo@am__quote@

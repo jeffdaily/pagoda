@@ -51,8 +51,10 @@ int main(int argc, char **argv)
     dataset->adjust_masks(cmd.get_box());
 
     NetcdfFileWriter::write(cmd.get_output_filename(), dataset);
+    TRACER("after NetcdfFileWriter::write\n")
 
     delete dataset;
+    TRACER("after delete dataset\n")
     GA_Terminate();
     MPI_Finalize();
     exit(EXIT_SUCCESS);

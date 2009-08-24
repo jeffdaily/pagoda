@@ -72,9 +72,9 @@ AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libsubsetter.la
 libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
 
-bin_PROGRAMS = subsetter_old subsetter
-subsetter_old_SOURCES = Mainp.C
-subsetter_old_LDADD = libsubsetter.la
+bin_PROGRAMS = subsetter
+#subsetter_old_SOURCES = Mainp.C
+#subsetter_old_LDADD = libsubsetter.la
 
 subsetter_SOURCES = SubsetterMain.C
 subsetter_LDADD = libsubsetter.la
