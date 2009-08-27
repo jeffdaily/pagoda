@@ -293,6 +293,6 @@ void Dataset::decorate()
     }
 #endif // DEBUG
 
-    decorate(vars);
+    decorate_set(vars);
 }
 

@@ -108,7 +108,7 @@ ostream& AggregationUnion::print(ostream &os) const
 }
 
 
-void AggregationUnion::decorate(const vector<Variable*> &vars)
+void AggregationUnion::decorate_set(const vector<Variable*> &vars)
 {
     this->vars = vars;
 }

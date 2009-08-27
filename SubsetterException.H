@@ -7,8 +7,8 @@
 class SubsetterException : public runtime_error
 {
   public:
-    SubsetterException(const string& s)
-      : runtime_error(s) {}
+    SubsetterException(const string &where, const string& s)
+      : runtime_error(where + ": " + s) {}
 };
 
 #endif // SUBSETTEREXCEPTION_H_

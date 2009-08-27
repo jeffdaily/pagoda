@@ -37,7 +37,7 @@ class NetcdfDataset : public Dataset
         NetcdfDimension* get_udim() const;
 
     protected:
-        virtual void decorate(const vector<Variable*> &vars) ;
+        virtual void decorate_set(const vector<Variable*> &vars) ;
 
         string filename;
         int ncid;

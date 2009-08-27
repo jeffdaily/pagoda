@@ -48,7 +48,7 @@ class Dataset
 
     protected:
         virtual void decorate();
-        virtual void decorate(const vector<Variable*> &vars) = 0;
+        virtual void decorate_set(const vector<Variable*> &vars) = 0;
 };
 
 #endif // DATASET_H_

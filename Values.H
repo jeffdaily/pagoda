@@ -27,15 +27,15 @@ class Values
         virtual void as(size_t n, double &val) const = 0;
         virtual void as(size_t n, string &val) const = 0;
 
-        virtual void as(char* &values) const;
-        virtual void as(signed char* &values) const;
-        virtual void as(unsigned char* &values) const;
-        virtual void as(short* &values) const;
-        virtual void as(int* &values) const;
-        virtual void as(long* &values) const;
-        virtual void as(float* &values) const;
-        virtual void as(double* &values) const;
-        virtual void as(string &values) const;
+        void as(char* &values) const;
+        void as(signed char* &values) const;
+        void as(unsigned char* &values) const;
+        void as(short* &values) const;
+        void as(int* &values) const;
+        void as(long* &values) const;
+        void as(float* &values) const;
+        void as(double* &values) const;
+        void as(string &values) const;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Values *values);

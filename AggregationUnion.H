@@ -29,7 +29,7 @@ class AggregationUnion : public Aggregation
         virtual ostream& print(ostream &os) const;
 
     protected:
-        virtual void decorate(const vector<Variable*> &vars);
+        virtual void decorate_set(const vector<Variable*> &vars);
 
     private:
         vector<Dataset*> datasets;

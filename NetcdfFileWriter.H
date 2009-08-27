@@ -42,8 +42,8 @@ class NetcdfFileWriter : public FileWriter
         void def_check();
         void maybe_enddef();
 
-        void copy_att(Attribute *attr, int id);
-        void copy_atts(const vector<Attribute*> &atts, int id);
+        void copy_att_id(Attribute *attr, int id);
+        void copy_atts_id(const vector<Attribute*> &atts, int id);
         void write(int handle, int id, int record=-1);
 
         bool is_in_define_mode;

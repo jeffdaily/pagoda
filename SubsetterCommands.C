@@ -47,7 +47,7 @@ void SubsetterCommands::parse(int argc, char **argv)
     while ((c = getopt(argc, argv, "hb:d:")) != -1) {
         switch (c) {
             case 'h':
-                throw SubsetterException(get_usage());
+                throw SubsetterException(AT, get_usage());
             case 'b':
                 _has_box = true;
                 box = LatLonBox(optarg);
@@ -66,7 +66,7 @@ void SubsetterCommands::parse(int argc, char **argv)
                 ostringstream os;
                 os << "ERROR: Unrecognized argument '" << c << "'" << endl;
                 os << get_usage() << endl;
-                throw SubsetterException(os.str());
+                throw SubsetterException(AT, os.str());
         }
     }
 
@@ -74,12 +74,12 @@ void SubsetterCommands::parse(int argc, char **argv)
         ostringstream os;
         os << "ERROR: Input and output file arguments required" << endl;
         os << get_usage() << endl;
-        throw SubsetterException(os.str());
+        throw SubsetterException(AT, os.str());
     } else if (optind+1 == argc) {
         ostringstream os;
         os << "ERROR: Output file argument required" << endl;
         os << get_usage() << endl;
-        throw SubsetterException(os.str());
+        throw SubsetterException(AT, os.str());
     }
 
     while (optind < argc-1) {

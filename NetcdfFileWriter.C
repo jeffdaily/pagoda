@@ -98,7 +98,7 @@ void NetcdfFileWriter::def_var(Variable *var)
     ERRNO_CHECK(err);
     var_id[name] = id;
 
-    copy_atts(var->get_atts(), id);
+    copy_atts_id(var->get_atts(), id);
 }
 
 
@@ -146,20 +146,22 @@ void NetcdfFileWriter::maybe_enddef()
 {
     if (is_in_define_mode) {
         is_in_define_mode = false;
-        ncmpi_enddef(ncid);
+        err = ncmpi_enddef(ncid);
+        ERRNO_CHECK(err);
+        TRACER("NetcdfFileWriter::maybe_enddef END DEF\n");
     }
 }
 
 
 void NetcdfFileWriter::copy_att(Attribute *att, const string &name)
 {
-    copy_att(att, name.empty() ? NC_GLOBAL : get_var_id(name));
+    copy_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
 }
 
 
-void NetcdfFileWriter::copy_att(Attribute *attr, int varid)
+void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 {
-    TRACER1("NetcdfFileWriter::copy_att %s\n", attr->get_name().c_str());
+    TRACER1("NetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
     def_check();
     string name = attr->get_name();
     DataType type = attr->get_type();
@@ -188,11 +190,11 @@ void NetcdfFileWriter::copy_att(Attribute *attr, int varid)
 }
 
 
-void NetcdfFileWriter::copy_atts(const vector<Attribute*> &atts, int varid)
+void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 {
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
-        copy_att(*att_it, varid);
+        copy_att_id(*att_it, varid);
     }
 }
 

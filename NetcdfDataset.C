@@ -130,7 +130,7 @@ NetcdfDimension* NetcdfDataset::get_udim() const
 }
 
 
-void NetcdfDataset::decorate(const vector<Variable*> &vars)
+void NetcdfDataset::decorate_set(const vector<Variable*> &vars)
 {
     decorated = vars;
 }

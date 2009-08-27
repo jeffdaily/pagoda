@@ -45,18 +45,22 @@ class Variable;
 #define DEG_PER_RAD (180.0 / M_PI)
 #define PRECISION (((int)(NPROC/10))+1)
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define AT __FILE__ ":" TOSTRING(__LINE__)
+
 #define ERR(e) \
 { \
     ostringstream __os; \
     __os << "Error: " << e << endl; \
-    throw SubsetterException(__os.str()); \
+    throw SubsetterException(AT, __os.str()); \
 }
 
 #define ERRNO(n) \
 { \
     ostringstream __os; \
     __os << "Error: " << ncmpi_strerror(n) << endl; \
-    throw SubsetterException(__os.str()); \
+    throw SubsetterException(AT, __os.str()); \
 }
 
 #define ERRNO_CHECK(n) \
