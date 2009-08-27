@@ -36,14 +36,18 @@ AC_ARG_VAR([GA_LIBS], [Global Arrays C linker directives])
 AC_SUBST([GA_LIBS])
 
 # Debug helper stuff.
-msg="output unordered debug messages"
 AC_ARG_ENABLE([debug],
     [AS_HELP_STRING([--enable-debug], [stderr: unordered debug messages])],
     [AC_DEFINE_UNQUOTED([DEBUG], [1], [stderr: unordered debug messages])])
-msg="output ordered function calls to stderr"
 AC_ARG_ENABLE([trace],
     [AS_HELP_STRING([--enable-trace], [stderr: ordered function calls])],
     [AC_DEFINE_UNQUOTED([TRACE], [1], [stderr: ordered function calls])])
+AC_ARG_ENABLE([profile],
+    [AS_HELP_STRING([--enable-profile], [enable gprof symbols])])
+AM_CONDITIONAL([PROFILE], [test x$enable_profile = xyes])
+AC_ARG_ENABLE([warnings],
+    [AS_HELP_STRING([--enable-warnings], [enable -Wall warnings])])
+AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])

@@ -2,28 +2,55 @@
 #define NETCDFFILEWRITER_H_
 
 #include <string>
-    using std::string;
+#include <map>
+#include <vector>
 
-class ConnectivityVariable;
+#include "FileWriter.H"
+
 class Dataset;
 class NetcdfVariable;
 class Variable;
+
+using std::string;
+using std::map;
+using std::vector;
 
 
 /**
  * Writes a Dataset to a netcdf-3 file.
  */
-class NetcdfFileWriter
+class NetcdfFileWriter : public FileWriter
 {
     public:
-        static void write(const string &filename, Dataset *dataset);
+        NetcdfFileWriter(const string &filename);
+        virtual ~NetcdfFileWriter();
+
+        virtual void def_dim(Dimension *dim);
+
+        virtual void def_var(Variable *var);
+
+        virtual void copy_att(Attribute *att, const string &name="");
+
+        virtual void write(int handle, const string &name, int record=-1);
+
+        virtual ostream& print(ostream &os) const;
 
     protected:
-        static void copy_att(Attribute *attr, int ncid, int varid);
-        static void copy_atts(const vector<Attribute*> &atts, int ncid, int varid);
-        static void copy_var(Variable *var_in, int ncid, int varid);
-        static void copy_record_var(Variable *var_in, int ncid, int varid);
-        static void write(int handle, int ncid, int varid, int recidx=-1);
+        int get_dim_id(const string &name);
+        int get_var_id(const string &name);
+
+        void def_check();
+        void maybe_enddef();
+
+        void copy_att(Attribute *attr, int id);
+        void copy_atts(const vector<Attribute*> &atts, int id);
+        void write(int handle, int id, int record=-1);
+
+        bool is_in_define_mode;
+        string filename;
+        int ncid;
+        map<string,int> dim_id;
+        map<string,int> var_id;
 };
 
 #endif // NETCDFFILEWRITER_H_

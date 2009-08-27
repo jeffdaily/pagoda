@@ -85,8 +85,8 @@ libsubsetter_la_LIBADD =
 am__objects_1 = AbstractVariable.lo Aggregation.lo AggregationUnion.lo \
 	Attribute.lo BoundaryVariable.lo ConnectivityVariable.lo \
 	CoordinateVariable.lo DataType.lo Dataset.lo Dimension.lo \
-	DistributedMask.lo LatLonBox.lo LocalMask.lo Mask.lo \
-	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
+	DistributedMask.lo FileWriter.lo LatLonBox.lo LocalMask.lo \
+	Mask.lo NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
 	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo \
 	StringComparator.lo SubsetterCommands.lo TypedValues.lo \
 	Util.lo Values.lo Variable.lo VariableDecorator.lo
@@ -309,6 +309,7 @@ HEADERS_PRIVATE = \
   Dataset.H \
   Dimension.H \
   DistributedMask.H \
+  FileWriter.H \
   LatLonBox.H \
   LocalMask.H \
   Mask.H \
@@ -341,6 +342,7 @@ SOURCE = \
   Dataset.C \
   Dimension.C \
   DistributedMask.C \
+  FileWriter.C \
   LatLonBox.C \
   LocalMask.C \
   Mask.C \
@@ -358,12 +360,11 @@ SOURCE = \
   Variable.C \
   VariableDecorator.C
 
-
-#WALL = -Wall
-AM_CFLAGS = $(GA_INCS) $(WALL)
-AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL)
-#AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
-AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
+@WARNINGS_TRUE@WALL = -Wall
+@PROFILE_TRUE@PROFILE = -pg
+AM_CFLAGS = $(GA_INCS) $(WALL) $(PROFILE)
+AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL) $(PROFILE)
+AM_LDFLAGS = $(GA_LIBS) $(FLIBS) $(PROFILE)
 lib_LTLIBRARIES = libsubsetter.la
 libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
 #subsetter_old_SOURCES = Mainp.C
@@ -522,6 +523,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DistributedMask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LocalMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@

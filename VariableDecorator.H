@@ -26,9 +26,8 @@ class VariableDecorator : public Variable
         virtual bool has_record() const;
         virtual size_t num_dims() const;
         virtual vector<Dimension*> get_dims() const;
-        virtual int64_t get_size() const;
-        virtual int64_t* get_sizes() const;
-        virtual long* get_mask_sizes() const;
+        virtual int64_t get_size(const bool &use_masks=false) const;
+        virtual int64_t* get_sizes(const bool &use_masks=false) const;
         virtual size_t num_masks() const;
         virtual size_t num_cleared_masks() const;
 

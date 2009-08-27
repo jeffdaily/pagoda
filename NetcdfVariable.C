@@ -99,7 +99,7 @@ void NetcdfVariable::read()
     MPI_Offset count[ndim];
     int err;
 
-    NGA_Distribution64(handle, me, lo, hi);
+    NGA_Distribution64(get_handle(), me, lo, hi);
 
     if (0 > lo[0] && 0 > hi[0]) {
         // make a non-participating process a no-op
@@ -134,7 +134,7 @@ void NetcdfVariable::read()
 #define read_var_all(TYPE, NC_TYPE) \
         if (type == NC_TYPE) { \
             TYPE *ptr; \
-            NGA_Access64(handle, lo, hi, &ptr, ld); \
+            NGA_Access64(get_handle(), lo, hi, &ptr, ld); \
             err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
             ERRNO_CHECK(err); \
         } else
@@ -143,7 +143,7 @@ void NetcdfVariable::read()
         read_var_all(double, NC_DOUBLE)
         ; // for last else above
 #undef read_var_all
-        NGA_Release_update64(handle, lo, hi);
+        NGA_Release_update64(get_handle(), lo, hi);
     }
 }
 

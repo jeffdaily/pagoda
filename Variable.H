@@ -24,9 +24,8 @@ class Variable
         virtual bool has_record() const = 0;
         virtual size_t num_dims() const = 0;
         virtual vector<Dimension*> get_dims() const = 0;
-        virtual int64_t get_size() const = 0;
-        virtual int64_t* get_sizes() const = 0;
-        virtual long* get_mask_sizes() const = 0;
+        virtual int64_t get_size(const bool &use_masks=false) const = 0;
+        virtual int64_t* get_sizes(const bool &use_masks=false) const = 0;
         virtual size_t num_masks() const = 0;
         virtual size_t num_cleared_masks() const = 0;
 

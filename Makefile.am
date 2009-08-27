@@ -14,6 +14,7 @@ HEADERS_PRIVATE = \
   Dataset.H \
   Dimension.H \
   DistributedMask.H \
+  FileWriter.H \
   LatLonBox.H \
   LocalMask.H \
   Mask.H \
@@ -46,6 +47,7 @@ SOURCE = \
   Dataset.C \
   Dimension.C \
   DistributedMask.C \
+  FileWriter.C \
   LatLonBox.C \
   LocalMask.C \
   Mask.C \
@@ -63,11 +65,17 @@ SOURCE = \
   Variable.C \
   VariableDecorator.C
 
-#WALL = -Wall
-AM_CFLAGS = $(GA_INCS) $(WALL)
-AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL)
-#AM_LDFLAGS = $(GA_LIBS) $(FCLIBS)
-AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
+if WARNINGS
+WALL = -Wall
+endif
+
+if PROFILE
+PROFILE = -pg
+endif
+
+AM_CFLAGS = $(GA_INCS) $(WALL) $(PROFILE)
+AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL) $(PROFILE)
+AM_LDFLAGS = $(GA_LIBS) $(FLIBS) $(PROFILE)
 
 lib_LTLIBRARIES = libsubsetter.la
 libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)

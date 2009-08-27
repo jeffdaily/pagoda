@@ -43,6 +43,7 @@ class Variable;
 #define MAX_DIM 8
 #define RAD_PER_DEG (M_PI / 180.0)
 #define DEG_PER_RAD (180.0 / M_PI)
+#define PRECISION (((int)(NPROC/10))+1)
 
 #define ERR(e) \
 { \
@@ -68,22 +69,22 @@ class Variable;
 #if defined(DEBUG) || defined(TRACE)
 #   define DEBUG_PRINT(FMT) \
     { \
-        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr, "[%*d] ", PRECISION, ME); \
         fprintf(stderr,FMT); \
     }
 #   define DEBUG_PRINT1(FMT,A1) \
     { \
-        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr, "[%*d] ", PRECISION, ME); \
         fprintf(stderr,FMT,A1); \
     }
 #   define DEBUG_PRINT2(FMT,A1,A2) \
     { \
-        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr, "[%*d] ", PRECISION, ME); \
         fprintf(stderr,FMT,A1,A2); \
     }
 #   define DEBUG_PRINT3(FMT,A1,A2,A3) \
     { \
-        fprintf(stderr, "[%d] ", ME); \
+        fprintf(stderr, "[%*d] ", PRECISION, ME); \
         fprintf(stderr,FMT,A1,A2,A3); \
     }
 #   define DEBUG_PRINT_ME(FMT) if (ME == 0) fprintf(stderr, FMT)
@@ -108,11 +109,11 @@ class Variable;
         int count=100; \
         char msg[count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[0] "); \
+            fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -128,11 +129,11 @@ class Variable;
         int count=100; \
         char msg[count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[0] "); \
+            fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt, a1); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -148,11 +149,11 @@ class Variable;
         int count=100; \
         char msg[count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[0] "); \
+            fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt,a1,a2); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -168,11 +169,11 @@ class Variable;
         int count=100; \
         char msg[count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[0] "); \
+            fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt,a1,a2,a3); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -188,11 +189,11 @@ class Variable;
         int count=100; \
         char msg[count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[0] "); \
+            fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt,a1,a2,a3,a4); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%d] ", proc); \
+                fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \

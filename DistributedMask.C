@@ -28,6 +28,7 @@ DistributedMask::DistributedMask(Dimension *dim, int value)
     string name = dim->get_name();
     int64_t size = dim->get_size();
     handle = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), NULL);
+    TRACER1("DistributedMask ctor handle=%d\n", handle);
     NGA_Distribution64(handle, ME, &lo, &hi);
     GA_Fill(handle, &value);
     counts = new long[NPROC];

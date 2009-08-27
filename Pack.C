@@ -8,6 +8,22 @@
 #include "Util.H"
 
 
+static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *result)
+{
+    // x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
+    result[ndim-1] = x % dims[ndim-1];
+    for (int i=ndim-2; i>=0; --i) {
+        x /= dims[i+1];
+        result[i] = x % dims[i];
+    }
+    for (int i=0; i<ndim; ++i) {
+        if (result[i] >= dims[i]) {
+            GA_Error("unravel64: result[i] >= dims[i]", 0);
+        }
+    }
+}
+
+
 void partial_sum(int g_src, int g_dst, int excl)
 {
     TRACER("partial_sum\n");
@@ -247,7 +263,7 @@ void pack(int g_src, int g_dst, int *g_masks)
                         TYPE *buf_dst = new TYPE[local_counts_product]; \
                         NGA_Access64(g_src, lo_src, hi_src, &buf_src, ld_src); \
                         for (int64_t i=0; i<elems_product_src; ++i) { \
-                            unravel64(i, ndim_src, elems_src, index); \
+                            unravel64i(i, ndim_src, elems_src, index); \
                             int okay = 1; \
                             for (int j=0; j<ndim_src; ++j) { \
                                 okay *= local_masks[j][index[j]]; \
@@ -290,18 +306,7 @@ void pack(int g_src, int g_dst, int *g_masks)
 
 void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
-    //TRACER("unravel64\n");
-    // x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
-    result[ndim-1] = x % dims[ndim-1];
-    for (int i=ndim-2; i>=0; --i) {
-        x /= dims[i+1];
-        result[i] = x % dims[i];
-    }
-    for (int i=0; i<ndim; ++i) {
-        if (result[i] >= dims[i]) {
-            GA_Error("unravel64: result[i] >= dims[i]", 0);
-        }
-    }
+    unravel64i(x,ndim,dims,result);
 }
 
 

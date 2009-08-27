@@ -18,22 +18,28 @@ AbstractVariable::~AbstractVariable()
 }
 
 
-int64_t AbstractVariable::get_size() const
+int64_t AbstractVariable::get_size(const bool &use_masks) const
 {
     int64_t result = 1;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it;
 
     for (it=dims.begin(); it!=dims.end(); ++it) {
-        if (! (*it)->is_unlimited())
-            result *= (*it)->get_size();
+        if (! (*it)->is_unlimited()) {
+            Mask *mask = (*it)->get_mask();
+            if (use_masks && mask) {
+                result *= mask->get_count();
+            } else {
+                result *= (*it)->get_size();
+            }
+        }
     }
 
     return result;
 }
 
 
-int64_t* AbstractVariable::get_sizes() const
+int64_t* AbstractVariable::get_sizes(const bool &use_masks) const
 {
     size_t dimidx;
     size_t ndim = num_dims();
@@ -41,23 +47,8 @@ int64_t* AbstractVariable::get_sizes() const
     vector<Dimension*> dims = get_dims();
 
     for (dimidx=0; dimidx<ndim; ++dimidx) {
-        sizes[dimidx] = dims[dimidx]->get_size();
-    }
-
-    return sizes;
-}
-
-
-long* AbstractVariable::get_mask_sizes() const
-{
-    size_t dimidx;
-    size_t ndim = num_dims();
-    long *sizes = new long[ndim];
-    vector<Dimension*> dims = get_dims();
-
-    for (dimidx=0; dimidx<ndim; ++dimidx) {
         Mask *mask = dims[dimidx]->get_mask();
-        if (mask) {
+        if (use_masks && mask) {
             sizes[dimidx] = mask->get_count();
         } else {
             sizes[dimidx] = dims[dimidx]->get_size();

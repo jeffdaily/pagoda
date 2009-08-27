@@ -38,21 +38,15 @@ vector<Dimension*> VariableDecorator::get_dims() const
 }
 
 
-int64_t VariableDecorator::get_size() const
+int64_t VariableDecorator::get_size(const bool &use_masks) const
 {
-    return var->get_size();
+    return var->get_size(use_masks);
 }
 
 
-int64_t* VariableDecorator::get_sizes() const
+int64_t* VariableDecorator::get_sizes(const bool &use_masks) const
 {
-    return var->get_sizes();
-}
-
-
-long* VariableDecorator::get_mask_sizes() const
-{
-    return var->get_mask_sizes();
+    return var->get_sizes(use_masks);
 }
 
 
