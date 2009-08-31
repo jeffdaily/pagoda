@@ -6,32 +6,32 @@
 #endif // HAVE_CONFIG_H
 
 #include <algorithm>
-    using std::reverse;
-    using std::reverse_copy;
-    using std::rotate;
-    using std::transform;
 #include <cmath>
 #include <functional>
-    using std::bind2nd;
-    using std::divides;
-    using std::modulus;
-    using std::multiplies;
-    using std::ptr_fun;
 #include <numeric>
-    using std::partial_sum;
 #include <sstream>
-    using std::endl;
-    using std::ostringstream;
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
 #include <ga.h>
 #include <mpi.h>
 
 #include "StringComparator.H"
 #include "SubsetterException.H"
+
+//using std::bind2nd;
+using std::divides;
+using std::endl;
+using std::modulus;
+using std::multiplies;
+using std::ostringstream;
+using std::partial_sum;
+//using std::ptr_fun;
+using std::reverse;
+using std::rotate;
+using std::string;
+using std::transform;
+using std::vector;
 
 class Attribute;
 class Dimension;
@@ -50,25 +50,25 @@ class Variable;
 #define AT __FILE__ ":" TOSTRING(__LINE__)
 
 #define ERR(e) \
-{ \
+do { \
     ostringstream __os; \
     __os << "Error: " << e << endl; \
     throw SubsetterException(AT, __os.str()); \
-}
+} while (0)
 
 #define ERRNO(n) \
-{ \
+do { \
     ostringstream __os; \
     __os << "Error: " << ncmpi_strerror(n) << endl; \
     throw SubsetterException(AT, __os.str()); \
-}
+} while (0)
 
 #define ERRNO_CHECK(n) \
-{ \
+do { \
     if (n != NC_NOERR) { \
         ERRNO(n); \
     } \
-}
+} while (0)
 
 #if defined(DEBUG) || defined(TRACE)
 #   define DEBUG_PRINT(FMT) \
