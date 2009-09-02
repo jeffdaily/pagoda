@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <cstring> // for memset
 
 #include <ga.h>
 #include <macdecls.h>
 #include <message.h>
 
-#include "Common.H"
 #include "Debug.H"
 #include "Pack.H"
 

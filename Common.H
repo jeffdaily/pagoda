@@ -1,10 +1,6 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
 #include <cmath> // for M_PI
 
 #define ME GA_Nodeid()

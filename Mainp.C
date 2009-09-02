@@ -21,7 +21,6 @@
 #include <vector>
 
 // C++ includes
-#include "Common.H"
 #include "LatLonBox.H"
 #include "RangeException.H"
 #include "Slice.H"

@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <algorithm>
 #include <string>
 #include <vector>
 
 #include "AggregationUnion.H"
 #include "Attribute.H"
-#include "Common.H"
 #include "Dimension.H"
 #include "Util.H"
 #include "Variable.H"

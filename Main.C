@@ -15,7 +15,6 @@
 
 #include <netcdfcpp.h>
 
-#include "Common.H"
 #include "DimensionSlice.H"
 #include "LatLonBox.H"
 #include "RangeException.H"

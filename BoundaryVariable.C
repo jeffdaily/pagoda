@@ -1,5 +1,8 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include "BoundaryVariable.H"
-#include "Common.H"
 
 
 BoundaryVariable::BoundaryVariable(Variable *bound, Variable *bounded_var)

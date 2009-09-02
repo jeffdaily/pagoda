@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <cmath>
 #include <cstdlib>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include "Common.H"
 #include "LatLonBox.H"
 #include "RangeException.H"
 

@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <algorithm>
 #include <iostream>
 
@@ -7,7 +11,6 @@
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
-#include "Common.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"

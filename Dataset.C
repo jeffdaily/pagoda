@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <algorithm>
 #include <cctype>
 #include <iostream>
 
 #include "Attribute.H"
 #include "BoundaryVariable.H"
-#include "Common.H"
 #include "ConnectivityVariable.H"
 #include "CoordinateVariable.H"
 #include "Dataset.H"

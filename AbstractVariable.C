@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <sstream>
 
 #include <ga.h>
 
 #include "AbstractVariable.H"
 #include "Attribute.H"
-#include "Common.H"
 #include "Dimension.H"
 #include "Mask.H"
 #include "StringComparator.H"

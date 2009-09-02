@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <exception>
 #include <string>
 #include <vector>
@@ -6,7 +10,6 @@
 #include <pnetcdf.h>
 
 #include "Attribute.H"
-#include "Common.H"
 #include "ConnectivityVariable.H"
 #include "Dataset.H"
 #include "Debug.H"

@@ -1,7 +1,10 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <algorithm>
 #include <cctype>
 
-#include "Common.H"
 #include "StringComparator.H"
 
 using std::tolower;

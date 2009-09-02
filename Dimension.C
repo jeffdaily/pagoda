@@ -1,4 +1,7 @@
-#include "Common.H"
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include "Dimension.H"
 
 Dimension::Dimension()

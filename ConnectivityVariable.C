@@ -1,9 +1,12 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <cstring> // for memset
 #include <map>
 
 #include <ga.h>
 
-#include "Common.H"
 #include "ConnectivityVariable.H"
 #include "Debug.H"
 #include "Dimension.H"

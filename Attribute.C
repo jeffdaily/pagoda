@@ -1,7 +1,10 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <sstream>
 
 #include "Attribute.H"
-#include "Common.H"
 #include "DataType.H"
 #include "Util.H"
 #include "Values.H"

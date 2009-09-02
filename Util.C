@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <string>
 #include <vector>
 
 #include <ga.h>
 #include <macdecls.h>
 
-#include "Common.H"
 #include "Debug.H"
 #include "Util.H"
 #include "Variable.H"

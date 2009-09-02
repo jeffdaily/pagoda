@@ -1,8 +1,11 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "Common.H"
 #include "FileWriter.H"
 #include "NetcdfFileWriter.H"
 #include "Util.H"

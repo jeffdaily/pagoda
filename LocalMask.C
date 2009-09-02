@@ -1,10 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <algorithm>
 //#include <functional>
 //#include <numeric>
 
 #include <macdecls.h>
 
-#include "Common.H"
 #include "Dimension.H"
 #include "LocalMask.H"
 #include "Slice.H"

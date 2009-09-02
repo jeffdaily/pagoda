@@ -1,9 +1,12 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "AggregationVariable.H"
-#include "Common.H"
 #include "DataType.H"
 #include "Dimension.H"
 #include "Variable.H"

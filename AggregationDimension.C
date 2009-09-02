@@ -1,8 +1,11 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <string>
 #include <vector>
 
 #include "AggregationDimension.H"
-#include "Common.H"
 #include "Dimension.H"
 
 using std::string;

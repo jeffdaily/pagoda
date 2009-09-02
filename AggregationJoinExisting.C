@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -6,7 +10,6 @@
 #include "AggregationJoinExisting.H"
 #include "AggregationVariable.H"
 #include "Attribute.H"
-#include "Common.H"
 #include "Debug.H"
 #include "Dimension.H"
 #include "Variable.H"
