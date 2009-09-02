@@ -1,21 +1,18 @@
 #include <algorithm>
-    using std::find_if;
-    using std::transform;
-#include <functional>
-    using std::bind2nd;
-    using std::ptr_fun;
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
 #include "AggregationUnion.H"
 #include "Attribute.H"
+#include "Common.H"
 #include "Dimension.H"
 #include "Util.H"
-    using Util::ptr_deleter;
-    using Util::same_name;
 #include "Variable.H"
+
+using std::string;
+using std::transform;
+using std::vector;
+using Util::ptr_deleter;
 
 
 AggregationUnion::AggregationUnion()
@@ -59,45 +56,36 @@ void AggregationUnion::add(Dataset *dataset)
     datasets.push_back(dataset);
 
     vector<Attribute*> other_atts = dataset->get_atts();
-    for (size_t i=0,limit=other_atts.size(); i<limit; ++i) {
-        Attribute *att = other_atts[i];
-        vector<Attribute*>::iterator iter;
-        iter = find_if(atts.begin(), atts.end(),
-                bind2nd(ptr_fun(same_name<Attribute>), att));
-        if (iter == atts.end()) {
-            atts.push_back(att);
+    vector<Attribute*>::const_iterator other_atts_it = other_atts.begin();
+    vector<Attribute*>::const_iterator other_atts_end = other_atts.end();
+    for (; other_atts_it!=other_atts_end; ++other_atts_it) {
+        Attribute *other_att = *other_atts_it;
+        Attribute *orig_att = find_att(other_att->get_name());
+        if (! orig_att) {
+            atts.push_back(other_att);
         }
     }
 
     vector<Dimension*> other_dims = dataset->get_dims();
-    for (size_t i=0,limit=other_dims.size(); i<limit; ++i) {
-        Dimension *dim = other_dims[i];
-        vector<Dimension*>::iterator iter;
-        iter = find_if(dims.begin(), dims.end(),
-                bind2nd(ptr_fun(same_name<Dimension>), dim));
-        if (iter == dims.end()) {
-            dims.push_back(dim);
+    vector<Dimension*>::const_iterator other_dims_it = other_dims.begin();
+    vector<Dimension*>::const_iterator other_dims_end = other_dims.end();
+    for (; other_dims_it!=other_dims_end; ++other_dims_it) {
+        Dimension *other_dim = *other_dims_it;
+        Dimension *orig_dim = find_dim(other_dim->get_name());
+        if (! orig_dim) {
+            dims.push_back(other_dim);
         }
     }
 
     vector<Variable*> other_vars = dataset->get_vars();
-    for (size_t i=0,limit=other_vars.size(); i<limit; ++i) {
-        Variable *var = other_vars[i];
-        vector<Variable*>::iterator iter;
-        iter = find_if(vars.begin(), vars.end(),
-                bind2nd(ptr_fun(same_name<Variable>), var));
-        if (iter == vars.end()) {
-            vars.push_back(var);
+    vector<Variable*>::const_iterator other_vars_it = other_vars.begin();
+    vector<Variable*>::const_iterator other_vars_end = other_vars.end();
+    for (; other_vars_it!=other_vars_end; ++other_vars_it) {
+        Variable *other_var = *other_vars_it;
+        Variable *orig_var = find_var(other_var->get_name());
+        if (! orig_var) {
+            vars.push_back(other_var);
         }
-    }
-}
-
-
-void AggregationUnion::add(const vector<Dataset*> &datasets)
-{
-    vector<Dataset*>::const_iterator it;
-    for (it=datasets.begin(); it!=datasets.end(); ++it) {
-        add(*it);
     }
 }
 

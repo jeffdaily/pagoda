@@ -21,21 +21,21 @@ class Variable
 
         virtual string get_name() const = 0;
 
+        virtual vector<Dimension*> get_dims() const = 0;
         virtual bool has_record() const = 0;
         virtual size_t num_dims() const = 0;
-        virtual vector<Dimension*> get_dims() const = 0;
-        virtual int64_t get_size(const bool &use_masks=false) const = 0;
-        virtual int64_t* get_sizes(const bool &use_masks=false) const = 0;
+        virtual int64_t get_size(bool use_masks=false) const = 0;
+        virtual vector<int64_t> get_sizes(bool use_masks=false) const = 0;
         virtual size_t num_masks() const = 0;
         virtual size_t num_cleared_masks() const = 0;
 
-        virtual size_t num_atts() const = 0;
         virtual vector<Attribute*> get_atts() const = 0;
+        virtual size_t num_atts() const = 0;
         virtual string get_long_name() const = 0;
         virtual Attribute* find_att(const string &name,
-                bool ignore_case=true) const = 0;
+                bool ignore_case=false) const = 0;
         virtual Attribute* find_att(const vector<string> &names,
-                bool ignore_case=true) const = 0;
+                bool ignore_case=false) const = 0;
 
         virtual DataType get_type() const = 0;
 

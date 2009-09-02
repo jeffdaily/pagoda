@@ -1,18 +1,20 @@
 #include <algorithm>
-    using std::copy;
-    using std::fill;
-#include <functional>
-    using std::bind1st;
-    using std::ptr_fun;
-#include <numeric>
-    using std::accumulate;
+//#include <functional>
+//#include <numeric>
 
 #include <macdecls.h>
 
+#include "Common.H"
 #include "Dimension.H"
 #include "LocalMask.H"
 #include "Slice.H"
 #include "Util.H"
+
+//using std::accumulate;
+//using std::bind1st;
+using std::copy;
+using std::fill;
+//using std::ptr_fun;
 
 
 LocalMask::LocalMask(Dimension *dim)

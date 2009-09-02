@@ -1,9 +1,11 @@
 #include <algorithm>
-    using std::transform;
 #include <cctype>
-    using std::tolower;
 
+#include "Common.H"
 #include "StringComparator.H"
+
+using std::tolower;
+using std::transform;
 
 
 StringComparator::StringComparator()
@@ -33,7 +35,7 @@ StringComparator::StringComparator(const StringComparator &copy)
 }
 
 
-StringComparator& StringComparator::operator = (const StringComparator &copy)
+StringComparator& StringComparator::operator= (const StringComparator &copy)
 {
     if (&copy != this) {
         value = copy.value;
@@ -49,7 +51,7 @@ StringComparator::~StringComparator()
 }
 
 
-bool StringComparator::operator () (const string &that) const
+bool StringComparator::operator() (const string &that) const
 {
     string mine = value;
     string theirs = that;
@@ -62,6 +64,24 @@ bool StringComparator::operator () (const string &that) const
     } else {
         return mine == theirs;
     }
+}
+
+
+/**
+ * Return true if any of strings in input vector match our value.
+ */
+bool StringComparator::operator() (const vector<string> &that) const
+{
+    vector<string>::const_iterator it = that.begin();
+    vector<string>::const_iterator end = that.end();
+
+    for (; it!=end; ++it) {
+        if (this->operator() (*it)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 

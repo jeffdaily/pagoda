@@ -3,67 +3,78 @@ ACLOCAL_AMFLAGS = -I config
 SUBDIRS = tests
 
 HEADERS_PRIVATE = \
-  AbstractVariable.H \
-  Aggregation.H \
-  AggregationUnion.H \
-  Attribute.H \
-  BoundaryVariable.H \
-  ConnectivityVariable.H \
-  CoordinateVariable.H \
-  DataType.H \
-  Dataset.H \
-  Dimension.H \
-  DistributedMask.H \
-  FileWriter.H \
-  LatLonBox.H \
-  LocalMask.H \
-  Mask.H \
-  NetcdfAttribute.H \
-  NetcdfDataset.H \
-  NetcdfDimension.H \
-  NetcdfFileWriter.H \
-  NetcdfVariable.H \
-  Pack.H \
-  RangeException.H \
-  Slice.H \
-  StringComparator.H \
-  SubsetterCommands.H \
-  SubsetterException.H \
-  TypedValues.H \
-  Util.H \
-  Values.H \
-  Variable.H \
-  VariableDecorator.H
+AbstractVariable.H \
+AggregationDimension.H \
+Aggregation.H \
+AggregationJoinExisting.H \
+AggregationUnion.H \
+AggregationVariable.H \
+Attribute.H \
+BoundaryVariable.H \
+CommandLineParser.H \
+Common.H \
+ConnectivityVariable.H \
+CoordinateVariable.H \
+Dataset.H \
+DataType.H \
+Debug.H \
+Dimension.H \
+DistributedMask.H \
+Error.H \
+FileWriter.H \
+LatLonBox.H \
+LocalMask.H \
+Mask.H \
+NetcdfAttribute.H \
+NetcdfDataset.H \
+NetcdfDimension.H \
+NetcdfError.H \
+NetcdfFileWriter.H \
+NetcdfVariable.H \
+Pack.H \
+RangeException.H \
+Slice.H \
+StringComparator.H \
+SubsetterCommands.H \
+SubsetterException.H \
+TypedValues.H \
+Util.H \
+Values.H \
+VariableDecorator.H \
+Variable.H
 
 SOURCE = \
-  AbstractVariable.C \
-  Aggregation.C \
-  AggregationUnion.C \
-  Attribute.C \
-  BoundaryVariable.C \
-  ConnectivityVariable.C \
-  CoordinateVariable.C \
-  DataType.C \
-  Dataset.C \
-  Dimension.C \
-  DistributedMask.C \
-  FileWriter.C \
-  LatLonBox.C \
-  LocalMask.C \
-  Mask.C \
-  NetcdfAttribute.C \
-  NetcdfDataset.C \
-  NetcdfDimension.C \
-  NetcdfFileWriter.C \
-  NetcdfVariable.C \
-  Pack.C \
-  StringComparator.C \
-  SubsetterCommands.C \
-  TypedValues.C \
-  Util.C \
-  Values.C \
-  Variable.C \
-  VariableDecorator.C
+AbstractVariable.C \
+Aggregation.C \
+AggregationDimension.C \
+AggregationJoinExisting.C \
+AggregationUnion.C \
+AggregationVariable.C \
+Attribute.C \
+BoundaryVariable.C \
+CommandLineParser.C \
+ConnectivityVariable.C \
+CoordinateVariable.C \
+Dataset.C \
+DataType.C \
+Dimension.C \
+DistributedMask.C \
+FileWriter.C \
+LatLonBox.C \
+LocalMask.C \
+Mask.C \
+NetcdfAttribute.C \
+NetcdfDataset.C \
+NetcdfDimension.C \
+NetcdfFileWriter.C \
+NetcdfVariable.C \
+Pack.C \
+StringComparator.C \
+SubsetterCommands.C \
+Util.C \
+Values.C \
+Variable.C \
+VariableDecorator.C
 
 if WARNINGS
 WALL = -Wall

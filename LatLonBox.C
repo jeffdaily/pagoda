@@ -1,16 +1,21 @@
+#include <cmath>
+#include <cstdlib>
 #include <sstream>
-    using std::istringstream;
-#include <stdlib.h>
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
+#include "Common.H"
 #include "LatLonBox.H"
 #include "RangeException.H"
 
+using std::ceil;
+using std::floor;
+using std::istringstream;
+using std::string;
+using std::vector;
 
-const LatLonBox LatLonBox::GLOBAL(90,-90,180,-180);
+
+const LatLonBox LatLonBox::GLOBAL(90.0,-90.0,180.0,-180.0);
 
 
 LatLonBox::LatLonBox()
@@ -25,11 +30,7 @@ LatLonBox::LatLonBox(const string &latLonString)
 }
 
 
-LatLonBox::LatLonBox(
-        const double &north,
-        const double &south,
-        const double &east,
-        const double &west)
+LatLonBox::LatLonBox(double north, double south, double east, double west)
 {
     set(north,south,east,west);
 }
@@ -49,21 +50,29 @@ LatLonBox::LatLonBox(const LatLonBox &range)
 void LatLonBox::set(const string &latLonString)
 {
     vector<string> latLonParts;
-    istringstream ss(latLonString);
+    istringstream iss(latLonString);
+
     string token;
-    while (!ss.eof()) {
-        getline(ss, token, ',');
+    while (!iss.eof()) {
+        getline(iss, token, ',');
         latLonParts.push_back(token);
     }
 
     if (latLonParts.size() != 4) {
-        throw RangeException("invalid box string");
+        throw RangeException(string("invalid box string"));
     }
 
-    n = strtol(latLonParts[0].c_str(), NULL, 10);
-    s = strtol(latLonParts[1].c_str(), NULL, 10);
-    e = strtol(latLonParts[2].c_str(), NULL, 10);
-    w = strtol(latLonParts[3].c_str(), NULL, 10);
+    istringstream sn(latLonParts[0]);
+    istringstream ss(latLonParts[1]);
+    istringstream se(latLonParts[2]);
+    istringstream sw(latLonParts[3]);
+    sn >> n;
+    ss >> s;
+    se >> e;
+    sw >> w;
+    if (!sn || !ss || !se || !sw) {
+        throw RangeException(string("invalid box string"));
+    }
     x = ((w+e)/2);
     y = ((n+s)/2);
 
@@ -71,11 +80,7 @@ void LatLonBox::set(const string &latLonString)
 }
 
 
-void LatLonBox::set(
-        const double &north,
-        const double &south,
-        const double &east,
-        const double &west)
+void LatLonBox::set(double north, double south, double east, double west)
 {
     n = north;
     s = south;
@@ -136,13 +141,47 @@ bool LatLonBox::operator >= (const LatLonBox &that) const
 
 
 
-bool LatLonBox::contains(const double &lat, const double &lon) const
+bool LatLonBox::contains(int lat, int lon) const
+{
+    long long llat = lat;
+    long long llon = lon;
+    return contains(llat, llon);
+}
+
+
+bool LatLonBox::contains(long lat, long lon) const
+{
+    long long llat = lat;
+    long long llon = lon;
+    return contains(llat, llon);
+}
+
+
+bool LatLonBox::contains(long long lat, long long lon) const
+{
+    long long _n = (0 < n) ? floor(n) : ceil(n);
+    long long _s = (0 < s) ? floor(s) : ceil(s);
+    long long _e = (0 < e) ? floor(e) : ceil(e);
+    long long _w = (0 < w) ? floor(w) : ceil(w);
+    return _s<lat && lat<_n && _w<lon && lon<_e;
+}
+
+
+bool LatLonBox::contains(float lat, float lon) const
+{
+    double dlat = lat;
+    double dlon = lon;
+    return contains(dlat, dlon);
+}
+
+
+bool LatLonBox::contains(double lat, double lon) const
 {
     return s<lat && lat<n && w<lon && lon<e;
 }
 
 
-void LatLonBox::scale(const double &value)
+void LatLonBox::scale(double value)
 {
     n *= value;
     s *= value;
@@ -180,6 +219,6 @@ void LatLonBox::check()
             || s > 90 || s < -90
             || e > 180 || e < -180
             || w > 180 || w < -180)
-        throw RangeException("");
+        throw RangeException(string(""));
 }
 

@@ -28,9 +28,10 @@ class FileWriter
         virtual void def_var(Variable *var) = 0;
         virtual void def_vars(const vector<Variable*> &vars);
 
-        virtual void copy_att(Attribute *att, const string &name="") = 0;
+        virtual void copy_att(Attribute *att,
+                const string &name=string("")) = 0;
         virtual void copy_atts(const vector<Attribute*> &atts,
-                const string &name="");
+                const string &name=string(""));
 
         virtual void write(int handle, const string &name, int record=-1) = 0;
 

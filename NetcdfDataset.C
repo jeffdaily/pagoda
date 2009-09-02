@@ -1,8 +1,10 @@
 #include <pnetcdf.h>
 
+#include "Common.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
+#include "NetcdfError.H"
 #include "NetcdfVariable.H"
 #include "Util.H"
 

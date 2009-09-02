@@ -1,14 +1,19 @@
 #include <pnetcdf.h>
 
+#include "Common.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
+#include "NetcdfError.H"
 #include "NetcdfVariable.H"
 #include "Util.H"
 #include "Values.H"
 #include "TypedValues.H"
 
 
-NetcdfAttribute::NetcdfAttribute(NetcdfDataset *dataset, int attid, NetcdfVariable *var)
+NetcdfAttribute::NetcdfAttribute(
+        NetcdfDataset *dataset,
+        int attid,
+        NetcdfVariable *var)
     :   Attribute()
     ,   dataset(dataset)
     ,   id(attid)
@@ -18,24 +23,27 @@ NetcdfAttribute::NetcdfAttribute(NetcdfDataset *dataset, int attid, NetcdfVariab
     ,   global(var == NULL)
     ,   values(NULL)
 {
-    int err;
+    int err = 0;
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
     char att_name_tmp[MAX_NAME];
+    nc_type type_tmp;
+    MPI_Offset len_mpi;
+    size_t len;
+
     err = ncmpi_inq_attname(ncid, varid, attid, att_name_tmp);
     ERRNO_CHECK(err);
     name = string(att_name_tmp);
-    nc_type type_tmp;
-    MPI_Offset len;
-    err = ncmpi_inq_att(ncid, varid, name.c_str(), &type_tmp, &len);
+    err = ncmpi_inq_att(ncid, varid, name.c_str(), &type_tmp, &len_mpi);
     ERRNO_CHECK(err);
+    len = len_mpi;
     type = type_tmp;
-#define get_attr_values(DT, CT, NAME) \
-    if (type == DT) { \
-        CT data[len]; \
+#define get_attr_values(DATA_TYPE, C_TYPE, NAME) \
+    if (type == DATA_TYPE) { \
+        C_TYPE data[len]; \
         err = ncmpi_get_att_##NAME(ncid, varid, name.c_str(), data); \
         ERRNO_CHECK(err); \
-        values = new TypedValues<CT>(data, len); \
+        values = new TypedValues<C_TYPE>(data, len); \
     } else
     get_attr_values(DataType::BYTE, unsigned char, uchar)
     get_attr_values(DataType::CHAR, char, text)
@@ -43,8 +51,8 @@ NetcdfAttribute::NetcdfAttribute(NetcdfDataset *dataset, int attid, NetcdfVariab
     get_attr_values(DataType::INT, int, int)
     get_attr_values(DataType::FLOAT, float, float)
     get_attr_values(DataType::DOUBLE, double, double)
-#undef get_attr_values
     ; // because of last "else" in macro
+#undef get_attr_values
 }
 
 
@@ -66,12 +74,6 @@ DataType NetcdfAttribute::get_type() const
 }
 
 
-size_t NetcdfAttribute::get_count() const
-{
-    return values->size();
-}
-
-
 bool NetcdfAttribute::is_global() const
 {
     return global;
@@ -81,13 +83,6 @@ bool NetcdfAttribute::is_global() const
 Values* NetcdfAttribute::get_values() const
 {
     return values;
-}
-
-
-ostream& NetcdfAttribute::print(ostream &os) const
-{
-    os << name << "(" << get_type() << ") = " << values;
-    return os;
 }
 
 

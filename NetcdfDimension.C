@@ -1,8 +1,9 @@
 #include <pnetcdf.h>
 
+#include "Common.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
-#include "Util.H"
+#include "NetcdfError.H"
 
 
 NetcdfDimension::NetcdfDimension(NetcdfDataset *dataset, int dimid)

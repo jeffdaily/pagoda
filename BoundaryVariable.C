@@ -1,4 +1,5 @@
 #include "BoundaryVariable.H"
+#include "Common.H"
 
 
 BoundaryVariable::BoundaryVariable(Variable *bound, Variable *bounded_var)
@@ -22,5 +23,6 @@ Variable* BoundaryVariable::get_bounded_var() const
 
 ostream& BoundaryVariable::print(ostream &os) const
 {
-    return os << "BoundaryVariable(" << var->get_name() << ")";
+    const string name = var->get_name();
+    return os << "BoundaryVariable(" << name << ")";
 }

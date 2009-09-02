@@ -6,12 +6,15 @@
 #include <pnetcdf.h>
 
 #include "Attribute.H"
+#include "Common.H"
 #include "ConnectivityVariable.H"
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
 #include "Mask.H"
 #include "NetcdfDimension.H"
+#include "NetcdfError.H"
 #include "NetcdfFileWriter.H"
 #include "NetcdfVariable.H"
 #include "Pack.H"
@@ -76,12 +79,13 @@ void NetcdfFileWriter::def_var(Variable *var)
     int ndim = var->num_dims();
     int dim_ids[ndim];
     int id;
+    nc_type type;
 
     for (int dimidx=0; dimidx<ndim; ++dimidx) {
         try {
             dim_ids[dimidx] = get_dim_id(dims.at(dimidx)->get_name());
         } catch (invalid_argument &ex) {
-            // skip variables without a corresponding dimension in output file
+            TRACER("skipping variable without corresponding dim in output\n");
             return;
         }
     }
@@ -94,7 +98,8 @@ void NetcdfFileWriter::def_var(Variable *var)
         TRACER4("NetcdfFileWriter::def_var %s(%d,%d,%d)\n", name.c_str(), dim_ids[0], dim_ids[1], dim_ids[2]);
     }
 #endif
-    err = ncmpi_def_var(ncid, name.c_str(), var->get_type(), ndim, dim_ids, &id);
+    type = var->get_type();
+    err = ncmpi_def_var(ncid, name.c_str(), type, ndim, dim_ids, &id);
     ERRNO_CHECK(err);
     var_id[name] = id;
 
@@ -164,15 +169,16 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     TRACER1("NetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
     def_check();
     string name = attr->get_name();
-    DataType type = attr->get_type();
+    DataType dt = attr->get_type();
     MPI_Offset len = attr->get_count();
 #define put_attr_values(DT, CT, NAME) \
-    if (type == DT) { \
-        CT *data; \
+    if (dt == DT) { \
+        nc_type type = DT; \
+        vector<CT> data; \
         attr->get_values()->as(data); \
-        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), DT, len, data); \
+        CT *buf = &data[0]; \
+        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), type, len, buf); \
         ERRNO_CHECK(err); \
-        delete [] data; \
     } else
     put_attr_values(DataType::BYTE, unsigned char, uchar)
     put_attr_values(DataType::SHORT, short, short)
@@ -180,12 +186,12 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     put_attr_values(DataType::FLOAT, float, float)
     put_attr_values(DataType::DOUBLE, double, double)
 #undef put_attr_values
-    if (type == DataType::CHAR) {
-        char *data;
+    if (dt == DataType::CHAR) {
+        vector<char> data;
         attr->get_values()->as(data);
-        err = ncmpi_put_att_text(ncid, varid, name.c_str(), len, data);
+        char *buf = &data[0];
+        err = ncmpi_put_att_text(ncid, varid, name.c_str(), len, buf);
         ERRNO_CHECK(err);
-        delete [] data;
     }
 }
 

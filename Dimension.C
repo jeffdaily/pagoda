@@ -1,3 +1,4 @@
+#include "Common.H"
 #include "Dimension.H"
 
 Dimension::Dimension()

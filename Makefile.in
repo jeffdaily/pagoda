@@ -82,14 +82,17 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libsubsetter_la_LIBADD =
-am__objects_1 = AbstractVariable.lo Aggregation.lo AggregationUnion.lo \
-	Attribute.lo BoundaryVariable.lo ConnectivityVariable.lo \
-	CoordinateVariable.lo DataType.lo Dataset.lo Dimension.lo \
-	DistributedMask.lo FileWriter.lo LatLonBox.lo LocalMask.lo \
-	Mask.lo NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
-	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo \
-	StringComparator.lo SubsetterCommands.lo TypedValues.lo \
-	Util.lo Values.lo Variable.lo VariableDecorator.lo
+am__objects_1 = AbstractVariable.lo Aggregation.lo \
+	AggregationDimension.lo AggregationJoinExisting.lo \
+	AggregationUnion.lo AggregationVariable.lo Attribute.lo \
+	BoundaryVariable.lo CommandLineParser.lo \
+	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
+	DataType.lo Dimension.lo DistributedMask.lo FileWriter.lo \
+	LatLonBox.lo LocalMask.lo Mask.lo NetcdfAttribute.lo \
+	NetcdfDataset.lo NetcdfDimension.lo NetcdfFileWriter.lo \
+	NetcdfVariable.lo Pack.lo StringComparator.lo \
+	SubsetterCommands.lo Util.lo Values.lo Variable.lo \
+	VariableDecorator.lo
 am__objects_2 =
 am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
@@ -298,67 +301,78 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I config
 SUBDIRS = tests
 HEADERS_PRIVATE = \
-  AbstractVariable.H \
-  Aggregation.H \
-  AggregationUnion.H \
-  Attribute.H \
-  BoundaryVariable.H \
-  ConnectivityVariable.H \
-  CoordinateVariable.H \
-  DataType.H \
-  Dataset.H \
-  Dimension.H \
-  DistributedMask.H \
-  FileWriter.H \
-  LatLonBox.H \
-  LocalMask.H \
-  Mask.H \
-  NetcdfAttribute.H \
-  NetcdfDataset.H \
-  NetcdfDimension.H \
-  NetcdfFileWriter.H \
-  NetcdfVariable.H \
-  Pack.H \
-  RangeException.H \
-  Slice.H \
-  StringComparator.H \
-  SubsetterCommands.H \
-  SubsetterException.H \
-  TypedValues.H \
-  Util.H \
-  Values.H \
-  Variable.H \
-  VariableDecorator.H
+AbstractVariable.H \
+AggregationDimension.H \
+Aggregation.H \
+AggregationJoinExisting.H \
+AggregationUnion.H \
+AggregationVariable.H \
+Attribute.H \
+BoundaryVariable.H \
+CommandLineParser.H \
+Common.H \
+ConnectivityVariable.H \
+CoordinateVariable.H \
+Dataset.H \
+DataType.H \
+Debug.H \
+Dimension.H \
+DistributedMask.H \
+Error.H \
+FileWriter.H \
+LatLonBox.H \
+LocalMask.H \
+Mask.H \
+NetcdfAttribute.H \
+NetcdfDataset.H \
+NetcdfDimension.H \
+NetcdfError.H \
+NetcdfFileWriter.H \
+NetcdfVariable.H \
+Pack.H \
+RangeException.H \
+Slice.H \
+StringComparator.H \
+SubsetterCommands.H \
+SubsetterException.H \
+TypedValues.H \
+Util.H \
+Values.H \
+VariableDecorator.H \
+Variable.H
 
 SOURCE = \
-  AbstractVariable.C \
-  Aggregation.C \
-  AggregationUnion.C \
-  Attribute.C \
-  BoundaryVariable.C \
-  ConnectivityVariable.C \
-  CoordinateVariable.C \
-  DataType.C \
-  Dataset.C \
-  Dimension.C \
-  DistributedMask.C \
-  FileWriter.C \
-  LatLonBox.C \
-  LocalMask.C \
-  Mask.C \
-  NetcdfAttribute.C \
-  NetcdfDataset.C \
-  NetcdfDimension.C \
-  NetcdfFileWriter.C \
-  NetcdfVariable.C \
-  Pack.C \
-  StringComparator.C \
-  SubsetterCommands.C \
-  TypedValues.C \
-  Util.C \
-  Values.C \
-  Variable.C \
-  VariableDecorator.C
+AbstractVariable.C \
+Aggregation.C \
+AggregationDimension.C \
+AggregationJoinExisting.C \
+AggregationUnion.C \
+AggregationVariable.C \
+Attribute.C \
+BoundaryVariable.C \
+CommandLineParser.C \
+ConnectivityVariable.C \
+CoordinateVariable.C \
+Dataset.C \
+DataType.C \
+Dimension.C \
+DistributedMask.C \
+FileWriter.C \
+LatLonBox.C \
+LocalMask.C \
+Mask.C \
+NetcdfAttribute.C \
+NetcdfDataset.C \
+NetcdfDimension.C \
+NetcdfFileWriter.C \
+NetcdfVariable.C \
+Pack.C \
+StringComparator.C \
+SubsetterCommands.C \
+Util.C \
+Values.C \
+Variable.C \
+VariableDecorator.C
 
 @WARNINGS_TRUE@WALL = -Wall
 @PROFILE_TRUE@PROFILE = -pg
@@ -514,9 +528,13 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Aggregation.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationDimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationJoinExisting.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationUnion.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BoundaryVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommandLineParser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectivityVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CoordinateVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataType.Plo@am__quote@
@@ -536,7 +554,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterMain.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TypedValues.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Values.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@

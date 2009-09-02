@@ -34,8 +34,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = Test$(EXEEXT) TestAttribute$(EXEEXT) \
-	TestDimension$(EXEEXT) TestEnum$(EXEEXT) TestGather$(EXEEXT) \
-	TestGet$(EXEEXT) TestLocateRegion$(EXEEXT) \
+	TestDimension$(EXEEXT) TestEnum$(EXEEXT) TestGet$(EXEEXT) \
+	TestLocateRegion$(EXEEXT) TestJoin$(EXEEXT) \
 	TestNetcdfDataset$(EXEEXT) TestOpen$(EXEEXT) \
 	TestPartialSum$(EXEEXT) TestRavel$(EXEEXT) \
 	TestScanAdd$(EXEEXT) TestUnion$(EXEEXT) TestUnpack$(EXEEXT)
@@ -78,18 +78,18 @@ TestEnum_DEPENDENCIES = ../libsubsetter.la
 TestEnum_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestEnum_CXXFLAGS) \
 	$(CXXFLAGS) $(TestEnum_LDFLAGS) $(LDFLAGS) -o $@
-am_TestGather_OBJECTS = TestGather-TestGather.$(OBJEXT)
-TestGather_OBJECTS = $(am_TestGather_OBJECTS)
-TestGather_LDADD = $(LDADD)
-TestGather_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(TestGather_CFLAGS) \
-	$(CFLAGS) $(TestGather_LDFLAGS) $(LDFLAGS) -o $@
 am_TestGet_OBJECTS = TestGet-TestGet.$(OBJEXT)
 TestGet_OBJECTS = $(am_TestGet_OBJECTS)
 TestGet_DEPENDENCIES = ../libsubsetter.la
 TestGet_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(TestGet_CXXFLAGS) $(CXXFLAGS) \
 	$(TestGet_LDFLAGS) $(LDFLAGS) -o $@
+am_TestJoin_OBJECTS = TestJoin-TestJoin.$(OBJEXT)
+TestJoin_OBJECTS = $(am_TestJoin_OBJECTS)
+TestJoin_DEPENDENCIES = ../libsubsetter.la
+TestJoin_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(TestJoin_CXXFLAGS) \
+	$(CXXFLAGS) $(TestJoin_LDFLAGS) $(LDFLAGS) -o $@
 am_TestLocateRegion_OBJECTS =  \
 	TestLocateRegion-TestLocateRegion.$(OBJEXT)
 TestLocateRegion_OBJECTS = $(am_TestLocateRegion_OBJECTS)
@@ -167,14 +167,14 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(Test_SOURCES) $(TestAttribute_SOURCES) \
 	$(TestDimension_SOURCES) $(TestEnum_SOURCES) \
-	$(TestGather_SOURCES) $(TestGet_SOURCES) \
+	$(TestGet_SOURCES) $(TestJoin_SOURCES) \
 	$(TestLocateRegion_SOURCES) $(TestNetcdfDataset_SOURCES) \
 	$(TestOpen_SOURCES) $(TestPartialSum_SOURCES) \
 	$(TestRavel_SOURCES) $(TestScanAdd_SOURCES) \
 	$(TestUnion_SOURCES) $(TestUnpack_SOURCES)
 DIST_SOURCES = $(Test_SOURCES) $(TestAttribute_SOURCES) \
 	$(TestDimension_SOURCES) $(TestEnum_SOURCES) \
-	$(TestGather_SOURCES) $(TestGet_SOURCES) \
+	$(TestGet_SOURCES) $(TestJoin_SOURCES) \
 	$(TestLocateRegion_SOURCES) $(TestNetcdfDataset_SOURCES) \
 	$(TestOpen_SOURCES) $(TestPartialSum_SOURCES) \
 	$(TestRavel_SOURCES) $(TestScanAdd_SOURCES) \
@@ -311,44 +311,45 @@ AM_CXXFLAGS = $(GA_INCS) -I$(top_srcdir) $(CFLAGS)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS)
 Test_SOURCES = Test.C
 Test_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-Test_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+Test_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestAttribute_SOURCES = TestAttribute.C
 TestAttribute_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestAttribute_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestAttribute_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestAttribute_LDADD = ../libsubsetter.la
 TestDimension_SOURCES = TestDimension.C
 TestDimension_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestDimension_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestDimension_LDADD = ../libsubsetter.la
 TestEnum_SOURCES = TestEnum.C
 TestEnum_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestEnum_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestEnum_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestEnum_LDADD = ../libsubsetter.la
-TestGather_SOURCES = TestGather.c
-TestGather_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
-TestGather_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestGet_SOURCES = TestGet.C
 TestGet_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestGet_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestGet_LDADD = ../libsubsetter.la
+TestJoin_SOURCES = TestJoin.C
+TestJoin_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
+TestJoin_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
+TestJoin_LDADD = ../libsubsetter.la
 TestLocateRegion_SOURCES = TestLocateRegion.C
 TestLocateRegion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestLocateRegion_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestLocateRegion_LDADD = ../libsubsetter.la
 TestNetcdfDataset_SOURCES = TestNetcdfDataset.C
 TestNetcdfDataset_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestNetcdfDataset_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestNetcdfDataset_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestNetcdfDataset_LDADD = ../libsubsetter.la
 TestOpen_SOURCES = TestOpen.C
 TestOpen_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestOpen_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestOpen_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestPartialSum_SOURCES = TestPartialSum.C
 TestPartialSum_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
 TestPartialSum_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestPartialSum_LDADD = ../libsubsetter.la
 TestRavel_SOURCES = TestRavel.C
 TestRavel_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestRavel_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestRavel_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestRavel_LDADD = ../libsubsetter.la
 TestScanAdd_SOURCES = TestScanAdd.C
 TestScanAdd_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
@@ -356,7 +357,7 @@ TestScanAdd_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestScanAdd_LDADD = ../libsubsetter.la
 TestUnion_SOURCES = TestUnion.C
 TestUnion_CXXFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CXXFLAGS)
-TestUnion_LDFLAGS = -L/home/d3n000/gcrm/local/lib -lnetcdf $(AM_LDFLAGS)
+TestUnion_LDFLAGS = -L/home/d3n000/gcrm/local/lib $(AM_LDFLAGS)
 TestUnion_LDADD = ../libsubsetter.la
 TestUnpack_SOURCES = TestUnpack.c
 TestUnpack_CFLAGS = -I/home/d3n000/gcrm/local/include $(AM_CFLAGS)
@@ -416,12 +417,12 @@ TestDimension$(EXEEXT): $(TestDimension_OBJECTS) $(TestDimension_DEPENDENCIES)
 TestEnum$(EXEEXT): $(TestEnum_OBJECTS) $(TestEnum_DEPENDENCIES) 
 	@rm -f TestEnum$(EXEEXT)
 	$(TestEnum_LINK) $(TestEnum_OBJECTS) $(TestEnum_LDADD) $(LIBS)
-TestGather$(EXEEXT): $(TestGather_OBJECTS) $(TestGather_DEPENDENCIES) 
-	@rm -f TestGather$(EXEEXT)
-	$(TestGather_LINK) $(TestGather_OBJECTS) $(TestGather_LDADD) $(LIBS)
 TestGet$(EXEEXT): $(TestGet_OBJECTS) $(TestGet_DEPENDENCIES) 
 	@rm -f TestGet$(EXEEXT)
 	$(TestGet_LINK) $(TestGet_OBJECTS) $(TestGet_LDADD) $(LIBS)
+TestJoin$(EXEEXT): $(TestJoin_OBJECTS) $(TestJoin_DEPENDENCIES) 
+	@rm -f TestJoin$(EXEEXT)
+	$(TestJoin_LINK) $(TestJoin_OBJECTS) $(TestJoin_LDADD) $(LIBS)
 TestLocateRegion$(EXEEXT): $(TestLocateRegion_OBJECTS) $(TestLocateRegion_DEPENDENCIES) 
 	@rm -f TestLocateRegion$(EXEEXT)
 	$(TestLocateRegion_LINK) $(TestLocateRegion_OBJECTS) $(TestLocateRegion_LDADD) $(LIBS)
@@ -457,8 +458,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestAttribute-TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDimension-TestDimension.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestEnum-TestEnum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestGather-TestGather.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestGet-TestGet.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestJoin-TestJoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestLocateRegion-TestLocateRegion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestNetcdfDataset-TestNetcdfDataset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestOpen-TestOpen.Po@am__quote@
@@ -558,6 +559,20 @@ TestGet-TestGet.obj: TestGet.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestGet.C' object='TestGet-TestGet.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGet_CXXFLAGS) $(CXXFLAGS) -c -o TestGet-TestGet.obj `if test -f 'TestGet.C'; then $(CYGPATH_W) 'TestGet.C'; else $(CYGPATH_W) '$(srcdir)/TestGet.C'; fi`
+
+TestJoin-TestJoin.o: TestJoin.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestJoin_CXXFLAGS) $(CXXFLAGS) -MT TestJoin-TestJoin.o -MD -MP -MF $(DEPDIR)/TestJoin-TestJoin.Tpo -c -o TestJoin-TestJoin.o `test -f 'TestJoin.C' || echo '$(srcdir)/'`TestJoin.C
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/TestJoin-TestJoin.Tpo $(DEPDIR)/TestJoin-TestJoin.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestJoin.C' object='TestJoin-TestJoin.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestJoin_CXXFLAGS) $(CXXFLAGS) -c -o TestJoin-TestJoin.o `test -f 'TestJoin.C' || echo '$(srcdir)/'`TestJoin.C
+
+TestJoin-TestJoin.obj: TestJoin.C
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestJoin_CXXFLAGS) $(CXXFLAGS) -MT TestJoin-TestJoin.obj -MD -MP -MF $(DEPDIR)/TestJoin-TestJoin.Tpo -c -o TestJoin-TestJoin.obj `if test -f 'TestJoin.C'; then $(CYGPATH_W) 'TestJoin.C'; else $(CYGPATH_W) '$(srcdir)/TestJoin.C'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/TestJoin-TestJoin.Tpo $(DEPDIR)/TestJoin-TestJoin.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TestJoin.C' object='TestJoin-TestJoin.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestJoin_CXXFLAGS) $(CXXFLAGS) -c -o TestJoin-TestJoin.obj `if test -f 'TestJoin.C'; then $(CYGPATH_W) 'TestJoin.C'; else $(CYGPATH_W) '$(srcdir)/TestJoin.C'; fi`
 
 TestLocateRegion-TestLocateRegion.o: TestLocateRegion.C
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestLocateRegion_CXXFLAGS) $(CXXFLAGS) -MT TestLocateRegion-TestLocateRegion.o -MD -MP -MF $(DEPDIR)/TestLocateRegion-TestLocateRegion.Tpo -c -o TestLocateRegion-TestLocateRegion.o `test -f 'TestLocateRegion.C' || echo '$(srcdir)/'`TestLocateRegion.C
@@ -677,20 +692,6 @@ TestUnion-TestUnion.obj: TestUnion.C
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-TestGather-TestGather.o: TestGather.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGather_CFLAGS) $(CFLAGS) -MT TestGather-TestGather.o -MD -MP -MF $(DEPDIR)/TestGather-TestGather.Tpo -c -o TestGather-TestGather.o `test -f 'TestGather.c' || echo '$(srcdir)/'`TestGather.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/TestGather-TestGather.Tpo $(DEPDIR)/TestGather-TestGather.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TestGather.c' object='TestGather-TestGather.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGather_CFLAGS) $(CFLAGS) -c -o TestGather-TestGather.o `test -f 'TestGather.c' || echo '$(srcdir)/'`TestGather.c
-
-TestGather-TestGather.obj: TestGather.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGather_CFLAGS) $(CFLAGS) -MT TestGather-TestGather.obj -MD -MP -MF $(DEPDIR)/TestGather-TestGather.Tpo -c -o TestGather-TestGather.obj `if test -f 'TestGather.c'; then $(CYGPATH_W) 'TestGather.c'; else $(CYGPATH_W) '$(srcdir)/TestGather.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/TestGather-TestGather.Tpo $(DEPDIR)/TestGather-TestGather.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='TestGather.c' object='TestGather-TestGather.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestGather_CFLAGS) $(CFLAGS) -c -o TestGather-TestGather.obj `if test -f 'TestGather.c'; then $(CYGPATH_W) 'TestGather.c'; else $(CYGPATH_W) '$(srcdir)/TestGather.c'; fi`
 
 TestUnpack-TestUnpack.o: TestUnpack.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(TestUnpack_CFLAGS) $(CFLAGS) -MT TestUnpack-TestUnpack.o -MD -MP -MF $(DEPDIR)/TestUnpack-TestUnpack.Tpo -c -o TestUnpack-TestUnpack.o `test -f 'TestUnpack.c' || echo '$(srcdir)/'`TestUnpack.c

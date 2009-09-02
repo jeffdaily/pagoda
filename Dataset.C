@@ -1,13 +1,10 @@
 #include <algorithm>
-    using std::find;
 #include <cctype>
-    using std::tolower;
 #include <iostream>
-    using std::cerr;
-    using std::endl;
 
 #include "Attribute.H"
 #include "BoundaryVariable.H"
+#include "Common.H"
 #include "ConnectivityVariable.H"
 #include "CoordinateVariable.H"
 #include "Dataset.H"
@@ -15,17 +12,23 @@
 #include "DistributedMask.H"
 #include "LatLonBox.H"
 #include "LocalMask.H"
-#include "NetcdfDataset.H"
 #include "Mask.H"
+#include "NetcdfDataset.H"
 #include "Slice.H"
+#include "StringComparator.H"
 #include "Util.H"
 #include "Variable.H"
 
+using std::cerr;
+using std::endl;
+using std::find;
+using std::tolower;
 
 Dataset* Dataset::open(const string &filename)
 {
     Dataset *dataset = NULL;
-    if (Util::ends_with(filename, ".nc")) {
+    string EXT_NC(".nc");
+    if (Util::ends_with(filename, EXT_NC)) {
         dataset = new NetcdfDataset(filename);
     }
     if (dataset) {
@@ -49,10 +52,18 @@ Dataset::~Dataset()
 Attribute* Dataset::find_att(const string &name, bool ignore_case)
 {
     vector<Attribute*> atts = get_atts();
-    vector<Attribute*>::iterator result;
-    result = Util::find(atts, name, ignore_case);
-    if (result != atts.end())
-        return *result;
+    vector<Attribute*>::const_iterator it = atts.begin();
+    vector<Attribute*>::const_iterator end = atts.end();
+    StringComparator cmp;
+
+    cmp.set_ignore_case(ignore_case);
+    for (; it!=end; ++it) {
+        cmp.set_value((*it)->get_name());
+        if (cmp(name)) {
+            return *it;
+        }
+    }
+
     return NULL;
 }
 
@@ -60,10 +71,18 @@ Attribute* Dataset::find_att(const string &name, bool ignore_case)
 Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case)
 {
     vector<Attribute*> atts = get_atts();
-    vector<Attribute*>::iterator result;
-    result = Util::find(atts, names, ignore_case);
-    if (result != atts.end())
-        return *result;
+    vector<Attribute*>::const_iterator it = atts.begin();
+    vector<Attribute*>::const_iterator end = atts.end();
+    StringComparator cmp;
+
+    cmp.set_ignore_case(ignore_case);
+    for (; it!=end; ++it) {
+        cmp.set_value((*it)->get_name());
+        if (cmp(names)) {
+            return *it;
+        }
+    }
+
     return NULL;
 }
 
@@ -71,10 +90,18 @@ Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case)
 Dimension* Dataset::find_dim(const string &name, bool ignore_case)
 {
     vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::iterator result;
-    result = Util::find(dims, name, ignore_case);
-    if (result != dims.end())
-        return *result;
+    vector<Dimension*>::const_iterator it = dims.begin();
+    vector<Dimension*>::const_iterator end = dims.end();
+    StringComparator cmp;
+
+    cmp.set_ignore_case(ignore_case);
+    for (; it!=end; ++it) {
+        cmp.set_value((*it)->get_name());
+        if (cmp(name)) {
+            return *it;
+        }
+    }
+
     return NULL;
 }
 
@@ -82,10 +109,18 @@ Dimension* Dataset::find_dim(const string &name, bool ignore_case)
 Variable* Dataset::find_var(const string &name, bool ignore_case)
 {
     vector<Variable*> vars = get_vars();
-    vector<Variable*>::iterator result;
-    result = Util::find(vars, name, ignore_case);
-    if (result != vars.end())
-        return *result;
+    vector<Variable*>::const_iterator it = vars.begin();
+    vector<Variable*>::const_iterator end = vars.end();
+    StringComparator cmp;
+
+    cmp.set_ignore_case(ignore_case);
+    for (; it!=end; ++it) {
+        cmp.set_value((*it)->get_name());
+        if (cmp(name)) {
+            return *it;
+        }
+    }
+
     return NULL;
 }
 
@@ -95,7 +130,8 @@ void Dataset::create_masks()
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::iterator dim_it;
     for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
-        (*dim_it)->set_mask(new DistributedMask(*dim_it, 1));
+        Dimension *dim = *dim_it;
+        dim->set_mask(new DistributedMask(dim, 1));
     }
 }
 
@@ -112,16 +148,20 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
 
         // find the Dimension
         for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
-            if ((*dim_it)->get_name() == slice_it->get_name()) break;
+            Dimension *dim = *dim_it;
+            if (dim->get_name() == slice_it->get_name()) {
+                break;
+            }
         }
         if (dim_it == dims.end()) {
-            cerr << "Sliced dimension '" << slice_it->get_name()
-                << "' does not exist" << endl;
+            const string name = slice_it->get_name();
+            cerr << "Sliced dimension '" << name << "' does not exist" << endl;
             continue;
+        } else {
+            Dimension *dim = *dim_it;
+            // adjust the Mask based on the current Slice
+            dim->get_mask()->adjust(*slice_it);
         }
-
-        // adjust the Mask based on the current Slice
-        (*dim_it)->get_mask()->adjust(*slice_it);
     }
 }
 
@@ -146,8 +186,8 @@ void Dataset::adjust_masks(const LatLonBox &box)
         // corner/edge variables
         // Likely solution is to iterate over all Variables and examine them
         // for special attributes
-        Variable *lat = find_var("grid_center_lat");
-        Variable *lon = find_var("grid_center_lon");
+        Variable *lat = find_var(string("grid_center_lat"));
+        Variable *lon = find_var(string("grid_center_lon"));
         lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
     }
 }
@@ -167,39 +207,39 @@ void Dataset::decorate()
 {
     static vector<string> lat_units;
     if (lat_units.empty()) {
-        lat_units.push_back("degrees_north");
-        lat_units.push_back("degree_north");
-        lat_units.push_back("degree_N");
-        lat_units.push_back("degrees_N");
-        lat_units.push_back("degreeN");
-        lat_units.push_back("degreesN");
+        lat_units.push_back(string("degrees_north"));
+        lat_units.push_back(string("degree_north"));
+        lat_units.push_back(string("degree_N"));
+        lat_units.push_back(string("degrees_N"));
+        lat_units.push_back(string("degreeN"));
+        lat_units.push_back(string("degreesN"));
     }
     static vector<string> lon_units;
     if (lon_units.empty()) {
-        lon_units.push_back("degrees_east");
-        lon_units.push_back("degree_east");
-        lon_units.push_back("degree_E");
-        lon_units.push_back("degrees_E");
-        lon_units.push_back("degreeE");
-        lon_units.push_back("degreesE");
+        lon_units.push_back(string("degrees_east"));
+        lon_units.push_back(string("degree_east"));
+        lon_units.push_back(string("degree_E"));
+        lon_units.push_back(string("degrees_E"));
+        lon_units.push_back(string("degreeE"));
+        lon_units.push_back(string("degreesE"));
     }
     static vector<string> vert_units;
     if (vert_units.empty()) {
-        vert_units.push_back("bar");
-        vert_units.push_back("millibar");
-        vert_units.push_back("decibar");
-        vert_units.push_back("atm"); // atmosphere
-        vert_units.push_back("Pa"); // pascal
-        vert_units.push_back("hPa"); // hectopascal
-        vert_units.push_back("meter");
-        vert_units.push_back("metre");
-        vert_units.push_back("m"); // meter
-        vert_units.push_back("kilometer");
-        vert_units.push_back("km"); // kilometer
+        vert_units.push_back(string("bar"));
+        vert_units.push_back(string("millibar"));
+        vert_units.push_back(string("decibar"));
+        vert_units.push_back(string("atm")); // atmosphere
+        vert_units.push_back(string("Pa")); // pascal
+        vert_units.push_back(string("hPa")); // hectopascal
+        vert_units.push_back(string("meter"));
+        vert_units.push_back(string("metre"));
+        vert_units.push_back(string("m")); // meter
+        vert_units.push_back(string("kilometer"));
+        vert_units.push_back(string("km")); // kilometer
         // deprecated
-        vert_units.push_back("level");
-        vert_units.push_back("layer");
-        vert_units.push_back("sigma_level");
+        vert_units.push_back(string("level"));
+        vert_units.push_back(string("layer"));
+        vert_units.push_back(string("sigma_level"));
     }
 
     vector<Variable*> vars = get_vars();
@@ -209,7 +249,7 @@ void Dataset::decorate()
         Variable *var = *var_it;
         //cerr << "Attempting to decorate " << var->get_name() << endl;
         Attribute *att;
-        if ((att = var->find_att("bounds"))) {
+        if ((att = var->find_att(string("bounds")))) {
             string val = att->get_string();
             Variable *bound_var;
             if ((bound_var = find_var(val))) {
@@ -218,7 +258,7 @@ void Dataset::decorate()
                 (*it) = new BoundaryVariable(bound_var, var);
             }
         }
-        if ((att = var->find_att("units"))) {
+        if ((att = var->find_att(string("units")))) {
             string val = att->get_string();
             if (find(lat_units.begin(),lat_units.end(),val) != lat_units.end())
             {
@@ -236,7 +276,7 @@ void Dataset::decorate()
                 continue;
             }
         }
-        if ((att = var->find_att("standard_name"))) {
+        if ((att = var->find_att(string("standard_name")))) {
             string val = att->get_string();
             if ("latitude" == val) {
                 (*var_it) = new CoordinateVariable(var);
@@ -246,7 +286,7 @@ void Dataset::decorate()
                 continue;
             }
         }
-        if ((att = var->find_att("axis"))) {
+        if ((att = var->find_att(string("axis")))) {
             string val = att->get_string();
             if ("Y" == val) {
                 (*var_it) = new CoordinateVariable(var);
@@ -259,7 +299,7 @@ void Dataset::decorate()
                 continue;
             }
         }
-        if ((att = var->find_att("positive"))) {
+        if ((att = var->find_att(string("positive")))) {
             string val = att->get_string();
             transform(val.begin(), val.end(), val.begin(), tolower);
             if ("up" == val || "down" == val) {
@@ -268,19 +308,19 @@ void Dataset::decorate()
             }
         }
         if (var->get_name() == "cell_neighbors") {
-            Dimension *dim = find_dim("cells");
+            Dimension *dim = find_dim(string("cells"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }
         }
         if (var->get_name() == "cell_corners") {
-            Dimension *dim = find_dim("cellcorners");
+            Dimension *dim = find_dim(string("cellcorners"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }
         }
         if (var->get_name() == "cell_edges") {
-            Dimension *dim = find_dim("celledges");
+            Dimension *dim = find_dim(string("celledges"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }

@@ -1,11 +1,12 @@
-#include <strings.h> // for bzero
+#include <cstring> // for memset
 
 #include <ga.h>
 #include <macdecls.h>
 #include <message.h>
 
+#include "Common.H"
+#include "Debug.H"
 #include "Pack.H"
-#include "Util.H"
 
 
 static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *result)
@@ -100,7 +101,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 #define partial_sum_op(MTYPE,TYPE,GOP_OP) \
         if (MTYPE == type_dst) { \
             TYPE values[nproc]; \
-            bzero(values, sizeof(TYPE)*nproc); \
+            memset(values, 0, sizeof(TYPE)*nproc); \
             GOP_OP(values, nproc, "+"); \
             TRACER("partial_sum_op N/A\n"); \
         } else
@@ -122,7 +123,7 @@ void partial_sum(int g_src, int g_dst, int excl)
             TYPE_DST values[nproc]; \
             TYPE_SRC *src = (TYPE_SRC*)ptr_src; \
             TYPE_DST *dst = (TYPE_DST*)ptr_dst; \
-            bzero(values, sizeof(TYPE_DST)*nproc); \
+            memset(values, 0, sizeof(TYPE_DST)*nproc); \
             values[me] = dst[elems-1]; \
             if (0 == excl) { \
                 values[me] += src[elems-1]; \
@@ -221,7 +222,7 @@ void pack(int g_src, int g_dst, int *g_masks)
     if (0 > lo_src[0] && 0 > hi_src[0]); /* no elements on this process */
     else {
         /* Now get the portions of the masks associated with each dim */
-        bzero(local_counts, sizeof(int64_t)*ndim_src);
+        memset(local_counts, 0, sizeof(int64_t)*ndim_src);
         for (int i=0; i<ndim_src; ++i) {
             elems_src[i] = hi_src[i]-lo_src[i]+1;
             elems_product_src *= elems_src[i];
@@ -273,7 +274,7 @@ void pack(int g_src, int g_dst, int *g_masks)
                             } \
                         } \
                         if (buf_dst_index != local_counts_product) { \
-                            printf("%lld != %lld\n", buf_dst_index, local_counts_product); \
+                            printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
                             GA_Error("pack: mismatch", buf_dst_index); \
                         } \
                         NGA_Put64(g_dst, lo_dst, hi_dst, buf_dst, ld_dst); \
@@ -417,7 +418,7 @@ void unpack1d(int g_src, int g_dst, int g_msk)
     }
 
     // count mask bits on each proc
-    bzero(counts, sizeof(long)*nproc);
+    memset(counts, 0, sizeof(long)*nproc);
     NGA_Distribution64(g_msk, me, &lo_msk, &hi_msk);
     if (0 > lo_msk && 0 > hi_msk) {
         GA_Lgop(counts, nproc, "+");

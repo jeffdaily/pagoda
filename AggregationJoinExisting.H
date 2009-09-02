@@ -1,23 +1,29 @@
-#ifndef AGGREGATIONUNION_H_
-#define AGGREGATIONUNION_H_
+#ifndef AGGREGATIONJOINEXISTING_H_
+#define AGGREGATIONJOINEXISTING_H_
 
+#include <iostream>
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
 #include "Aggregation.H"
 
+using std::ostream;
+using std::string;
+using std::vector;
+
+class AggregationDimension;
+class AggregationVariable;
 class Attribute;
+class Dataset;
 class Dimension;
 class Variable;
 
 
-class AggregationUnion : public Aggregation
+class AggregationJoinExisting : public Aggregation
 {
     public:
-        AggregationUnion();
-        virtual ~AggregationUnion();
+        AggregationJoinExisting(const string& name);
+        virtual ~AggregationJoinExisting();
 
         virtual vector<Attribute*> get_atts();
         virtual vector<Dimension*> get_dims();
@@ -31,10 +37,14 @@ class AggregationUnion : public Aggregation
         virtual void decorate_set(const vector<Variable*> &vars);
 
     private:
+        string agg_dim_name;
+        AggregationDimension *agg_dim;
+        AggregationVariable *agg_var;
         vector<Dataset*> datasets;
         vector<Attribute*> atts;
         vector<Dimension*> dims;
         vector<Variable*> vars;
+
 };
 
-#endif // AGGREGATIONUNION_H_
+#endif // AGGREGATIONJOINEXISTING_H_

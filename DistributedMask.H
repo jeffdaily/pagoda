@@ -2,19 +2,19 @@
 #define DISTRIBUTEDMASK_H_
 
 #include <map>
-    using std::map;
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
 #include "LatLonBox.H"
 #include "Mask.H"
 #include "Slice.H"
 
+using std::map;
+using std::string;
+using std::vector;
+
 class Dimension;
 class Variable;
-
 
 
 class DistributedMask : public Mask

@@ -1,3 +1,4 @@
+#include "Common.H"
 #include "DataType.H"
 
 int DataType::counter(0);

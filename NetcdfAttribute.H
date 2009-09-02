@@ -23,14 +23,11 @@ class NetcdfAttribute : public Attribute
 
         virtual string get_name() const;
         virtual DataType get_type() const;
-        virtual size_t get_count() const;
         virtual bool is_global() const;
         virtual Values* get_values() const;
 
-        virtual ostream& print(ostream &os) const;
-
         NetcdfDataset* get_dataset() const;
-        virtual int get_id() const;
+        int get_id() const;
         NetcdfVariable* get_var() const;
 
     protected:

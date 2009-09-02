@@ -1,7 +1,12 @@
-#include <sstream>
-    using std::ostringstream;
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include "Values.H"
+
+using std::ostream;
+using std::string;
+using std::vector;
 
 
 Values::Values()
@@ -14,19 +19,16 @@ Values::~Values()
 }
 
 
-ostream& operator << (ostream &os, const Values *values)
-{
-    return values->print(os);
-}
-
-
 #define implement_as(TYPE) \
-void Values::as(TYPE* &values) const \
+void Values::as(vector<TYPE> &values) const \
 { \
+    values.clear(); \
+    size_t i = 0; \
     size_t limit = size(); \
-    values = new TYPE[limit]; \
-    for (size_t i=0; i<limit; ++i) { \
-        as(i, values[i]); \
+    for (i=0; i<limit; ++i) { \
+        TYPE val; \
+        as(i, val); \
+        values.push_back(val); \
     } \
 }
 implement_as(char)
@@ -42,14 +44,18 @@ implement_as(double)
 
 void Values::as(string &values) const
 {
-    ostringstream os;
-    size_t i,limit;
-    for (i=0,limit=size(); i<limit; ++i) {
+    values.clear();
+    size_t i = 0;
+    size_t limit = size();
+    for (i=0; i<limit; ++i) {
         string val;
         as(i, val);
-        if (val == "\0") break;
-        os << val;
+        values.append(val);
     }
-    values = os.str();
 }
 
+
+ostream& operator << (ostream &os, const Values *values)
+{
+    return values->print(os);
+}

@@ -29,7 +29,7 @@ class NetcdfFileWriter : public FileWriter
 
         virtual void def_var(Variable *var);
 
-        virtual void copy_att(Attribute *att, const string &name="");
+        virtual void copy_att(Attribute *att, const string &name=string(""));
 
         virtual void write(int handle, const string &name, int record=-1);
 

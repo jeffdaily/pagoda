@@ -20,7 +20,7 @@ class Aggregation : public Dataset
         virtual ~Aggregation();
 
         virtual void add(Dataset *dataset) = 0;
-        virtual void add(const vector<Dataset*> &dataset) = 0;
+        void add(const vector<Dataset*> &datasets);
 };
 
 #endif // AGGREGATION_H_

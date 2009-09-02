@@ -1,3 +1,4 @@
+#include "Common.H"
 #include "CoordinateVariable.H"
 
 
@@ -14,6 +15,7 @@ CoordinateVariable::~CoordinateVariable()
 
 ostream& CoordinateVariable::print(ostream &os) const
 {
-    return os << "CoordinateVariable(" << var->get_name() << ")";
+    const string name = var->get_name();
+    return os << "CoordinateVariable(" << name << ")";
 }
 

@@ -14,7 +14,7 @@
 #include <vector>
 
 // C++ includes
-#include "AggregationUnion.H"
+#include "AggregationJoinExisting.H"
 #include "Attribute.H"
 #include "Dimension.H"
 #include "NetcdfDataset.H"
@@ -32,50 +32,77 @@ int main(int argc, char **argv)
     MPI_Init(&argc, &argv);
     GA_Initialize();
 
-    if (argc < 2) return EXIT_FAILURE;
+    if (argc < 3) return EXIT_FAILURE;
 
-    for (int argi=0; argi<argc; ++argi) {
-        cout << argv[argi] << endl;
+    if (0 == ME) {
+        for (int argi=0; argi<argc; ++argi) {
+            cout << argv[argi] << endl;
+        }
     }
 
     string s("        ");
 
-    cout << "union dataset" << endl;
-    Aggregation *dataset = new AggregationUnion;
-    for (int argi=1; argi<argc; ++argi) {
+    if (0 == ME) {
+        cout << "joined dataset" << endl;
+    }
+    Aggregation *dataset = new AggregationJoinExisting(argv[1]);
+    for (int argi=2; argi<argc; ++argi) {
         dataset->add(new NetcdfDataset(argv[argi]));
     }
 
-    cout << "dimensions:" << endl;
+    if (0 == ME) {
+        cout << "dimensions:" << endl;
+    }
     vector<Dimension*> dims = dataset->get_dims();
     for (size_t dimid=0,limit=dims.size(); dimid<limit; ++dimid) {
         Dimension *dim = dims[dimid];
-        cout << s << dim->get_name() << " = " << dim->get_size() << " ;" << endl;
+        if (0 == ME) {
+            cout << s << dim->get_name() << " = ";
+            if (dim->is_unlimited()) {
+                cout << "UNLIMITED ; // (" << dim->get_size() << " currently)" << endl;
+            } else {
+                cout << dim->get_size() << " ;" << endl;
+            }
+        }
     }
 
-    cout << "variables:" << endl;
+    if (0 == ME) {
+        cout << "variables:" << endl;
+    }
     vector<Variable*> vars = dataset->get_vars();
     for (size_t varid=0,limit=vars.size(); varid<limit; ++varid) {
         Variable *var = vars[varid];
-        cout << s << var->get_type() << " " << var->get_name() << "(";
+        if (0 == ME) {
+            cout << s << var->get_type() << " " << var->get_name() << "(";
+        }
         vector<Dimension*> dims = var->get_dims();
         for (size_t dimid=0,limit=dims.size()-1; dimid<limit; ++dimid) {
             Dimension *dim = dims[dimid];
-            cout << dim->get_name() << ", ";
+            if (0 == ME) {
+                cout << dim->get_name() << ", ";
+            }
         }
         Dimension *dim = dims[dims.size()-1];
-        cout << dim->get_name() << ") ;" << endl;
+        if (0 == ME) {
+            cout << dim->get_name() << ") ;" << endl;
+        }
         vector<Attribute*> atts = var->get_atts();
         for (size_t attid=0,limit=atts.size(); attid<limit; ++ attid) {
             Attribute *att = atts[attid];
-            cout << s << s << att << endl;
+            if (0 == ME) {
+                cout << s << s << att << endl;
+            }
         }
     }
 
-    cout << "// global attributes:" << endl;
+    if (0 == ME) {
+        cout << "// global attributes:" << endl;
+    }
     vector<Attribute*> atts = dataset->get_atts();
     for (size_t attid=0,limit=atts.size(); attid<limit; ++attid) {
-        cout << s << s << atts[attid] << endl;
+        if (0 == ME) {
+            cout << s << s << atts[attid] << endl;
+        }
     }
 
     // Must close netcdf file -- in dtor.

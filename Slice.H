@@ -2,23 +2,22 @@
 #define SLICE_H_
 
 #include <iostream>
-    using std::ostream;
 #include <sstream>
-    using std::istringstream;
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
 #include "RangeException.H"
 
+using std::ostream;
+using std::istringstream;
+using std::string;
+using std::vector;
 
 
-template <class T>
-class Slice;
+// predeclare Slice and friend operator to avoid compiler confusion
+template <class T> class Slice;
+template <class T> ostream& operator<< (ostream &os, const Slice<T> &other);
 
-template <class T>
-ostream& operator << (ostream &os, const Slice<T> &other);
 
 /**
  * Eerily similar to Python's slice class, but with a 'name' field.
@@ -36,15 +35,15 @@ class Slice
         Slice(const string &name, T start, T stop, T step);
         Slice(string arg);
         Slice(const Slice<T> &slice);
-        Slice<T>& operator = (const Slice<T> &other);
+        //Slice<T>& operator= (const Slice<T> &other);
         virtual ~Slice();
 
-        bool operator == (const Slice<T> &other) const;
+        bool operator== (const Slice<T> &other) const;
 
         string get_name() const;
         void indices(T size, T &start, T &stop, T &step) const;
 
-        friend ostream& operator << <>(ostream &os, const Slice<T> &other);
+        friend ostream& operator<< <>(ostream &os, const Slice<T> &other);
 
     protected:
         string name;
@@ -100,7 +99,7 @@ Slice<T>::Slice(string arg)
     }
 
     if (parts.size() < 2 or parts.size() > 4) {
-        throw RangeException("invalid dimension string");
+        throw RangeException(string("invalid dimension string"));
     }
 
     name = parts[0];
@@ -120,8 +119,9 @@ Slice<T>::Slice(const Slice& slice)
 }
 
 
+/*
 template <class T>
-Slice<T>& Slice<T>::operator = (const Slice<T> &other)
+Slice<T>& Slice<T>::operator= (const Slice<T> &other)
 {
     name = other.name;
     if (stop) delete stop;
@@ -131,6 +131,7 @@ Slice<T>& Slice<T>::operator = (const Slice<T> &other)
     step = other.step ? new T(*other.step) : NULL;
     return *this;
 }
+*/
 
 
 template <class T>
@@ -142,7 +143,7 @@ Slice<T>::~Slice()
 
 
 template <class T>
-bool Slice<T>::operator == (const Slice<T> &other) const
+bool Slice<T>::operator== (const Slice<T> &other) const
 {
     if (name == other.name) {
         if (start == other.start) {
@@ -164,7 +165,7 @@ bool Slice<T>::operator == (const Slice<T> &other) const
 
 
 template <class T>
-ostream& operator << (ostream &os, const Slice<T> &other)
+ostream& operator<< (ostream &os, const Slice<T> &other)
 {
     os << "Slice("
         << other.name << ","
@@ -197,34 +198,36 @@ string Slice<T>::get_name() const
  * "dim,-1", size 20 --> 19,20,1
  */
 template <class T>
-void Slice<T>::indices(T size, T &start, T &stop, T &step) const
+void Slice<T>::indices(T size, T &_start, T &_stop, T &_step) const
 {
-    if (size < 0) throw RangeException("size must be positive");
+    if (size < 0) throw RangeException(string("size must be positive"));
 
-    start = this->start;
-    if (start < 0) start += size;
-    if (start < 0 || start > size)
-        throw RangeException("start < 0 || start > size");
+    _start = this->start;
+    if (_start < 0) _start += size;
+    if (_start < 0 || _start > size)
+        throw RangeException(string("start < 0 || start > size"));
 
     if (this->stop) {
-        stop = *(this->stop);
-        if (stop < 0) stop += size;
-        if (stop < 0 || stop > size)
-            throw RangeException("stop < 0 || stop > size");
+        _stop = *(this->stop);
+        if (_stop < 0) _stop += size;
+        if (_stop < 0 || _stop > size)
+            throw RangeException(string("stop < 0 || stop > size"));
     } else {
-        stop = start + 1;
+        _stop = _start + 1;
     }
 
     if (this->step) {
-        step = *(this->step);
+        _step = *(this->step);
     } else {
-        step = 1;
+        _step = 1;
     }
 
-    if (start > stop && step > 0)
-        throw RangeException("start > stop && step > 0 (causes no-op loop)");
-    if (start < stop && step < 0)
-        throw RangeException("start < stop && step < 0 (causes infinite loop)");
+    if (_start > _stop && _step > 0)
+        throw RangeException(
+                string("start > stop && step > 0 (causes no-op loop)"));
+    if (_start < _stop && _step < 0)
+        throw RangeException(
+                string("start < stop && step < 0 (causes infinite loop)"));
 }
 
 typedef Slice<int64_t> DimSlice;

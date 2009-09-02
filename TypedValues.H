@@ -2,33 +2,27 @@
 #define TYPEDVALUES_H_
 
 #include <iostream>
-    using std::ostream;
 #include <sstream>
-    using std::ostringstream;
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
 
 #include "Values.H"
 
+using std::ostream;
+using std::ostringstream;
+using std::string;
+using std::vector;
+
 
 template <class T>
-class TypedValues
-    :   public vector<T>
-    ,   public Values
+class TypedValues : public Values
 {
     public:
-        TypedValues();
-        TypedValues(const T &value, const size_t &num=1);
-        TypedValues(T *values, const size_t &num);
+        TypedValues(T values[], const size_t &size);
         TypedValues(const vector<T> &values);
         virtual ~TypedValues();
 
-        virtual TypedValues<T>* clone() const;
-
         virtual size_t size() const;
-        virtual ostream& print(ostream &os) const;
 
         virtual void as(size_t n, char &val) const;
         virtual void as(size_t n, signed char &val) const;
@@ -39,50 +33,26 @@ class TypedValues
         virtual void as(size_t n, float &val) const;
         virtual void as(size_t n, double &val) const;
         virtual void as(size_t n, string &val) const;
+
+        virtual ostream& print(ostream &os) const;
+
+    protected:
+        vector<T> values;
 };
 
 
-extern ostream& __print(ostream &os, const TypedValues<char> &obj);
-
-
 template <class T>
-ostream& __print(ostream &os, const TypedValues<T> &obj)
-{
-    size_t i,limit;
-    for (i=0,limit=obj.size(); i<limit-1; ++i) {
-        os << obj.at(i) << ", ";
-    }
-    if (limit > 0) {
-        os << obj.at(limit-1);
-    }
-    return os;
-}
-
-
-template <class T>
-TypedValues<T>::TypedValues()
-    :   vector<T>()
-{
-}
-
-
-template <class T>
-TypedValues<T>::TypedValues(const T &value, const size_t &num)
-    :   vector<T>(num, value)
-{
-}
-
-
-template <class T>
-TypedValues<T>::TypedValues(T *values, const size_t &num)
-    :   vector<T>(values, values+num)
+TypedValues<T>::TypedValues(T *values, const size_t &size)
+    :   Values()
+    ,   values(values, values+size)
 {
 }
 
 
 template <class T>
 TypedValues<T>::TypedValues(const vector<T> &values)
-    :   vector<T>(values)
+    :   Values()
+    ,   values(values)
 {
 }
 
@@ -94,23 +64,9 @@ TypedValues<T>::~TypedValues()
 
 
 template <class T>
-TypedValues<T>* TypedValues<T>::clone() const
-{
-    return new TypedValues(*this);
-}
-
-
-template <class T>
 size_t TypedValues<T>::size() const
 {
-    return vector<T>::size();
-}
-
-
-template <class T>
-ostream& TypedValues<T>::print(ostream &os) const
-{
-    return __print(os, *this);
+    return values.size();
 }
 
 
@@ -118,7 +74,7 @@ ostream& TypedValues<T>::print(ostream &os) const
 template <class T> \
 void TypedValues<T>::as(size_t n, TYPE &val) const \
 { \
-    val = (TYPE)this->at(n); \
+    val = (TYPE)values.at(n); \
 }
 implement_as(char)
 implement_as(signed char)
@@ -135,8 +91,23 @@ template <class T>
 void TypedValues<T>::as(size_t n, string &val) const
 {
     ostringstream os;
-    os << this->at(n);
+    os << values.at(n);
     val = os.str();
+}
+
+
+template <class T>
+ostream& TypedValues<T>::print(ostream &os) const
+{
+    size_t i = 0;
+    size_t limit = values.size();
+    for (i=0; i<limit-1; ++i) {
+        os << values.at(i) << ", ";
+    }
+    if (limit > 0) {
+        os << values.at(limit-1);
+    }
+    return os;
 }
 
 #endif // TYPEDVALUES_H_

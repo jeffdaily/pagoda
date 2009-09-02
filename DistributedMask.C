@@ -1,21 +1,19 @@
 #include <algorithm>
-    using std::copy;
-    using std::fill;
-#include <functional>
-    using std::bind1st;
-    using std::ptr_fun;
-#include <numeric>
-    using std::accumulate;
+//#include <functional>
+//#include <numeric>
 
 #include <macdecls.h>
 
+#include "Common.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
 #include "Pack.H"
 #include "Slice.H"
-#include "Util.H"
 #include "Variable.H"
 
+using std::accumulate;
+using std::fill;
 
 DistributedMask::DistributedMask(Dimension *dim, int value)
     :   Mask(dim)
@@ -149,12 +147,8 @@ void DistributedMask::adjust(const LatLonBox &box, Variable *lat, Variable *lon)
         case MTYPE: { \
             TYPE *plat = (TYPE*)lat_data; \
             TYPE *plon = (TYPE*)lon_data; \
-            double dlat; \
-            double dlon; \
             for (int64_t i=0; i<size; ++i) { \
-                dlat = plat[i]; \
-                dlon = plon[i]; \
-                mask_data[i] = box.contains(dlat, dlon) ? 1 : 0; \
+                mask_data[i] = box.contains(plat[i], plon[i]) ? 1 : 0; \
             } \
             break; \
         }
@@ -232,7 +226,8 @@ void DistributedMask::adjust(
 void DistributedMask::recount()
 {
     int *data;
-    fill(counts, counts+NPROC, 0);
+    long ZERO = 0;
+    fill(counts, counts+NPROC, ZERO);
     if (0 > lo || 0 > hi) {
     } else {
         NGA_Access64(handle, &lo, &hi, &data, NULL);
@@ -244,7 +239,7 @@ void DistributedMask::recount()
         NGA_Release_update64(handle, &lo, &hi);
     }
     GA_Lgop(counts, NPROC, "+");
-    count = accumulate(counts, counts+NPROC, 0);
+    count = accumulate(counts, counts+NPROC, ZERO);
 }
 
 

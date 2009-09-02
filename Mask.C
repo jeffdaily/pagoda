@@ -1,27 +1,5 @@
-#include <algorithm>
-    using std::copy;
-    using std::fill;
-#include <functional>
-    using std::bind1st;
-    using std::ptr_fun;
-#include <iostream>
-    using std::cerr;
-    using std::cout;
-    using std::endl;
-#include <numeric>
-    using std::accumulate;
-
-#include <macdecls.h>
-
 #include "Dimension.H"
 #include "Mask.H"
-#include "Slice.H"
-#include "Util.H"
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Mask
-///////////////////////////////////////////////////////////////////////////////
 
 Mask::Mask(Dimension *dim)
     :   dim(dim)
@@ -57,4 +35,3 @@ long Mask::get_count()
     }
     return count;
 }
-

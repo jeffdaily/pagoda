@@ -1,4 +1,9 @@
+#include <vector>
+
 #include "VariableDecorator.H"
+
+using std::vector;
+
 
 VariableDecorator::VariableDecorator(Variable *var)
     :   Variable()
@@ -20,6 +25,12 @@ string VariableDecorator::get_name() const
 }
 
 
+vector<Dimension*> VariableDecorator::get_dims() const
+{
+    return var->get_dims();
+}
+
+
 bool VariableDecorator::has_record() const
 {
     return var->has_record();
@@ -32,19 +43,13 @@ size_t VariableDecorator::num_dims() const
 }
 
 
-vector<Dimension*> VariableDecorator::get_dims() const
-{
-    return var->get_dims();
-}
-
-
-int64_t VariableDecorator::get_size(const bool &use_masks) const
+int64_t VariableDecorator::get_size(bool use_masks) const
 {
     return var->get_size(use_masks);
 }
 
 
-int64_t* VariableDecorator::get_sizes(const bool &use_masks) const
+vector<int64_t> VariableDecorator::get_sizes(bool use_masks) const
 {
     return var->get_sizes(use_masks);
 }
@@ -62,15 +67,15 @@ size_t VariableDecorator::num_cleared_masks() const
 }
 
 
-size_t VariableDecorator::num_atts() const
-{
-    return var->num_atts();
-}
-
-
 vector<Attribute*> VariableDecorator::get_atts() const
 {
     return var->get_atts();
+}
+
+
+size_t VariableDecorator::num_atts() const
+{
+    return var->num_atts();
 }
 
 

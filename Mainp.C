@@ -1,43 +1,44 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#   include <config.h>
 #endif // HAVE_CONFIG_H
 
 // C includes, std and otherwise
 #include <ga.h>
-#include <limits.h> // for INT_MAX
 #include <macdecls.h>
-#include <math.h> // for M_PI
 #include <mpi.h>
 #include <pnetcdf.h>
 #include <unistd.h>
 
 // C++ includes, std and otherwise
 #include <algorithm>
-using std::copy;
-using std::fill;
+#include <climits> // for INT_MAX
+#include <cmath> // for M_PI
 #include <iomanip>
-using std::fixed;
-using std::setprecision;
 #include <iostream>
-using std::cout;
-using std::endl;
 #include <map>
-using std::make_pair;
-using std::map;
-using std::multimap;
 #include <sstream>
-using std::ostringstream;
 #include <string>
-using std::string;
 #include <vector>
-using std::vector;
 
 // C++ includes
+#include "Common.H"
 #include "LatLonBox.H"
 #include "RangeException.H"
 #include "Slice.H"
 #include "SubsetterException.H"
 
+using std::copy;
+using std::cout;
+using std::endl;
+using std::fill;
+using std::fixed;
+using std::make_pair;
+using std::map;
+using std::multimap;
+using std::ostringstream;
+using std::setprecision;
+using std::string;
+using std::vector;
 
 static double DEG2RAD = M_PI / 180.0;
 //static double RAD2DEG = 180.0 / M_PI;

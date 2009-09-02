@@ -1,26 +1,33 @@
-#include <algorithm>
-  using std::count;
-  using std::fill;
-#include <iostream>
-  using std::cout;
-  using std::endl;
-#include <map>
-  using std::map;
-#include <math.h>
-#include <set>
-  using std::set;
-#include <stdlib.h>
-#include <string>
-  using std::string;
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <unistd.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <set>
+#include <string>
 #include <vector>
-  using std::vector;
 
 #include <netcdfcpp.h>
 
+#include "Common.H"
 #include "DimensionSlice.H"
 #include "LatLonBox.H"
 #include "RangeException.H"
+
+using std::count;
+using std::cout;
+using std::endl;
+using std::fill;
+using std::map;
+using std::set;
+using std::string;
+using std::vector;
 
 double DEG2RAD = M_PI / 180.0;
 double RAD2DEG = 180.0 / M_PI;

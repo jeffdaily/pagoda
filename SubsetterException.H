@@ -2,7 +2,11 @@
 #define SUBSETTEREXCEPTION_H_
 
 #include <stdexcept>
-  using std::runtime_error;
+#include <string>
+
+using std::runtime_error;
+using std::string;
+
 
 class SubsetterException : public runtime_error
 {

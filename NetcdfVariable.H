@@ -25,14 +25,11 @@ class NetcdfVariable : public AbstractVariable
 
         virtual string get_name() const;
 
-        virtual bool has_record() const;
-        virtual size_t num_dims() const;
         virtual vector<Dimension*> get_dims() const;
 
-        virtual size_t num_atts() const;
         virtual vector<Attribute*> get_atts() const;
 
-        DataType get_type() const;
+        virtual DataType get_type() const;
 
         virtual void read();
 

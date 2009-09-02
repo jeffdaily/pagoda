@@ -1,13 +1,15 @@
 #include <cstring> // for memset
 #include <map>
-using std::map;
 
 #include <ga.h>
 
+#include "Common.H"
 #include "ConnectivityVariable.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
-#include "Util.H"
+
+using std::map;
 
 
 ConnectivityVariable::ConnectivityVariable(Variable *var, Dimension *to)
@@ -54,7 +56,6 @@ void ConnectivityVariable::reindex()
         DistributedMask *mask = dynamic_cast<DistributedMask*>(to->get_mask());
         if (mask) {
             int me = GA_Nodeid();
-            int nproc = GA_Nnodes();
             int var_handle = var->get_handle();
             size_t var_ndim = var->num_dims();
             int64_t *var_lo = new int64_t[var_ndim];
@@ -96,6 +97,7 @@ void ConnectivityVariable::reindex()
                 int64_t count;
                 map<int,int> m;
                 map<int,int>::const_iterator m_it;
+                map<int,int>::const_iterator m_end;
                 int64_t **subs;
                 size_t subs_idx;
                 int *values;
@@ -118,7 +120,9 @@ void ConnectivityVariable::reindex()
                 TRACER("create the retarded array of pointers that GA wants\n");
                 subs = new int64_t*[size];
                 subs_idx = 0;
-                for (m_it=m.begin(); m_it!=m.end(); ++m_it) {
+                m_it = m.begin();
+                m_end = m.end();
+                for (; m_it!=m_end; ++m_it) {
                     subs[subs_idx++] = new int64_t(m_it->first);
                     if (0 > subs[subs_idx-1][0]
                             || idx_size <= subs[subs_idx-1][0]) {
@@ -134,7 +138,10 @@ void ConnectivityVariable::reindex()
 
                 TRACER("use the gathered values for the map\n");
                 for (int64_t i=0; i<size; ++i) {
-                    m.find(subs[i][0])->second = values[i];
+                    int64_t val_to_find = subs[i][0];
+                    map<int,int>::iterator found = m.find(val_to_find);
+                    found->second = values[i];
+                    //m.find(subs[i][0])->second = values[i];
                 }
 
                 TRACER("now go through buf one last time and replace values!\n");
@@ -143,9 +150,18 @@ void ConnectivityVariable::reindex()
                     buf[i] = m.find(buf[i])->second;
                 }
                 NGA_Release_update64(var_handle, var_lo, var_hi);
+
+                // clean up!
+                delete [] values;
+                for (int64_t idx=0; idx<size; ++idx) {
+                    delete subs[idx];
+                }
+                delete [] subs;
             }
 
-            delete [] var_ld;
+            if (var_ld) {
+                delete [] var_ld;
+            }
             delete [] var_hi;
             delete [] var_lo;
         }
@@ -156,6 +172,7 @@ void ConnectivityVariable::reindex()
 
 ostream& ConnectivityVariable::print(ostream &os) const
 {
-    return os << "ConnectivityVariable(" << var->get_name() << ")";
+    const string name = var->get_name();
+    return os << "ConnectivityVariable(" << name << ")";
 }
 

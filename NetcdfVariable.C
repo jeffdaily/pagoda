@@ -1,11 +1,13 @@
+#include <ga.h>
 #include <pnetcdf.h>
 
 #include "Attribute.H"
+#include "Common.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
+#include "NetcdfError.H"
 #include "NetcdfVariable.H"
-#include "Util.H"
 
 
 NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
@@ -49,27 +51,9 @@ string NetcdfVariable::get_name() const
 }
 
 
-bool NetcdfVariable::has_record() const
-{
-    return dims[0]->is_unlimited();
-}
-
-
-size_t NetcdfVariable::num_dims() const
-{
-    return dims.size();
-}
-
-
 vector<Dimension*> NetcdfVariable::get_dims() const
 {
     return vector<Dimension*>(dims.begin(), dims.end());
-}
-
-
-size_t NetcdfVariable::num_atts() const
-{
-    return atts.size();
 }
 
 

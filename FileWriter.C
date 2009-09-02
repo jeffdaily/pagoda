@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include "Common.H"
 #include "FileWriter.H"
 #include "NetcdfFileWriter.H"
 #include "Util.H"
@@ -14,7 +15,8 @@ using std::vector;
 FileWriter* FileWriter::create(const string &filename)
 {
     FileWriter *writer = NULL;
-    if (Util::ends_with(filename, ".nc")) {
+    string EXT_NC(".nc");
+    if (Util::ends_with(filename, EXT_NC)) {
         writer = new NetcdfFileWriter(filename);
     }
     return writer;
