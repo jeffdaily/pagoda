@@ -26,6 +26,7 @@ using std::cerr;
 using std::endl;
 using std::find;
 using std::tolower;
+using std::transform;
 
 Dataset* Dataset::open(const string &filename)
 {
@@ -307,7 +308,7 @@ void Dataset::decorate()
         }
         if ((att = var->find_att(string("positive")))) {
             string val = att->get_string();
-            transform(val.begin(), val.end(), val.begin(), tolower);
+            transform(val.begin(),val.end(),val.begin(),(int(*)(int))tolower);
             if ("up" == val || "down" == val) {
                 (*var_it) = new CoordinateVariable(var);
                 continue;
