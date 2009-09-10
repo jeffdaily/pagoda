@@ -97,3 +97,5 @@
 
 /* Version number of package */
 #undef VERSION
+
+#include <mpi.h>

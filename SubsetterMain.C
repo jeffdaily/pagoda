@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include <ga.h>
-#include <mpi.h>
 
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"

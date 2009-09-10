@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include <mpi.h>
 #include <pnetcdf.h>
 
 #include "Attribute.H"

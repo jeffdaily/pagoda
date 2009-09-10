@@ -1,10 +1,11 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
+#include <mpi.h>
+
 #include <cstdio>
 
 #include <ga.h>
-#include <mpi.h>
 
 #define ME GA_Nodeid()
 #define NPROC GA_Nnodes()

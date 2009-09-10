@@ -53,7 +53,7 @@ Dataset::~Dataset()
 }
 
 
-Attribute* Dataset::find_att(const string &name, bool ignore_case)
+Attribute* Dataset::find_att(const string &name, bool ignore_case, bool within)
 {
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
@@ -61,6 +61,7 @@ Attribute* Dataset::find_att(const string &name, bool ignore_case)
     StringComparator cmp;
 
     cmp.set_ignore_case(ignore_case);
+    cmp.set_within(within);
     for (; it!=end; ++it) {
         cmp.set_value((*it)->get_name());
         if (cmp(name)) {
@@ -72,7 +73,8 @@ Attribute* Dataset::find_att(const string &name, bool ignore_case)
 }
 
 
-Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case)
+Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case,
+        bool within)
 {
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
@@ -80,6 +82,7 @@ Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case)
     StringComparator cmp;
 
     cmp.set_ignore_case(ignore_case);
+    cmp.set_within(within);
     for (; it!=end; ++it) {
         cmp.set_value((*it)->get_name());
         if (cmp(names)) {
@@ -91,7 +94,7 @@ Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case)
 }
 
 
-Dimension* Dataset::find_dim(const string &name, bool ignore_case)
+Dimension* Dataset::find_dim(const string &name, bool ignore_case, bool within)
 {
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
@@ -99,6 +102,7 @@ Dimension* Dataset::find_dim(const string &name, bool ignore_case)
     StringComparator cmp;
 
     cmp.set_ignore_case(ignore_case);
+    cmp.set_within(within);
     for (; it!=end; ++it) {
         cmp.set_value((*it)->get_name());
         if (cmp(name)) {
@@ -110,7 +114,7 @@ Dimension* Dataset::find_dim(const string &name, bool ignore_case)
 }
 
 
-Variable* Dataset::find_var(const string &name, bool ignore_case)
+Variable* Dataset::find_var(const string &name, bool ignore_case, bool within)
 {
     vector<Variable*> vars = get_vars();
     vector<Variable*>::const_iterator it = vars.begin();
@@ -118,6 +122,7 @@ Variable* Dataset::find_var(const string &name, bool ignore_case)
     StringComparator cmp;
 
     cmp.set_ignore_case(ignore_case);
+    cmp.set_within(within);
     for (; it!=end; ++it) {
         cmp.set_value((*it)->get_name());
         if (cmp(name)) {
@@ -193,9 +198,15 @@ void Dataset::adjust_masks(const LatLonBox &box)
         // corner/edge variables
         // Likely solution is to iterate over all Variables and examine them
         // for special attributes
-        Variable *lat = find_var(string("grid_center_lat"));
-        Variable *lon = find_var(string("grid_center_lon"));
-        lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
+        Variable *lat = find_var(string("grid_center_lat"), false, true);
+        Variable *lon = find_var(string("grid_center_lon"), false, true);
+        if (!lat) {
+            cerr << "adjust_masks: missing lat" << endl;
+        } else if (!lon) {
+            cerr << "adjust_masks: missing lon" << endl;
+        } else {
+            lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
+        }
     }
 }
 

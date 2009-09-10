@@ -73,6 +73,11 @@ AC_HEADER_STDBOOL
 # Checks for library functions.
 AC_CHECK_FUNCS([strtol])
 
+# NERSC's MPI library requires all C++ codes to include mpi.h before any
+# other include files.  I'm not sure if this includes config.h as well, but
+# putting this here will at least put mpi.h before any OTHER include files.
+AH_BOTTOM([#include <mpi.h>])
+
 AC_CONFIG_FILES([Makefile
                  tests/Makefile])
 AC_OUTPUT

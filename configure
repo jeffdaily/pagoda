@@ -18391,6 +18391,11 @@ fi
 done
 
 
+# NERSC's MPI library requires all C++ codes to include mpi.h before any
+# other include files.  I'm not sure if this includes config.h as well, but
+# putting this here will at least put mpi.h before any OTHER include files.
+
+
 ac_config_files="$ac_config_files Makefile tests/Makefile"
 
 cat >confcache <<\_ACEOF
