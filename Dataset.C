@@ -147,23 +147,26 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
 
     // we're iterating over the command-line specified slices to create masks
     for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
+        DimSlice slice = *slice_it;
         //Mask *mask;
 
         // find the Dimension
         for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
             Dimension *dim = *dim_it;
-            if (dim->get_name() == slice_it->get_name()) {
+            string dim_name = dim->get_name();
+            string slice_name = slice.get_name();
+            if (dim_name == slice_name) {
                 break;
             }
         }
         if (dim_it == dims.end()) {
-            const string name = slice_it->get_name();
+            const string name = slice.get_name();
             cerr << "Sliced dimension '" << name << "' does not exist" << endl;
             continue;
         } else {
             Dimension *dim = *dim_it;
             // adjust the Mask based on the current Slice
-            dim->get_mask()->adjust(*slice_it);
+            dim->get_mask()->adjust(slice);
         }
     }
 }

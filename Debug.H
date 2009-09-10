@@ -70,13 +70,13 @@
 #   define TRACER(fmt) \
     do { \
         MPI_Status stat; \
-        int count=100; \
-        char msg[count]; \
+        int _count=100; \
+        char msg[_count]; \
         if (0 == ME) { \
             fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt); \
             for (int proc=1; proc<NPROC; ++proc) { \
-                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
                 fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
@@ -84,19 +84,19 @@
             fflush(stdout); \
         } else { \
             sprintf(msg, fmt); \
-            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
+            MPI_Send(msg, _count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     } while (0)
 #   define TRACER1(fmt,a1) \
     do { \
         MPI_Status stat; \
-        int count=100; \
-        char msg[count]; \
+        int _count=100; \
+        char msg[_count]; \
         if (0 == ME) { \
             fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt, a1); \
             for (int proc=1; proc<NPROC; ++proc) { \
-                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
                 fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
@@ -104,19 +104,19 @@
             fflush(stdout); \
         } else { \
             sprintf(msg, fmt, a1); \
-            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
+            MPI_Send(msg, _count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     } while (0)
 #   define TRACER2(fmt,a1,a2) \
     do { \
         MPI_Status stat; \
-        int count=100; \
-        char msg[count]; \
+        int _count=100; \
+        char msg[_count]; \
         if (0 == ME) { \
             fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt,a1,a2); \
             for (int proc=1; proc<NPROC; ++proc) { \
-                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
                 fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
@@ -124,19 +124,19 @@
             fflush(stdout); \
         } else { \
             sprintf(msg, fmt,a1,a2); \
-            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
+            MPI_Send(msg, _count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     } while (0)
 #   define TRACER3(fmt,a1,a2,a3) \
     do { \
         MPI_Status stat; \
-        int count=100; \
-        char msg[count]; \
+        int _count=100; \
+        char msg[_count]; \
         if (0 == ME) { \
             fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt,a1,a2,a3); \
             for (int proc=1; proc<NPROC; ++proc) { \
-                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
                 fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
@@ -144,19 +144,19 @@
             fflush(stdout); \
         } else { \
             sprintf(msg, fmt,a1,a2,a3); \
-            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
+            MPI_Send(msg, _count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     } while (0)
 #   define TRACER4(fmt,a1,a2,a3,a4) \
     do { \
         MPI_Status stat; \
-        int count=100; \
-        char msg[count]; \
+        int _count=100; \
+        char msg[_count]; \
         if (0 == ME) { \
             fprintf(stderr, "[%*d] ", PRECISION, 0); \
             fprintf(stderr, fmt,a1,a2,a3,a4); \
             for (int proc=1; proc<NPROC; ++proc) { \
-                MPI_Recv(msg, count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
+                MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
                 fprintf(stderr, "[%*d] ", PRECISION, proc); \
                 fprintf(stderr, msg); \
             } \
@@ -164,7 +164,7 @@
             fflush(stdout); \
         } else { \
             sprintf(msg, fmt,a1,a2,a3,a4); \
-            MPI_Send(msg, count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
+            MPI_Send(msg, _count, MPI_BYTE, 0, 1, MPI_COMM_WORLD); \
         } \
     } while (0)
 #else

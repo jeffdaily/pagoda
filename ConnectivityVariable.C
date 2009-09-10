@@ -98,9 +98,9 @@ void ConnectivityVariable::reindex()
                 // array of pointers into a flat array... WTF)
                 int *buf;
                 int64_t count;
-                map<int,int> m;
-                map<int,int>::const_iterator m_it;
-                map<int,int>::const_iterator m_end;
+                map<int64_t,int64_t> m;
+                map<int64_t,int64_t>::const_iterator m_it;
+                map<int64_t,int64_t>::const_iterator m_end;
                 int64_t **subs;
                 size_t subs_idx;
                 int *values;
@@ -118,7 +118,7 @@ void ConnectivityVariable::reindex()
                 }
                 NGA_Release64(var_handle, var_lo, var_hi);
                 size = m.size();
-                TRACER1("size = %lld\n", size);
+                TRACER1("size = %ld\n", size);
 
                 TRACER("create the retarded array of pointers that GA wants\n");
                 subs = new int64_t*[size];
@@ -142,9 +142,8 @@ void ConnectivityVariable::reindex()
                 TRACER("use the gathered values for the map\n");
                 for (int64_t i=0; i<size; ++i) {
                     int64_t val_to_find = subs[i][0];
-                    map<int,int>::iterator found = m.find(val_to_find);
+                    map<int64_t,int64_t>::iterator found = m.find(val_to_find);
                     found->second = values[i];
-                    //m.find(subs[i][0])->second = values[i];
                 }
 
                 TRACER("now go through buf one last time and replace values!\n");

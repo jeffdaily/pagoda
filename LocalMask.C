@@ -3,8 +3,6 @@
 #endif
 
 #include <algorithm>
-//#include <functional>
-//#include <numeric>
 
 #include <macdecls.h>
 
@@ -13,11 +11,8 @@
 #include "Slice.H"
 #include "Util.H"
 
-//using std::accumulate;
-//using std::bind1st;
 using std::copy;
 using std::fill;
-//using std::ptr_fun;
 
 
 LocalMask::LocalMask(Dimension *dim)
@@ -25,8 +20,9 @@ LocalMask::LocalMask(Dimension *dim)
     ,   data(NULL)
     ,   index(NULL)
 {
+    int ZERO = 0;
     data = new int[dim->get_size()];
-    fill(data, data+dim->get_size(), 0);
+    fill(data, data+dim->get_size(), ZERO);
 }
 
 
@@ -56,7 +52,8 @@ void LocalMask::clear()
 {
     if (cleared) return;
     cleared = true;
-    fill(data, data+dim->get_size(), 0);
+    int ZERO = 0;
+    fill(data, data+dim->get_size(), ZERO);
 }
 
 

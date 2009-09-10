@@ -442,7 +442,7 @@ void unpack1d(int g_src, int g_dst, int g_msk)
                 lo_src += counts[i];
             }
             hi_src = lo_src + counts[me] - 1;
-            TRACER2("unpack1d lo,hi = %lld,%lld\n", lo_src, hi_src);
+            TRACER2("unpack1d lo,hi = %ld,%ld\n", lo_src, hi_src);
             // do the unpacking
             // assumption is that dst array has same distribution as msk array
             // get src (and dst) type, that's all we want...

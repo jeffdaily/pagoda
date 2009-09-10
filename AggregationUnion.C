@@ -9,13 +9,10 @@
 #include "AggregationUnion.H"
 #include "Attribute.H"
 #include "Dimension.H"
-#include "Util.H"
 #include "Variable.H"
 
 using std::string;
-using std::transform;
 using std::vector;
-using Util::ptr_deleter;
 
 
 AggregationUnion::AggregationUnion()
@@ -31,8 +28,12 @@ AggregationUnion::AggregationUnion()
 AggregationUnion::~AggregationUnion()
 {
     // deleting the datasets should also delete their associate members
-    transform(datasets.begin(), datasets.end(),
-            datasets.begin(), ptr_deleter<Dataset*>);
+    vector<Dataset*>::iterator it = datasets.begin();
+    vector<Dataset*>::iterator end = datasets.end();
+    for (; it!=end; ++it) {
+        Dataset *dataset = *it;
+        delete dataset;
+    }
 }
 
 
