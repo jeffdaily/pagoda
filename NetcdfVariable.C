@@ -21,7 +21,7 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
     ,   name("")
     ,   dims()
     ,   atts()
-    ,   type(DataType::CHAR)
+    ,   type(NC_CHAR)
 {
     int ncid = dataset->get_id();
     int ndim;

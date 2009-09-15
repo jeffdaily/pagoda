@@ -87,12 +87,12 @@ am__objects_1 = AbstractVariable.lo Aggregation.lo \
 	AggregationUnion.lo AggregationVariable.lo Attribute.lo \
 	BoundaryVariable.lo CommandLineParser.lo \
 	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
-	DataType.lo Dimension.lo DistributedMask.lo FileWriter.lo \
-	LatLonBox.lo LocalMask.lo Mask.lo NetcdfAttribute.lo \
-	NetcdfDataset.lo NetcdfDimension.lo NetcdfFileWriter.lo \
-	NetcdfVariable.lo Pack.lo StringComparator.lo \
-	SubsetterCommands.lo Util.lo Values.lo Variable.lo \
-	VariableDecorator.lo
+	DataType.lo Debug.lo Dimension.lo DistributedMask.lo \
+	FileWriter.lo LatLonBox.lo LocalMask.lo Mask.lo \
+	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
+	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo \
+	StringComparator.lo SubsetterCommands.lo Util.lo Values.lo \
+	Variable.lo VariableDecorator.lo
 am__objects_2 =
 am_libsubsetter_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
@@ -355,6 +355,7 @@ ConnectivityVariable.C \
 CoordinateVariable.C \
 Dataset.C \
 DataType.C \
+Debug.C \
 Dimension.C \
 DistributedMask.C \
 FileWriter.C \
@@ -539,6 +540,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CoordinateVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DistributedMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileWriter.Plo@am__quote@

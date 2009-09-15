@@ -59,15 +59,9 @@ vector<int64_t> VariableDecorator::get_sizes(bool use_masks) const
 }
 
 
-size_t VariableDecorator::num_masks() const
+bool VariableDecorator::needs_subset() const
 {
-    return var->num_masks();
-}
-
-
-size_t VariableDecorator::num_cleared_masks() const
-{
-    return var->num_cleared_masks();
+    return var->needs_subset();
 }
 
 

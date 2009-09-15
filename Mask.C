@@ -7,7 +7,7 @@
 
 Mask::Mask(Dimension *dim)
     :   dim(dim)
-    ,   dirty(true)
+    ,   need_recount(true)
     ,   cleared(false)
     ,   count(0)
 {
@@ -31,11 +31,17 @@ Dimension* Mask::get_dim() const
 }
 
 
-long Mask::get_count()
+int64_t Mask::get_size() const
 {
-    if (dirty) {
+    return get_dim()->get_size();
+}
+
+
+int64_t Mask::get_count()
+{
+    if (need_recount) {
+        need_recount = false;
         recount();
-        dirty = false;
     }
     return count;
 }

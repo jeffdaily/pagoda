@@ -23,7 +23,7 @@ NetcdfAttribute::NetcdfAttribute(
     ,   id(attid)
     ,   var(var)
     ,   name("")
-    ,   type(DataType::CHAR)
+    ,   type(NC_CHAR)
     ,   global(var == NULL)
     ,   values(NULL)
 {
@@ -43,18 +43,18 @@ NetcdfAttribute::NetcdfAttribute(
     len = len_mpi;
     type = type_tmp;
 #define get_attr_values(DATA_TYPE, C_TYPE, NAME) \
-    if (type == DATA_TYPE) { \
+    if (DATA_TYPE == type_tmp) { \
         C_TYPE data[len]; \
         err = ncmpi_get_att_##NAME(ncid, varid, name.c_str(), data); \
         ERRNO_CHECK(err); \
         values = new TypedValues<C_TYPE>(data, len); \
     } else
-    get_attr_values(DataType::BYTE, unsigned char, uchar)
-    get_attr_values(DataType::CHAR, char, text)
-    get_attr_values(DataType::SHORT, short, short)
-    get_attr_values(DataType::INT, int, int)
-    get_attr_values(DataType::FLOAT, float, float)
-    get_attr_values(DataType::DOUBLE, double, double)
+    get_attr_values(NC_BYTE, signed char, schar)
+    get_attr_values(NC_CHAR, char, text)
+    get_attr_values(NC_SHORT, short, short)
+    get_attr_values(NC_INT, int, int)
+    get_attr_values(NC_FLOAT, float, float)
+    get_attr_values(NC_DOUBLE, double, double)
     ; // because of last "else" in macro
 #undef get_attr_values
 }

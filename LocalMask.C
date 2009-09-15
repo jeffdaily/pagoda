@@ -17,12 +17,8 @@ using std::fill;
 
 LocalMask::LocalMask(Dimension *dim)
     :   Mask(dim)
-    ,   data(NULL)
-    ,   index(NULL)
+    ,   data(dim->get_size(), 0)
 {
-    int ZERO = 0;
-    data = new int[dim->get_size()];
-    fill(data, data+dim->get_size(), ZERO);
 }
 
 
@@ -31,20 +27,15 @@ LocalMask::~LocalMask()
 }
 
 
-int* LocalMask::get_data() const
+void LocalMask::get_data(vector<int> &ret)
 {
-    int64_t size = dim->get_size();
-    int *ret = new int[size];
-    copy(data, data+size, ret);
-    return ret;
+    ret.assign(data.begin(), data.end());
 }
 
 
-int* LocalMask::get_data(int64_t lo, int64_t hi)
+void LocalMask::get_data(vector<int> &ret, int64_t lo, int64_t hi)
 {
-    int *ret = new int[hi-lo+1];
-    copy(data+lo, data+hi, ret);
-    return ret;
+    ret.assign(data.begin()+lo, data.begin()+hi);
 }
 
 
@@ -52,14 +43,13 @@ void LocalMask::clear()
 {
     if (cleared) return;
     cleared = true;
-    int ZERO = 0;
-    fill(data, data+dim->get_size(), ZERO);
+    data.assign(dim->get_size(), 0);
 }
 
 
 void LocalMask::adjust(const DimSlice &slice)
 {
-    dirty = true;
+    need_recount = true;
 
     int64_t size = dim->get_size();
     int64_t lo;
@@ -68,7 +58,7 @@ void LocalMask::adjust(const DimSlice &slice)
 
     slice.indices(size, lo, hi, step);
     for (int64_t i=lo; i<=hi; i+=step) {
-        data[i] = 1;
+        data.at(i) = 1;
     }
 }
 
@@ -87,7 +77,7 @@ void LocalMask::recount()
 {
     count = 0;
     for (int64_t i=0,limit=dim->get_size(); i<limit; ++i) {
-        if (data[i] != 0) ++count;
+        if (data.at(i) != 0) ++count;
     }
 }
 

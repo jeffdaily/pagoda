@@ -19,7 +19,6 @@
 #include "NetcdfError.H"
 #include "NetcdfFileWriter.H"
 #include "NetcdfVariable.H"
-#include "Pack.H"
 #include "Util.H"
 #include "Values.H"
 
@@ -173,22 +172,21 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
     MPI_Offset len = attr->get_count();
-#define put_attr_values(DT, CT, NAME) \
-    if (dt == DT) { \
-        nc_type type = DT; \
+#define put_attr_values(NT, CT, NAME) \
+    if (dt == NT) { \
         vector<CT> data; \
         attr->get_values()->as(data); \
         CT *buf = &data[0]; \
-        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), type, len, buf); \
+        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), NT, len, buf); \
         ERRNO_CHECK(err); \
     } else
-    put_attr_values(DataType::BYTE, unsigned char, uchar)
-    put_attr_values(DataType::SHORT, short, short)
-    put_attr_values(DataType::INT, int, int)
-    put_attr_values(DataType::FLOAT, float, float)
-    put_attr_values(DataType::DOUBLE, double, double)
+    put_attr_values(NC_BYTE, signed char, schar)
+    put_attr_values(NC_SHORT, short, short)
+    put_attr_values(NC_INT, int, int)
+    put_attr_values(NC_FLOAT, float, float)
+    put_attr_values(NC_DOUBLE, double, double)
 #undef put_attr_values
-    if (dt == DataType::CHAR) {
+    if (dt == NC_CHAR) {
         vector<char> data;
         attr->get_values()->as(data);
         char *buf = &data[0];
@@ -218,7 +216,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
 {
     TRACER3("NetcdfFileWriter::write %d %d %d\n", handle, varid, record);
     maybe_enddef();
-    DataType type = DataType::CHAR;
+    DataType type = NC_CHAR;
     int mt_type;
     int ndim;
     int64_t dim_sizes[GA_MAX_DIM];
@@ -230,7 +228,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
     int dimidx=0;
 
     NGA_Inquire64(handle, &mt_type, &ndim, dim_sizes);
-    type.from_mt(mt_type);
+    type = mt_type;
     NGA_Distribution64(handle, ME, lo, hi);
 
     if (0 > lo[0] && 0 > hi[0]) {
@@ -240,7 +238,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
             count[dimidx] = 0;
         }
 #define write_var_all(TYPE, NC_TYPE) \
-        if (type == NC_TYPE) { \
+        if (NC_TYPE == type) { \
             err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, NULL);\
         } else
         write_var_all(int, NC_INT)
@@ -264,7 +262,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
             }
         }
 #define write_var_all(TYPE, NC_TYPE) \
-        if (type == NC_TYPE) { \
+        if (NC_TYPE == type) { \
             TYPE *ptr; \
             NGA_Access64(handle, lo, hi, &ptr, ld); \
             err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \

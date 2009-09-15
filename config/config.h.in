@@ -19,14 +19,17 @@
 /* Define if you have libpnetcdf */
 #undef HAVE_LIBPNETCDF
 
-/* Define to 1 if you have the <limits.h> header file. */
-#undef HAVE_LIMITS_H
+/* Define to 1 if the system has the type `long double'. */
+#undef HAVE_LONG_DOUBLE
+
+/* Define to 1 if the system has the type `long long int'. */
+#undef HAVE_LONG_LONG_INT
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if stdbool.h conforms to C99. */
-#undef HAVE_STDBOOL_H
+/* Define to 1 if you have the <pnetcdf.h> header file. */
+#undef HAVE_PNETCDF_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -40,9 +43,6 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have the `strtol' function. */
-#undef HAVE_STRTOL
-
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -52,8 +52,8 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define to 1 if the system has the type `_Bool'. */
-#undef HAVE__BOOL
+/* Define to 1 if the system has the type `unsigned long long int'. */
+#undef HAVE_UNSIGNED_LONG_LONG_INT
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
@@ -83,11 +83,41 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* The size of `char', as computed by sizeof. */
+#undef SIZEOF_CHAR
+
+/* The size of `double', as computed by sizeof. */
+#undef SIZEOF_DOUBLE
+
+/* The size of `float', as computed by sizeof. */
+#undef SIZEOF_FLOAT
+
+/* The size of `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
 /* The size of `int64_t', as computed by sizeof. */
 #undef SIZEOF_INT64_T
 
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `long double', as computed by sizeof. */
+#undef SIZEOF_LONG_DOUBLE
+
+/* The size of `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
+
 /* The size of `MPI_Offset', as computed by sizeof. */
 #undef SIZEOF_MPI_OFFSET
+
+/* The size of `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* The size of `unsigned long long', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_LONG_LONG
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
@@ -97,5 +127,9 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Define to the type of a signed integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int64_t
 
 #include <mpi.h>

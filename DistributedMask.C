@@ -6,6 +6,7 @@
 #include <numeric>
 
 #include <macdecls.h>
+#include <message.h>
 
 #include "Common.H"
 #include "Debug.H"
@@ -18,21 +19,21 @@
 using std::accumulate;
 using std::fill;
 
+
 DistributedMask::DistributedMask(Dimension *dim, int value)
     :   Mask(dim)
     ,   handle(0)
     ,   handle_index(0)
     ,   lo(0)
     ,   hi(0)
-    ,   counts(NULL)
+    ,   counts(NPROC, 0)
 {
     string name = dim->get_name();
     int64_t size = dim->get_size();
-    handle = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), NULL);
+    handle = NGA_Create64(C_INT, 1, &size, const_cast<char*>(name.c_str()), NULL);
     TRACER1("DistributedMask ctor handle=%d\n", handle);
     NGA_Distribution64(handle, ME, &lo, &hi);
     GA_Fill(handle, &value);
-    counts = new long[NPROC];
 }
 
 
@@ -45,38 +46,39 @@ DistributedMask::~DistributedMask()
 }
 
 
-int* DistributedMask::get_data() const
+void DistributedMask::get_data(vector<int> &ret)
 {
     int64_t size = dim->get_size();
-    int *data = new int[size];
     int64_t glo = 0;
     int64_t ghi = size - 1;
-    NGA_Get64(handle, &glo, &ghi, data, NULL);
-    return data;
+    ret.resize(size);
+    NGA_Get64(handle, &glo, &ghi, &ret[0], NULL);
 }
 
 
-int* DistributedMask::get_data(int64_t lo, int64_t hi)
+void DistributedMask::get_data(vector<int> &ret, int64_t lo, int64_t hi)
 {
-    int *data = new int[hi-lo+1];
-    NGA_Get64(handle, &lo, &hi, data, NULL);
-    return data;
+    ret.resize(hi-lo+1);
+    NGA_Get64(handle, &lo, &hi, &ret[0], NULL);
 }
 
 
 void DistributedMask::clear()
 {
     // bail if already cleared once (a one-time operation)
-    if (cleared) return;
-    cleared = true;
-    int ZERO = 0;
-    GA_Fill(handle, &ZERO);
+    if (cleared) {
+        return;
+    } else {
+        cleared = true;
+        int ZERO = 0;
+        GA_Fill(handle, &ZERO);
+    }
 }
 
 
 void DistributedMask::adjust(const DimSlice &slice)
 {
-    dirty = true;
+    need_recount = true;
     clear();
 
     // bail if we don't own any of the data
@@ -120,7 +122,7 @@ void DistributedMask::adjust(const DimSlice &slice)
 
 void DistributedMask::adjust(const LatLonBox &box, Variable *lat, Variable *lon)
 {
-    dirty = true;
+    need_recount = true;
     clear();
 
     // bail if we don't own any of the data
@@ -177,7 +179,7 @@ void DistributedMask::adjust(
         Variable *var,
         bool bitwise_or)
 {
-    dirty = true;
+    need_recount = true;
     clear();
 
     // bail if we don't own any of the data
@@ -229,8 +231,8 @@ void DistributedMask::adjust(
 void DistributedMask::recount()
 {
     int *data;
-    long ZERO = 0;
-    fill(counts, counts+NPROC, ZERO);
+    int64_t ZERO = 0;
+    fill(counts.begin(), counts.end(), ZERO);
     if (0 > lo || 0 > hi) {
     } else {
         NGA_Access64(handle, &lo, &hi, &data, NULL);
@@ -239,10 +241,16 @@ void DistributedMask::recount()
                 ++(counts[ME]);
             }
         }
-        NGA_Release_update64(handle, &lo, &hi);
+        NGA_Release64(handle, &lo, &hi);
     }
-    GA_Lgop(counts, NPROC, "+");
-    count = accumulate(counts, counts+NPROC, ZERO);
+#if SIZEOF_INT64_T == SIZEOF_INT
+    armci_msg_igop(&counts[0], NPROC, "+");
+#elif SIZEOF_INT64_T == SIZEOF_LONG
+    armci_msg_lgop(&counts[0], NPROC, "+");
+#elif SIZEOF_INT64_T == SIZEOF_LONG_LONG
+    armci_msg_llgop(&counts[0], NPROC, "+");
+#endif
+    count = accumulate(counts.begin(), counts.end(), ZERO);
 }
 
 

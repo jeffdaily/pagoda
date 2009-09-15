@@ -34,74 +34,50 @@
 #   and this notice are preserved.
 
 AC_DEFUN([GCRM_CHECK_PACKAGE],
-[
-
-AC_ARG_WITH($1,
-  [AS_HELP_STRING([--with-$1[[=DIR]]],
-    [root directory of $1 installation])],
-  [],
-  [with_$1=yes])
-if test "${with_$1}" != yes -a "${with_$1}" != no ; then
-  $1_include="${with_$1}/include"
-  $1_lib="${with_$1}/lib"
-fi
+[AC_ARG_WITH($1,
+    [AS_HELP_STRING([--with-$1[[=DIR]]],
+        [root directory of $1 installation])],
+    [],
+    [with_$1=yes])
+AS_IF([test "${with_$1}" != yes -a "${with_$1}" != no],
+    [$1_include="${with_$1}/include"
+    $1_lib="${with_$1}/lib"])
 
 AC_ARG_WITH($1-include,
-  [AS_HELP_STRING([--with-$1-include=DIR],
-    [specify exact include dir for $1 headers])],
-  [],
-  [with_$1_include=no])
-if test "${with_$1_include}" = yes ; then
-  AC_MSG_ERROR([You must specify DIR for --with-$1-include=DIR])
-fi
-if test "${with_$1_include}" != no ; then
-  $1_include="${with_$1_include}"
-  if test "${with_$1}" = no ; then
-    with_$1=yes
-  fi
-fi
+    [AS_HELP_STRING([--with-$1-include=DIR],
+        [specify exact include dir for $1 headers])],
+    [],
+    [with_$1_include=no])
+AS_IF([test "${with_$1_include}" = yes],
+    [AC_MSG_ERROR([You must specify DIR for --with-$1-include=DIR])])
+AS_IF([test "${with_$1_include}" != no],
+    [$1_include="${with_$1_include}"
+    AS_IF([test "${with_$1}" = no], [with_$1=yes])])
 
 AC_ARG_WITH($1-lib,
-  [AS_HELP_STRING([--with-$1-lib=DIR],
-    [specify exact library dir for $1 library])],
-  [],
-  [with_$1_lib=no])
-if test "${with_$1_lib}" = yes ; then
-  AC_MSG_ERROR([You must specify DIR for --with-$1-lib=DIR])
-fi
-if test "${with_$1_lib}" != no ; then
-  $1_lib="${with_$1_lib}"
-  if test "${with_$1}" = no ; then
-    with_$1=yes
-  fi
-fi
+    [AS_HELP_STRING([--with-$1-lib=DIR],
+        [specify exact library dir for $1 library])],
+    [],
+    [with_$1_lib=no])
+AS_IF([test "${with_$1_lib}" = yes],
+    [AC_MSG_ERROR([You must specify DIR for --with-$1-lib=DIR])])
+AS_IF([test "${with_$1_lib}" != no],
+    [$1_lib="${with_$1_lib}"
+    AS_IF([test "${with_$1}" = no], [with_$1=yes])])
 
-if test "${with_$1}" != no ; then
-  OLD_LIBS=$LIBS
-  OLD_LDFLAGS=$LDFLAGS
-  OLD_CFLAGS=$CFLAGS
-  
-  if test "x${$1_lib}" != x ; then
-    LDFLAGS="$LDFLAGS -L${$1_lib}"
-  fi
-  if test "x${$1_include}" != x ; then
-    CFLAGS="$CFLAGS -I${$1_include}"
-  fi
-  
-  no_good=no
-  AC_CHECK_LIB($3,$2,,no_good=yes,$7)
-  AC_CHECK_HEADER($4,,no_good=yes)
-  if test "$no_good" = yes; then
-dnl broken
-    ifelse([$6], , , [$6])
-    LIBS=$OLD_LIBS
-    LDFLAGS=$OLD_LDFLAGS
-    CFLAGS=$OLD_CFLAGS
-  else
-dnl fixed
-    ifelse([$5], , , [$5])
-dnl    AC_DEFINE(HAVE_PKG_$1)
-  fi
-fi
-
+AS_IF([test "${with_$1}" != no],
+    [OLD_LIBS=$LIBS
+    OLD_LDFLAGS=$LDFLAGS
+    OLD_CPPFLAGS=$CPPFLAGS
+    AS_IF([test "x${$1_lib}" != x], [LDFLAGS="$LDFLAGS -L${$1_lib}"])
+    AS_IF([test "x${$1_include}" != x], [CPPFLAGS="$CPPFLAGS -I${$1_include}"])
+    no_good=no
+    AC_CHECK_LIB([$3], [$2], [], [no_good=yes], [$7])
+    AC_CHECK_HEADERS([$4], [], [no_good=yes])
+    AS_IF([test "$no_good" = yes],
+        [ifelse([$6], , , [$6])
+        LIBS=$OLD_LIBS
+        LDFLAGS=$OLD_LDFLAGS
+        CPPFLAGS=$OLD_CPPFLAGS],
+        [ifelse([$5], , , [$5])])])
 ])

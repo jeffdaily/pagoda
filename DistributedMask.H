@@ -17,14 +17,17 @@ class Dimension;
 class Variable;
 
 
+/**
+ * Distribute the mask across all available processs.
+ */
 class DistributedMask : public Mask
 {
     public:
         DistributedMask(Dimension *dim, int value=0);
         virtual ~DistributedMask();
 
-        virtual int* get_data() const;
-        virtual int* get_data(int64_t lo, int64_t hi);
+        virtual void get_data(vector<int> &data);
+        virtual void get_data(vector<int> &data, int64_t lo, int64_t hi);
         virtual void clear();
         virtual void adjust(const DimSlice &slice);
         virtual void adjust(const LatLonBox &box, Variable *lat, Variable *lon);
@@ -41,7 +44,7 @@ class DistributedMask : public Mask
         int handle_index;
         int64_t lo;
         int64_t hi;
-        long *counts;
+        vector<int64_t> counts;
 };
 
 #endif // DISTRIBUTEDMASK_H_

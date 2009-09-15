@@ -57,6 +57,7 @@ ConnectivityVariable.C \
 CoordinateVariable.C \
 Dataset.C \
 DataType.C \
+Debug.C \
 Dimension.C \
 DistributedMask.C \
 FileWriter.C \

@@ -29,8 +29,7 @@ class VariableDecorator : public Variable
         virtual size_t num_dims() const;
         virtual int64_t get_size(bool use_masks=false) const;
         virtual vector<int64_t> get_sizes(bool use_masks=false) const;
-        virtual size_t num_masks() const;
-        virtual size_t num_cleared_masks() const;
+        virtual bool needs_subset() const;
 
         virtual vector<Attribute*> get_atts() const;
         virtual size_t num_atts() const;

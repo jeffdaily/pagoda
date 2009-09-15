@@ -9,27 +9,28 @@
 
 #define ME GA_Nodeid()
 #define NPROC GA_Nnodes()
-#define PRECISION (((int)(NPROC/10))+1)
+
+extern int __gcrm_subsetter_get_precision();
 
 #if defined(DEBUG) || defined(TRACE)
 #   define DEBUG_PRINT(FMT) \
     do { \
-        fprintf(stderr, "[%*d] ", PRECISION, ME); \
+        fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), ME); \
         fprintf(stderr,FMT); \
     } while (0)
 #   define DEBUG_PRINT1(FMT,A1) \
     do { \
-        fprintf(stderr, "[%*d] ", PRECISION, ME); \
+        fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), ME); \
         fprintf(stderr,FMT,A1); \
     } while (0)
 #   define DEBUG_PRINT2(FMT,A1,A2) \
     do { \
-        fprintf(stderr, "[%*d] ", PRECISION, ME); \
+        fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), ME); \
         fprintf(stderr,FMT,A1,A2); \
     } while (0)
 #   define DEBUG_PRINT3(FMT,A1,A2,A3) \
     do { \
-        fprintf(stderr, "[%*d] ", PRECISION, ME); \
+        fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), ME); \
         fprintf(stderr,FMT,A1,A2,A3); \
     } while (0)
 #   define DEBUG_PRINT_ME(FMT) \
@@ -74,11 +75,11 @@
         int _count=100; \
         char msg[_count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[%*d] ", PRECISION, 0); \
+            fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), 0); \
             fprintf(stderr, fmt); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%*d] ", PRECISION, proc); \
+                fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -94,11 +95,11 @@
         int _count=100; \
         char msg[_count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[%*d] ", PRECISION, 0); \
+            fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), 0); \
             fprintf(stderr, fmt, a1); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%*d] ", PRECISION, proc); \
+                fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -114,11 +115,11 @@
         int _count=100; \
         char msg[_count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[%*d] ", PRECISION, 0); \
+            fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), 0); \
             fprintf(stderr, fmt,a1,a2); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%*d] ", PRECISION, proc); \
+                fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -134,11 +135,11 @@
         int _count=100; \
         char msg[_count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[%*d] ", PRECISION, 0); \
+            fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), 0); \
             fprintf(stderr, fmt,a1,a2,a3); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%*d] ", PRECISION, proc); \
+                fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \
@@ -154,11 +155,11 @@
         int _count=100; \
         char msg[_count]; \
         if (0 == ME) { \
-            fprintf(stderr, "[%*d] ", PRECISION, 0); \
+            fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), 0); \
             fprintf(stderr, fmt,a1,a2,a3,a4); \
             for (int proc=1; proc<NPROC; ++proc) { \
                 MPI_Recv(msg, _count, MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat); \
-                fprintf(stderr, "[%*d] ", PRECISION, proc); \
+                fprintf(stderr, "[%*d] ", __gcrm_subsetter_get_precision(), proc); \
                 fprintf(stderr, msg); \
             } \
             fflush(stderr); \

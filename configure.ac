@@ -6,6 +6,8 @@ AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
 
+AC_LANG([C++])
+
 # Checks for compilers and compiler characteristics.
 AC_PROG_CC([mpicc hcc mpxlc_r mpxlc mpcc cmpicc cc])
 AC_PROG_CXX([mpic++ mpicxx mpiCC hcp mpxlC_r mpxlC mpCC cmpic++ CC])
@@ -50,28 +52,39 @@ AC_ARG_ENABLE([warnings],
 AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
 
 # Checks for header files.
-AC_CHECK_HEADERS([limits.h stdlib.h unistd.h])
+AC_CHECK_HEADERS([unistd.h])
 
 #
 # Check for some types
 #
 
+AC_TYPE_LONG_LONG_INT
+AC_TYPE_UNSIGNED_LONG_LONG_INT
+AC_TYPE_INT64_T
 AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
-AC_CHECK_TYPE([int64_t])
+AC_TYPE_LONG_DOUBLE
 
 #
 # Check for type sizes
 #
 
-AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])
-AC_CHECK_SIZEOF([int64_t])
+AC_CHECK_SIZEOF([void *])
+AC_CHECK_SIZEOF([char])
+AC_CHECK_SIZEOF([short])
+AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([long])
+AS_IF([test x$ac_cv_type_long_long_int = xyes], [AC_CHECK_SIZEOF([long long])])
+AS_IF([test x$ac_cv_type_unsigned_long_long_int = xyes],
+      [AC_CHECK_SIZEOF([unsigned long long])])
+AS_IF([test x$ac_cv_c_int64_t = xyes], [AC_CHECK_SIZEOF([int64_t])])
+AC_CHECK_SIZEOF([float])
+AC_CHECK_SIZEOF([double])
+AS_IF([test x$ac_cv_type_long_double = xyes], [AC_CHECK_SIZEOF([long double])])
+AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
+      [AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AM_PROG_CC_C_O
-AC_HEADER_STDBOOL
-
-# Checks for library functions.
-AC_CHECK_FUNCS([strtol])
 
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but

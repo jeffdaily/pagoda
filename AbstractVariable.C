@@ -85,35 +85,19 @@ vector<int64_t> AbstractVariable::get_sizes(bool use_masks) const
 }
 
 
-size_t AbstractVariable::num_masks() const
+bool AbstractVariable::needs_subset() const
 {
-    size_t result = 0;
+    bool result = false;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
     vector<Dimension*>::const_iterator end = dims.end();
 
     for (; it!=end; ++it) {
-        if (((*it)->get_mask())) {
-            ++result;
-        }
-    }
-
-    return result;
-}
-
-
-size_t AbstractVariable::num_cleared_masks() const
-{
-    size_t result = 0;
-    vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::const_iterator it = dims.begin();
-    vector<Dimension*>::const_iterator end = dims.end();
-
-    for (; it!=end; ++it) {
-        Mask *mask;
-        if ((mask = (*it)->get_mask())) {
-            if (mask->was_cleared()) {
-                ++result;
+        Mask *mask = (*it)->get_mask();
+        if (mask) {
+            if (mask->get_count() != mask->get_size()) {
+                result = true;
+                break;
             }
         }
     }
@@ -195,12 +179,12 @@ int AbstractVariable::get_handle()
         if (has_record() && num_dims() > 1) {
             size_tmp = &dim_sizes[1];
             ndim = num_dims() - 1;
-            tmp_handle = NGA_Create64(get_type().as_mt(), ndim,
+            tmp_handle = NGA_Create64((int)get_type(), ndim,
                     size_tmp, name, NULL);
         } else {
             size_tmp = &dim_sizes[0];
             ndim = num_dims();
-            tmp_handle = NGA_Create64(get_type().as_mt(), ndim,
+            tmp_handle = NGA_Create64((int)get_type(), ndim,
                     size_tmp, name, NULL);
         }
         handle = new int(tmp_handle);

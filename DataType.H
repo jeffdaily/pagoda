@@ -2,37 +2,76 @@
 #define DATATYPE_H_
 
 #include <iostream>
-    using std::ostream;
+#include <stdexcept>
+#include <string>
 
 #include <macdecls.h>
-#include <pnetcdf.h>
+#if HAVE_PNETCDF_H
+#   include <pnetcdf.h>
+#endif
+#if HAVE_NETCDF_H
+#   include <netcdf.h>
+#endif
+
+using std::ostream;
+using std::runtime_error;
+using std::string;
+
+
+class DataTypeException : public runtime_error
+{
+    public:
+        explicit DataTypeException(const string &what)
+            :   runtime_error(what)
+        {}
+};
 
 
 class DataType
 {
-    private:
-        static int counter;
-
-        DataType();
-        int value;
+    enum dt_type {
+        dt_char=-1000, /* something unique between netcdf and GA */
+        dt_short,
+        dt_int,
+        dt_long,
+        dt_longlong,
+        dt_float,
+        dt_double,
+        dt_longdouble,
+        dt_uchar,
+        dt_ushort,
+        dt_uint,
+        dt_ulong,
+        dt_ulonglong,
+        dt_string
+    };
 
     public:
-        bool operator == (const DataType &other) const;
-        DataType& operator = (const nc_type &type);
-        DataType& operator = (int value);
-        operator int () const;
+        DataType(nc_type type);
+        DataType(int type);
+        DataType(const DataType &type);
+
+        DataType& operator = (nc_type type);
+        DataType& operator = (int type);
+        DataType& operator = (const DataType &type);
         operator nc_type () const;
-        int as_mt() const;
-        void from_mt(int mt);
+        operator int () const;
+        nc_type as_nc() const;
+        int as_ma() const;
+
+        bool operator == (nc_type) const;
+        bool operator == (int) const;
+        bool operator == (const DataType &type) const;
+
         friend ostream& operator << (ostream &os, const DataType &other);
 
-        static const DataType BYTE;
-        static const DataType CHAR;
-        static const DataType SHORT;
-        static const DataType INT;
-        //static const DataType LONG;
-        static const DataType FLOAT;
-        static const DataType DOUBLE;
+        static dt_type to_dt(nc_type type);
+        static dt_type to_dt(int type);
+        static nc_type to_nc(dt_type type);
+        static int to_ma(dt_type type);
+
+    protected:
+        dt_type value;
 };
 
 #endif // DATATYPE_H_
