@@ -54,18 +54,18 @@ Dimension* ConnectivityVariable::get_to_dim() const
 void ConnectivityVariable::reindex()
 {
     TRACER("ConnectivityVariable::reindex BEGIN\n");
-    Mask *mask = to->get_mask();
-    if (mask && (mask->get_size() != mask->get_count())) {
-        mask->reindex();
-        DistributedMask *dmask = dynamic_cast<DistributedMask*>(mask);
-        if (dmask) {
+    Mask *maskbase = to->get_mask();
+    if (maskbase && (maskbase->get_count() != maskbase->get_size())) {
+        maskbase->reindex();
+        DistributedMask *mask = dynamic_cast<DistributedMask*>(maskbase);
+        if (mask) {
             int me = GA_Nodeid();
             int var_handle = var->get_handle();
             size_t var_ndim = var->num_dims();
             int64_t *var_lo = new int64_t[var_ndim];
             int64_t *var_hi = new int64_t[var_ndim];
             int64_t *var_ld = NULL;
-            int idx_handle = dmask->get_handle_index();
+            int idx_handle = mask->get_handle_index();
             int idx_type;
             int idx_ndim;
             int64_t idx_size;
@@ -86,7 +86,7 @@ void ConnectivityVariable::reindex()
             else {
                 // This is screwy.
                 // For each value in the variable we're remapping, we need its
-                // associated remapped value based on the dmask's reindex array.
+                // associated remapped value based on the mask's reindex array.
                 // But the variable's values are not monotonic or anything nice
                 // like that, so using NGA_Gather seems like the only way to
                 // keep from remotely retrieving more data than we really need.

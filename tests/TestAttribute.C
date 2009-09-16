@@ -50,13 +50,10 @@ int main(int argc, char **argv)
         cout << att << endl;
 
         cout << "TEST OF as(), size=" << att->get_count() << endl;
-        char *test;
+        string test;
         att->get_values()->as(test);
-        for (size_t i=0,limit=att->get_count(); i<limit; ++i) {
-            cout << test[i] << " ";
-        }
+        cout << test << endl;
         cout << endl;
-        delete [] test;
     }
 
     cout << "@@@@@@@@@@@@@@@@@@@ VARIABLE ATTRIBUTES" << endl;

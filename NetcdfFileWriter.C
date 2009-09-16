@@ -19,6 +19,7 @@
 #include "NetcdfError.H"
 #include "NetcdfFileWriter.H"
 #include "NetcdfVariable.H"
+#include "Pack.H"
 #include "Util.H"
 #include "Values.H"
 
@@ -172,12 +173,13 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
     MPI_Offset len = attr->get_count();
-#define put_attr_values(NT, CT, NAME) \
-    if (dt == NT) { \
+#define put_attr_values(DT, CT, NAME) \
+    if (dt == DT) { \
+        nc_type type = DT; \
         vector<CT> data; \
         attr->get_values()->as(data); \
         CT *buf = &data[0]; \
-        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), NT, len, buf); \
+        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), type, len, buf); \
         ERRNO_CHECK(err); \
     } else
     put_attr_values(NC_BYTE, signed char, schar)
@@ -238,7 +240,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
             count[dimidx] = 0;
         }
 #define write_var_all(TYPE, NC_TYPE) \
-        if (NC_TYPE == type) { \
+        if (type == NC_TYPE) { \
             err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, NULL);\
         } else
         write_var_all(int, NC_INT)
@@ -262,7 +264,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
             }
         }
 #define write_var_all(TYPE, NC_TYPE) \
-        if (NC_TYPE == type) { \
+        if (type == NC_TYPE) { \
             TYPE *ptr; \
             NGA_Access64(handle, lo, hi, &ptr, ld); \
             err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \

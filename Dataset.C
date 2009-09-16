@@ -11,7 +11,6 @@
 #include "ConnectivityVariable.H"
 #include "CoordinateVariable.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
 #include "LatLonBox.H"
@@ -137,7 +136,6 @@ Variable* Dataset::find_var(const string &name, bool ignore_case, bool within)
 
 void Dataset::create_masks()
 {
-    TRACER("Dataset::create_masks()\n");
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::iterator dim_it;
     for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
@@ -207,9 +205,7 @@ void Dataset::adjust_masks(const LatLonBox &box)
         } else if (!lon) {
             cerr << "adjust_masks: missing lon" << endl;
         } else {
-            TRACER("Dataset::adjust_masks box BEGIN\n");
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
-            TRACER("Dataset::adjust_masks box END\n");
         }
     }
 }

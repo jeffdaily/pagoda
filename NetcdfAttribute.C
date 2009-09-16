@@ -43,14 +43,14 @@ NetcdfAttribute::NetcdfAttribute(
     len = len_mpi;
     type = type_tmp;
 #define get_attr_values(DATA_TYPE, C_TYPE, NAME) \
-    if (DATA_TYPE == type_tmp) { \
+    if (type == DATA_TYPE) { \
         C_TYPE data[len]; \
         err = ncmpi_get_att_##NAME(ncid, varid, name.c_str(), data); \
         ERRNO_CHECK(err); \
         values = new TypedValues<C_TYPE>(data, len); \
     } else
-    get_attr_values(NC_BYTE, signed char, schar)
     get_attr_values(NC_CHAR, char, text)
+    get_attr_values(NC_BYTE, signed char, schar)
     get_attr_values(NC_SHORT, short, short)
     get_attr_values(NC_INT, int, int)
     get_attr_values(NC_FLOAT, float, float)

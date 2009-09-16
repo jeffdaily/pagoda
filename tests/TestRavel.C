@@ -60,14 +60,14 @@ int main(int argc, char **argv)
     //printf("dims=[%lld,%lld,%lld]\n", dims1[0], dims1[1], dims1[2]);
     for (size_t i=0; i<26; ++i) {
         unravel64(i, 3, dims1, result1);
-        //printf("unravel64(%zd, %d, [%lld,%lld,%lld], [%lld,%lld,%lld])\n",
-        //        i, ndim,
-        //        dims1[0], dims1[1], dims1[2],
-        //        result1[0], result1[1], result1[2]);
-        result2 = Util::unravel_index(i, dims2);
-        cout << setw(2) << i << " --> " << result2 << " ";
-        printf("[%lld,%lld,%lld]", result1[0], result1[1], result1[2]);
-        cout << " --> " << setw(2) << Util::ravel_index(result2, dims2) << endl;
+        printf("unravel64(%zd, %d, [%lld,%lld,%lld], [%lld,%lld,%lld])\n",
+                i, ndim,
+                dims1[0], dims1[1], dims1[2],
+                result1[0], result1[1], result1[2]);
+        //result2 = Util::unravel_index(i, dims2);
+        //cout << setw(2) << i << " --> " << result2 << " ";
+        //printf("[%lld,%lld,%lld]", result1[0], result1[1], result1[2]);
+        //cout << " --> " << setw(2) << Util::ravel_index(result2, dims2) << endl;
     }
 
     delete [] dims1;
