@@ -58,7 +58,7 @@ void partial_sum(int g_src, int g_dst, int excl)
         GA_Error("partial_sum: supports 1-dim arrays only", g_dst);
     }
 
-    GA_Sync();
+    //GA_Sync(); // TODO do we need this?
     
     NGA_Distribution64(g_src, me, &lo, &hi);
     elems = hi-lo+1;
@@ -158,7 +158,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 
 
 
-void pack(int g_src, int g_dst, int *g_masks)
+void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 {
     TRACER("pack\n");
     //int nproc = GA_Nnodes();
@@ -181,7 +181,6 @@ void pack(int g_src, int g_dst, int *g_masks)
     int64_t ld_dst[ndim_dst-1];
 
     int64_t index[ndim_src];
-    int g_masksums[ndim_src];
     int64_t local_counts[ndim_src];
     int64_t local_counts_product=1;
     int *local_masks[ndim_src];
@@ -193,32 +192,7 @@ void pack(int g_src, int g_dst, int *g_masks)
     NGA_Inquire64(g_src, &type_src, &ndim_src, dims_src);
     NGA_Inquire64(g_dst, &type_dst, &ndim_dst, dims_dst);
 
-    GA_Sync(); // do we need this?
-
-    /* We must perform the partial sum on the masks*/
-    for (int i=0; i<ndim_src; ++i) {
-        //static bool done=false;
-        g_masksums[i] = GA_Duplicate(g_masks[i], "maskcopy");
-        partial_sum(g_masks[i], g_masksums[i], 0);
-        /*
-        if (0 == me && !done) {
-            done = true;
-            int type_msk;
-            int ndim_msk;
-            int64_t dims_msk[7];
-            NGA_Inquire64(g_masks[i], &type_msk, &ndim_msk, dims_msk);
-            int64_t lo=0;
-            int64_t hi=dims_msk[i]-1;
-            int msk[dims_msk[i]];
-            int sum[dims_msk[i]];
-            NGA_Get64(g_masks[i], &lo, &hi, msk, NULL);
-            NGA_Get64(g_masksums[i], &lo, &hi, sum, NULL);
-            for (int j=0; j<=hi; ++j) {
-                printf("[%d] %d %d\n", j, msk[j], sum[j]);
-            }
-        }
-        */
-    }
+    //GA_Sync(); // TODO do we need this?
 
     NGA_Distribution64(g_src, me, lo_src, hi_src);
 
@@ -299,7 +273,6 @@ void pack(int g_src, int g_dst, int *g_masks)
     //printf("before Clean up\n");
     /* Remove temporary partial sum arrays */
     for (int i=0; i<ndim_src; ++i) {
-        GA_Destroy(g_masksums[i]);
         int *tmp = local_masks[i];
         delete [] tmp;
         tmp = NULL;

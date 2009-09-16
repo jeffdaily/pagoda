@@ -20,8 +20,11 @@
 #include "Util.H"
 #include "Variable.H"
 
-static void subset(Variable *var, FileWriter *writer);
-static void subset_record(Variable *var, FileWriter *writer);
+using std::cout;
+using std::endl;
+
+static void subset(Variable *var, FileWriter *writer, map<int,int> sum_map);
+static void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map);
 
 #ifdef F77_DUMMY_MAIN
 #  ifdef __cplusplus
@@ -42,6 +45,7 @@ int main(int argc, char **argv)
     Aggregation *agg;
     vector<Variable*> vars;
     FileWriter *writer;
+    map<int,int> sum_map;
 
     TRACER("cmd line parsing BEGIN\n");
     try {
@@ -49,7 +53,7 @@ int main(int argc, char **argv)
     }
     catch (SubsetterException &ex) {
         if (ME == 0) {
-            std::cout << ex.what() << std::endl;
+            cout << ex.what() << endl;
         }
         exit(EXIT_FAILURE);
     }
@@ -73,6 +77,45 @@ int main(int argc, char **argv)
     dataset->adjust_masks(cmd.get_box());
 
     vars = dataset->get_vars();
+
+    TRACER("precompute partial sums BEGIN\n");
+    for (vector<Variable*>::iterator it=vars.begin(); it!=vars.end(); ++it) {
+        Variable *var = *it;
+        if (var->has_record() && var->num_dims() == 1) {
+            continue; // don't sum record coordinate variable
+        }
+        if (var->needs_subset()) {
+            vector<Dimension*> dims = var->get_dims();
+            if (var->has_record()) {
+                dims.erase(dims.begin()); // don't sum record dimension
+            }
+            for (vector<Dimension*>::iterator dimit=dims.begin();
+                    dimit!=dims.end(); ++dimit) {
+                Dimension *dim = *dimit;
+                DistributedMask *mask;
+                mask = dynamic_cast<DistributedMask*>(dim->get_mask());
+                if (mask) {
+                    int g_mask = mask->get_handle();
+                    if (sum_map.find(g_mask) == sum_map.end()) {
+                        sum_map[g_mask] = GA_Duplicate(g_mask, "maskcopy");
+                        partial_sum(g_mask, sum_map[g_mask], 0);
+                    }
+                }
+            }
+        }
+    }
+    TRACER("precompute partial sums END\n");
+#ifdef TRACE
+    if (0 == ME) {
+        cout << "partial sum results:" << endl;
+        for (map<int,int>::iterator it=sum_map.begin();
+                it!=sum_map.end(); ++it) {
+            cout << it->first << "," << it->second << endl;
+        }
+    }
+    GA_Sync();
+#endif
+
     writer = FileWriter::create(cmd.get_output_filename());
     writer->copy_atts(dataset->get_atts());
     writer->def_dims(dataset->get_dims());
@@ -80,9 +123,9 @@ int main(int argc, char **argv)
     for (vector<Variable*>::iterator it=vars.begin(); it!=vars.end(); ++it) {
         Variable *var = *it;
         if (var->has_record() && var->num_dims() > 1) {
-            subset_record(var, writer);
+            subset_record(var, writer, sum_map);
         } else {
-            subset(var, writer);
+            subset(var, writer, sum_map);
         }
     }
 
@@ -91,6 +134,12 @@ int main(int argc, char **argv)
     delete dataset;
     TRACER("after delete dataset\n");
 
+#ifdef TRACE
+    if (0 == ME) {
+        GA_Print_stats();
+    }
+#endif
+
     GA_Terminate();
     MPI_Finalize();
     exit(EXIT_SUCCESS);
@@ -98,7 +147,7 @@ int main(int argc, char **argv)
 
 
 // subset and write var
-void subset(Variable *var, FileWriter *writer)
+void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
 {
     const string name = var->get_name();
     TRACER1("SubsetterMain::subset %s BEGIN\n", name.c_str());
@@ -110,6 +159,7 @@ void subset(Variable *var, FileWriter *writer)
         int ga_out;
         size_t ndim = var->num_dims();
         int ga_masks[ndim];
+        int ga_masksums[ndim];
         vector<int64_t> shape_out = var->get_sizes(true);
         int matype = var->get_type();
 
@@ -119,12 +169,17 @@ void subset(Variable *var, FileWriter *writer)
             DistributedMask *mask;
             mask = dynamic_cast<DistributedMask*>(dims.at(dimidx)->get_mask());
             ga_masks[dimidx] = mask->get_handle();
-            TRACER2("mask handle %zd=%d\n", dimidx, ga_masks[dimidx]);
+            if (sum_map.find(ga_masks[dimidx]) == sum_map.end()) {
+                GA_Error("missing partial sum", ga_masks[dimidx]);
+            }
+            ga_masksums[dimidx] = sum_map[ga_masks[dimidx]];
+            TRACER4("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
+                    dimidx, ga_masks[dimidx], dimidx, ga_masksums[dimidx]);
         }
 
         TRACER("before ga_out (pack_dst) create\n");
         ga_out = NGA_Create64(matype, ndim, &shape_out[0], "pack_dst", NULL);
-        pack(var->get_handle(), ga_out, ga_masks);
+        pack(var->get_handle(), ga_out, ga_masks, ga_masksums);
         writer->write(ga_out, name);
         GA_Destroy(ga_out);
     } else {
@@ -139,7 +194,7 @@ void subset(Variable *var, FileWriter *writer)
 
 // subset and write record var
 // TODO what if there is no mask (num_cleared_masks)??  Need if/else block
-void subset_record(Variable *var, FileWriter *writer)
+void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
 {
     const string name = var->get_name();
     TRACER1("SubsetterMain::subset_record %s BEGIN\n", name.c_str());
@@ -147,7 +202,8 @@ void subset_record(Variable *var, FileWriter *writer)
     size_t ndim = dims.size();
     size_t ndim_1 = ndim - 1;
     vector<int> mask_rec;
-    int ga_masks[ndim];
+    int ga_masks[ndim-1];
+    int ga_masksums[ndim-1];
     vector<int64_t> shape_out = var->get_sizes(true);
     int ga_out;
     int matype = var->get_type();
@@ -160,11 +216,16 @@ void subset_record(Variable *var, FileWriter *writer)
     }
 
     // HACK for now since all masks are distributed by default
-    for (size_t dimidx=0; dimidx<ndim; ++dimidx) {
+    for (size_t dimidx=1; dimidx<ndim; ++dimidx) {
         DistributedMask *mask;
         mask = dynamic_cast<DistributedMask*>(dims.at(dimidx)->get_mask());
-        ga_masks[dimidx] = mask->get_handle();
-        TRACER2("mask handle %zd=%d\n", dimidx, ga_masks[dimidx]);
+        ga_masks[dimidx-1] = mask->get_handle();
+        if (sum_map.find(ga_masks[dimidx-1]) == sum_map.end()) {
+            GA_Error("missing partial sum", ga_masks[dimidx-1]);
+        }
+        ga_masksums[dimidx-1] = sum_map[ga_masks[dimidx-1]];
+        TRACER4("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
+                dimidx, ga_masks[dimidx-1], dimidx, ga_masksums[dimidx-1]);
     }
 
     ga_out = NGA_Create64(matype, ndim_1, &shape_out[1], "pack_dst", NULL);
@@ -173,7 +234,7 @@ void subset_record(Variable *var, FileWriter *writer)
         if (mask_rec[record] != 0) {
             var->set_record_index(record);
             var->read();
-            pack(var->get_handle(), ga_out, ga_masks+1);
+            pack(var->get_handle(), ga_out, ga_masks, ga_masksums);
             writer->write(ga_out, name, packed_recidx++);
         }
     }
