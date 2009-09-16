@@ -155,7 +155,7 @@ void subset(Variable *var, FileWriter *writer, SumMap &sum_map)
     var->read();
     var->reindex(); // noop if not ConnectivityVariable
 
-    if (var->needs_subset() > 0) {
+    if (var->needs_subset()) {
         int ga_out;
         size_t ndim = var->num_dims();
         int ga_masks[ndim];
@@ -185,7 +185,7 @@ void subset(Variable *var, FileWriter *writer, SumMap &sum_map)
         writer->write(ga_out, name);
         GA_Destroy(ga_out);
     } else {
-        // no masks, so a direct copy
+        TRACER("no masks, so a direct copy\n");
         writer->write(var->get_handle(), name);
     }
 

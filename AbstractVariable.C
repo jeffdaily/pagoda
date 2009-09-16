@@ -8,6 +8,7 @@
 
 #include "AbstractVariable.H"
 #include "Attribute.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "Mask.H"
 #include "StringComparator.H"
@@ -171,6 +172,7 @@ Attribute* AbstractVariable::find_att(
 int AbstractVariable::get_handle()
 {
     if (! handle) {
+        TRACER("AbstractVariable::get_handle() BEGIN\n");
         vector<int64_t> dim_sizes = get_sizes();
         char *name = const_cast<char*>(get_name().c_str());
         int64_t *size_tmp; // because NGA_Create64 expects int64_t pointer
@@ -179,15 +181,13 @@ int AbstractVariable::get_handle()
         if (has_record() && num_dims() > 1) {
             size_tmp = &dim_sizes[1];
             ndim = num_dims() - 1;
-            tmp_handle = NGA_Create64((int)get_type(), ndim,
-                    size_tmp, name, NULL);
         } else {
             size_tmp = &dim_sizes[0];
             ndim = num_dims();
-            tmp_handle = NGA_Create64((int)get_type(), ndim,
-                    size_tmp, name, NULL);
         }
+        tmp_handle = NGA_Create64((int)get_type(), ndim, size_tmp, name, NULL);
         handle = new int(tmp_handle);
+        TRACER("AbstractVariable::get_handle() END\n");
     }
     return *handle;
 }
