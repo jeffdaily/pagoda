@@ -59,11 +59,11 @@ bool StringComparator::operator() (const string &that) const
     string mine = value;
     string theirs = that;
     if (ignore_case) {
-        transform(mine.begin(), mine.end(), mine.begin(), tolower);
-        transform(theirs.begin(), theirs.end(), theirs.begin(), tolower);
+        transform(mine.begin(), mine.end(), mine.begin(), (int(*)(int))tolower);
+        transform(theirs.begin(), theirs.end(), theirs.begin(), (int(*)(int))tolower);
     }
     if (within) {
-        return theirs.find(mine) != string::npos;
+        return mine.find(theirs) != string::npos;
     } else {
         return mine == theirs;
     }
