@@ -155,8 +155,9 @@ DataType::dt_type DataType::to_dt(nc_type type)
         return dt_long;
 #elif 2 == SIZEOF_LONG_LONG
         return dt_longlong;
-#endif
+#else
         throw DataTypeException("no corresponding C type for NC_SHORT");
+#endif
     } else if (NC_INT == type) { /* signed 4 byte integer */
 #if 4 == SIZEOF_SHORT
         return dt_short;
@@ -166,8 +167,9 @@ DataType::dt_type DataType::to_dt(nc_type type)
         return dt_long;
 #elif 4 == SIZEOF_LONG_LONG
         return dt_longlong;
-#endif
+#else
         throw DataTypeException("no corresponding C type for NC_INT");
+#endif
     } else if (NC_FLOAT == type) { /* single precision floating point number */
 #if 4 == SIZEOF_FLOAT
         return dt_float;
@@ -175,8 +177,9 @@ DataType::dt_type DataType::to_dt(nc_type type)
         return dt_double;
 #elif 4 == SIZEOF_LONG_DOUBLE
         return dt_longdouble;
-#endif
+#else
         throw DataTypeException("no corresponding C type for NC_FLOAT");
+#endif
     } else if (NC_DOUBLE == type) { /* double precision floating point number */
 #if 8 == SIZEOF_FLOAT
         return dt_float;
@@ -184,8 +187,9 @@ DataType::dt_type DataType::to_dt(nc_type type)
         return dt_double;
 #elif 8 == SIZEOF_LONG_DOUBLE
         return dt_longdouble;
-#endif
+#else
         throw DataTypeException("no corresponding C type for NC_DOUBLE");
+#endif
         return dt_double;
 #ifdef HAVE_NETCDF4
     } else if (NC_UBYTE == type) { /* unsigned 1 byte integer */
@@ -201,8 +205,9 @@ DataType::dt_type DataType::to_dt(nc_type type)
         return dt_long;
 #elif 8 == SIZEOF_LONG_LONG
         return dt_longlong;
-#endif
+#else
         throw DataTypeException("no corresponding C type for NC_INT64");
+#endif
     } else if (NC_UINT64 == type) { /* unsigned 8 byte integer */
     } else if (NC_STRING == type) { /* string */
 #endif /* HAVE_NETCDF4 */
@@ -248,8 +253,9 @@ nc_type DataType::to_nc(dt_type type)
         return NC_INT;
 #elif 8 == SIZEOF_INT && HAVE_NETCDF4
         return NC_INT64;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_short");
+#endif
     } else if (dt_int == type) {
 #if 2 == SIZEOF_INT
         return NC_SHORT;
@@ -257,8 +263,9 @@ nc_type DataType::to_nc(dt_type type)
         return NC_INT;
 #elif 8 == SIZEOF_INT && HAVE_NETCDF4
         return NC_INT64;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_int");
+#endif
     } else if (dt_long == type) {
 #if 2 == SIZEOF_LONG
         return NC_SHORT;
@@ -266,8 +273,9 @@ nc_type DataType::to_nc(dt_type type)
         return NC_INT;
 #elif 8 == SIZEOF_LONG && HAVE_NETCDF4
         return NC_INT64;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_long");
+#endif
     } else if (dt_longlong == type) {
 #if 2 == SIZEOF_LONG_LONG
         return NC_SHORT;
@@ -275,29 +283,33 @@ nc_type DataType::to_nc(dt_type type)
         return NC_INT;
 #elif 8 == SIZEOF_LONG_LONG && HAVE_NETCDF4
         return NC_INT64;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_longlong");
+#endif
     } else if (dt_float == type) {
 #if 4 == SIZEOF_FLOAT
         return NC_FLOAT;
 #elif 8 == SIZEOF_FLOAT
         return NC_DOUBLE;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_float");
+#endif
     } else if (dt_double == type) {
 #if 4 == SIZEOF_DOUBLE
         return NC_FLOAT;
 #elif 8 == SIZEOF_DOUBLE
         return NC_DOUBLE;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_double");
+#endif
     } else if (dt_longdouble == type) {
 #if 4 == SIZEOF_LONG_DOUBLE
         return NC_FLOAT;
 #elif 8 == SIZEOF_LONG_DOUBLE
         return NC_DOUBLE;
-#endif
+#else
         throw DataTypeException("could not determine nc_type from dt_longdouble");
+#endif
     } else if (dt_uchar == type) {
         return NC_CHAR;
     } else if (dt_ushort == type) {

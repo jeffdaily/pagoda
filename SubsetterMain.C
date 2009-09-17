@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 
     GA_Terminate();
     MPI_Finalize();
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
 
@@ -203,7 +203,6 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
     if (dims[0]->get_mask()) {
         dims[0]->get_mask()->get_data(mask_rec);
     } else {
-        int ONE = 1;
         mask_rec.assign(dims[0]->get_size(), 1);
     }
 
