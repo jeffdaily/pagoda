@@ -95,7 +95,7 @@ bool AbstractVariable::needs_subset() const
         Dimension *dim = *it;
         Mask *mask = dim->get_mask();;
         if (mask) {
-            if (dim->get_size() != mask->get_count()) {
+            if (mask->get_size() != mask->get_count()) {
                 return true;
             }
         }

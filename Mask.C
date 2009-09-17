@@ -6,10 +6,11 @@
 #include "Mask.H"
 
 Mask::Mask(Dimension *dim)
-    :   dim(dim)
+    :   name(dim->get_name())
+    ,   size(dim->get_size())
+    ,   count(0)
     ,   need_recount(true)
     ,   cleared(false)
-    ,   count(0)
 {
 }
 
@@ -21,19 +22,13 @@ Mask::~Mask()
 
 string Mask::get_name() const
 {
-    return dim->get_name();
-}
-
-
-Dimension* Mask::get_dim() const
-{
-    return dim;
+    return name;
 }
 
 
 int64_t Mask::get_size() const
 {
-    return get_dim()->get_size();
+    return size;
 }
 
 

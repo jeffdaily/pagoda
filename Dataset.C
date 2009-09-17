@@ -36,7 +36,7 @@ Dataset* Dataset::open(const string &filename)
         dataset = new NetcdfDataset(filename);
     }
     if (dataset) {
-        dataset->decorate();
+        //dataset->decorate();
         //dataset->create_masks();
     }
     return dataset;
@@ -136,11 +136,27 @@ Variable* Dataset::find_var(const string &name, bool ignore_case, bool within)
 
 void Dataset::create_masks()
 {
+    vector<Mask*> masks;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::iterator dim_it;
     for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
         Dimension *dim = *dim_it;
-        dim->set_mask(new DistributedMask(dim, 1));
+        masks.push_back(new DistributedMask(dim, 1));
+    }
+    populate_masks(masks);
+}
+
+
+void Dataset::populate_masks(const vector<Mask*> &masks)
+{
+    vector<Mask*>::const_iterator masks_it = masks.begin();
+    vector<Mask*>::const_iterator masks_end = masks.end();
+    for (; masks_it!=masks_end; ++masks_it) {
+        Mask *mask = *masks_it;
+        Dimension *dim = find_dim(mask->get_name());
+        if (dim) {
+            dim->set_mask(mask);
+        }
     }
 }
 

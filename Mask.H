@@ -19,7 +19,6 @@ class Mask
         virtual ~Mask();
 
         string get_name() const;
-        Dimension* get_dim() const;
         int64_t get_size() const;
         int64_t get_count();
 
@@ -35,10 +34,11 @@ class Mask
         virtual void reindex() = 0;
 
     protected:
-        Dimension *dim;
+        string name;
+        int64_t size;
+        int64_t count;
         bool need_recount;
         bool cleared;
-        int64_t count;
 };
 
 #endif // MASK_H_

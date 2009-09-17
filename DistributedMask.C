@@ -28,8 +28,6 @@ DistributedMask::DistributedMask(Dimension *dim, int value)
     ,   hi(0)
     ,   counts(NPROC, 0)
 {
-    string name = dim->get_name();
-    int64_t size = dim->get_size();
     handle = NGA_Create64(C_INT, 1, &size, const_cast<char*>(name.c_str()), NULL);
     TRACER3("DistributedMask ctor name=%s,size=%ld,handle=%d\n",
             name.c_str(), size, handle);
@@ -49,7 +47,6 @@ DistributedMask::~DistributedMask()
 
 void DistributedMask::get_data(vector<int> &ret)
 {
-    int64_t size = dim->get_size();
     int64_t glo = 0;
     int64_t ghi = size - 1;
     ret.resize(size);
@@ -85,7 +82,6 @@ void DistributedMask::adjust(const DimSlice &slice)
     // bail if we don't own any of the data
     if (0 > lo || 0 > hi) return;
 
-    int64_t size = dim->get_size();
     int64_t slo;
     int64_t shi;
     int64_t step;
@@ -281,7 +277,7 @@ void DistributedMask::reindex()
     /*
     if (GA_Nnodes() == 1) {
         int64_t ZERO = 0;
-        int64_t bighi = dim->get_size()-1;
+        int64_t bighi = size-1;
         int64_t smlhi = tmp_count-1;
         int *src,*dst,*mask;
         NGA_Access64(handle_index, &ZERO, &bighi, &dst, NULL);

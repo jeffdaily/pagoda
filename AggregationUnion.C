@@ -9,6 +9,7 @@
 #include "AggregationUnion.H"
 #include "Attribute.H"
 #include "Dimension.H"
+#include "Error.H"
 #include "Variable.H"
 
 using std::string;
@@ -78,6 +79,11 @@ void AggregationUnion::add(Dataset *dataset)
         Dimension *orig_dim = find_dim(other_dim->get_name());
         if (! orig_dim) {
             dims.push_back(other_dim);
+        } else {
+            // dim already exists, but make sure the sizes are the same
+            if (orig_dim->get_size() != other_dim->get_size()) {
+                ERR("union dimension mismatch");
+            }
         }
     }
 
@@ -97,6 +103,16 @@ void AggregationUnion::add(Dataset *dataset)
 ostream& AggregationUnion::print(ostream &os) const
 {
     return os << "AggregationUnion()";
+}
+
+
+void AggregationUnion::populate_masks(const vector<Mask*> &masks)
+{
+    vector<Dataset*>::iterator dataset_it = datasets.begin();
+    vector<Dataset*>::iterator dataset_end = datasets.end();
+    for (; dataset_it!=dataset_end; ++dataset_it) {
+        (*dataset_it)->populate_masks(masks);
+    }
 }
 
 

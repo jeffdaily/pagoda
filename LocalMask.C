@@ -17,7 +17,7 @@ using std::fill;
 
 LocalMask::LocalMask(Dimension *dim)
     :   Mask(dim)
-    ,   data(dim->get_size(), 0)
+    ,   data(size, 0)
 {
 }
 
@@ -43,7 +43,7 @@ void LocalMask::clear()
 {
     if (cleared) return;
     cleared = true;
-    data.assign(dim->get_size(), 0);
+    data.assign(size, 0);
 }
 
 
@@ -51,7 +51,6 @@ void LocalMask::adjust(const DimSlice &slice)
 {
     need_recount = true;
 
-    int64_t size = dim->get_size();
     int64_t lo;
     int64_t hi;
     int64_t step;
@@ -76,7 +75,7 @@ void LocalMask::adjust(double low, double hi, Variable *var, bool bitwise_or)
 void LocalMask::recount()
 {
     count = 0;
-    for (int64_t i=0,limit=dim->get_size(); i<limit; ++i) {
+    for (int64_t i=0; i<size; ++i) {
         if (data.at(i) != 0) ++count;
     }
 }
