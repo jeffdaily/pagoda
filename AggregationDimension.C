@@ -14,7 +14,9 @@ using std::vector;
 
 AggregationDimension::AggregationDimension(Dimension *dim)
     :   Dimension()
-    ,   dims(1, dim)
+    ,   name(dim->get_name())
+    ,   size(dim->get_size())
+    ,   _is_unlimited(dim->is_unlimited())
 {
 }
 
@@ -26,29 +28,25 @@ AggregationDimension::~AggregationDimension()
 
 void AggregationDimension::add(Dimension *dim)
 {
-    dims.push_back(dim);
+    size += dim->get_size();
 }
 
 
 string AggregationDimension::get_name() const
 {
-    return dims.at(0)->get_name();
+    return name;
 }
 
 
 int64_t AggregationDimension::get_size() const
 {
-    int64_t size=0;
-    for (size_t idx=0,limit=dims.size(); idx<limit; ++idx) {
-        size += dims.at(idx)->get_size();
-    }
     return size;
 }
 
 
 bool AggregationDimension::is_unlimited() const
 {
-    return dims.at(0)->is_unlimited();
+    return _is_unlimited;
 }
 
 

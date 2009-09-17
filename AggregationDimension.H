@@ -27,7 +27,9 @@ class AggregationDimension : public Dimension
         virtual ostream& print(ostream &os) const;
 
     protected:
-        vector<Dimension*> dims;
+        string name;
+        int64_t size;
+        bool _is_unlimited;
 };
 
 #endif // AGGREGATIONDIMENSION_H_

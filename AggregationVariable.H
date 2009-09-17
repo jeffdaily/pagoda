@@ -13,12 +13,13 @@ using std::string;
 using std::vector;
 
 class Attribute;
+class AggregationDimension;
 
 
 class AggregationVariable : public AbstractVariable
 {
     public:
-        AggregationVariable(Dimension *dim, Variable *var);
+        AggregationVariable(AggregationDimension *agg_dim, Variable *var);
         virtual ~AggregationVariable();
 
         void add(Variable *var);
@@ -39,7 +40,7 @@ class AggregationVariable : public AbstractVariable
     protected:
         size_t index_var;
         int64_t index_within_var;
-        Dimension *dim;         /* an AggregationDimension */
+        AggregationDimension *agg_dim;
         vector<Variable*> vars; /* Variables we are concatenating */
 };
 

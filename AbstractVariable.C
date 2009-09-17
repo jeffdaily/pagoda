@@ -178,12 +178,11 @@ int AbstractVariable::get_handle()
         if (has_record() && num_dims() > 1) {
             size_tmp = &dim_sizes[1];
             ndim = num_dims() - 1;
-            tmp_handle = NGA_Create64(get_type(), ndim, size_tmp, name, NULL);
         } else {
             size_tmp = &dim_sizes[0];
             ndim = num_dims();
-            tmp_handle = NGA_Create64(get_type(), ndim, size_tmp, name, NULL);
         }
+        tmp_handle = NGA_Create64(get_type(), ndim, size_tmp, name, NULL);
         handle = new int(tmp_handle);
     }
     return *handle;
