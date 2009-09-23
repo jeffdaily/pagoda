@@ -2,12 +2,14 @@
 #define AGGREGATIONJOINEXISTING_H_
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
 #include "Aggregation.H"
 
 using std::ostream;
+using std::map;
 using std::string;
 using std::vector;
 
@@ -39,7 +41,7 @@ class AggregationJoinExisting : public Aggregation
     private:
         string agg_dim_name;
         AggregationDimension *agg_dim;
-        AggregationVariable *agg_var;
+        map<string,AggregationVariable*> agg_vars;
         vector<Dataset*> datasets;
         vector<Attribute*> atts;
         vector<Dimension*> dims;

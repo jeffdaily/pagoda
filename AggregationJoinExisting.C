@@ -12,6 +12,7 @@
 #include "Attribute.H"
 #include "Debug.H"
 #include "Dimension.H"
+#include "Error.H"
 #include "Variable.H"
 
 using std::ostream;
@@ -23,7 +24,7 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
     :   Aggregation()
     ,   agg_dim_name(name)
     ,   agg_dim(NULL)
-    ,   agg_var(NULL)
+    ,   agg_vars()
     ,   datasets()
     ,   atts()
     ,   dims()
@@ -35,8 +36,14 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
 
 AggregationJoinExisting::~AggregationJoinExisting()
 {
+    map<string,AggregationVariable*>::iterator agg_var_it = agg_vars.begin();
+    map<string,AggregationVariable*>::iterator agg_var_end = agg_vars.end();
+    for (; agg_var_it!=agg_var_end; ++agg_var_it) {
+        AggregationVariable *agg_var = agg_var_it->second;
+        delete agg_var;
+        agg_var = NULL;
+    }
     delete agg_dim;
-    delete agg_var;
 }
 
 
@@ -100,13 +107,21 @@ void AggregationJoinExisting::add(Dataset *dataset)
         Variable *var = find_var(other_var->get_name());
         if (! var) {
             if (other_var->get_dims()[0]->get_name() == agg_dim_name) {
+                AggregationVariable *agg_var;
                 agg_var = new AggregationVariable(agg_dim, other_var);
+                agg_vars[other_var->get_name()] = agg_var;
                 vars.push_back(agg_var);
             } else {
                 vars.push_back(other_var);
             }
         } else if (other_var->get_dims()[0]->get_name() == agg_dim_name) {
+            AggregationVariable *agg_var;
+            agg_var = dynamic_cast<AggregationVariable*>(var);
+            if (! agg_var) {
+                ERR("dynamic_cast of AggregationVariable failed");
+            }
             agg_var->add(other_var);
+            TRACER1("agg_var->get_sizes()[0]=%ld\n", agg_var->get_sizes()[0]);
         }
     }
     TRACER("AggregationJoinExisting::add END\n");

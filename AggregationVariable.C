@@ -29,6 +29,7 @@ AggregationVariable::AggregationVariable(
     ,   agg_dim(agg_dim)
     ,   vars()
 {
+    TRACER1("AggregationVariable ctor %s\n", var->get_name().c_str());
     add(var);
 }
 
@@ -40,6 +41,7 @@ AggregationVariable::~AggregationVariable()
 
 void AggregationVariable::add(Variable *var)
 {
+    TRACER1("AggregationVariable::add %s\n", var->get_name().c_str());
     vars.push_back(var);
 }
 
@@ -84,7 +86,7 @@ int AggregationVariable::get_handle()
 void AggregationVariable::release_handle()
 {
     TRACER("AggregationVariable::release_handle() BEGIN\n");
-    AggregationVariable::release_handle();
+    AbstractVariable::release_handle();
     for (size_t varidx=0; varidx<vars.size(); ++varidx) {
         vars[varidx]->release_handle();
     }
@@ -94,28 +96,29 @@ void AggregationVariable::release_handle()
 
 void AggregationVariable::set_record_index(size_t index)
 {
+    TRACER1("AggregationVariable::set_record_index(%zd)\n", index);
     AbstractVariable::set_record_index(index);
 
     index_within_var = index;
     for (index_var=0; index_var<vars.size(); ++index_var) {
-        int64_t size = vars[index_var]->get_dims()[0]->get_size();
-        if (index < size) {
+        int64_t size = vars.at(index_var)->get_dims().at(0)->get_size();
+        if (index_within_var < size) {
             break;
         } else {
             index_within_var -= size;
         }
     }
-    if (index_var == vars.size()) {
-        ERR("AggregationVariable: index_var == vars.size()");
-    }
-    vars[index_var]->set_record_index(index_within_var);
+    vars.at(index_var)->set_record_index(index_within_var);
 }
 
 
 void AggregationVariable::read()
 {
     TRACER("AggregationVariable::read() BEGIN\n");
+    TRACER1("vars.size()=%ld\n", vars.size());
     if (has_record() && num_dims() > 1) {
+        TRACER2("record read from index_var=%zd, index_within_var=%ld\n",
+                index_var, index_within_var);
         vars[index_var]->read();
     } else {
         int ndim = num_dims();
