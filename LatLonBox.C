@@ -10,6 +10,7 @@
 
 #include "LatLonBox.H"
 #include "RangeException.H"
+#include "Timing.H"
 
 using std::ceil;
 using std::floor;
@@ -23,18 +24,21 @@ const LatLonBox LatLonBox::GLOBAL(90.0,-90.0,180.0,-180.0);
 
 LatLonBox::LatLonBox()
 {
+    TIMING("LatLonBox::LatLonBox()");
     *this = GLOBAL;
 }
 
 
 LatLonBox::LatLonBox(const string &latLonString)
 {
+    TIMING("LatLonBox::LatLonBox(string)");
     set(latLonString);
 }
 
 
 LatLonBox::LatLonBox(double north, double south, double east, double west)
 {
+    TIMING("LatLonBox::LatLonBox(double,double,double,double)");
     set(north,south,east,west);
 }
 
@@ -47,11 +51,13 @@ LatLonBox::LatLonBox(const LatLonBox &range)
         x(range.x),
         y(range.y)
 {
+    TIMING("LatLonBox::LatLonBox(LatLonBox)");
 }
 
 
 void LatLonBox::set(const string &latLonString)
 {
+    TIMING("LatLonBox::set(string)");
     vector<string> latLonParts;
     istringstream iss(latLonString);
 
@@ -85,6 +91,7 @@ void LatLonBox::set(const string &latLonString)
 
 void LatLonBox::set(double north, double south, double east, double west)
 {
+    TIMING("LatLonBox::set(double,double,double,double)");
     n = north;
     s = south;
     e = east;
@@ -98,6 +105,7 @@ void LatLonBox::set(double north, double south, double east, double west)
 
 bool LatLonBox::operator == (const LatLonBox &that) const
 {
+    TIMING("LatLonBox::operator==(LatLonBox)");
     return this->n == that.n
         && this->s == that.s
         && this->e == that.e
@@ -108,6 +116,7 @@ bool LatLonBox::operator == (const LatLonBox &that) const
 
 bool LatLonBox::operator != (const LatLonBox &that) const
 {
+    TIMING("LatLonBox::operator!=(LatLonBox)");
     return !(*this == that);
 }
 
@@ -115,6 +124,7 @@ bool LatLonBox::operator != (const LatLonBox &that) const
 
 bool LatLonBox::operator <  (const LatLonBox &that) const
 {
+    TIMING("LatLonBox::operator<(LatLonBox)");
     return this->n < that.n
         && this->s > that.s
         && this->e < that.e
@@ -125,6 +135,7 @@ bool LatLonBox::operator <  (const LatLonBox &that) const
 
 bool LatLonBox::operator <= (const LatLonBox &that) const
 {
+    TIMING("LatLonBox::operator<=(LatLonBox)");
     return (*this < that) || (*this == that);
 }
 
@@ -132,6 +143,7 @@ bool LatLonBox::operator <= (const LatLonBox &that) const
 
 bool LatLonBox::operator >  (const LatLonBox &that) const
 {
+    TIMING("LatLonBox::operator>(LatLonBox)");
     return !(*this <= that);
 }
 
@@ -139,6 +151,7 @@ bool LatLonBox::operator >  (const LatLonBox &that) const
 
 bool LatLonBox::operator >= (const LatLonBox &that) const
 {
+    TIMING("LatLonBox::operator>=(LatLonBox)");
     return !(*this < that);
 }
 
@@ -146,6 +159,7 @@ bool LatLonBox::operator >= (const LatLonBox &that) const
 
 bool LatLonBox::contains(int lat, int lon) const
 {
+    TIMING("LatLonBox::contains(int,int)");
     long long llat = lat;
     long long llon = lon;
     return contains(llat, llon);
@@ -154,6 +168,7 @@ bool LatLonBox::contains(int lat, int lon) const
 
 bool LatLonBox::contains(long lat, long lon) const
 {
+    TIMING("LatLonBox::contains(long,long)");
     long long llat = lat;
     long long llon = lon;
     return contains(llat, llon);
@@ -162,6 +177,7 @@ bool LatLonBox::contains(long lat, long lon) const
 
 bool LatLonBox::contains(long long lat, long long lon) const
 {
+    TIMING("LatLonBox::contains(long long,long long)");
     long long _n = (0 < n) ? floor(n) : ceil(n);
     long long _s = (0 < s) ? floor(s) : ceil(s);
     long long _e = (0 < e) ? floor(e) : ceil(e);
@@ -172,6 +188,7 @@ bool LatLonBox::contains(long long lat, long long lon) const
 
 bool LatLonBox::contains(float lat, float lon) const
 {
+    TIMING("LatLonBox::contains(float,float)");
     double dlat = lat;
     double dlon = lon;
     return contains(dlat, dlon);
@@ -180,12 +197,14 @@ bool LatLonBox::contains(float lat, float lon) const
 
 bool LatLonBox::contains(double lat, double lon) const
 {
+    TIMING("LatLonBox::contains(double,double)");
     return s<lat && lat<n && w<lon && lon<e;
 }
 
 
 void LatLonBox::scale(double value)
 {
+    TIMING("LatLonBox::scale(double)");
     n *= value;
     s *= value;
     e *= value;
@@ -195,6 +214,7 @@ void LatLonBox::scale(double value)
 
 LatLonBox LatLonBox::enclose(const LatLonBox &first, const LatLonBox &second)
 {
+    TIMING("LatLonBox::enclose(LatLonBox,LatLonBox)");
     LatLonBox box;
     box.n = first.n > second.n ? first.n : second.n;
     box.s = first.s < second.s ? first.s : second.s;
@@ -206,6 +226,7 @@ LatLonBox LatLonBox::enclose(const LatLonBox &first, const LatLonBox &second)
 
 ostream& operator<<(ostream &os, const LatLonBox &box)
 {
+    TIMING("operator<<(ostream,LatLonBox)");
     return os
         << box.n << ","
         << box.s << ","
@@ -218,10 +239,10 @@ ostream& operator<<(ostream &os, const LatLonBox &box)
 
 void LatLonBox::check()
 {
+    TIMING("LatLonBox::check()");
     if (n > 90 || n < -90
             || s > 90 || s < -90
             || e > 180 || e < -180
             || w > 180 || w < -180)
         throw RangeException(string(""));
 }
-

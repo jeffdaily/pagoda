@@ -2,12 +2,15 @@
 #   include <config.h>
 #endif
 
-#include <unistd.h> // for getopt
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h> // for getopt
+#endif
 
 #include "Common.H"
 #include "Error.H"
 #include "SubsetterCommands.H"
 #include "SubsetterException.H"
+#include "Timing.H"
 
 
 SubsetterCommands::SubsetterCommands()
@@ -18,6 +21,7 @@ SubsetterCommands::SubsetterCommands()
     ,   _has_box(false)
     ,   box()
 {
+    TIMING("SubsetterCommands::SubsetterCommands()");
 }
 
 
@@ -29,6 +33,7 @@ SubsetterCommands::SubsetterCommands(int argc, char **argv)
     ,   _has_box(false)
     ,   box()
 {
+    TIMING("SubsetterCommands::SubsetterCommands(int,char**)");
     parse(argc, argv);
 }
 
@@ -41,16 +46,19 @@ SubsetterCommands::SubsetterCommands(const SubsetterCommands &that)
     ,   _has_box(that._has_box)
     ,   box(that.box)
 {
+    TIMING("SubsetterCommands::SubsetterCommands(SubsetterCommands)");
 }
 
 
 SubsetterCommands::~SubsetterCommands()
 {
+    TIMING("SubsetterCommands::~SubsetterCommands()");
 }
 
 
 void SubsetterCommands::parse(int argc, char **argv)
 {
+    TIMING("SubsetterCommands::parse(int,char**)");
     int c;
     opterr = 0;
     const string usage = get_usage();
@@ -108,6 +116,7 @@ void SubsetterCommands::parse(int argc, char **argv)
 
 const string& SubsetterCommands::get_usage() const
 {
+    TIMING("SubsetterCommands::get_usage()");
     static string usage = ""
         "Usage: subsetter [options] infile1 [infile2 ...] output_filename\n"
         "\n"
@@ -123,36 +132,41 @@ const string& SubsetterCommands::get_usage() const
 
 const vector<string>& SubsetterCommands::get_intput_filenames() const
 {
+    TIMING("SubsetterCommands::get_intput_filenames()");
     return input_filenames;
 }
 
 
 const string& SubsetterCommands::get_output_filename() const
 {
+    TIMING("SubsetterCommands::get_output_filename()");
     return output_filename;
 }
 
 
 const string& SubsetterCommands::get_join_name() const
 {
+    TIMING("SubsetterCommands::get_join_name()");
     return join_name;
 }
 
 
 bool SubsetterCommands::has_box() const
 {
+    TIMING("SubsetterCommands::has_box()");
     return _has_box;
 }
 
 
 const LatLonBox& SubsetterCommands::get_box() const
 {
+    TIMING("SubsetterCommands::get_box()");
     return box;
 }
 
 
 const vector<DimSlice>& SubsetterCommands::get_slices() const
 {
+    TIMING("SubsetterCommands::get_slices()");
     return slices;
 }
-

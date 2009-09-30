@@ -21,6 +21,7 @@
 #include "NetcdfVariable.H"
 #include "Pack.H"
 #include "Util.H"
+#include "Timing.H"
 #include "Values.H"
 
 using std::invalid_argument;
@@ -36,6 +37,7 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
     ,   is_in_define_mode(true)
     ,   filename(filename)
 {
+    TIMING("NetcdfFileWriter::NetcdfFileWriter(string)");
     TRACER1("NetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
     err = ncmpi_create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
@@ -46,6 +48,7 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
 
 NetcdfFileWriter::~NetcdfFileWriter()
 {
+    TIMING("NetcdfFileWriter::~NetcdfFileWriter()");
     err = ncmpi_close(ncid);
     ERRNO_CHECK(err);
 }
@@ -53,6 +56,7 @@ NetcdfFileWriter::~NetcdfFileWriter()
 
 void NetcdfFileWriter::def_dim(Dimension *dim)
 {
+    TIMING("NetcdfFileWriter::def_dim(Dimension*)");
     def_check();
     string name = dim->get_name();
     Mask *mask = dim->get_mask();
@@ -75,6 +79,7 @@ void NetcdfFileWriter::def_dim(Dimension *dim)
 
 void NetcdfFileWriter::def_var(Variable *var)
 {
+    TIMING("NetcdfFileWriter::def_var(Variable*)");
     def_check();
     string name = var->get_name();
     vector<Dimension*> dims = var->get_dims();
@@ -111,12 +116,14 @@ void NetcdfFileWriter::def_var(Variable *var)
 
 ostream& NetcdfFileWriter::print(ostream &os) const
 {
+    TIMING("NetcdfFileWriter::print(ostream)");
     return os << "NetcdfFileWriter(" << filename << ")";
 }
 
 
 int NetcdfFileWriter::get_dim_id(const string &name)
 {
+    TIMING("NetcdfFileWriter::get_dim_id(string)");
     map<string,int>::iterator it = dim_id.find(name);
     if (it != dim_id.end()) {
         return it->second;
@@ -129,6 +136,7 @@ int NetcdfFileWriter::get_dim_id(const string &name)
 
 int NetcdfFileWriter::get_var_id(const string &name)
 {
+    TIMING("NetcdfFileWriter::get_var_id(string)");
     map<string,int>::iterator it = var_id.find(name);
     if (it != var_id.end()) {
         return it->second;
@@ -141,6 +149,7 @@ int NetcdfFileWriter::get_var_id(const string &name)
 
 void NetcdfFileWriter::def_check()
 {
+    TIMING("NetcdfFileWriter::def_check()");
     if (!is_in_define_mode) {
         ostringstream strerr;
         strerr << "cannot (re)define output file after writing begins";
@@ -151,6 +160,7 @@ void NetcdfFileWriter::def_check()
 
 void NetcdfFileWriter::maybe_enddef()
 {
+    TIMING("NetcdfFileWriter::maybe_enddef()");
     if (is_in_define_mode) {
         is_in_define_mode = false;
         err = ncmpi_enddef(ncid);
@@ -162,12 +172,14 @@ void NetcdfFileWriter::maybe_enddef()
 
 void NetcdfFileWriter::copy_att(Attribute *att, const string &name)
 {
+    TIMING("NetcdfFileWriter::copy_att(Attribute*,string)");
     copy_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
 }
 
 
 void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 {
+    TIMING("NetcdfFileWriter::copy_att_id(Attribute*,int)");
     TRACER1("NetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
     def_check();
     string name = attr->get_name();
@@ -200,6 +212,7 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 
 void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 {
+    TIMING("NetcdfFileWriter::copy_atts_id(vector<Attribute*>,int)");
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
         copy_att_id(*att_it, varid);
@@ -209,6 +222,7 @@ void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 
 void NetcdfFileWriter::write(int handle, const string &name, int record)
 {
+    TIMING("NetcdfFileWriter::write(int,string,int)");
     maybe_enddef();
     write(handle, get_var_id(name), record);
 }
@@ -216,6 +230,7 @@ void NetcdfFileWriter::write(int handle, const string &name, int record)
 
 void NetcdfFileWriter::write(int handle, int varid, int record)
 {
+    TIMING("NetcdfFileWriter::write(int,int,int)");
     TRACER3("NetcdfFileWriter::write %d %d %d\n", handle, varid, record);
     maybe_enddef();
     DataType type = NC_CHAR;
@@ -278,4 +293,3 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
         NGA_Release64(handle, lo, hi);
     }
 }
-

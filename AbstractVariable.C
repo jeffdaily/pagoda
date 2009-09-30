@@ -11,6 +11,7 @@
 #include "Dimension.H"
 #include "Mask.H"
 #include "StringComparator.H"
+#include "Timing.H"
 
 using std::ostringstream;
 
@@ -20,29 +21,34 @@ AbstractVariable::AbstractVariable()
     ,   handle(NULL)
     ,   record_index(0)
 {
+    TIMING("AbstractVariable::AbstractVariable()");
 }
 
 
 AbstractVariable::~AbstractVariable()
 {
+    TIMING("AbstractVariable::~AbstractVariable()");
     release_handle();
 }
 
 
 bool AbstractVariable::has_record() const
 {
+    TIMING("AbstractVariable::has_record()");
     return get_dims()[0]->is_unlimited();
 }
 
 
 size_t AbstractVariable::num_dims() const
 {
+    TIMING("AbstractVariable::num_dims()");
     return get_dims().size();
 }
 
 
 int64_t AbstractVariable::get_size(bool use_masks) const
 {
+    TIMING("AbstractVariable::get_size(bool)");
     int64_t result = 1;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
@@ -65,6 +71,7 @@ int64_t AbstractVariable::get_size(bool use_masks) const
 
 vector<int64_t> AbstractVariable::get_sizes(bool use_masks) const
 {
+    TIMING("AbstractVariable::get_sizes(bool)");
     vector<int64_t> sizes;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
@@ -87,6 +94,7 @@ vector<int64_t> AbstractVariable::get_sizes(bool use_masks) const
 
 bool AbstractVariable::needs_subset() const
 {
+    TIMING("AbstractVariable::needs_subset()");
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
     vector<Dimension*>::const_iterator end = dims.end();
@@ -107,12 +115,14 @@ bool AbstractVariable::needs_subset() const
 
 size_t AbstractVariable::num_atts() const
 {
+    TIMING("AbstractVariable::num_atts()");
     return get_atts().size();
 }
 
 
 string AbstractVariable::get_long_name() const
 {
+    TIMING("AbstractVariable::get_long_name()");
     string att_name("long_name");
     Attribute *att = find_att(att_name);
 
@@ -129,6 +139,7 @@ Attribute* AbstractVariable::find_att(
         const string &name,
         bool ignore_case) const
 {
+    TIMING("AbstractVariable::find_att(string,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -150,6 +161,7 @@ Attribute* AbstractVariable::find_att(
         const vector<string> &names,
         bool ignore_case) const
 {
+    TIMING("AbstractVariable::find_att(vector<string>,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -169,6 +181,7 @@ Attribute* AbstractVariable::find_att(
 
 int AbstractVariable::get_handle()
 {
+    TIMING("AbstractVariable::get_handle()");
     if (! handle) {
         vector<int64_t> dim_sizes = get_sizes();
         char *name = const_cast<char*>(get_name().c_str());
@@ -191,6 +204,7 @@ int AbstractVariable::get_handle()
 
 void AbstractVariable::release_handle()
 {
+    TIMING("AbstractVariable::release_handle()");
     if (handle) {
         GA_Destroy(*handle);
         delete handle;
@@ -201,24 +215,27 @@ void AbstractVariable::release_handle()
 
 void AbstractVariable::set_record_index(size_t index)
 {
+    TIMING("AbstractVariable::set_record_index(size_t)");
     record_index = index;
 }
 
 
 size_t AbstractVariable::get_record_index() const
 {
+    TIMING("AbstractVariable::get_record_index()");
     return record_index;
 }
 
 
 void AbstractVariable::reindex()
 {
+    TIMING("AbstractVariable::reindex()");
 }
 
 
 ostream& AbstractVariable::print(ostream &os) const
 {
+    TIMING("AbstractVariable::print(ostream)");
     const string name(get_name());
     return os << "AbstractVariable(" << name << ")";
 }
-

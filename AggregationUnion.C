@@ -10,6 +10,7 @@
 #include "Attribute.H"
 #include "Dimension.H"
 #include "Error.H"
+#include "Timing.H"
 #include "Variable.H"
 
 using std::string;
@@ -23,11 +24,13 @@ AggregationUnion::AggregationUnion()
     ,   dims()
     ,   vars()
 {
+    TIMING("AggregationUnion::AggregationUnion()");
 }
 
 
 AggregationUnion::~AggregationUnion()
 {
+    TIMING("AggregationUnion::~AggregationUnion()");
     // deleting the datasets should also delete their associate members
     vector<Dataset*>::iterator it = datasets.begin();
     vector<Dataset*>::iterator end = datasets.end();
@@ -40,24 +43,28 @@ AggregationUnion::~AggregationUnion()
 
 vector<Attribute*> AggregationUnion::get_atts()
 {
+    TIMING("AggregationUnion::get_atts()");
     return atts;
 }
 
 
 vector<Dimension*> AggregationUnion::get_dims()
 {
+    TIMING("AggregationUnion::get_dims()");
     return dims;
 }
 
 
 vector<Variable*> AggregationUnion::get_vars()
 {
+    TIMING("AggregationUnion::get_vars()");
     return vars;
 }
 
 
 void AggregationUnion::add(Dataset *dataset)
 {
+    TIMING("AggregationUnion::add(Dataset*)");
     datasets.push_back(dataset);
 
     vector<Attribute*> other_atts = dataset->get_atts();
@@ -102,12 +109,14 @@ void AggregationUnion::add(Dataset *dataset)
 
 ostream& AggregationUnion::print(ostream &os) const
 {
+    TIMING("AggregationUnion::print(ostream)");
     return os << "AggregationUnion()";
 }
 
 
 void AggregationUnion::populate_masks(const vector<Mask*> &masks)
 {
+    TIMING("AggregationUnion::populate_masks(vector<Mask*>)");
     vector<Dataset*>::iterator dataset_it = datasets.begin();
     vector<Dataset*>::iterator dataset_end = datasets.end();
     for (; dataset_it!=dataset_end; ++dataset_it) {
@@ -118,6 +127,7 @@ void AggregationUnion::populate_masks(const vector<Mask*> &masks)
 
 void AggregationUnion::decorate_set(const vector<Variable*> &vars)
 {
+    TIMING("AggregationUnion::decorate_set(vector<Variable*>)");
     this->vars = vars;
 }
 

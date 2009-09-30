@@ -14,6 +14,7 @@
 #include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
+#include "Timing.H"
 #include "Variable.H"
 
 using std::ostream;
@@ -29,6 +30,7 @@ AggregationVariable::AggregationVariable(
     ,   agg_dim(agg_dim)
     ,   vars()
 {
+    TIMING("AggregationVariable::AggregationVariable(...)");
     TRACER1("AggregationVariable ctor %s\n", var->get_name().c_str());
     add(var);
 }
@@ -36,11 +38,13 @@ AggregationVariable::AggregationVariable(
 
 AggregationVariable::~AggregationVariable()
 {
+    TIMING("AggregationVariable::~AggregationVariable()");
 }
 
 
 void AggregationVariable::add(Variable *var)
 {
+    TIMING("AggregationVariable::add(Variable*)");
     TRACER1("AggregationVariable::add %s\n", var->get_name().c_str());
     vars.push_back(var);
 }
@@ -48,12 +52,14 @@ void AggregationVariable::add(Variable *var)
 
 string AggregationVariable::get_name() const
 {
+    TIMING("AggregationVariable::get_name()");
     return vars[0]->get_name();
 }
 
 
 vector<Dimension*> AggregationVariable::get_dims() const
 {
+    TIMING("AggregationVariable::get_dims()");
     vector<Dimension*> dims = vars[0]->get_dims();
     dims[0] = agg_dim;
     return dims;
@@ -62,6 +68,7 @@ vector<Dimension*> AggregationVariable::get_dims() const
 
 vector<Attribute*> AggregationVariable::get_atts() const
 {
+    TIMING("AggregationVariable::get_atts()");
     // TODO return union of attributes of all vars
     return vars[0]->get_atts();
 }
@@ -69,12 +76,14 @@ vector<Attribute*> AggregationVariable::get_atts() const
 
 DataType AggregationVariable::get_type() const
 {
+    TIMING("AggregationVariable::get_type()");
     return vars[0]->get_type();
 }
 
 
 int AggregationVariable::get_handle()
 {
+    TIMING("AggregationVariable::get_handle()");
     if (has_record() && num_dims() > 1) {
         return vars[index_var]->get_handle();
     } else {
@@ -85,6 +94,7 @@ int AggregationVariable::get_handle()
 
 void AggregationVariable::release_handle()
 {
+    TIMING("AggregationVariable::release_handle()");
     TRACER("AggregationVariable::release_handle() BEGIN\n");
     AbstractVariable::release_handle();
     for (size_t varidx=0; varidx<vars.size(); ++varidx) {
@@ -96,6 +106,7 @@ void AggregationVariable::release_handle()
 
 void AggregationVariable::set_record_index(size_t index)
 {
+    TIMING("AggregationVariable::set_record_index(size_t)");
     TRACER1("AggregationVariable::set_record_index(%zd)\n", index);
     AbstractVariable::set_record_index(index);
 
@@ -114,6 +125,7 @@ void AggregationVariable::set_record_index(size_t index)
 
 void AggregationVariable::read()
 {
+    TIMING("AggregationVariable::read()");
     TRACER("AggregationVariable::read() BEGIN\n");
     TRACER1("vars.size()=%ld\n", vars.size());
     if (has_record() && num_dims() > 1) {
@@ -154,6 +166,7 @@ void AggregationVariable::read()
 
 ostream& AggregationVariable::print(ostream &os) const
 {
+    TIMING("AggregationVariable::print(ostream)");
     const string name(get_name());
     return os << "AggregationVariable(" << name << ")";
 }

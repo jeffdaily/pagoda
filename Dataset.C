@@ -19,6 +19,7 @@
 #include "NetcdfDataset.H"
 #include "Slice.H"
 #include "StringComparator.H"
+#include "Timing.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -28,8 +29,10 @@ using std::find;
 using std::tolower;
 using std::transform;
 
+
 Dataset* Dataset::open(const string &filename)
 {
+    TIMING("Dataset::open(string)");
     Dataset *dataset = NULL;
     string EXT_NC(".nc");
     if (Util::ends_with(filename, EXT_NC)) {
@@ -45,16 +48,19 @@ Dataset* Dataset::open(const string &filename)
 
 Dataset::Dataset()
 {
+    TIMING("Dataset::Dataset()");
 }
 
 
 Dataset::~Dataset()
 {
+    TIMING("Dataset::~Dataset()");
 }
 
 
 Attribute* Dataset::find_att(const string &name, bool ignore_case, bool within)
 {
+    TIMING("Dataset::find_att(string,bool,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -76,6 +82,7 @@ Attribute* Dataset::find_att(const string &name, bool ignore_case, bool within)
 Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case,
         bool within)
 {
+    TIMING("Dataset::find_att(vector<string>,bool,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -96,6 +103,7 @@ Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case,
 
 Dimension* Dataset::find_dim(const string &name, bool ignore_case, bool within)
 {
+    TIMING("Dataset::find_dim(string,bool,bool)");
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
     vector<Dimension*>::const_iterator end = dims.end();
@@ -116,6 +124,7 @@ Dimension* Dataset::find_dim(const string &name, bool ignore_case, bool within)
 
 Variable* Dataset::find_var(const string &name, bool ignore_case, bool within)
 {
+    TIMING("Dataset::find_var(string,bool,bool)");
     vector<Variable*> vars = get_vars();
     vector<Variable*>::const_iterator it = vars.begin();
     vector<Variable*>::const_iterator end = vars.end();
@@ -136,6 +145,7 @@ Variable* Dataset::find_var(const string &name, bool ignore_case, bool within)
 
 void Dataset::create_masks()
 {
+    TIMING("Dataset::create_masks()");
     vector<Mask*> masks;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::iterator dim_it;
@@ -149,6 +159,7 @@ void Dataset::create_masks()
 
 void Dataset::populate_masks(const vector<Mask*> &masks)
 {
+    TIMING("Dataset::populate_masks(vector<Mask*>)");
     vector<Mask*>::const_iterator masks_it = masks.begin();
     vector<Mask*>::const_iterator masks_end = masks.end();
     for (; masks_it!=masks_end; ++masks_it) {
@@ -163,6 +174,7 @@ void Dataset::populate_masks(const vector<Mask*> &masks)
 
 void Dataset::adjust_masks(const vector<DimSlice> &slices)
 {
+    TIMING("Dataset::adjust_masks(vector<DimSlice)");
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::iterator dim_it;
     vector<DimSlice>::const_iterator slice_it;
@@ -208,6 +220,7 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
  */
 void Dataset::adjust_masks(const LatLonBox &box)
 {
+    TIMING("Dataset::adjust_masks(LatLonBox)");
     if (box != LatLonBox::GLOBAL) {
         // TODO how to locate the lat/lon dims?
         // TODO subset anything with lat or lon dimensions such as
@@ -239,6 +252,7 @@ ostream& operator << (ostream &os, const Dataset *dataset)
  */
 void Dataset::decorate()
 {
+    TIMING("Dataset::decorate()");
     static vector<string> lat_units;
     if (lat_units.empty()) {
         lat_units.push_back(string("degrees_north"));
@@ -369,4 +383,3 @@ void Dataset::decorate()
 
     decorate_set(vars);
 }
-

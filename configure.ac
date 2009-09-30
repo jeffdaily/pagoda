@@ -1,5 +1,5 @@
 # Initialize autoconf.
-AC_PREREQ([2.63])
+AC_PREREQ([2.64])
 AC_INIT([GCRM PARALLEL SUBSETTER], [0.1], [jeff.daily@pnl.gov])
 AC_CONFIG_SRCDIR([Mainp.C])
 AC_CONFIG_HEADERS([config/config.h])
@@ -52,22 +52,19 @@ AC_ARG_ENABLE([warnings],
 AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
 
 # Checks for header files.
-AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_HEADERS([stdlib.h sys/time.h unistd.h])
 
-#
-# Check for some types
-#
-
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_INLINE
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_TYPE_INT64_T
 AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
 AC_TYPE_LONG_DOUBLE
+AM_PROG_CC_C_O
 
-#
-# Check for type sizes
-#
-
+# Check for type sizes.
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF([char])
 AC_CHECK_SIZEOF([short])
@@ -83,8 +80,8 @@ AS_IF([test x$ac_cv_type_long_double = xyes], [AC_CHECK_SIZEOF([long double])])
 AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
       [AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])])
 
-# Checks for typedefs, structures, and compiler characteristics.
-AM_PROG_CC_C_O
+# Checks for library functions.
+AC_CHECK_FUNCS([floor gettimeofday memset strtol])
 
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but

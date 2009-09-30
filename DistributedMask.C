@@ -14,6 +14,7 @@
 #include "DistributedMask.H"
 #include "Pack.H"
 #include "Slice.H"
+#include "Timing.H"
 #include "Variable.H"
 
 using std::accumulate;
@@ -28,6 +29,7 @@ DistributedMask::DistributedMask(Dimension *dim, int value)
     ,   hi(0)
     ,   counts(NPROC, 0)
 {
+    TIMING("DistributedMask::DistributedMask(...)");
     handle = NGA_Create64(C_INT, 1, &size, const_cast<char*>(name.c_str()), NULL);
     TRACER3("DistributedMask ctor name=%s,size=%ld,handle=%d\n",
             name.c_str(), size, handle);
@@ -38,6 +40,7 @@ DistributedMask::DistributedMask(Dimension *dim, int value)
 
 DistributedMask::~DistributedMask()
 {
+    TIMING("DistributedMask::~DistributedMask()");
     GA_Destroy(handle);
     if (handle_index != 0) {
         GA_Destroy(handle_index);
@@ -47,6 +50,7 @@ DistributedMask::~DistributedMask()
 
 void DistributedMask::get_data(vector<int> &ret)
 {
+    TIMING("DistributedMask::get_data(vector<int>)");
     int64_t glo = 0;
     int64_t ghi = size - 1;
     ret.resize(size);
@@ -56,6 +60,7 @@ void DistributedMask::get_data(vector<int> &ret)
 
 void DistributedMask::get_data(vector<int> &ret, int64_t lo, int64_t hi)
 {
+    TIMING("DistributedMask::get_data(vector<int>,int64_t,int64_t)");
     ret.resize(hi-lo+1);
     NGA_Get64(handle, &lo, &hi, &ret[0], NULL);
 }
@@ -63,6 +68,7 @@ void DistributedMask::get_data(vector<int> &ret, int64_t lo, int64_t hi)
 
 void DistributedMask::clear()
 {
+    TIMING("DistributedMask::clear()");
     // bail if already cleared once (a one-time operation)
     if (cleared) {
         return;
@@ -76,6 +82,7 @@ void DistributedMask::clear()
 
 void DistributedMask::adjust(const DimSlice &slice)
 {
+    TIMING("DistributedMask::adjust(DimSlice)");
     need_recount = true;
     clear();
 
@@ -119,6 +126,7 @@ void DistributedMask::adjust(const DimSlice &slice)
 
 void DistributedMask::adjust(const LatLonBox &box, Variable *lat, Variable *lon)
 {
+    TIMING("DistributedMask::adjust(LatLonBox,Variable*,Variable*)");
     need_recount = true;
     clear();
 
@@ -176,6 +184,7 @@ void DistributedMask::adjust(
         Variable *var,
         bool bitwise_or)
 {
+    TIMING("DistributedMask::adjust(double,double,Variable*,bool)");
     need_recount = true;
     clear();
 
@@ -227,6 +236,7 @@ void DistributedMask::adjust(
 
 void DistributedMask::recount()
 {
+    TIMING("DistributedMask::recount()");
     int *data;
     int64_t ZERO = 0;
     fill(counts.begin(), counts.end(), ZERO);
@@ -253,6 +263,7 @@ void DistributedMask::recount()
 
 void DistributedMask::reindex()
 {
+    TIMING("DistributedMask::reindex()");
     TRACER("DistributedMask::reindex() BEGIN\n");
     if (0 == handle_index) {
         int type;
@@ -290,4 +301,3 @@ void DistributedMask::reindex()
     */
     TRACER("DistributedMask::reindex() END\n");
 }
-

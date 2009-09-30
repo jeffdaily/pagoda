@@ -11,6 +11,7 @@
 #include "NetcdfVariable.H"
 #include "Util.H"
 #include "Values.H"
+#include "Timing.H"
 #include "TypedValues.H"
 
 
@@ -27,6 +28,7 @@ NetcdfAttribute::NetcdfAttribute(
     ,   global(var == NULL)
     ,   values(NULL)
 {
+    TIMING("NetcdfAttribute::NetcdfAttribute(...)");
     int err = 0;
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
@@ -62,48 +64,55 @@ NetcdfAttribute::NetcdfAttribute(
 
 NetcdfAttribute::~NetcdfAttribute()
 {
+    TIMING("NetcdfAttribute::~NetcdfAttribute()");
     delete values;
 }
 
 
 string NetcdfAttribute::get_name() const
 {
+    TIMING("NetcdfAttribute::get_name()");
     return name;
 }
 
 
 DataType NetcdfAttribute::get_type() const
 {
+    TIMING("NetcdfAttribute::get_type()");
     return type;
 }
 
 
 bool NetcdfAttribute::is_global() const
 {
+    TIMING("NetcdfAttribute::is_global()");
     return global;
 }
 
 
 Values* NetcdfAttribute::get_values() const
 {
+    TIMING("NetcdfAttribute::get_values()");
     return values;
 }
 
 
 NetcdfDataset* NetcdfAttribute::get_dataset() const
 {
+    TIMING("NetcdfAttribute::get_dataset()");
     return dataset;
 }
 
 
 int NetcdfAttribute::get_id() const
 {
+    TIMING("NetcdfAttribute::get_id()");
     return id;
 }
 
 
 NetcdfVariable* NetcdfAttribute::get_var() const
 {
+    TIMING("NetcdfAttribute::get_var()");
     return var;
 }
-

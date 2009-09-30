@@ -10,10 +10,12 @@
 
 #include "Debug.H"
 #include "Pack.H"
+#include "Timing.H"
 
 
 static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
+    //TIMING("unravel64i(int64_t,int,int64_t*,int64_t*)");
     // x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
     result[ndim-1] = x % dims[ndim-1];
     for (int i=ndim-2; i>=0; --i) {
@@ -22,7 +24,7 @@ static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *resul
     }
     for (int i=0; i<ndim; ++i) {
         if (result[i] >= dims[i]) {
-            GA_Error("unravel64: result[i] >= dims[i]", 0);
+            GA_Error("unravel64i: result[i] >= dims[i]", 0);
         }
     }
 }
@@ -30,6 +32,7 @@ static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *resul
 
 void partial_sum(int g_src, int g_dst, int excl)
 {
+    TIMING("partial_sum(int,int,int)");
     TRACER("partial_sum\n");
     int nproc = GA_Nnodes();
     int me = GA_Nodeid();
@@ -160,6 +163,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 
 void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 {
+    TIMING("pack(int,int,int*,int*)");
     TRACER("pack\n");
     //int nproc = GA_Nnodes();
     int me = GA_Nodeid();
@@ -283,6 +287,7 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 
 void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
+    TIMING("unravel64(int64_t,int,int64_t*,int64_t*)");
     unravel64i(x,ndim,dims,result);
 }
 
@@ -294,6 +299,7 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
  */
 void enumerate(int g_src, void *start_val, void *inc_val)
 {
+    TIMING("enumerate(int,void*,void*)");
     TRACER("enumerate BEGIN\n");
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
@@ -376,6 +382,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
  */
 void unpack1d(int g_src, int g_dst, int g_msk)
 {
+    TIMING("unpack1d(int,int,int)");
     TRACER("unpack1d BEGIN\n");
     int me = GA_Nodeid();
     int nproc = GA_Nnodes();
@@ -451,4 +458,3 @@ void unpack1d(int g_src, int g_dst, int g_msk)
     }
     TRACER("unpack1d END\n");
 }
-

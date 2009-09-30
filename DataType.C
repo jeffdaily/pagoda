@@ -11,28 +11,33 @@
 #endif
 
 #include "DataType.H"
+#include "Timing.H"
 
 
 DataType::DataType(nc_type type)
     :   value(DataType::to_dt(type))
 {
+    TIMING("DataType::DataType(nc_type)");
 }
 
 
 DataType::DataType(int type)
     :   value(DataType::to_dt(type))
 {
+    TIMING("DataType(int)");
 }
 
 
 DataType::DataType(const DataType &type)
     :   value(type.value)
 {
+    TIMING("DataType(DataType)");
 }
 
 
 DataType& DataType::operator = (nc_type type)
 {
+    TIMING("DataType::operator=(nc_type)");
     value = DataType::to_dt(type);
     return *this;
 }
@@ -40,6 +45,7 @@ DataType& DataType::operator = (nc_type type)
 
 DataType& DataType::operator = (int type)
 {
+    TIMING("DataType::operator=(int)");
     value = DataType::to_dt(type);
     return *this;
 }
@@ -47,6 +53,7 @@ DataType& DataType::operator = (int type)
 
 DataType& DataType::operator = (const DataType &type)
 {
+    TIMING("DataType::operator=(DataType)");
     value = type.value;
     return *this;
 }
@@ -54,48 +61,56 @@ DataType& DataType::operator = (const DataType &type)
 
 DataType::operator nc_type() const
 {
+    TIMING("DataType::operator nc_type()");
     return DataType::to_nc(value);
 }
 
 
 DataType::operator int () const
 {
+    TIMING("DataType::operator int()");
     return DataType::to_ma(value);
 }
 
 
 nc_type DataType::as_nc() const
 {
+    TIMING("DataType::as_nc()");
     return DataType::to_nc(value);
 }
 
 
 int DataType::as_ma() const
 {
+    TIMING("DataType::as_ma()");
     return DataType::to_ma(value);
 }
 
 
 bool DataType::operator == (nc_type type) const
 {
+    TIMING("DataType::operator==(nc_type)");
     return value == DataType::to_dt(type);
 }
 
 
 bool DataType::operator == (int type) const
 {
+    TIMING("DataType::operator==(int)");
     return value == DataType::to_dt(type);
 }
 
 
 bool DataType::operator == (const DataType &type) const
 {
+    TIMING("DataType::operator==(DataType)");
     return value == type.value;
 }
 
 
 ostream& operator << (ostream &os, const DataType &type)
 {
+    TIMING("operator<<(ostream,DataType)");
     if (DataType::dt_char == type) {
         os << "char";
     } else if (DataType::dt_short == type) {
@@ -140,6 +155,7 @@ ostream& operator << (ostream &os, const DataType &type)
  */
 DataType::dt_type DataType::to_dt(nc_type type)
 {
+    TIMING("DataType::to_dt(nc_type)");
     if (NC_NAT == type) { /* 'Not A Type' */
         throw DataTypeException("NC_NAT not supported");
     } else if (NC_BYTE == type) { /* signed 1 byte integer */
@@ -223,6 +239,7 @@ DataType::dt_type DataType::to_dt(nc_type type)
  */
 DataType::dt_type DataType::to_dt(int type)
 {
+    TIMING("DataType::to_dt(int)");
     if (MT_C_CHAR == type) {
         return dt_char;
     } else if (MT_C_INT == type) {
@@ -244,6 +261,7 @@ DataType::dt_type DataType::to_dt(int type)
 
 nc_type DataType::to_nc(dt_type type)
 {
+    TIMING("DataType::to_nc(dt_type)");
     if (dt_char == type) {
         return NC_BYTE;
     } else if (dt_short == type) {
@@ -329,6 +347,7 @@ nc_type DataType::to_nc(dt_type type)
 
 int DataType::to_ma(dt_type type)
 {
+    TIMING("DataType::to_ma(dt_type)");
     if (type == dt_char) {
         return MT_C_CHAR;
     } else if (type == dt_short) {

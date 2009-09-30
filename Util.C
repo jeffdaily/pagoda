@@ -9,6 +9,7 @@
 #include <macdecls.h>
 
 #include "Debug.H"
+#include "Timing.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -21,6 +22,7 @@ using std::vector;
  */
 bool Util::ends_with(string const &fullString, string const &ending)
 {
+    TIMING("Util::ends_with(string,string)");
     size_t len_string = fullString.length();
     size_t len_ending = ending.length();
     size_t arg1 = len_string - len_ending;
@@ -41,6 +43,7 @@ bool Util::ends_with(string const &fullString, string const &ending)
  */
 void Util::calculate_required_memory(const vector<Variable*> &vars)
 {
+    TIMING("Util::calculate_required_memory(vector<Variable*>)");
     TRACER("Util::calculate_required_memory BEGIN\n");
     int64_t max_size = 0;
     string max_name;

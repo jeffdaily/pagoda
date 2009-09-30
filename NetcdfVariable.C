@@ -12,6 +12,7 @@
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
+#include "Timing.H"
 
 
 NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
@@ -23,6 +24,7 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
     ,   atts()
     ,   type(NC_CHAR)
 {
+    TIMING("NetcdfVariable::NetcdfVariable(NetcdfDataset*,int)");
     int ncid = dataset->get_id();
     int ndim;
     int err = ncmpi_inq_ndims(ncid, &ndim);
@@ -46,35 +48,41 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
 
 NetcdfVariable::~NetcdfVariable()
 {
+    TIMING("NetcdfVariable::~NetcdfVariable()");
 }
 
 
 string NetcdfVariable::get_name() const
 {
+    TIMING("NetcdfVariable::get_name()");
     return name;
 }
 
 
 vector<Dimension*> NetcdfVariable::get_dims() const
 {
+    TIMING("NetcdfVariable::get_dims()");
     return vector<Dimension*>(dims.begin(), dims.end());
 }
 
 
 vector<Attribute*> NetcdfVariable::get_atts() const
 {
+    TIMING("NetcdfVariable::get_atts()");
     return vector<Attribute*>(atts.begin(), atts.end());
 }
 
 
 DataType NetcdfVariable::get_type() const
 {
+    TIMING("NetcdfVariable::get_type()");
     return type;
 }
 
 
 void NetcdfVariable::read()
 {
+    TIMING("NetcdfVariable::read()");
     int me = GA_Nodeid();
     int ncid = dataset->get_id();
     DataType type = get_type();
@@ -138,6 +146,7 @@ void NetcdfVariable::read()
 
 ostream& NetcdfVariable::print(ostream &os) const
 {
+    TIMING("NetcdfVariable::print(ostream)");
     os << "NetcdfVariable(" << name << ")";
     return os;
 }
@@ -145,12 +154,13 @@ ostream& NetcdfVariable::print(ostream &os) const
 
 NetcdfDataset* NetcdfVariable::get_dataset() const
 {
+    TIMING("NetcdfVariable::get_dataset()");
     return dataset;
 }
 
 
 int NetcdfVariable::get_id() const
 {
+    TIMING("NetcdfVariable::get_id()");
     return id;
 }
-

@@ -9,6 +9,7 @@
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
+#include "Timing.H"
 #include "Util.H"
 
 
@@ -22,6 +23,7 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ,   vars()
     ,   decorated()
 {
+    TIMING("NetcdfDataset::NetcdfDataset(string)");
     int err;
     int ndim;
     int nvar;
@@ -45,6 +47,7 @@ NetcdfDataset::NetcdfDataset(const string &filename)
 
 NetcdfDataset::~NetcdfDataset()
 {
+    TIMING("NetcdfDataset::~NetcdfDataset()");
     using Util::ptr_deleter;
     transform(atts.begin(), atts.end(), atts.begin(),
             ptr_deleter<NetcdfAttribute*>);
@@ -58,6 +61,7 @@ NetcdfDataset::~NetcdfDataset()
 
 vector<Attribute*> NetcdfDataset::get_atts()
 {
+    TIMING("NetcdfDataset::get_atts()");
     vector<Attribute*> ret;
     vector<NetcdfAttribute*>::iterator it;
     for (it=atts.begin(); it!=atts.end(); ++it) {
@@ -69,6 +73,7 @@ vector<Attribute*> NetcdfDataset::get_atts()
 
 vector<Dimension*> NetcdfDataset::get_dims()
 {
+    TIMING("NetcdfDataset::get_dims()");
     vector<Dimension*> ret;
     vector<NetcdfDimension*>::iterator it;
     for (it=dims.begin(); it!=dims.end(); ++it) {
@@ -80,6 +85,7 @@ vector<Dimension*> NetcdfDataset::get_dims()
 
 vector<Variable*> NetcdfDataset::get_vars()
 {
+    TIMING("NetcdfDataset::get_vars()");
     if (decorated.empty()) {
         vector<Variable*> ret;
         vector<NetcdfVariable*>::iterator it;
@@ -95,48 +101,55 @@ vector<Variable*> NetcdfDataset::get_vars()
 
 NetcdfAttribute* NetcdfDataset::get_att(size_t i) const
 {
+    TIMING("NetcdfDataset::get_att(size_t)");
     return atts.at(i);
 }
 
 
 NetcdfDimension* NetcdfDataset::get_dim(size_t i) const
 {
+    TIMING("NetcdfDataset::get_dim(size_t)");
     return dims.at(i);
 }
 
 
 NetcdfVariable* NetcdfDataset::get_var(size_t i) const
 {
+    TIMING("NetcdfDataset::get_var(size_t)");
     return vars.at(i);
 }
 
 
 ostream& NetcdfDataset::print(ostream &os) const
 {
+    TIMING("NetcdfDataset::print(ostream)");
     return os << "NetcdfDataset(" << filename << ")";
 }
 
 
 string NetcdfDataset::get_filename() const
 {
+    TIMING("NetcdfDataset::get_filename()");
     return filename;
 }
 
 
 int NetcdfDataset::get_id() const
 {
+    TIMING("NetcdfDataset::get_id()");
     return ncid;
 }
 
 
 NetcdfDimension* NetcdfDataset::get_udim() const
 {
+    TIMING("NetcdfDataset::get_udim()");
     return dims.at(udim);
 }
 
 
 void NetcdfDataset::decorate_set(const vector<Variable*> &vars)
 {
+    TIMING("NetcdfDataset::decorate_set(vector<Variable*>)");
     decorated = vars;
 }
-

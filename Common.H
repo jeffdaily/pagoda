@@ -3,6 +3,8 @@
 
 #include <cmath> // for M_PI
 
+#include <ga.h>
+
 #define ME GA_Nodeid()
 #define NPROC GA_Nnodes()
 #define MAX_NAME 80

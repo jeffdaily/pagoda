@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "Timing.H"
 #include "Values.H"
 
 using std::ostream;
@@ -15,17 +16,20 @@ using std::vector;
 
 Values::Values()
 {
+    TIMING("Values::Values()");
 }
 
 
 Values::~Values()
 {
+    TIMING("Values::~Values()");
 }
 
 
 #define implement_as(TYPE) \
 void Values::as(vector<TYPE> &values) const \
 { \
+    TIMING("Values::as(vector<" #TYPE ">)"); \
     values.clear(); \
     size_t i = 0; \
     size_t limit = size(); \
@@ -48,6 +52,7 @@ implement_as(double)
 
 void Values::as(string &values) const
 {
+    TIMING("Values::as(string)");
     values.clear();
     size_t i = 0;
     size_t limit = size();
@@ -61,5 +66,6 @@ void Values::as(string &values) const
 
 ostream& operator << (ostream &os, const Values *values)
 {
+    TIMING("operator<<(ostream,Values*)");
     return values->print(os);
 }

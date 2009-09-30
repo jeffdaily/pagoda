@@ -1,6 +1,7 @@
 #ifndef SLICE_H_
 #define SLICE_H_
 
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -11,6 +12,7 @@
 using std::ostream;
 using std::istringstream;
 using std::string;
+using std::strtol;
 using std::vector;
 
 

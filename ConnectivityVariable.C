@@ -11,6 +11,7 @@
 #include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
+#include "Timing.H"
 
 using std::map;
 
@@ -19,23 +20,27 @@ ConnectivityVariable::ConnectivityVariable(Variable *var, Dimension *to)
     :   VariableDecorator(var)
     ,   to(to)
 {
+    TIMING("ConnectivityVariable::ConnectivityVariable(...)");
 }
 
 
 ConnectivityVariable::~ConnectivityVariable()
 {
+    TIMING("ConnectivityVariable::~ConnectivityVariable()");
     to = NULL;
 }
 
 
 Dimension* ConnectivityVariable::get_from_dim() const
 {
+    TIMING("ConnectivityVariable::get_from_dim()");
     return var->get_dims()[0];
 }
 
 
 Dimension* ConnectivityVariable::get_to_dim() const
 {
+    TIMING("ConnectivityVariable::get_to_dim()");
     return to;
 }
 
@@ -53,6 +58,7 @@ Dimension* ConnectivityVariable::get_to_dim() const
  */
 void ConnectivityVariable::reindex()
 {
+    TIMING("ConnectivityVariable::reindex()");
     TRACER("ConnectivityVariable::reindex BEGIN\n");
     Mask *maskbase = to->get_mask();
     if (maskbase && (maskbase->get_count() != maskbase->get_size())) {
@@ -175,7 +181,7 @@ void ConnectivityVariable::reindex()
 
 ostream& ConnectivityVariable::print(ostream &os) const
 {
+    TIMING("ConnectivityVariable::print(ostream)");
     const string name = var->get_name();
     return os << "ConnectivityVariable(" << name << ")";
 }
-

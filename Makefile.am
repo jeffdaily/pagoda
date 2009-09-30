@@ -37,6 +37,7 @@ Slice.H \
 StringComparator.H \
 SubsetterCommands.H \
 SubsetterException.H \
+Timing.H \
 TypedValues.H \
 Util.H \
 Values.H \
@@ -72,6 +73,7 @@ NetcdfVariable.C \
 Pack.C \
 StringComparator.C \
 SubsetterCommands.C \
+Timing.C \
 Util.C \
 Values.C \
 Variable.C \

@@ -13,6 +13,7 @@
 #include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
+#include "Timing.H"
 #include "Variable.H"
 
 using std::ostream;
@@ -30,12 +31,14 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
     ,   dims()
     ,   vars()
 {
+    TIMING("AggregationJoinExisting::AggregationJoinExisting(string)");
     TRACER1("AggregationJoinExisting::ctor(%s)\n", name.c_str());
 }
 
 
 AggregationJoinExisting::~AggregationJoinExisting()
 {
+    TIMING("AggregationJoinExisting::~AggregationJoinExisting()");
     map<string,AggregationVariable*>::iterator agg_var_it = agg_vars.begin();
     map<string,AggregationVariable*>::iterator agg_var_end = agg_vars.end();
     for (; agg_var_it!=agg_var_end; ++agg_var_it) {
@@ -49,24 +52,28 @@ AggregationJoinExisting::~AggregationJoinExisting()
 
 vector<Attribute*> AggregationJoinExisting::get_atts()
 {
+    TIMING("AggregationJoinExisting::get_atts()");
     return atts;
 }
 
 
 vector<Dimension*> AggregationJoinExisting::get_dims()
 {
+    TIMING("AggregationJoinExisting::get_dims()");
     return dims;
 }
 
 
 vector<Variable*> AggregationJoinExisting::get_vars()
 {
+    TIMING("AggregationJoinExisting::get_vars()");
     return vars;
 }
 
 
 void AggregationJoinExisting::add(Dataset *dataset)
 {
+    TIMING("AggregationJoinExisting::add(Dataset*)");
     TRACER("AggregationJoinExisting::add BEGIN\n");
     datasets.push_back(dataset);
 
@@ -130,11 +137,13 @@ void AggregationJoinExisting::add(Dataset *dataset)
 
 ostream& AggregationJoinExisting::print(ostream &os) const
 {
+    TIMING("AggregationJoinExisting::print(ostream)");
     return os << "AggregationJoinExisting()";
 }
 
 
 void AggregationJoinExisting::decorate_set(const vector<Variable*> &vars)
 {
+    TIMING("AggregationJoinExisting::decorate_set(vector<Variable*>)");
     this->vars = vars;
 }

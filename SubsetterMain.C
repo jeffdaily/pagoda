@@ -18,6 +18,7 @@
 #include "SubsetterCommands.H"
 #include "SubsetterException.H"
 #include "Util.H"
+#include "Timing.H"
 #include "Variable.H"
 
 using std::cout;
@@ -237,4 +238,12 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
     GA_Destroy(ga_out);
     var->release_handle();
     TRACER1("SubsetterMain::subset_record %s END\n", name.c_str());
+#ifdef GATHER_TIMING
+    if (0 == ME) {
+        cout << Timing::get_stats_calls() << endl;
+        cout << endl;
+        cout << endl;
+        cout << Timing::get_stats_total_time() << endl;
+    }
+#endif
 }
