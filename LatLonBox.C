@@ -159,7 +159,7 @@ bool LatLonBox::operator >= (const LatLonBox &that) const
 
 bool LatLonBox::contains(int lat, int lon) const
 {
-    TIMING("LatLonBox::contains(int,int)");
+    //TIMING("LatLonBox::contains(int,int)");
     long long llat = lat;
     long long llon = lon;
     return contains(llat, llon);
@@ -168,7 +168,7 @@ bool LatLonBox::contains(int lat, int lon) const
 
 bool LatLonBox::contains(long lat, long lon) const
 {
-    TIMING("LatLonBox::contains(long,long)");
+    //TIMING("LatLonBox::contains(long,long)");
     long long llat = lat;
     long long llon = lon;
     return contains(llat, llon);
@@ -188,7 +188,7 @@ bool LatLonBox::contains(long long lat, long long lon) const
 
 bool LatLonBox::contains(float lat, float lon) const
 {
-    TIMING("LatLonBox::contains(float,float)");
+    //TIMING("LatLonBox::contains(float,float)");
     double dlat = lat;
     double dlon = lon;
     return contains(dlat, dlon);

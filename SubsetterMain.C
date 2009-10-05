@@ -41,6 +41,14 @@ int main(int argc, char **argv)
     GA_Initialize();
     TRACER("AFTER INITS\n");
 
+#ifdef GATHER_TIMING
+    Timing::start_global = Timing::get_time();
+    if (0 == ME) {
+        cout << "Timing::start_global=" << Timing::start_global << endl;
+        cout << endl;
+    }
+#endif
+
     SubsetterCommands cmd;
     Dataset *dataset;
     Aggregation *agg;
@@ -126,7 +134,17 @@ int main(int argc, char **argv)
         GA_Print_stats();
     }
 #endif
-
+#ifdef GATHER_TIMING
+    Timing::end_global = Timing::get_time();
+    if (0 == ME) {
+        cout << "Timing::end_global=" << Timing::end_global << endl;
+        cout << endl;
+        cout << Timing::get_stats_calls() << endl;
+        cout << endl;
+        cout << endl;
+        cout << Timing::get_stats_total_time() << endl;
+    }
+#endif
     GA_Terminate();
     MPI_Finalize();
     return EXIT_SUCCESS;
@@ -238,12 +256,4 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
     GA_Destroy(ga_out);
     var->release_handle();
     TRACER1("SubsetterMain::subset_record %s END\n", name.c_str());
-#ifdef GATHER_TIMING
-    if (0 == ME) {
-        cout << Timing::get_stats_calls() << endl;
-        cout << endl;
-        cout << endl;
-        cout << Timing::get_stats_total_time() << endl;
-    }
-#endif
 }

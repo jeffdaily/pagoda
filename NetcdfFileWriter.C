@@ -212,7 +212,7 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 
 void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 {
-    TIMING("NetcdfFileWriter::copy_atts_id(vector<Attribute*>,int)");
+    //TIMING("NetcdfFileWriter::copy_atts_id(vector<Attribute*>,int)");
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
         copy_att_id(*att_it, varid);
@@ -222,7 +222,7 @@ void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 
 void NetcdfFileWriter::write(int handle, const string &name, int record)
 {
-    TIMING("NetcdfFileWriter::write(int,string,int)");
+    //TIMING("NetcdfFileWriter::write(int,string,int)");
     maybe_enddef();
     write(handle, get_var_id(name), record);
 }

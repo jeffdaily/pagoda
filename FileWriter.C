@@ -18,7 +18,7 @@ using std::vector;
 
 FileWriter* FileWriter::create(const string &filename)
 {
-    TIMING("FileWriter::create(string)");
+    //TIMING("FileWriter::create(string)");
     FileWriter *writer = NULL;
     string EXT_NC(".nc");
     if (Util::ends_with(filename, EXT_NC)) {

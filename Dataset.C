@@ -32,7 +32,7 @@ using std::transform;
 
 Dataset* Dataset::open(const string &filename)
 {
-    TIMING("Dataset::open(string)");
+    //TIMING("Dataset::open(string)");
     Dataset *dataset = NULL;
     string EXT_NC(".nc");
     if (Util::ends_with(filename, EXT_NC)) {

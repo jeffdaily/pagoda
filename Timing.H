@@ -31,8 +31,13 @@ typedef pair<unsigned long,string> CountsPairReverse;
 class Timing
 {
     public:
+        static int64_t start_global;
+        static int64_t end_global;
+
         Timing(const string &name);
         ~Timing();
+
+        static int64_t get_time();
 
         static string get_stats_calls(bool descending=true);
         static string get_stats_total_time(bool descending=true);

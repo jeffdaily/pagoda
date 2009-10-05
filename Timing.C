@@ -41,78 +41,94 @@ using std::string;
 using std::time;
 
 
-static inline void line(ostringstream &out,
-        int name_width, string name,
-        int counts_width, int counts, int counts_total,
-        int times_width, int64_t times, int64_t times_total,
-        int percent_width, int times_per_call_width)
+static int g_name_width = 14;
+static int g_counts_width = 6;
+static int g_times_width = 7;
+static int g_percent_width = 7;
+static int g_log10_adjustment = 3;
+
+
+static inline void header(ostringstream &out)
 {
     out << left
-        << setw(name_width) << name
+        << setw(g_name_width) << "Function Name"
         << right
-        << setw(counts_width) << counts
-        << setw(percent_width) << ((double)(100.0*counts/counts_total)) << '%'
-        << setw(times_width) << times
-        << setw(percent_width) << ((double)(100.0*times/times_total)) << '%'
-        << setw(times_per_call_width) << ((double)(1.0*times/counts))
+        << setw(g_counts_width) << "Calls"
+        << setw(g_percent_width) << "Prcnt"
+        << setw(g_times_width) << "Times"
+        << setw(g_percent_width) << "Prcnt"
+        << setw(g_times_width) << "T/call"
+        << setw(g_percent_width) << "Prcnt"
         << endl;
 }
 
 
+static inline void line(ostringstream &out,
+        string name, int counts, int counts_total,
+        int64_t times, int64_t times_total, int64_t times_global)
+{
+    out << left
+        << setw(g_name_width) << name
+        << right
+        << setw(g_counts_width) << counts
+        << setw(g_percent_width) << ((double)(100.0*counts/counts_total))
+        << setw(g_times_width) << times
+        << setw(g_percent_width) << ((double)(100.0*times/times_total))
+        << setw(g_times_width) << ((double)(1.0*times/counts))
+        << setw(g_percent_width) << ((double)(100.0*times/times_global))
+        << endl;
+}
+
+
+int64_t Timing::start_global;
+int64_t Timing::end_global;
 TimesMap Timing::times;
 CountsMap Timing::counts;
 
 
 Timing::Timing(const string &name)
     :   name(name)
-    ,   start()
+    ,   start(get_time())
 {
     ++counts[name];
-#ifdef HAVE_GETTIMEOFDAY
-    struct timeval _start;
-    gettimeofday(&_start, NULL);
-    start = _start.tv_sec * 1000 + _start.tv_usec;
-#elif defined(HAVE_CLOCK_T)
-    start = clock();
-#else
-    start = time(NULL);
-#endif
 }
 
 
 Timing::~Timing()
 {
-    int64_t end;
+    int64_t end = get_time();
+    int64_t diff = end-start;
+    if (diff > 0) {
+        int64_t new_sum = times[name] + diff;
+        if (new_sum > 0) {
+            times[name] = new_sum;
+        } else {
+            std::cerr << "WARNING: times integer overflow: " << name << endl;
+        }
+    } else if (diff < 0) {
+        std::cerr << "WARNING: diff < 0: " << name << endl;
+        std::cerr << "\t" << end << "-" << start << "=" << diff << endl;
+    }
+}
+
+
+int64_t Timing::get_time()
+{
+    int64_t value;
+
+#undef HAVE_GETTIMEOFDAY
+#define HAVE_CLOCK_T
 #ifdef HAVE_GETTIMEOFDAY
-    struct timeval _end;
-    gettimeofday(&_end, NULL);
-    end = _end.tv_sec * 1000 + _end.tv_usec;
-    /*
-    if ((end-start) < 0 && 0 == ME) {
-        std::cout << "WARNING: end-start < 0 in " << name << endl;
-        std::cout << "end=" << end << endl;
-        std::cout << "start=" << start << endl;
-        std::cout << _end.tv_sec
-            << " " << _end.tv_usec
-            << " " << (_end.tv_sec*1000)
-            << " " << (_end.tv_sec*1000 +_end.tv_usec)
-            << endl;
-    }
-    */
+    struct timeval the_time;
+    gettimeofday(&the_time, NULL);
+    value = the_time.tv_sec * 1000 + the_time.tv_usec;
 #elif defined(HAVE_CLOCK_T)
-    end = clock();
+    value = clock();
 #else
-    end = time(NULL);
+    value = time(NULL);
 #endif
-    /*
-    if (0 == ME) {
-        std::cout << name
-            << " " << start
-            << " " << end
-            << " " << (end-start)<< endl;
-    }
-    */
-    times[name] += end-start;
+
+    return value;
 }
 
 
@@ -120,7 +136,6 @@ string Timing::get_stats_calls(bool descending)
 {
     ostringstream out;
     size_t name_width = 0;
-    int percent_width = 5;
     CountsMapReverse counts_reverse;
     CountsMap::iterator counts_it = counts.begin();
     CountsMap::iterator counts_end = counts.end();
@@ -146,9 +161,12 @@ string Timing::get_stats_calls(bool descending)
         }
         counts_total += counts_it->second;
     }
-    counts_width = (int)(ceil(log10(counts_max))) + 1;
-    if (counts_width < 6) {
-        counts_width = 6;
+    if (name_width > g_name_width) {
+        g_name_width = name_width;
+    }
+    counts_width = (int)(ceil(log10(counts_max))) + g_log10_adjustment;
+    if (counts_width > g_counts_width) {
+        g_counts_width = counts_width;
     }
     // determine total time
     for (; times_it!=times_end; ++times_it) {
@@ -156,25 +174,13 @@ string Timing::get_stats_calls(bool descending)
             times_max = times_it->second;
         }
         times_total += times_it->second;
-        /*
-        if (0 == ME) {
-            std::cout << times_it->first << " " << times_it->second << endl;
-        }
-        */
     }
-    times_width = (int)(ceil(log10(times_max))) + 4;
-    if (times_width < 6) {
-        times_width = 6;
+    times_width = (int)(ceil(log10(times_max))) + g_log10_adjustment;
+    if (times_width > g_times_width) {
+        g_times_width = times_width;
     }
 
-    // header
-    out << setw(name_width) << left << " Function Name"
-        << setw(counts_width) << " Calls"
-        << setw(percent_width) << " Prcnt"
-        << setw(times_width) << " Times"
-        << setw(percent_width) << " Prcnt"
-        << setw(times_width) << " T/call"
-        << endl;
+    header(out);
 
     if (descending) {
         CountsMapReverse::reverse_iterator rit;
@@ -183,10 +189,9 @@ string Timing::get_stats_calls(bool descending)
         rit = counts_reverse.rbegin();
         rend = counts_reverse.rend();
         for (; rit!=rend; ++rit) {
-            line(out, name_width, rit->second,
-                    counts_width, rit->first, counts_total,
-                    times_width, times.find(rit->second)->second, times_total,
-                    percent_width, times_width);
+            line(out, rit->second, rit->first, counts_total,
+                    times.find(rit->second)->second, times_total,
+                    end_global-start_global);
         }
     } else {
         CountsMapReverse::iterator rit;
@@ -195,10 +200,9 @@ string Timing::get_stats_calls(bool descending)
         rit = counts_reverse.begin();
         rend = counts_reverse.end();
         for (; rit!=rend; ++rit) {
-            line(out, name_width, rit->second,
-                    counts_width, rit->first, counts_total,
-                    times_width, times.find(rit->second)->second, times_total,
-                    percent_width, times_width);
+            line(out, rit->second, rit->first, counts_total,
+                    times.find(rit->second)->second, times_total,
+                    end_global-start_global);
         }
     }
 
@@ -210,7 +214,6 @@ string Timing::get_stats_total_time(bool descending)
 {
     ostringstream out;
     size_t name_width = 0;
-    int percent_width = 5;
     TimesMapReverse times_reverse;
     TimesMap::iterator times_it = times.begin();
     TimesMap::iterator times_end = times.end();
@@ -236,9 +239,9 @@ string Timing::get_stats_total_time(bool descending)
         }
         times_total += times_it->second;
     }
-    times_width = (int)(ceil(log10(times_max))) + 4;
-    if (times_width < 6) {
-        times_width = 6;
+    times_width = (int)(ceil(log10(times_max))) + g_log10_adjustment;
+    if (times_width > g_times_width) {
+        g_times_width = times_width;
     }
     // determine total time
     for (; counts_it!=counts_end; ++counts_it) {
@@ -246,15 +249,10 @@ string Timing::get_stats_total_time(bool descending)
             counts_max = counts_it->second;
         }
         counts_total += counts_it->second;
-        /*
-        if (0 == ME) {
-            std::cout << counts_it->first << " " << counts_it->second << endl;
-        }
-        */
     }
-    counts_width = (int)(ceil(log10(counts_max))) + 1;
-    if (counts_width < 6) {
-        counts_width = 6;
+    counts_width = (int)(ceil(log10(counts_max))) + g_log10_adjustment;
+    if (counts_width > g_counts_width) {
+        g_counts_width = counts_width;
     }
 
     out << endl;
@@ -262,14 +260,7 @@ string Timing::get_stats_total_time(bool descending)
     out << "TOTAL CALLS=" << counts_total << endl;
     out << endl;
 
-    // header
-    out << setw(name_width) << left << "Function Name"
-        << setw(counts_width) << " Calls"
-        << setw(percent_width) << " Prcnt"
-        << setw(times_width) << " Times"
-        << setw(percent_width) << " Prcnt"
-        << setw(times_width) << " T/call"
-        << endl;
+    header(out);
 
     if (descending) {
         TimesMapReverse::reverse_iterator rit;
@@ -278,10 +269,9 @@ string Timing::get_stats_total_time(bool descending)
         rit = times_reverse.rbegin();
         rend = times_reverse.rend();
         for (; rit!=rend; ++rit) {
-            line(out, name_width, rit->second,
-                    counts_width, counts.find(rit->second)->second,
-                    counts_total, times_width, rit->first, times_total,
-                    percent_width, times_width);
+            line(out, rit->second, counts.find(rit->second)->second,
+                    counts_total, rit->first, times_total,
+                    end_global-start_global);
         }
     } else {
         TimesMapReverse::iterator rit;
@@ -290,10 +280,9 @@ string Timing::get_stats_total_time(bool descending)
         rit = times_reverse.begin();
         rend = times_reverse.end();
         for (; rit!=rend; ++rit) {
-            line(out, name_width, rit->second,
-                    counts_width, counts.find(rit->second)->second,
-                    counts_total, times_width, rit->first, times_total,
-                    percent_width, times_width);
+            line(out, rit->second, counts.find(rit->second)->second,
+                    counts_total, rit->first, times_total,
+                    end_global-start_global);
         }
     }
 
