@@ -17,6 +17,8 @@ AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
 #AC_FC_DUMMY_MAIN
 AC_F77_LIBRARY_LDFLAGS
 AC_F77_DUMMY_MAIN
+GCRM_CXX_VARIADIC_MACROS([],
+    [AC_MSG_WARN([C99 variadic macros not supported, IO timing disabled])])
 
 # Initialize automake and libtool.
 AM_INIT_AUTOMAKE
@@ -81,7 +83,7 @@ AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
       [AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])])
 
 # Checks for library functions.
-AC_CHECK_FUNCS([floor gettimeofday memset strtol])
+AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but

@@ -15,23 +15,21 @@
 #include "DistributedMask.H"
 #include "FileWriter.H"
 #include "Pack.H"
+#include "PnetcdfTiming.H"
 #include "SubsetterCommands.H"
 #include "SubsetterException.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Variable.H"
 
-using std::cout;
-using std::endl;
-
 static void subset(Variable *var, FileWriter *writer, map<int,int> sum_map);
 static void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map);
 
 #ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
+#   ifdef __cplusplus
+extern "C"
+#   endif
+int F77_DUMMY_MAIN() { return 1; }
 #endif
 
 
@@ -43,11 +41,13 @@ int main(int argc, char **argv)
 
 #ifdef GATHER_TIMING
     Timing::start_global = Timing::get_time();
-    if (0 == ME) {
-        cout << "Timing::start_global=" << Timing::start_global << endl;
-        cout << endl;
-    }
-#endif
+    PRINT_ZERO1("Timing::start_global=%ld\n\n", Timing::start_global);
+#endif /* GATHER_TIMING */
+#ifdef GATHER_PNETCDF_TIMING
+    PnetcdfTiming::start_global = PnetcdfTiming::get_time();
+    PRINT_ZERO1("PnetcdfTiming::start_global=%ld\n\n",
+            PnetcdfTiming::start_global);
+#endif /* GATHER_PNETCDF_TIMING */
 
     SubsetterCommands cmd;
     Dataset *dataset;
@@ -62,9 +62,7 @@ int main(int argc, char **argv)
         cmd.parse(argc,argv);
     }
     catch (SubsetterException &ex) {
-        if (ME == 0) {
-            cout << ex.what() << endl;
-        }
+        PRINT_ZERO1("%s\n", ex.what());
         exit(EXIT_FAILURE);
     }
     TRACER("cmd line parsing END\n");
@@ -136,15 +134,17 @@ int main(int argc, char **argv)
 #endif
 #ifdef GATHER_TIMING
     Timing::end_global = Timing::get_time();
-    if (0 == ME) {
-        cout << "Timing::end_global=" << Timing::end_global << endl;
-        cout << endl;
-        cout << Timing::get_stats_calls() << endl;
-        cout << endl;
-        cout << endl;
-        cout << Timing::get_stats_total_time() << endl;
-    }
-#endif
+    PRINT_ZERO1("Timing::end_global=%ld\n", Timing::end_global);
+    PRINT_STRING_ZERO(Timing::get_stats_calls());
+    PRINT_STRING_ZERO(Timing::get_stats_total_time());
+#endif /* GATHER_TIMING */
+#ifdef GATHER_PNETCDF_TIMING
+    PnetcdfTiming::end_global = PnetcdfTiming::get_time();
+    PRINT_ZERO1("PnetcdfTiming::end_global=%ld\n", PnetcdfTiming::end_global);
+    PRINT_STRING_ZERO(PnetcdfTiming::get_stats_calls());
+    PRINT_STRING_ZERO(PnetcdfTiming::get_stats_aggregate());
+#endif /* GATHER_PNETCDF_TIMING */
+    TRACER("just before GA_Terminate() and MPI_Finalize()\n");
     GA_Terminate();
     MPI_Finalize();
     return EXIT_SUCCESS;

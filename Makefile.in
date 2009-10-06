@@ -45,6 +45,7 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	config/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/gcrm_check_package.m4 \
+	$(top_srcdir)/config/gcrm_cxx_variadic_macro.m4 \
 	$(top_srcdir)/config/libtool.m4 \
 	$(top_srcdir)/config/ltoptions.m4 \
 	$(top_srcdir)/config/ltsugar.m4 \
@@ -90,7 +91,7 @@ am__objects_1 = AbstractVariable.lo Aggregation.lo \
 	DataType.lo Debug.lo Dimension.lo DistributedMask.lo \
 	FileWriter.lo LatLonBox.lo LocalMask.lo Mask.lo \
 	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
-	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo \
+	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo PnetcdfTiming.lo \
 	StringComparator.lo SubsetterCommands.lo Timing.lo Util.lo \
 	Values.lo Variable.lo VariableDecorator.lo
 am__objects_2 =
@@ -330,6 +331,7 @@ NetcdfError.H \
 NetcdfFileWriter.H \
 NetcdfVariable.H \
 Pack.H \
+PnetcdfTiming.H \
 RangeException.H \
 Slice.H \
 StringComparator.H \
@@ -369,6 +371,7 @@ NetcdfDimension.C \
 NetcdfFileWriter.C \
 NetcdfVariable.C \
 Pack.C \
+PnetcdfTiming.C \
 StringComparator.C \
 SubsetterCommands.C \
 Timing.C \
@@ -555,6 +558,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfFileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterMain.Po@am__quote@

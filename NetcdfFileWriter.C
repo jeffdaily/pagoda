@@ -20,6 +20,7 @@
 #include "NetcdfFileWriter.H"
 #include "NetcdfVariable.H"
 #include "Pack.H"
+#include "PnetcdfTiming.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Values.H"
@@ -27,9 +28,6 @@
 using std::invalid_argument;
 using std::string;
 using std::vector;
-
-
-static int err = 0;
 
 
 NetcdfFileWriter::NetcdfFileWriter(const string &filename)
@@ -40,17 +38,15 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
     TIMING("NetcdfFileWriter::NetcdfFileWriter(string)");
     TRACER1("NetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
-    err = ncmpi_create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
-    //err = ncmpi_create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_DATA, MPI_INFO_NULL, &ncid);
-    ERRNO_CHECK(err);
+    ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
+    //ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_DATA, MPI_INFO_NULL, &ncid);
 }
 
 
 NetcdfFileWriter::~NetcdfFileWriter()
 {
     TIMING("NetcdfFileWriter::~NetcdfFileWriter()");
-    err = ncmpi_close(ncid);
-    ERRNO_CHECK(err);
+    close(ncid);
 }
 
 
@@ -70,8 +66,7 @@ void NetcdfFileWriter::def_dim(Dimension *dim)
     } else {
         size = dim->get_size();
     }
-    err = ncmpi_def_dim(ncid, name.c_str(), size, &id);
-    ERRNO_CHECK(err);
+    ncmpi::def_dim(ncid, name.c_str(), size, &id);
     TRACER3("NetcdfFileWriter::def_dim %s=%lld id=%d\n", name.c_str(), size, id);
     dim_id[name] = id;
 }
@@ -106,8 +101,7 @@ void NetcdfFileWriter::def_var(Variable *var)
     }
 #endif
     type = var->get_type();
-    err = ncmpi_def_var(ncid, name.c_str(), type, ndim, dim_ids, &id);
-    ERRNO_CHECK(err);
+    ncmpi::def_var(ncid, name.c_str(), type, ndim, dim_ids, &id);
     var_id[name] = id;
 
     copy_atts_id(var->get_atts(), id);
@@ -163,8 +157,7 @@ void NetcdfFileWriter::maybe_enddef()
     TIMING("NetcdfFileWriter::maybe_enddef()");
     if (is_in_define_mode) {
         is_in_define_mode = false;
-        err = ncmpi_enddef(ncid);
-        ERRNO_CHECK(err);
+        ncmpi::enddef(ncid);
         TRACER("NetcdfFileWriter::maybe_enddef END DEF\n");
     }
 }
@@ -185,28 +178,22 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
     MPI_Offset len = attr->get_count();
-#define put_attr_values(DT, CT, NAME) \
+#define put_attr_values(DT, CT) \
     if (dt == DT) { \
         nc_type type = DT; \
         vector<CT> data; \
         attr->get_values()->as(data); \
         CT *buf = &data[0]; \
-        err = ncmpi_put_att_##NAME(ncid, varid, name.c_str(), type, len, buf); \
-        ERRNO_CHECK(err); \
+        ncmpi::put_att(ncid, varid, name.c_str(), type, len, buf); \
     } else
-    put_attr_values(NC_BYTE, signed char, schar)
-    put_attr_values(NC_SHORT, short, short)
-    put_attr_values(NC_INT, int, int)
-    put_attr_values(NC_FLOAT, float, float)
-    put_attr_values(NC_DOUBLE, double, double)
+    put_attr_values(NC_CHAR,   char)
+    put_attr_values(NC_BYTE,   signed char)
+    put_attr_values(NC_SHORT,  short)
+    put_attr_values(NC_INT,    int)
+    put_attr_values(NC_FLOAT,  float)
+    put_attr_values(NC_DOUBLE, double)
+    ; // for last else above
 #undef put_attr_values
-    if (dt == NC_CHAR) {
-        vector<char> data;
-        attr->get_values()->as(data);
-        char *buf = &data[0];
-        err = ncmpi_put_att_text(ncid, varid, name.c_str(), len, buf);
-        ERRNO_CHECK(err);
-    }
 }
 
 
@@ -256,14 +243,13 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
         }
 #define write_var_all(TYPE, NC_TYPE) \
         if (type == NC_TYPE) { \
-            err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, NULL);\
+            ncmpi::put_vara_all(ncid, varid, start, count, (const TYPE*)NULL);\
         } else
-        write_var_all(int, NC_INT)
-        write_var_all(float, NC_FLOAT)
+        write_var_all(int,    NC_INT)
+        write_var_all(float,  NC_FLOAT)
         write_var_all(double, NC_DOUBLE)
 #undef write_var_all
         ; // for last else above
-        ERRNO_CHECK(err);
     } else {
         if (record >= 0) {
             start[0] = record;
@@ -282,14 +268,13 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
         if (type == NC_TYPE) { \
             TYPE *ptr; \
             NGA_Access64(handle, lo, hi, &ptr, ld); \
-            err = ncmpi_put_vara_##TYPE##_all(ncid, varid, start, count, ptr); \
+            ncmpi::put_vara_all(ncid, varid, start, count, ptr); \
         } else
         write_var_all(int, NC_INT)
         write_var_all(float, NC_FLOAT)
         write_var_all(double, NC_DOUBLE)
 #undef write_var_all
         ; // for last else above
-        ERRNO_CHECK(err);
         NGA_Release64(handle, lo, hi);
     }
 }

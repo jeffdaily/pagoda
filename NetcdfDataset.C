@@ -9,6 +9,7 @@
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
+#include "PnetcdfTiming.H"
 #include "Timing.H"
 #include "Util.H"
 
@@ -28,11 +29,8 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     int ndim;
     int nvar;
     int natt;
-    err = ncmpi_open(MPI_COMM_WORLD, filename.c_str(), NC_NOWRITE,
-            MPI_INFO_NULL, &ncid);
-    ERRNO_CHECK(err);
-    err = ncmpi_inq(ncid, &ndim, &nvar, &natt, &udim);
-    ERRNO_CHECK(err);
+    ncmpi::open(MPI_COMM_WORLD, filename.c_str(), NC_NOWRITE, MPI_INFO_NULL, &ncid);
+    ncmpi::inq(ncid, &ndim, &nvar, &natt, &udim);
     for (int attid=0; attid<natt; ++attid) {
         atts.push_back(new NetcdfAttribute(this, attid));
     }
@@ -55,7 +53,7 @@ NetcdfDataset::~NetcdfDataset()
             ptr_deleter<NetcdfDimension*>);
     transform(vars.begin(), vars.end(), vars.begin(),
             ptr_deleter<NetcdfVariable*>);
-    ERRNO_CHECK(ncmpi_close(ncid));
+    ncmpi::close(ncid);
 }
 
 

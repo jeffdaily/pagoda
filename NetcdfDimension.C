@@ -8,6 +8,7 @@
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
+#include "PnetcdfTiming.H"
 #include "Timing.H"
 
 
@@ -22,12 +23,10 @@ NetcdfDimension::NetcdfDimension(NetcdfDataset *dataset, int dimid)
     TIMING("NetcdfDimension::NetcdfDimension(NetcdfDataset*,int)");
     int ncid = dataset->get_id();
     int udim;
-    int err = ncmpi_inq_unlimdim(ncid, &udim);
-    ERRNO_CHECK(err);
+    ncmpi::inq_unlimdim(ncid, &udim);
     char name_tmp[MAX_NAME];
     MPI_Offset size_tmp;
-    err = ncmpi_inq_dim(ncid, dimid, name_tmp, &size_tmp);
-    ERRNO_CHECK(err);
+    ncmpi::inq_dim(ncid, dimid, name_tmp, &size_tmp);
     name = string(name_tmp);
     size = size_tmp;
     unlimited = (udim == dimid);

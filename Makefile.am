@@ -32,6 +32,7 @@ NetcdfError.H \
 NetcdfFileWriter.H \
 NetcdfVariable.H \
 Pack.H \
+PnetcdfTiming.H \
 RangeException.H \
 Slice.H \
 StringComparator.H \
@@ -71,6 +72,7 @@ NetcdfDimension.C \
 NetcdfFileWriter.C \
 NetcdfVariable.C \
 Pack.C \
+PnetcdfTiming.C \
 StringComparator.C \
 SubsetterCommands.C \
 Timing.C \

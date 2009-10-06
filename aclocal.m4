@@ -985,6 +985,7 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([config/gcrm_check_package.m4])
+m4_include([config/gcrm_cxx_variadic_macro.m4])
 m4_include([config/libtool.m4])
 m4_include([config/ltoptions.m4])
 m4_include([config/ltsugar.m4])

@@ -12,6 +12,7 @@
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
+#include "PnetcdfTiming.H"
 #include "Timing.H"
 
 
@@ -27,14 +28,12 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
     TIMING("NetcdfVariable::NetcdfVariable(NetcdfDataset*,int)");
     int ncid = dataset->get_id();
     int ndim;
-    int err = ncmpi_inq_ndims(ncid, &ndim);
-    ERRNO_CHECK(err);
+    ncmpi::inq_ndims(ncid, &ndim);
     char cname[MAX_NAME];
     int dim_ids[ndim]; // plenty big (file's ndim <= variable's ndim)
     nc_type type_tmp;
     int natt;
-    err = ncmpi_inq_var(ncid, varid, cname, &type_tmp, &ndim, dim_ids, &natt);
-    ERRNO_CHECK(err);
+    ncmpi::inq_var(ncid, varid, cname, &type_tmp, &ndim, dim_ids, &natt);
     name = string(cname);
     type = type_tmp;
     for (int dimidx=0; dimidx<ndim; ++dimidx) {
@@ -105,11 +104,10 @@ void NetcdfVariable::read()
         }
 #define read_var_all(TYPE, NC_TYPE) \
         if (type == NC_TYPE) { \
-            err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, NULL); \
-            ERRNO_CHECK(err); \
+            ncmpi::get_vara_all(ncid, id, start, count, (TYPE*)NULL); \
         } else
-        read_var_all(int, NC_INT)
-        read_var_all(float, NC_FLOAT)
+        read_var_all(int,    NC_INT)
+        read_var_all(float,  NC_FLOAT)
         read_var_all(double, NC_DOUBLE)
         ; // for last else above
 #undef read_var_all
@@ -131,8 +129,7 @@ void NetcdfVariable::read()
         if (type == NC_TYPE) { \
             TYPE *ptr; \
             NGA_Access64(get_handle(), lo, hi, &ptr, ld); \
-            err = ncmpi_get_vara_##TYPE##_all(ncid, id, start, count, ptr); \
-            ERRNO_CHECK(err); \
+            ncmpi::get_vara_all(ncid, id, start, count, ptr); \
         } else
         read_var_all(int, NC_INT)
         read_var_all(float, NC_FLOAT)

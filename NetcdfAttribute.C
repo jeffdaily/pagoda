@@ -9,6 +9,7 @@
 #include "NetcdfDataset.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
+#include "PnetcdfTiming.H"
 #include "Util.H"
 #include "Values.H"
 #include "Timing.H"
@@ -37,26 +38,23 @@ NetcdfAttribute::NetcdfAttribute(
     MPI_Offset len_mpi;
     size_t len;
 
-    err = ncmpi_inq_attname(ncid, varid, attid, att_name_tmp);
-    ERRNO_CHECK(err);
+    ncmpi::inq_attname(ncid, varid, attid, att_name_tmp);
     name = string(att_name_tmp);
-    err = ncmpi_inq_att(ncid, varid, name.c_str(), &type_tmp, &len_mpi);
-    ERRNO_CHECK(err);
+    ncmpi::inq_att(ncid, varid, name.c_str(), &type_tmp, &len_mpi);
     len = len_mpi;
     type = type_tmp;
-#define get_attr_values(DATA_TYPE, C_TYPE, NAME) \
+#define get_attr_values(DATA_TYPE, C_TYPE) \
     if (type == DATA_TYPE) { \
         C_TYPE data[len]; \
-        err = ncmpi_get_att_##NAME(ncid, varid, name.c_str(), data); \
-        ERRNO_CHECK(err); \
+        ncmpi::get_att(ncid, varid, name.c_str(), data); \
         values = new TypedValues<C_TYPE>(data, len); \
     } else
-    get_attr_values(NC_CHAR, char, text)
-    get_attr_values(NC_BYTE, signed char, schar)
-    get_attr_values(NC_SHORT, short, short)
-    get_attr_values(NC_INT, int, int)
-    get_attr_values(NC_FLOAT, float, float)
-    get_attr_values(NC_DOUBLE, double, double)
+    get_attr_values(NC_CHAR,   char)
+    get_attr_values(NC_BYTE,   signed char)
+    get_attr_values(NC_SHORT,  short)
+    get_attr_values(NC_INT,    int)
+    get_attr_values(NC_FLOAT,  float)
+    get_attr_values(NC_DOUBLE, double)
     ; // because of last "else" in macro
 #undef get_attr_values
 }
