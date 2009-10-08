@@ -303,16 +303,16 @@ string PnetcdfTiming::get_stats_calls(bool descending)
 string PnetcdfTiming::get_stats_aggregate()
 {
     ostringstream out;
-    uint64_t times_total;
-    uint64_t times_read;
-    uint64_t times_read_agg;
-    uint64_t times_write;
-    uint64_t times_write_agg;
-    uint64_t bytes_total;
-    uint64_t bytes_read;
-    uint64_t bytes_read_agg;
-    uint64_t bytes_write;
-    uint64_t bytes_write_agg;
+    uint64_t times_total=0;
+    uint64_t times_read=0;
+    uint64_t times_read_agg=0;
+    uint64_t times_write=0;
+    uint64_t times_write_agg=0;
+    uint64_t bytes_total=0;
+    uint64_t bytes_read=0;
+    uint64_t bytes_read_agg=0;
+    uint64_t bytes_write=0;
+    uint64_t bytes_write_agg=0;
 #if   SIZEOF_UINT64_T == SIZEOF_UNSIGNED_INT
     MPI_Datatype type = MPI_UNSIGNED;
 #elif SIZEOF_UINT64_T == SIZEOF_UNSIGNED_LONG
@@ -326,7 +326,7 @@ string PnetcdfTiming::get_stats_aggregate()
             it != end; ++it) {
         string name = it->first;
         uint64_t data = it->second;
-        if (name.find("get_var") != string::npos) {
+        if        (name.find("get_var") != string::npos) {
             times_read += data;
         } else if (name.find("put_var") != string::npos) {
             times_write += data;
@@ -337,37 +337,47 @@ string PnetcdfTiming::get_stats_aggregate()
             it != end; ++it) {
         string name = it->first;
         uint64_t data = it->second;
-        if (name.find("get_var") != string::npos) {
+        if        (name.find("get_var") != string::npos) {
             bytes_read += data;
         } else if (name.find("put_var") != string::npos) {
             bytes_write += data;
         }
     }
-    
-    MPI_Allreduce(&times_read, &times_read_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce(&times_write, &times_write_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce(&bytes_read, &bytes_read_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce(&bytes_write, &bytes_write_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
-    // sanity check...
-    if (times_read_agg < times_read) {
-        PRINT_SYNC("WARNING: times_read_agg<times_read\n");
-    } else {
-        PRINT_SYNC("I'm fine\n");
-    }
-    if (times_write_agg < times_write) {
-        PRINT_SYNC("WARNING: times_write_agg<times_write\n");
-    } else {
-        PRINT_SYNC("I'm fine\n");
-    }
+
+    PRINT_SYNC1("Before allreduce bytes_read:      %lu\n", bytes_read);
+    MPI_Allreduce(&bytes_read,&bytes_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    PRINT_SYNC1(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
     if (bytes_read_agg < bytes_read) {
         PRINT_SYNC("WARNING: bytes_read_agg<bytes_read\n");
     } else {
-        PRINT_SYNC("I'm fine\n");
+        PRINT_SYNC("bytes_read_agg OKAY\n");
     }
+
+    PRINT_SYNC1("Before allreduce bytes_write:     %lu\n", bytes_write);
+    MPI_Allreduce(&bytes_write,&bytes_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    PRINT_SYNC1(" after allreduce bytes_write_agg: %lu\n", bytes_write_agg);
     if (bytes_write_agg < bytes_write) {
         PRINT_SYNC("WARNING: bytes_write_agg<bytes_write\n");
     } else {
-        PRINT_SYNC("I'm fine\n");
+        PRINT_SYNC("bytes_write_agg OKAY\n");
+    }
+
+    PRINT_SYNC1("Before allreduce times_read:      %lu\n", times_read);
+    MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    PRINT_SYNC1(" after allreduce times_read_agg:  %lu\n", times_read_agg);
+    if (times_read_agg < times_read) {
+        PRINT_SYNC("WARNING: times_read_agg<times_read\n");
+    } else {
+        PRINT_SYNC("times_read_agg OKAY\n");
+    }
+
+    PRINT_SYNC1("Before allreduce times_write:     %lu\n", times_write);
+    MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    PRINT_SYNC1(" after allreduce times_write_agg: %lu\n", times_write_agg);
+    if (times_write_agg < times_write) {
+        PRINT_SYNC("WARNING: times_write_agg<times_write\n");
+    } else {
+        PRINT_SYNC("times_write_agg OKAY\n");
     }
 
     bytes_total = bytes_read_agg + bytes_write_agg;
