@@ -163,7 +163,7 @@ DataType::dt_type DataType::to_dt(nc_type type)
     } else if (NC_CHAR == type) { /* ISO/ASCII character */
         return dt_uchar;
     } else if (NC_SHORT == type) { /* signed 2 byte integer */
-#if 2 == SIZEOF_SHORT
+#if   2 == SIZEOF_SHORT
         return dt_short;
 #elif 2 == SIZEOF_INT
         return dt_int;
@@ -175,7 +175,7 @@ DataType::dt_type DataType::to_dt(nc_type type)
         throw DataTypeException("no corresponding C type for NC_SHORT");
 #endif
     } else if (NC_INT == type) { /* signed 4 byte integer */
-#if 4 == SIZEOF_SHORT
+#if   4 == SIZEOF_SHORT
         return dt_short;
 #elif 4 == SIZEOF_INT
         return dt_int;
@@ -187,7 +187,7 @@ DataType::dt_type DataType::to_dt(nc_type type)
         throw DataTypeException("no corresponding C type for NC_INT");
 #endif
     } else if (NC_FLOAT == type) { /* single precision floating point number */
-#if 4 == SIZEOF_FLOAT
+#if   4 == SIZEOF_FLOAT
         return dt_float;
 #elif 4 == SIZEOF_DOUBLE
         return dt_double;
@@ -197,7 +197,7 @@ DataType::dt_type DataType::to_dt(nc_type type)
         throw DataTypeException("no corresponding C type for NC_FLOAT");
 #endif
     } else if (NC_DOUBLE == type) { /* double precision floating point number */
-#if 8 == SIZEOF_FLOAT
+#if   8 == SIZEOF_FLOAT
         return dt_float;
 #elif 8 == SIZEOF_DOUBLE
         return dt_double;
@@ -206,7 +206,6 @@ DataType::dt_type DataType::to_dt(nc_type type)
 #else
         throw DataTypeException("no corresponding C type for NC_DOUBLE");
 #endif
-        return dt_double;
 #ifdef HAVE_NETCDF4
     } else if (NC_UBYTE == type) { /* unsigned 1 byte integer */
         return dt_uchar;
@@ -215,15 +214,15 @@ DataType::dt_type DataType::to_dt(nc_type type)
     } else if (NC_UINT == type) { /* unsigned 4 byte integer */
         return dt_uint;
     } else if (NC_INT64 == type) { /* signed 8 byte integer */
-#if 8 == SIZEOF_INT
+#   if   8 == SIZEOF_INT
         return dt_int;
-#elif 8 == SIZEOF_LONG
+#   elif 8 == SIZEOF_LONG
         return dt_long;
-#elif 8 == SIZEOF_LONG_LONG
+#   elif 8 == SIZEOF_LONG_LONG
         return dt_longlong;
-#else
+#   else
         throw DataTypeException("no corresponding C type for NC_INT64");
-#endif
+#   endif
     } else if (NC_UINT64 == type) { /* unsigned 8 byte integer */
     } else if (NC_STRING == type) { /* string */
 #endif /* HAVE_NETCDF4 */

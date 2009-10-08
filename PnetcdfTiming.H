@@ -1,6 +1,13 @@
 #ifndef PNETCDFTIMING_H
 #define PNETCDFTIMING_H
 
+#ifdef HAVE_STDINT_H
+#   include <stdint.h>
+#endif
+#ifdef HAVE_INTTYPES_H
+#   include <inttypes.h>
+#endif
+
 #include <map>
 #include <string>
 
@@ -22,8 +29,8 @@ using std::multimap;
 using std::string;
 
 
-typedef map<string,int64_t> PnetcdfIOMap;
-typedef multimap<int64_t,string> PnetcdfIOMapR;
+typedef map<string,uint64_t> PnetcdfIOMap;
+typedef multimap<uint64_t,string> PnetcdfIOMapR;
 
 
 class PnetcdfTiming
@@ -34,16 +41,16 @@ class PnetcdfTiming
                 const MPI_Offset *count, nc_type type);
         ~PnetcdfTiming();
 
-        static int64_t get_time();
+        static uint64_t get_time();
         static string get_stats_calls(bool descending=true);
         static string get_stats_aggregate();
 
-        static int64_t start_global;
-        static int64_t end_global;
+        static uint64_t start_global;
+        static uint64_t end_global;
 
     protected:
         string name;
-        int64_t start;
+        uint64_t start;
 
         static PnetcdfIOMap times;
         static PnetcdfIOMap bytes;

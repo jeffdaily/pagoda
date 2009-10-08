@@ -46,7 +46,7 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
 NetcdfFileWriter::~NetcdfFileWriter()
 {
     TIMING("NetcdfFileWriter::~NetcdfFileWriter()");
-    close(ncid);
+    ncmpi::close(ncid);
 }
 
 

@@ -54,7 +54,7 @@ AC_ARG_ENABLE([warnings],
 AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdlib.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([inttypes.h stdint.h stdlib.h sys/time.h time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -62,6 +62,7 @@ AC_C_INLINE
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_TYPE_INT64_T
+AC_TYPE_UINT64_T
 AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
 AC_TYPE_LONG_DOUBLE
 AM_PROG_CC_C_O
@@ -69,16 +70,25 @@ AM_PROG_CC_C_O
 # Check for type sizes.
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF([char])
+AC_CHECK_SIZEOF([unsigned char])
 AC_CHECK_SIZEOF([short])
+AC_CHECK_SIZEOF([unsigned short])
 AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([unsigned int])
 AC_CHECK_SIZEOF([long])
-AS_IF([test x$ac_cv_type_long_long_int = xyes], [AC_CHECK_SIZEOF([long long])])
+AC_CHECK_SIZEOF([unsigned long])
+AS_IF([test x$ac_cv_type_long_long_int = xyes],
+      [AC_CHECK_SIZEOF([long long])])
 AS_IF([test x$ac_cv_type_unsigned_long_long_int = xyes],
       [AC_CHECK_SIZEOF([unsigned long long])])
-AS_IF([test x$ac_cv_c_int64_t = xyes], [AC_CHECK_SIZEOF([int64_t])])
+AS_IF([test x$ac_cv_c_int64_t = xyes],
+      [AC_CHECK_SIZEOF([int64_t])])
+AS_IF([test x$ac_cv_c_uint64_t = xyes],
+      [AC_CHECK_SIZEOF([uint64_t])])
 AC_CHECK_SIZEOF([float])
 AC_CHECK_SIZEOF([double])
-AS_IF([test x$ac_cv_type_long_double = xyes], [AC_CHECK_SIZEOF([long double])])
+AS_IF([test x$ac_cv_type_long_double = xyes],
+      [AC_CHECK_SIZEOF([long double])])
 AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
       [AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])])
 

@@ -25,7 +25,6 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ,   decorated()
 {
     TIMING("NetcdfDataset::NetcdfDataset(string)");
-    int err;
     int ndim;
     int nvar;
     int natt;

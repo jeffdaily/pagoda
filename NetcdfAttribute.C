@@ -30,7 +30,6 @@ NetcdfAttribute::NetcdfAttribute(
     ,   values(NULL)
 {
     TIMING("NetcdfAttribute::NetcdfAttribute(...)");
-    int err = 0;
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
     char att_name_tmp[MAX_NAME];

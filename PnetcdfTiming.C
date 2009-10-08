@@ -2,13 +2,14 @@
 #   include <config.h>
 #endif
 
-#ifdef HAVE_GETTIMEOFDAY
-#   ifdef HAVE_SYS_TIME_H
-#       include <sys/time.h>
-#   endif
-#   ifdef HAVE_UNISTD_H
-#       include <unistd.h>
-#   endif
+#ifdef HAVE_TIME_H
+#   include <time.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
 #endif
 
 #include <cmath>
@@ -19,6 +20,7 @@
 #include <mpi.h>
 #include <pnetcdf.h>
 
+#include "Debug.H"
 #include "NetcdfError.H"
 #include "PnetcdfTiming.H"
 
@@ -32,8 +34,8 @@ using std::setprecision;
 using std::setw;
 
 
-int64_t PnetcdfTiming::start_global;
-int64_t PnetcdfTiming::end_global;
+uint64_t PnetcdfTiming::start_global;
+uint64_t PnetcdfTiming::end_global;
 PnetcdfIOMap PnetcdfTiming::times;
 PnetcdfIOMap PnetcdfTiming::bytes;
 PnetcdfIOMap PnetcdfTiming::calls;
@@ -45,6 +47,16 @@ static int g_times_width = 7;
 static int g_percent_width = 7;
 static int g_bytes_width = 7;
 static int g_log10_adjustment = 3;
+#if defined(HAVE_CLOCK_GETTIME)
+// converts bytes/nanosecond to gigabytes/second
+static double g_io_multiplier = 1000000000.0/1073741824.0; // 0.931322575
+#elif defined(HAVE_GETTIMEOFDAY)
+// converts bytes/microsecond to gigabytes/second
+static double g_io_multiplier = 1000000.0/1073741824.0; // 0.000931322575
+#else
+// converts bytes/second to gigabytes/second
+static double g_io_multiplier = 1.0/1073741824.0;
+#endif
 
 
 static inline void header(ostringstream &out)
@@ -64,21 +76,10 @@ static inline void header(ostringstream &out)
 }
 
 
-static inline void footer(ostringstream &out, int64_t bytes, int64_t times)
-{
-    out << endl
-        << "Aggregate Bandwidth (Total Bytes/Total Times)"
-        << endl
-        << bytes << " / " << times << " = " << (1.0*bytes/times)
-        << endl
-        << endl;
-}
-
-
 static inline void line(ostringstream &out, string name,
         int calls, int calls_total,
-        int64_t times, int64_t times_total, int64_t times_global,
-        int64_t bytes)
+        uint64_t times, uint64_t times_total, uint64_t times_global,
+        uint64_t bytes)
 {
     out << left
         << setw(g_name_width) << name
@@ -99,9 +100,9 @@ static inline void line(ostringstream &out, string name,
 static inline void reverse_info(
         const PnetcdfIOMap &iomap,
         PnetcdfIOMapR &iomap_reverse,
-        int64_t &total, int &width, int &name_width)
+        uint64_t &total, int &width, int &name_width)
 {
-    int64_t max = 0;
+    uint64_t max = 0;
 
     total = 0;
     width = 0;
@@ -109,7 +110,7 @@ static inline void reverse_info(
     for (PnetcdfIOMap::const_iterator it=iomap.begin(),end=iomap.end();
             it != end; ++it) {
         string name = it->first;
-        int64_t data = it->second;
+        uint64_t data = it->second;
 
         iomap_reverse.insert(make_pair(data,name));
         if (name.size() > name_width) {
@@ -123,26 +124,26 @@ static inline void reverse_info(
     if (name_width > g_name_width) {
         g_name_width = name_width;
     }
-    width = (int)(ceil(log10(max))) + g_log10_adjustment;
+    width = (int)(ceil(log10((double)max))) + g_log10_adjustment;
 }
 
 
 static inline void calc_info(const PnetcdfIOMap &iomap,
-        int64_t &total, int &width)
+        uint64_t &total, int &width)
 {
-    int64_t max = 0;
+    uint64_t max = 0;
 
     total = 0;
     width = 0;
     for (PnetcdfIOMap::const_iterator it=iomap.begin(), end=iomap.end();
             it != end; ++it) {
-        int64_t data = it->second;
+        uint64_t data = it->second;
         if (data > max) {
             max = data;
         }
         total += data;
     }
-    width = (int)(ceil(log10(max))) + g_log10_adjustment;
+    width = (int)(ceil(log10((double)max))) + g_log10_adjustment;
 }
 
 
@@ -164,6 +165,12 @@ PnetcdfTiming::PnetcdfTiming(
     ,   start(0)
 {
     MPI_Offset size = 1;
+    uint64_t new_size = 0;
+
+    // calls
+    ++calls[name];
+
+    // bytes
     for (int i=0; i<ndim; ++i) {
         size *= count[i];
     }
@@ -175,44 +182,54 @@ PnetcdfTiming::PnetcdfTiming(
         case NC_FLOAT:  size *= 4; break;
         case NC_DOUBLE: size *= 8; break;
     }
-    ++calls[name];
-    bytes[name] += size;
+    new_size = bytes[name] + size;
+    if (new_size < bytes[name]) {
+        cerr << ME << " WARNING: bytes overrun" << endl;
+    } else {
+        bytes[name] = new_size;
+    }
+
+    // time -- last so that the above doesn't weigh in on time
     start = get_time();
 }
 
 
 PnetcdfTiming::~PnetcdfTiming()
 {
-    int64_t end = get_time();
-    int64_t diff = end-start;
-    if (diff > 0) {
-        int64_t new_sum = times[name] + diff;
-        if (new_sum > 0) {
+    uint64_t end = get_time();
+
+    if (end > start) {
+        uint64_t diff = end-start;
+        uint64_t new_sum = times[name] + diff;
+
+        if (new_sum > times[name]) {
             times[name] = new_sum;
         } else {
-            cerr << "WARNING: times integer overflow: " << name << endl;
+            cerr << "WARNING: times overrun: " << name << endl;
         }
-    } else if (diff < 0) {
-        cerr << "WARNING: diff < 0: " << name << endl;
-        cerr << "\t" << end << "-" << start << "=" << diff << endl;
     }
 }
 
 
-int64_t PnetcdfTiming::get_time()
+uint64_t PnetcdfTiming::get_time()
 {
-    int64_t value;
+    uint64_t value;
 
 #if defined(HAVE_CLOCK_GETTIME)
     struct timespec tp;
     int stat = clock_gettime(CLOCK_MONOTONIC, &tp);
-    value = tp.tv_sec * 1000000000 + tp.tv_nsec;
+    //int stat = clock_gettime(CLOCK_REALTIME, &tp);
+    value = tp.tv_sec;
+    value *= 1000000000;
+    value += tp.tv_nsec;
 #elif defined(HAVE_GETTIMEOFDAY)
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    value = tv.tv_sec * 1000 + tv.tv_usec;
+    value = tv.tv_sec;
+    value *= 1000000;
+    value += tv.tv_usec;
 #elif defined(HAVE_CLOCK)
-    value = (int64_t)(1.0*clock()/CLOCKS_PER_SEC);
+    value = (uint64_t)(1.0*clock()/CLOCKS_PER_SEC);
 #else
     value = time(NULL);
 #endif
@@ -229,9 +246,9 @@ string PnetcdfTiming::get_stats_calls(bool descending)
     int calls_width = 0;
     int times_width = 0;
     int bytes_width = 0;
-    int64_t calls_total = 0;
-    int64_t times_total = 0;
-    int64_t bytes_total = 0;
+    uint64_t calls_total = 0;
+    uint64_t times_total = 0;
+    uint64_t bytes_total = 0;
 
     out << fixed << setprecision(1);
 
@@ -264,8 +281,8 @@ string PnetcdfTiming::get_stats_calls(bool descending)
             string name = it->second;
             PnetcdfIOMap::iterator times_it = times.find(name);
             PnetcdfIOMap::iterator bytes_it = bytes.find(name);
-            int64_t _times = (times_it == times.end()) ? 0 : times_it->second;
-            int64_t _bytes = (bytes_it == bytes.end()) ? 0 : bytes_it->second;
+            uint64_t _times = (times_it == times.end()) ? 0 : times_it->second;
+            uint64_t _bytes = (bytes_it == bytes.end()) ? 0 : bytes_it->second;
 
             line(out, name, it->first, calls_total,
                     _times, times_total, end_global-start_global,
@@ -278,7 +295,6 @@ string PnetcdfTiming::get_stats_calls(bool descending)
     }
 
     out << endl;
-    //footer(out, bytes_total, times_total);
 
     return out.str();
 }
@@ -287,31 +303,29 @@ string PnetcdfTiming::get_stats_calls(bool descending)
 string PnetcdfTiming::get_stats_aggregate()
 {
     ostringstream out;
-    int64_t times_total;
-    int64_t times_read;
-    int64_t times_read_agg;
-    int64_t times_write;
-    int64_t times_write_agg;
-    int64_t bytes_total;
-    int64_t bytes_read;
-    int64_t bytes_read_agg;
-    int64_t bytes_write;
-    int64_t bytes_write_agg;
-#if   SIZEOF_INT64_T == SIZEOF_INT
-    MPI_Datatype type = MPI_INT;
-#elif SIZEOF_INT64_T == SIZEOF_LONG
-    MPI_Datatype type = MPI_LONG;
-#elif SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    MPI_Datatype type = MPI_LONG_LONG_INT;
+    uint64_t times_total;
+    uint64_t times_read;
+    uint64_t times_read_agg;
+    uint64_t times_write;
+    uint64_t times_write_agg;
+    uint64_t bytes_total;
+    uint64_t bytes_read;
+    uint64_t bytes_read_agg;
+    uint64_t bytes_write;
+    uint64_t bytes_write_agg;
+#if   SIZEOF_UINT64_T == SIZEOF_UNSIGNED_INT
+    MPI_Datatype type = MPI_UNSIGNED;
+#elif SIZEOF_UINT64_T == SIZEOF_UNSIGNED_LONG
+    MPI_Datatype type = MPI_UNSIGNED_LONG;
 #else
-#   error Can't determine MPI_Datatype for int64_t
+#   error Can't determine MPI_Datatype for uint64_t
 #endif
 
     // calculate total times
     for (PnetcdfIOMap::const_iterator it=times.begin(), end=times.end();
             it != end; ++it) {
         string name = it->first;
-        int64_t data = it->second;
+        uint64_t data = it->second;
         if (name.find("get_var") != string::npos) {
             times_read += data;
         } else if (name.find("put_var") != string::npos) {
@@ -322,7 +336,7 @@ string PnetcdfTiming::get_stats_aggregate()
     for (PnetcdfIOMap::const_iterator it=bytes.begin(), end=bytes.end();
             it != end; ++it) {
         string name = it->first;
-        int64_t data = it->second;
+        uint64_t data = it->second;
         if (name.find("get_var") != string::npos) {
             bytes_read += data;
         } else if (name.find("put_var") != string::npos) {
@@ -334,18 +348,55 @@ string PnetcdfTiming::get_stats_aggregate()
     MPI_Allreduce(&times_write, &times_write_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
     MPI_Allreduce(&bytes_read, &bytes_read_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
     MPI_Allreduce(&bytes_write, &bytes_write_agg, 1, type, MPI_SUM, MPI_COMM_WORLD);
+    // sanity check...
+    if (times_read_agg < times_read) {
+        PRINT_SYNC("WARNING: times_read_agg<times_read\n");
+    } else {
+        PRINT_SYNC("I'm fine\n");
+    }
+    if (times_write_agg < times_write) {
+        PRINT_SYNC("WARNING: times_write_agg<times_write\n");
+    } else {
+        PRINT_SYNC("I'm fine\n");
+    }
+    if (bytes_read_agg < bytes_read) {
+        PRINT_SYNC("WARNING: bytes_read_agg<bytes_read\n");
+    } else {
+        PRINT_SYNC("I'm fine\n");
+    }
+    if (bytes_write_agg < bytes_write) {
+        PRINT_SYNC("WARNING: bytes_write_agg<bytes_write\n");
+    } else {
+        PRINT_SYNC("I'm fine\n");
+    }
 
     bytes_total = bytes_read_agg + bytes_write_agg;
     times_total = times_read_agg + times_write_agg;
+    double io_read  = g_io_multiplier * bytes_read_agg  / times_read_agg;
+    double io_write = g_io_multiplier * bytes_write_agg / times_write_agg;
+    double io_total = g_io_multiplier * bytes_total     / times_total;
 
     out << endl
-        << "Aggregate Bandwidth (Total Bytes/Total Times)" << endl
-        << "Read" << endl
-        << bytes_read_agg << " / " << times_read_agg << " = " << (1.0*bytes_read_agg/times_read_agg) << endl
-        << "Write" << endl
-        << bytes_write_agg << " / " << times_write_agg << " = " << (1.0*bytes_write_agg/times_write_agg) << endl
-        << "Total" << endl
-        << bytes_total << " / " << times_total << " = " << (1.0*bytes_total/times_total) << endl
+        << "Aggregate Bandwidth (Total Bytes/Total Times)"
+        << endl
+        << "Read"
+        << endl
+        << bytes_read_agg  << " / "
+        << times_read_agg  << " = "
+        <<    io_read
+        << endl
+        << "Write"
+        << endl
+        << bytes_write_agg << " / "
+        << times_write_agg << " = "
+        <<    io_write
+        << endl
+        << "Total"
+        << endl
+        << bytes_total << " / "
+        << times_total << " = "
+        <<    io_total
+        << endl
         << endl;
 
     return out.str();

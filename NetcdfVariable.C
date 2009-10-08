@@ -92,7 +92,6 @@ void NetcdfVariable::read()
     int64_t ld[ndim-1];
     MPI_Offset start[ndim];
     MPI_Offset count[ndim];
-    int err;
 
     NGA_Distribution64(get_handle(), me, lo, hi);
 

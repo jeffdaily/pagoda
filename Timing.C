@@ -164,7 +164,7 @@ string Timing::get_stats_calls(bool descending)
     if (name_width > g_name_width) {
         g_name_width = name_width;
     }
-    counts_width = (int)(ceil(log10(counts_max))) + g_log10_adjustment;
+    counts_width = (int)(ceil(log10((double)counts_max))) + g_log10_adjustment;
     if (counts_width > g_counts_width) {
         g_counts_width = counts_width;
     }
@@ -175,7 +175,7 @@ string Timing::get_stats_calls(bool descending)
         }
         times_total += times_it->second;
     }
-    times_width = (int)(ceil(log10(times_max))) + g_log10_adjustment;
+    times_width = (int)(ceil(log10((double)times_max))) + g_log10_adjustment;
     if (times_width > g_times_width) {
         g_times_width = times_width;
     }
@@ -239,7 +239,7 @@ string Timing::get_stats_total_time(bool descending)
         }
         times_total += times_it->second;
     }
-    times_width = (int)(ceil(log10(times_max))) + g_log10_adjustment;
+    times_width = (int)(ceil(log10((double)times_max))) + g_log10_adjustment;
     if (times_width > g_times_width) {
         g_times_width = times_width;
     }
@@ -250,7 +250,7 @@ string Timing::get_stats_total_time(bool descending)
         }
         counts_total += counts_it->second;
     }
-    counts_width = (int)(ceil(log10(counts_max))) + g_log10_adjustment;
+    counts_width = (int)(ceil(log10((double)counts_max))) + g_log10_adjustment;
     if (counts_width > g_counts_width) {
         g_counts_width = counts_width;
     }

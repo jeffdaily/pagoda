@@ -2408,6 +2408,66 @@ $as_echo "$ac_res" >&6; }
 
 } # ac_fn_c_find_intX_t
 
+# ac_fn_c_find_uintX_t LINENO BITS VAR
+# ------------------------------------
+# Finds an unsigned integer type with width BITS, setting cache variable VAR
+# accordingly.
+ac_fn_c_find_uintX_t ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for uint$2_t" >&5
+$as_echo_n "checking for uint$2_t... " >&6; }
+if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
+  $as_echo_n "(cached) " >&6
+else
+  eval "$3=no"
+     for ac_type in uint$2_t 'unsigned int' 'unsigned long int' \
+	 'unsigned long long int' 'unsigned short int' 'unsigned char'; do
+       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$ac_includes_default
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+static int test_array [1 - 2 * !(($ac_type) -1 >> ($2 - 1) == 1)];
+test_array [0] = 0
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  case $ac_type in #(
+  uint$2_t) :
+    eval "$3=yes" ;; #(
+  *) :
+    eval "$3=\$ac_type" ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+       eval as_val=\$$3
+   if test "x$as_val" = x""no; then :
+
+else
+  break
+fi
+     done
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; test "x$as_lineno_stack" = x && { as_lineno=; unset as_lineno;}
+
+} # ac_fn_c_find_uintX_t
+
 # ac_fn_cxx_compute_int LINENO EXPR VAR INCLUDES
 # ----------------------------------------------
 # Tries to find the compile-time value of EXPR in a program that includes
@@ -6259,13 +6319,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6262: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6322: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6265: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6325: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6268: output\"" >&5)
+  (eval echo "\"\$as_me:6328: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7470,7 +7530,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7473 "configure"' > conftest.$ac_ext
+  echo '#line 7533 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9643,11 +9703,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9646: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9706: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9650: \$? = $ac_status" >&5
+   echo "$as_me:9710: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9982,11 +10042,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9985: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10045: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9989: \$? = $ac_status" >&5
+   echo "$as_me:10049: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10087,11 +10147,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10090: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10150: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10094: \$? = $ac_status" >&5
+   echo "$as_me:10154: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10142,11 +10202,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10145: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10205: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10149: \$? = $ac_status" >&5
+   echo "$as_me:10209: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12573,7 +12633,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12576 "configure"
+#line 12636 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12669,7 +12729,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12672 "configure"
+#line 12732 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14641,11 +14701,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14644: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14704: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14648: \$? = $ac_status" >&5
+   echo "$as_me:14708: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14740,11 +14800,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14743: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14803: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14747: \$? = $ac_status" >&5
+   echo "$as_me:14807: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14792,11 +14852,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14795: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14855: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14799: \$? = $ac_status" >&5
+   echo "$as_me:14859: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16180,11 +16240,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16183: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16243: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16187: \$? = $ac_status" >&5
+   echo "$as_me:16247: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16279,11 +16339,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16282: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16342: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16286: \$? = $ac_status" >&5
+   echo "$as_me:16346: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16331,11 +16391,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16334: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16394: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16338: \$? = $ac_status" >&5
+   echo "$as_me:16398: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18419,7 +18479,7 @@ fi
 
 
 # Checks for header files.
-for ac_header in stdlib.h sys/time.h unistd.h
+for ac_header in inttypes.h stdint.h stdlib.h sys/time.h time.h unistd.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -18775,6 +18835,20 @@ _ACEOF
 ;;
 esac
 
+ac_fn_c_find_uintX_t "$LINENO" "64" "ac_cv_c_uint64_t"
+case $ac_cv_c_uint64_t in #(
+  no|yes) ;; #(
+  *)
+
+$as_echo "#define _UINT64_T 1" >>confdefs.h
+
+
+cat >>confdefs.h <<_ACEOF
+#define uint64_t $ac_cv_c_uint64_t
+_ACEOF
+;;
+  esac
+
 ac_fn_cxx_check_type "$LINENO" "MPI_Offset" "ac_cv_type_MPI_Offset" "#include <mpi.h>
 "
 if test "x$ac_cv_type_MPI_Offset" = x""yes; then :
@@ -19038,6 +19112,40 @@ _ACEOF
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of unsigned char" >&5
+$as_echo_n "checking size of unsigned char... " >&6; }
+if test "${ac_cv_sizeof_unsigned_char+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_cxx_compute_int "$LINENO" "(long int) (sizeof (unsigned char))" "ac_cv_sizeof_unsigned_char"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_unsigned_char" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+{ as_fn_set_status 77
+as_fn_error "cannot compute sizeof (unsigned char)
+See \`config.log' for more details." "$LINENO" 5; }; }
+   else
+     ac_cv_sizeof_unsigned_char=0
+   fi
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_unsigned_char" >&5
+$as_echo "$ac_cv_sizeof_unsigned_char" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_UNSIGNED_CHAR $ac_cv_sizeof_unsigned_char
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking size of short" >&5
 $as_echo_n "checking size of short... " >&6; }
 if test "${ac_cv_sizeof_short+set}" = set; then :
@@ -19065,6 +19173,40 @@ $as_echo "$ac_cv_sizeof_short" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define SIZEOF_SHORT $ac_cv_sizeof_short
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of unsigned short" >&5
+$as_echo_n "checking size of unsigned short... " >&6; }
+if test "${ac_cv_sizeof_unsigned_short+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_cxx_compute_int "$LINENO" "(long int) (sizeof (unsigned short))" "ac_cv_sizeof_unsigned_short"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_unsigned_short" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+{ as_fn_set_status 77
+as_fn_error "cannot compute sizeof (unsigned short)
+See \`config.log' for more details." "$LINENO" 5; }; }
+   else
+     ac_cv_sizeof_unsigned_short=0
+   fi
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_unsigned_short" >&5
+$as_echo "$ac_cv_sizeof_unsigned_short" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_UNSIGNED_SHORT $ac_cv_sizeof_unsigned_short
 _ACEOF
 
 
@@ -19106,6 +19248,40 @@ _ACEOF
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of unsigned int" >&5
+$as_echo_n "checking size of unsigned int... " >&6; }
+if test "${ac_cv_sizeof_unsigned_int+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_cxx_compute_int "$LINENO" "(long int) (sizeof (unsigned int))" "ac_cv_sizeof_unsigned_int"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_unsigned_int" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+{ as_fn_set_status 77
+as_fn_error "cannot compute sizeof (unsigned int)
+See \`config.log' for more details." "$LINENO" 5; }; }
+   else
+     ac_cv_sizeof_unsigned_int=0
+   fi
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_unsigned_int" >&5
+$as_echo "$ac_cv_sizeof_unsigned_int" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_UNSIGNED_INT $ac_cv_sizeof_unsigned_int
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking size of long" >&5
 $as_echo_n "checking size of long... " >&6; }
 if test "${ac_cv_sizeof_long+set}" = set; then :
@@ -19133,6 +19309,40 @@ $as_echo "$ac_cv_sizeof_long" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define SIZEOF_LONG $ac_cv_sizeof_long
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of unsigned long" >&5
+$as_echo_n "checking size of unsigned long... " >&6; }
+if test "${ac_cv_sizeof_unsigned_long+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_cxx_compute_int "$LINENO" "(long int) (sizeof (unsigned long))" "ac_cv_sizeof_unsigned_long"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_unsigned_long" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+{ as_fn_set_status 77
+as_fn_error "cannot compute sizeof (unsigned long)
+See \`config.log' for more details." "$LINENO" 5; }; }
+   else
+     ac_cv_sizeof_unsigned_long=0
+   fi
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_unsigned_long" >&5
+$as_echo "$ac_cv_sizeof_unsigned_long" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_UNSIGNED_LONG $ac_cv_sizeof_unsigned_long
 _ACEOF
 
 
@@ -19240,6 +19450,42 @@ $as_echo "$ac_cv_sizeof_int64_t" >&6; }
 
 cat >>confdefs.h <<_ACEOF
 #define SIZEOF_INT64_T $ac_cv_sizeof_int64_t
+_ACEOF
+
+
+fi
+if test x$ac_cv_c_uint64_t = xyes; then :
+  # The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of uint64_t" >&5
+$as_echo_n "checking size of uint64_t... " >&6; }
+if test "${ac_cv_sizeof_uint64_t+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_cxx_compute_int "$LINENO" "(long int) (sizeof (uint64_t))" "ac_cv_sizeof_uint64_t"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_uint64_t" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+{ as_fn_set_status 77
+as_fn_error "cannot compute sizeof (uint64_t)
+See \`config.log' for more details." "$LINENO" 5; }; }
+   else
+     ac_cv_sizeof_uint64_t=0
+   fi
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_uint64_t" >&5
+$as_echo "$ac_cv_sizeof_uint64_t" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_UINT64_T $ac_cv_sizeof_uint64_t
 _ACEOF
 
 
