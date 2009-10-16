@@ -12,11 +12,19 @@
 #   include <unistd.h>
 #endif
 
+#define USE_BARRIERS
+#ifdef USE_BARRIERS
+#   define BARRIER() GA_Sync()
+#else
+#   define BARRIER()
+#endif
+
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 
+#include <ga.h>
 #include <mpi.h>
 #include <pnetcdf.h>
 
@@ -50,12 +58,18 @@ static int g_log10_adjustment = 3;
 #if defined(HAVE_CLOCK_GETTIME)
 // converts bytes/nanosecond to gigabytes/second
 static double g_io_multiplier = 1000000000.0/1073741824.0; // 0.931322575
+static string UNIT_SIZE("bytes");
+static string UNIT_TIME("nanoseconds");
 #elif defined(HAVE_GETTIMEOFDAY)
 // converts bytes/microsecond to gigabytes/second
 static double g_io_multiplier = 1000000.0/1073741824.0; // 0.000931322575
+static string UNIT_SIZE("bytes");
+static string UNIT_TIME("microseconds");
 #else
 // converts bytes/second to gigabytes/second
 static double g_io_multiplier = 1.0/1073741824.0;
+static string UNIT_SIZE("bytes");
+static string UNIT_TIME("seconds");
 #endif
 
 
@@ -152,6 +166,7 @@ PnetcdfTiming::PnetcdfTiming(const string &name)
     ,   start(0)
 {
     ++calls[name];
+    BARRIER();
     start = get_time();
 }
 
@@ -189,7 +204,7 @@ PnetcdfTiming::PnetcdfTiming(
         bytes[name] = new_size;
     }
 
-    // time -- last so that the above doesn't weigh in on time
+    BARRIER();
     start = get_time();
 }
 
@@ -197,6 +212,8 @@ PnetcdfTiming::PnetcdfTiming(
 PnetcdfTiming::~PnetcdfTiming()
 {
     uint64_t end = get_time();
+    //BARRIER();
+    //uint64_t end_observed = get_time();
 
     if (end > start) {
         uint64_t diff = end-start;
@@ -363,7 +380,8 @@ string PnetcdfTiming::get_stats_aggregate()
     }
 
     PRINT_SYNC1("Before allreduce times_read:      %lu\n", times_read);
-    MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    //MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
     PRINT_SYNC1(" after allreduce times_read_agg:  %lu\n", times_read_agg);
     if (times_read_agg < times_read) {
         PRINT_SYNC("WARNING: times_read_agg<times_read\n");
@@ -372,7 +390,8 @@ string PnetcdfTiming::get_stats_aggregate()
     }
 
     PRINT_SYNC1("Before allreduce times_write:     %lu\n", times_write);
-    MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    //MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
     PRINT_SYNC1(" after allreduce times_write_agg: %lu\n", times_write_agg);
     if (times_write_agg < times_write) {
         PRINT_SYNC("WARNING: times_write_agg<times_write\n");
@@ -391,21 +410,21 @@ string PnetcdfTiming::get_stats_aggregate()
         << endl
         << "Read"
         << endl
-        << bytes_read_agg  << " / "
-        << times_read_agg  << " = "
-        <<    io_read
+        << bytes_read_agg  << " " << UNIT_SIZE << " / "
+        << times_read_agg  << " " << UNIT_TIME << " = "
+        <<    io_read      << " gigabytes/sec"
         << endl
         << "Write"
         << endl
-        << bytes_write_agg << " / "
-        << times_write_agg << " = "
-        <<    io_write
+        << bytes_write_agg << " " << UNIT_SIZE << " / "
+        << times_write_agg << " " << UNIT_TIME << " = "
+        <<    io_write     << " gigabytes/sec"
         << endl
         << "Total"
         << endl
-        << bytes_total << " / "
-        << times_total << " = "
-        <<    io_total
+        << bytes_total << " " << UNIT_SIZE << " / "
+        << times_total << " " << UNIT_TIME << " = "
+        <<    io_total << " gigabytes/sec"
         << endl
         << endl;
 

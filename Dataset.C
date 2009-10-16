@@ -227,12 +227,33 @@ void Dataset::adjust_masks(const LatLonBox &box)
         // corner/edge variables
         // Likely solution is to iterate over all Variables and examine them
         // for special attributes
-        Variable *lat = find_var(string("grid_center_lat"), false, true);
-        Variable *lon = find_var(string("grid_center_lon"), false, true);
+        Variable *lat;
+        Variable *lon;
+
+        lat = find_var(string("grid_center_lat"), false, true);
+        lon = find_var(string("grid_center_lon"), false, true);
         if (!lat) {
-            cerr << "adjust_masks: missing lat" << endl;
+            cerr << "adjust_masks: missing grid_center_lat" << endl;
         } else if (!lon) {
-            cerr << "adjust_masks: missing lon" << endl;
+            cerr << "adjust_masks: missing grid_center_lon" << endl;
+        } else {
+            lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
+        }
+        lat = find_var(string("grid_corner_lat2"), false, true);
+        lon = find_var(string("grid_corner_lon2"), false, true);
+        if (!lat) {
+            cerr << "adjust_masks: missing grid_corner_lat" << endl;
+        } else if (!lon) {
+            cerr << "adjust_masks: missing grid_corner_lon" << endl;
+        } else {
+            lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
+        }
+        lat = find_var(string("grid_edge_lat2"), false, true);
+        lon = find_var(string("grid_edge_lon2"), false, true);
+        if (!lat) {
+            cerr << "adjust_masks: missing grid_corner_lat" << endl;
+        } else if (!lon) {
+            cerr << "adjust_masks: missing grid_corner_lon" << endl;
         } else {
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
         }
@@ -362,13 +383,13 @@ void Dataset::decorate()
             }
         }
         if (var->get_name() == "cell_corners") {
-            Dimension *dim = find_dim(string("cellcorners"));
+            Dimension *dim = find_dim(string("corners"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }
         }
         if (var->get_name() == "cell_edges") {
-            Dimension *dim = find_dim(string("celledges"));
+            Dimension *dim = find_dim(string("edges"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }
