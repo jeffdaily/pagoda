@@ -11,6 +11,7 @@
 #include "ConnectivityVariable.H"
 #include "CoordinateVariable.H"
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
 #include "LatLonBox.H"
@@ -195,7 +196,7 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
         }
         if (dim_it == dims.end()) {
             const string name = slice.get_name();
-            cerr << "Sliced dimension '" << name << "' does not exist" << endl;
+            PRINT_ZERO1("Sliced dimension '%s' does not exist\n", name.c_str());
             continue;
         } else {
             Dimension *dim = *dim_it;
@@ -233,27 +234,27 @@ void Dataset::adjust_masks(const LatLonBox &box)
         lat = find_var(string("grid_center_lat"), false, true);
         lon = find_var(string("grid_center_lon"), false, true);
         if (!lat) {
-            cerr << "adjust_masks: missing grid_center_lat" << endl;
+            PRINT_ZERO("adjust_masks: missing grid_center_lat\n");
         } else if (!lon) {
-            cerr << "adjust_masks: missing grid_center_lon" << endl;
+            PRINT_ZERO("adjust_masks: missing grid_center_lon\n");
         } else {
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
         }
         lat = find_var(string("grid_corner_lat2"), false, true);
         lon = find_var(string("grid_corner_lon2"), false, true);
         if (!lat) {
-            cerr << "adjust_masks: missing grid_corner_lat" << endl;
+            PRINT_ZERO("adjust_masks: missing grid_corner_lat\n");
         } else if (!lon) {
-            cerr << "adjust_masks: missing grid_corner_lon" << endl;
+            PRINT_ZERO("adjust_masks: missing grid_corner_lon\n");
         } else {
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
         }
         lat = find_var(string("grid_edge_lat2"), false, true);
         lon = find_var(string("grid_edge_lon2"), false, true);
         if (!lat) {
-            cerr << "adjust_masks: missing grid_corner_lat" << endl;
+            PRINT_ZERO("adjust_masks: missing grid_corner_lat\n");
         } else if (!lon) {
-            cerr << "adjust_masks: missing grid_corner_lon" << endl;
+            PRINT_ZERO("adjust_masks: missing grid_corner_lon\n");
         } else {
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
         }
@@ -396,10 +397,13 @@ void Dataset::decorate()
         }
     }
 #ifdef DEBUG
-    cerr << "Variables after decoration" << endl;
-    for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
-        cerr << (*var_it) << endl;
+    if (0 == me) {
+        cerr << "Variables after decoration" << endl;
+        for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+            cerr << (*var_it) << endl;
+        }
     }
+    GA_Sync();
 #endif // DEBUG
 
     decorate_set(vars);
