@@ -1,0 +1,39 @@
+The subsetter uses autoconf/automake/libtool to build and has dependencies on Global Arrays and pnetcdf.
+
+--- BUILDING GLOBAL ARRAYS ----------------------------------------------------
+If you "module load ga" on systems that use modules e.g. franklin you should see the recommended LIBS and INCLUDES variables for GA which should be used later used as GA_LIBS and GA_INCS in the configure script invocation.  Otherwise, if you were to build your own GA, the last lines output by their makefile contain the LIBS and INCLUDES that should then be saved  in your environment as GA_LIBS and GA_INCS, respectively.  I usually build my own GA on any system I'm using so that I know what I'm getting.
+
+--- BUILDING GLOBAL ARRAYS -- franklin.nersc.gov ------------------------------
+I'm not using the provided GA on franklin.  The env vars I use to build GA are as follows:
+setenv TARGET LINUX64
+setenv MSG_COMMS MPI
+setenv ARMCI_NETWORK PORTALS
+setenv CC cc
+setenv CXX CC
+setenv F77 ftn
+setenv FC ftn
+setenv XT_SYMMETRIC_HEAP_SIZE 1G
+setenv MA_USE_ARMCI_MEM 1
+setenv COMM_LIBS /u0/m/manoj/libportals.a
+setenv CRAY_PORTALS_USE_BLOCKING_POLL 1
+
+With the above, you should be able to simply "make" GA.  The latter two env vars are important because apparently the portals version on franklin isn't up-to-date (?) so one of my colleagues pointed me to their own version of the portals library, and the last one toggles a feature of GA necessary on portals systems or else global operations within GA will crawl.
+
+--- BUILDING SUBSETTER --------------------------------------------------------
+To build the "subsetter", salt to taste the following (note the "SEE_ABOVE" refers to GA_LIBS/GA_INCS talked about in the opening paragraph of this README):
+./configure GA_LIBS=$SEE_ABOVE GA_INCS=$SEE_ABOVE --with-pnetcdf=$PATH_TO_PNETCDF_DIR
+
+--- RUNNING SUBSETTER ---------------------------------------------------------
+The subsetter takes command line arguments.  The usage screen is as follows:
+
+Usage: subsetter [options] infile1 [infile2 ...] output_filename
+
+Generic options:
+-h                                 produce this usage statement
+-b box north,south,east,west       limits in degrees
+-d dimension,start[,stop[,step]]   as integer indices
+-j name                            name of dim to join on
+
+Specify a bounding box representing the subset as indicated.  The values themselves may be in floating point or integer notation e.g. "-b 20.0,-20.0,170,150" (note the lack of spaces).  If multiple input files are placed on the command line, a "union" aggregation will occur.  If you use the "-j" argument in addition to placing multiple input files, it will perform a "join existing" aggregation.  See NcML aggregation documentation for details (http://www.unidata.ucar.edu/software/netcdf/ncml/v2.2/Aggregation.html).  The aggregation capability is not as extensively tested as running a single input file.
+
+NOTE: The famous "MJO" region is "-b 20,-20,170,150"
