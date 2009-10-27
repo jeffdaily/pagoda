@@ -301,3 +301,22 @@ void DistributedMask::reindex()
     */
     TRACER("DistributedMask::reindex() END\n");
 }
+
+
+bool DistributedMask::access(int64_t &alo, int64_t &ahi, int* &data)
+{
+    // bail if we don't own any of the data
+    if (0 > lo || 0 > hi) {
+        return false;
+    }
+    alo = lo;
+    ahi = hi;
+    NGA_Access64(handle, &lo, &hi, &data, NULL);
+    return true;
+}
+
+
+void DistributedMask::release()
+{
+    NGA_Release_update64(handle, &lo, &hi);
+}

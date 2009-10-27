@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <set>
 
 #include "Attribute.H"
 #include "BoundaryVariable.H"
@@ -14,10 +15,13 @@
 #include "Debug.H"
 #include "Dimension.H"
 #include "DistributedMask.H"
+#include "Error.H"
 #include "LatLonBox.H"
 #include "LocalMask.H"
 #include "Mask.H"
 #include "NetcdfDataset.H"
+#include "NetcdfVariable.H"
+#include "PnetcdfTiming.H"
 #include "Slice.H"
 #include "StringComparator.H"
 #include "Timing.H"
@@ -26,7 +30,9 @@
 
 using std::cerr;
 using std::endl;
+using std::fill;
 using std::find;
+using std::set;
 using std::tolower;
 using std::transform;
 
@@ -207,6 +213,8 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
 }
 
 
+//#define ADJUST_MASKS_WITHOUT_PRESERVATION 1
+#if ADJUST_MASKS_WITHOUT_PRESERVATION
 /**
  * Special-case mask creation using a Lat/Lon combination.
  *
@@ -218,6 +226,9 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
  * logic terms, an OR over the shared dimension mask. What we really want,
  * whether the grid is cell- or rectangular-based, is an AND result -- a
  * lat lon box instead of a lat lon cross.
+ *
+ * This algorithm does not preserve whole cells, rather the unique cells,
+ * corners, and edges are all subset individually.
  */
 void Dataset::adjust_masks(const LatLonBox &box)
 {
@@ -260,6 +271,195 @@ void Dataset::adjust_masks(const LatLonBox &box)
         }
     }
 }
+
+#else /* ADJUST_MASKS_WITHOUT_PRESERVATION */
+
+static inline void adjust_corners_edges_mask(
+        Dataset *dataset, int *cmask, int64_t clo, int64_t chi, bool corners)
+{
+    Variable *var;
+    ConnectivityVariable *cv;
+    NetcdfVariable *ncv;
+    Dimension *dim;
+    Dimension *dimbound;
+    DistributedMask *mask;
+    string var_name = corners ? "cell_corners" : "cell_edges";
+    string dim_name = corners ? "corners" : "edges";
+    int ZERO = 0;
+    int me = GA_Nodeid();
+    int64_t cells_count = chi-clo+1;
+    
+    var = dataset->find_var(var_name, false, true);
+    dim = dataset->find_dim(dim_name);
+
+    if (!var) {
+        if (corners)
+            PRINT_ZERO("no cell_corners found to subset");
+        else
+            PRINT_ZERO("no cell_edges found to subset");
+        return;
+    }
+    if (!dim) {
+        if (corners)
+            ERR("missing associated dimension 'corners' for cell_corners");
+        else
+            ERR("missing associated dimension 'edges' for cell_edgess");
+    }
+    mask = dynamic_cast<DistributedMask*>(dim->get_mask());
+    cv = dynamic_cast<ConnectivityVariable*>(var);
+    ncv = dynamic_cast<NetcdfVariable*>(var);
+    if (!ncv) {
+        if (!cv) {
+            ERR("did not cast to ConnectivityVariable");
+        } else {
+            ncv = dynamic_cast<NetcdfVariable*>(cv->get_var());
+            if (!ncv) {
+                ERR("did not cast to NetcdfVariable");
+            }
+        }
+    }
+    dimbound = var->get_dims().at(1);
+
+    GA_Fill(mask->get_handle(), &ZERO);
+    
+    // read portion of the corners or edges local to the cells mask
+    int64_t per_cell = dimbound->get_size();
+    int64_t local_size = cells_count * per_cell;
+    MPI_Offset var_lo[] = {clo, 0};
+    MPI_Offset var_count[] = {cells_count, per_cell};
+    int var_data[local_size];
+    ncmpi::get_vara_all(ncv->get_dataset()->get_id(), ncv->get_id(),
+                var_lo, var_count, &var_data[0]);
+
+    // iterate over the corners or edges indices and place into set
+    set<int> var_data_set;
+    for (int64_t cellidx=0; cellidx<cells_count; ++cellidx) {
+        if (cmask[cellidx] != 0) {
+            int64_t local_offset = cellidx * per_cell;
+            for (int64_t boundidx=0; boundidx<per_cell; ++boundidx) {
+                var_data_set.insert(var_data[local_offset+boundidx]);
+            }
+        }
+    }
+
+    // NGA_Scatter_acc expects int** (yuck)
+    size_t size = var_data_set.size();
+    int ones[size];
+    fill(ones, ones+size, 1);
+    int64_t *subs[size];
+    set<int>::const_iterator it,end;
+    size_t idx=0;
+    for (it=var_data_set.begin(),end=var_data_set.end(); it!=end; ++it,++idx) {
+        subs[idx] = new int64_t(*it);
+    }
+
+    NGA_Scatter64(mask->get_handle(), ones, subs, size);
+    
+    // Clean up!
+    for (int64_t idx=0; idx<size; ++idx) {
+        delete subs[idx];
+    }
+}
+
+
+static inline bool adjust_centers_mask(Dataset *dataset, const LatLonBox &box)
+{
+    TRACER("adjust_centers_mask\n");
+    int type;
+    int ndim;
+    int64_t dims[1];
+    int64_t lo;
+    int64_t hi;
+    DistributedMask *cells_mask;
+    int *cells_mask_data;
+    Variable *lat_var;
+    Variable *lon_var;
+    Dimension *cells_dim;
+
+    lat_var = dataset->find_var(string("grid_center_lat"), false, true);
+    lon_var = dataset->find_var(string("grid_center_lon"), false, true);
+    if (!lat_var) {
+        ERR("adjust_masks: missing grid_center_lat");
+    }
+    if (!lon_var) {
+        ERR("adjust_masks: missing grid_center_lon");
+    }
+
+    cells_dim = lat_var->get_dims()[0];
+    cells_mask = dynamic_cast<DistributedMask*>(cells_dim->get_mask());
+    if (!cells_mask) {
+        ERR("cells mask was not distributed");
+    }
+
+    lat_var->read();
+    lon_var->read();
+    if (!cells_mask->access(lo, hi, cells_mask_data)) {
+        // this process doesn't own any of the cells_mask, so return
+        return false;
+    }
+    // just need the type of the lat/lon vars
+    NGA_Inquire64(lat_var->get_handle(), &type, &ndim, dims);
+    switch (type) {
+#define adjust_op(MTYPE,TYPE) \
+        case MTYPE: { \
+            TYPE *lat; \
+            TYPE *lon; \
+            NGA_Access64(lat_var->get_handle(), &lo, &hi, &lat, NULL); \
+            NGA_Access64(lon_var->get_handle(), &lo, &hi, &lon, NULL); \
+            for (int64_t i=0, limit=hi-lo+1; i<limit; ++i) { \
+                cells_mask_data[i] = box.contains(lat[i], lon[i]) ? 1 : 0; \
+            } \
+            break; \
+        }
+        adjust_op(C_INT,int)
+        adjust_op(C_LONG,long)
+        adjust_op(C_LONGLONG,long long)
+        adjust_op(C_FLOAT,float)
+        adjust_op(C_DBL,double)
+#undef adjust_op
+    }
+    adjust_corners_edges_mask(dataset, cells_mask_data, lo, hi, true);
+    adjust_corners_edges_mask(dataset, cells_mask_data, lo, hi, false);
+    cells_mask->release();
+
+    return true;
+}
+
+
+/**
+ * Special-case mask creation using a Lat/Lon combination.
+ *
+ * Different than creating masks solely based on a single Slice at a time,
+ * this special case allows the lat and lon dimensions to be subset
+ * simultaenously. This is most important when dealing with a cell-based
+ * grid where the lat and lon coordinate variables share the same dimension.
+ * In that case, if we were to generate masks one at a time, we'd get, in
+ * logic terms, an OR over the shared dimension mask. What we really want,
+ * whether the grid is cell- or rectangular-based, is an AND result -- a
+ * lat lon box instead of a lat lon cross.
+ *
+ * This algorithm preserves whole cells.
+ */
+void Dataset::adjust_masks(const LatLonBox &box)
+{
+    TRACER("Dataset::adjust_masks(LatLonBox)\n");
+    TIMING("Dataset::adjust_masks(LatLonBox)");
+    // TODO THIS CODE SHOULD BE MOVED
+    // The distributed nature of the data should be hidden from the 
+    // Dataset class IMHO. This code also assumes the all of the variables
+    // here are distributed (which is a generally safe assumption.)
+    if (box == LatLonBox::GLOBAL) {
+        return;
+    }
+
+    if (!adjust_centers_mask(this, box)) {
+        // this process didn't own any of the data
+        return;
+    }
+}
+
+
+#endif /* ADJUST_MASKS_WITHOUT_PRESERVATION */
 
 
 

@@ -334,6 +334,9 @@ string PnetcdfTiming::get_stats_aggregate()
     MPI_Datatype type = MPI_UNSIGNED;
 #elif SIZEOF_UINT64_T == SIZEOF_UNSIGNED_LONG
     MPI_Datatype type = MPI_UNSIGNED_LONG;
+#elif SIZEOF_UINT64_T == SIZEOF_UNSIGNED_LONG_LONG
+    // NOTE: There is no MPI_UNSIGNED_LONG_LONG_INT type... :-(
+    MPI_Datatype type = MPI_LONG_LONG_INT;
 #else
 #   error Can't determine MPI_Datatype for uint64_t
 #endif

@@ -35,6 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+check_PROGRAMS = subsetter_old$(EXEEXT)
 bin_PROGRAMS = subsetter$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
@@ -101,6 +102,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_subsetter_OBJECTS = SubsetterMain.$(OBJEXT)
 subsetter_OBJECTS = $(am_subsetter_OBJECTS)
 subsetter_DEPENDENCIES = libsubsetter.la
+am_subsetter_old_OBJECTS = Mainp.$(OBJEXT)
+subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
+subsetter_old_DEPENDENCIES = libsubsetter.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -123,8 +127,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES)
-DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES)
+SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
+	$(subsetter_old_SOURCES)
+DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
+	$(subsetter_old_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -387,8 +393,8 @@ AM_CXXFLAGS = $(GA_INCS) $(CFLAGS) $(WALL) $(PROFILE)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS) $(PROFILE)
 lib_LTLIBRARIES = libsubsetter.la
 libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
-#subsetter_old_SOURCES = Mainp.C
-#subsetter_old_LDADD = libsubsetter.la
+subsetter_old_SOURCES = Mainp.C
+subsetter_old_LDADD = libsubsetter.la
 subsetter_SOURCES = SubsetterMain.C
 subsetter_LDADD = libsubsetter.la
 all: all-recursive
@@ -522,9 +528,21 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+
+clean-checkPROGRAMS:
+	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
 subsetter$(EXEEXT): $(subsetter_OBJECTS) $(subsetter_DEPENDENCIES) 
 	@rm -f subsetter$(EXEEXT)
 	$(CXXLINK) $(subsetter_OBJECTS) $(subsetter_LDADD) $(LIBS)
+subsetter_old$(EXEEXT): $(subsetter_old_OBJECTS) $(subsetter_old_DEPENDENCIES) 
+	@rm -f subsetter_old$(EXEEXT)
+	$(CXXLINK) $(subsetter_old_OBJECTS) $(subsetter_old_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -551,6 +569,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LocalMask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfAttribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDataset.Plo@am__quote@
@@ -908,6 +927,7 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
 install-binPROGRAMS: install-libLTLIBRARIES
@@ -944,8 +964,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
+	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -1016,18 +1036,18 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
-	install-am install-strip tags-recursive
+.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) check-am \
+	ctags-recursive install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
-	ctags-recursive dist dist-all dist-bzip2 dist-gzip dist-lzma \
-	dist-shar dist-tarZ dist-xz dist-zip distcheck distclean \
-	distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binPROGRAMS install-data \
+	clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool ctags ctags-recursive dist dist-all dist-bzip2 \
+	dist-gzip dist-lzma dist-shar dist-tarZ dist-xz dist-zip \
+	distcheck distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-tags distcleancheck \
+	distdir distuninstallcheck dvi dvi-am html html-am info \
+	info-am install install-am install-binPROGRAMS install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-libLTLIBRARIES install-man install-pdf \

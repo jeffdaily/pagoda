@@ -22,7 +22,9 @@
 
 // C++ includes
 #include "Debug.H"
+#include "Error.H"
 #include "LatLonBox.H"
+#include "NetcdfError.H"
 #include "RangeException.H"
 #include "Slice.H"
 #include "SubsetterException.H"
@@ -56,22 +58,6 @@ int error;
 char GOP_SUM[] = "+";
 char NAME_VAR_IN[] = "var_in";
 char NAME_VAR_OUT[] = "var_out";
-
-
-#define ERR(e) { \
-    ostringstream __os; \
-        __os << "Error: " << e << endl; \
-        throw SubsetterException(__os.str()); }
-
-#define ERRNO(n) { \
-    ostringstream __os; \
-        __os << "Error: " << ncmpi_strerror(n) << endl; \
-        throw SubsetterException(__os.str()); }
-
-#define ERRNO_CHECK(n) \
-        if (n != NC_NOERR) { \
-            ERRNO(n); \
-        }
 
 
 #ifdef F77_DUMMY_MAIN
@@ -168,7 +154,7 @@ int main(int argc, char **argv)
 {
     MPI_Init(&argc, &argv);
     GA_Initialize();
-    DEBUG_ZERO(stderr, "After GA_Initialize\n");
+    DEBUG_ZERO("After GA_Initialize\n");
 
     int ncid_in = -1;
     int ncid_grid = -1;
@@ -206,7 +192,7 @@ int main(int argc, char **argv)
         while ((c = getopt(argc, argv, "hb:g:d:")) != -1) {
             switch (c) {
                 case 'h':
-                    throw SubsetterException(usage);
+                    throw SubsetterException(AT, usage);
                 case 'b':
                     wants_region = true;
                     box = LatLonBox(optarg);
@@ -228,7 +214,7 @@ int main(int argc, char **argv)
                     ostringstream os;
                     os << "ERROR: Unrecognized argument '" << c << "'" << endl;
                     os << usage << endl;
-                    throw SubsetterException(os.str());
+                    throw SubsetterException(AT, os.str());
             }
         }
 
@@ -236,12 +222,12 @@ int main(int argc, char **argv)
             ostringstream os;
             os << "ERROR: Input and output file arguments required" << endl;
             os << usage << endl;
-            throw SubsetterException(os.str());
+            throw SubsetterException(AT, os.str());
         } else if (optind+1 == argc) {
             ostringstream os;
             os << "ERROR: Output file argument required" << endl;
             os << usage << endl;
-            throw SubsetterException(os.str());
+            throw SubsetterException(AT, os.str());
         } else if (optind+2 == argc) {
             input_filename = argv[optind];
             output_filename = argv[optind+1];
@@ -249,12 +235,12 @@ int main(int argc, char **argv)
             ostringstream os;
             os << "ERROR: Too many files specified" << endl;
             os << usage << endl;
-            throw SubsetterException(os.str());
+            throw SubsetterException(AT, os.str());
         }
 
         // open our input file and gather its header info
-        DEBUG_ZERO(stderr, "Before first file open, attempting to open\n");
-        DEBUG_ZERO(stderr, "%s\n", input_filename.c_str());
+        DEBUG_ZERO("Before first file open, attempting to open\n");
+        DEBUG_ZERO1("%s\n", input_filename.c_str());
         error = ncmpi_open(MPI_COMM_WORLD, input_filename.c_str(), NC_NOWRITE,
                 MPI_INFO_NULL, &ncid_in);
         ERRNO_CHECK(error);
@@ -265,7 +251,7 @@ int main(int argc, char **argv)
         // open our grid file and gather its header info, but only if one
         // was specified and that was different from the input file
         if (!grid_filename.empty() && grid_filename != input_filename) {
-            DEBUG_ZERO(stderr, "Before open grid file\n");
+            DEBUG_ZERO("Before open grid file\n");
             error = ncmpi_open(MPI_COMM_WORLD, grid_filename.c_str(), NC_NOWRITE,
                     MPI_INFO_NULL, &ncid_grid);
             ERRNO_CHECK(error);
@@ -274,7 +260,7 @@ int main(int argc, char **argv)
 
         // Open the output file now.  Better now than after we do a bunch of work
         // only to find out this step failed.
-        DEBUG_ZERO(stderr, "Before output file open\n");
+        DEBUG_ZERO("Before output file open\n");
         error = ncmpi_create(MPI_COMM_WORLD, output_filename.c_str(), NC_WRITE,
                 MPI_INFO_NULL, &ncid_out);
         ERRNO_CHECK(error);
@@ -300,8 +286,8 @@ int main(int argc, char **argv)
         }
         // MA_init values based on max size / #procs
         int64_t max_size = max / GA_Nnodes();
-        DEBUG_ZERO(stderr, "MA max memory %llu bytes\n", max_size*8);
-        DEBUG_ZERO(stderr, "MA max variable %s\n", max_name.c_str());
+        DEBUG_ZERO1("MA max memory %llu bytes\n", max_size*8);
+        DEBUG_ZERO1("MA max variable %s\n", max_name.c_str());
         if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
             char msg[] = "MA_init failed";
             GA_Error(msg, 0);
@@ -344,7 +330,7 @@ int main(int argc, char **argv)
             for (int i=0,remap=-1; i<=hi; ++i) {
                 if (mask[i] >= 1) {
                     cells_map[i] = ++remap;
-                    //DEBUG_ZERO(stderr, "cells_map[%d]=%d\n", i, cells_map[i]);
+                    //DEBUG_ZERO2("cells_map[%d]=%d\n", i, cells_map[i]);
                 }
             }
         }
@@ -358,7 +344,7 @@ int main(int argc, char **argv)
             for (int i=0,remap=-1; i<=hi; ++i) {
                 if (mask[i] >= 1) {
                     corners_map[i] = ++remap;
-                    //DEBUG_ZERO(stderr, "corners_map[%d]=%d\n", i, corners_map[i]);
+                    //DEBUG_ZERO2("corners_map[%d]=%d\n", i, corners_map[i]);
                 }
             }
         }
@@ -372,7 +358,7 @@ int main(int argc, char **argv)
             for (int i=0,remap=-1; i<=hi; ++i) {
                 if (mask[i] >= 1) {
                     edges_map[i] = ++remap;
-                    //DEBUG_ZERO(stderr, "edges_map[%d]=%d\n", i, edges_map[i]);
+                    //DEBUG_ZERO2("edges_map[%d]=%d\n", i, edges_map[i]);
                 }
             }
         }
@@ -388,7 +374,7 @@ int main(int argc, char **argv)
             if (name.find(COMPOSITE_PREFIX) == 0) continue; // skip composites
             Mask mask = it->second;
             MPI_Offset size = mask.global_count;
-            DEBUG_ZERO(stderr, "Defining dimension '%s'\n", name.c_str());
+            DEBUG_ZERO1("Defining dimension '%s'\n", name.c_str());
             if (mask.dim.is_unlimited) size = NC_UNLIMITED;
             int idp;
             error = ncmpi_def_dim(ncid_out, name.c_str(), size, &idp);
@@ -417,7 +403,7 @@ int main(int argc, char **argv)
             int varidp;
             string var_name = it->first;
             VarInfo var_in = it->second;
-            DEBUG_ZERO(stderr, "Defining variable '%s' with dims ",var_name.c_str());
+            DEBUG_ZERO1("Defining variable '%s' with dims ",var_name.c_str());
             int dims[var_in.ndim];
             bool skip = false;
             for (int dimidx=0; dimidx<var_in.ndim; ++dimidx) {
@@ -426,9 +412,9 @@ int main(int argc, char **argv)
                 skip |= (out_dims.find(var_in.dims[dimidx].name) == out_dims.end());
                 if (skip) break;
                 dims[dimidx] = out_dims[var_in.dims[dimidx].name].id;
-                DEBUG_ZERO(stderr, "%s,", var_in.dims[dimidx].name.c_str());
+                DEBUG_ZERO1("%s,", var_in.dims[dimidx].name.c_str());
             }
-            DEBUG_ZERO(stderr, skip ? ", skipping due to degenerate dimension\n" : "\n");
+            DEBUG_ZERO(skip ? ", skipping due to degenerate dimension\n" : "\n");
             if (skip) continue; // see note above
             error = ncmpi_def_var(ncid_out, var_name.c_str(), var_in.type, var_in.ndim, dims, &varidp);
             ERRNO_CHECK(error);
@@ -690,7 +676,7 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
 
 void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile)
 {
-    DEBUG_ZERO(stderr, "adjust_cell_masks BEGIN\n");
+    DEBUG_ZERO("adjust_cell_masks BEGIN\n");
 
     float *lon = NULL; // holds local grid_center_lon data, tmp
     float *lat = NULL; // holds local grid_center_lat data, tmp
@@ -812,7 +798,7 @@ void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile)
     delete [] lon;
     delete [] lat;
 
-    DEBUG_ZERO(stderr, "adjust_cell_masks END\n");
+    DEBUG_ZERO("adjust_cell_masks END\n");
 }
 
 
@@ -866,7 +852,7 @@ string get_mask_name(DimInfoVec dims)
 
 Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
 {
-    DEBUG_ZERO(stderr, "create_composite_mask2d\n");
+    DEBUG_ZERO("create_composite_mask2d\n");
 
     // create and access the new composite mask
     string name = composite_name(dims);
@@ -925,7 +911,7 @@ Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
 
 Mask create_composite_mask3d(MaskMap &masks, DimInfoVec dims)
 {
-    throw SubsetterException("create_composite_mask3d NOT IMPLEMENTED");
+    throw SubsetterException(AT, "create_composite_mask3d NOT IMPLEMENTED");
     /*
        string name = composite_name(dims);
        MPI_Offset size = dims[0].size * dims[1].size * dims[2].size;
@@ -940,29 +926,29 @@ void create_composite_mask(MaskMap &masks, VarInfo varInfo)
 {
     DimInfoVec dims = varInfo.dims;
     if (dims.size() > 0 && dims[0].name == "time") {
-        DEBUG_ZERO(stderr, "erasing time dimension from var info\n");
+        DEBUG_ZERO("erasing time dimension from var info\n");
         dims.erase(dims.begin());
     }
     if (dims.size() == 0) {
-        DEBUG_ZERO(stderr, "dims.size() == 0, skipping\n");
+        DEBUG_ZERO("dims.size() == 0, skipping\n");
     } else if (dims.size() == 1) {
-        DEBUG_ZERO(stderr, "dims.size() == 1, skipping\n");
+        DEBUG_ZERO("dims.size() == 1, skipping\n");
     } else if (dims.size() == 2) {
         string name = composite_name(dims);
         if (masks.find(name) != masks.end()) {
-            DEBUG_ZERO(stderr, "dims.size() == 2, name=%s, skipping\n", name.c_str());
+            DEBUG_ZERO1("dims.size() == 2, name=%s, skipping\n", name.c_str());
             return;
         } else {
-            DEBUG_ZERO(stderr, "dims.size() == 2, name=%s\n", name.c_str());
+            DEBUG_ZERO1("dims.size() == 2, name=%s\n", name.c_str());
             masks[name] = create_composite_mask2d(masks, dims);
         }
     } else if (dims.size() == 3) {
         string name = composite_name(dims);
         if (masks.find(name) != masks.end()) {
-            DEBUG_ZERO(stderr, "dims.size() == 3, name=%s, skipping\n", name.c_str());
+            DEBUG_ZERO1("dims.size() == 3, name=%s, skipping\n", name.c_str());
             return;
         } else {
-            DEBUG_ZERO(stderr, "dims.size() == 3, name=%s\n", name.c_str());
+            DEBUG_ZERO1("dims.size() == 3, name=%s\n", name.c_str());
             masks[name] = create_composite_mask3d(masks, dims);
         }
     } else {
@@ -973,7 +959,7 @@ void create_composite_mask(MaskMap &masks, VarInfo varInfo)
 
 void create_composite_masks(MaskMap &masks, VarInfoVec varInfos)
 {
-    DEBUG_ZERO(stderr, "create_composite_masks size=%zu\n", varInfos.size());
+    DEBUG_ZERO1("create_composite_masks size=%zu\n", varInfos.size());
     for (size_t idx=0; idx<varInfos.size(); ++idx) {
         VarInfo varInfo = varInfos[idx];
         create_composite_mask(masks, varInfo);
@@ -983,7 +969,7 @@ void create_composite_masks(MaskMap &masks, VarInfoVec varInfos)
 
 void count_masks(MaskMap &masks)
 {
-    DEBUG_ZERO(stderr, "count_masks BEGIN\n");
+    DEBUG_ZERO("count_masks BEGIN\n");
 
     for (MaskMap::iterator it=masks.begin(); it!=masks.end(); ++it) {
         if (it->first.find(COMPOSITE_PREFIX) == 0) continue; // don't count these
@@ -1007,7 +993,7 @@ void count_masks(MaskMap &masks)
         }
     }
 
-    DEBUG_ZERO(stderr, "count_masks END\n");
+    DEBUG_ZERO("count_masks END\n");
 }
 
 
@@ -1121,13 +1107,13 @@ void copy_record_var(
             ERR("Unable to locate composite mask");
         }
         int64_t icount;
-        DEBUG_ZERO(stderr, "before pack\n");
+        DEBUG_ZERO("before pack\n");
         GA_Pack64(g_var_in, g_var_out, masks[mask_name].handle, 0, size_in-1, &icount);
-        DEBUG_ZERO(stderr, "after pack, icount=%lld\n", icount);
+        DEBUG_ZERO1("after pack, icount=%lld\n", icount);
 
         // NO REMAPPING
 
-        DEBUG_ZERO(stderr, "WRITING: %s\n", name.c_str());
+        DEBUG_ZERO1("WRITING: %s\n", name.c_str());
 
         // Write to file from local memory
         // NOTE: data type dependent call
@@ -1248,14 +1234,14 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         ERR("Unable to locate composite mask");
     }
     int64_t icount;
-    DEBUG_ZERO(stderr, "before pack\n");
+    DEBUG_ZERO("before pack\n");
     GA_Pack64(g_var_in, g_var_out, masks[mask_name].handle, 0, size_in-1, &icount);
-    DEBUG_ZERO(stderr, "after pack, icount=%lld\n", icount);
+    DEBUG_ZERO1("after pack, icount=%lld\n", icount);
 
     // If we have one of the special mapping variables, perform the
     // remapping now.
     if (mapping) {
-        DEBUG_ZERO(stderr, "MAPPING: %s\n", name.c_str());
+        DEBUG_ZERO1("MAPPING: %s\n", name.c_str());
         int *ptr;
         NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
         MPI_Offset limit = hi_out - lo_out + 1;
@@ -1269,7 +1255,7 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         NGA_Release_update64(g_var_out, &lo_out, &hi_out);
     }
 
-    DEBUG_ZERO(stderr, "WRITING: %s\n", name.c_str());
+    DEBUG_ZERO1("WRITING: %s\n", name.c_str());
 
     // Write to file from local memory
     // NOTE: data type dependent call

@@ -38,6 +38,8 @@ class DistributedMask : public Mask
 
         int get_handle() const { return handle; }
         int get_handle_index() const { return handle_index; }
+        bool access(int64_t &lo, int64_t &hi, int* &data);
+        void release();
 
     protected:
         int handle;

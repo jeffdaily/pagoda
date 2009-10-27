@@ -51,6 +51,7 @@ class VariableDecorator : public Variable
 
         virtual ostream& print(ostream &os) const;
 
+        Variable* get_var() const { return var; }
     protected:
         Variable *var;
 };
