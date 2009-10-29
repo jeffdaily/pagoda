@@ -300,10 +300,14 @@ static inline void adjust_corners_edges_mask(
         return;
     }
     if (!dim) {
-        if (corners)
-            ERR("missing associated dimension 'corners' for cell_corners");
-        else
-            ERR("missing associated dimension 'edges' for cell_edgess");
+        if (corners) {
+            PRINT_ZERO("missing associated dimension 'corners' for cell_corners");
+            PRINT_ZERO("cannot subset cell_corners");
+        } else {
+            PRINT_ZERO("missing associated dimension 'edges' for cell_edgess");
+            PRINT_ZERO("cannot subset cell_edges");
+        }
+        return;
     }
     mask = dynamic_cast<DistributedMask*>(dim->get_mask());
     cv = dynamic_cast<ConnectivityVariable*>(var);

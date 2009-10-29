@@ -1,10 +1,12 @@
 #ifndef ERROR_H_
 #define ERROR_H_
 
+#include <iostream>
 #include <sstream>
 
 #include "SubsetterException.H"
 
+using std::cerr;
 using std::endl;
 using std::ostringstream;
 
@@ -19,6 +21,7 @@ do { \
     __os << __prefix << e << endl; \
     const string __msg(__os.str()); \
     const string __where(AT); \
+    cerr << __where << ": " << __msg << endl; \
     throw SubsetterException(__where, __msg); \
 } while (0)
 
