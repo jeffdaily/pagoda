@@ -199,7 +199,7 @@ PnetcdfTiming::PnetcdfTiming(
     }
     new_size = bytes[name] + size;
     if (new_size < bytes[name]) {
-        cerr << ME << " WARNING: bytes overrun" << endl;
+        cerr << GA_Nodeid() << " WARNING: bytes overrun" << endl;
     } else {
         bytes[name] = new_size;
     }
@@ -364,38 +364,38 @@ string PnetcdfTiming::get_stats_aggregate()
         }
     }
 
-    PRINT_SYNC1("Before allreduce bytes_read:      %lu\n", bytes_read);
+    PRINT_SYNC("Before allreduce bytes_read:      %lu\n", bytes_read);
     MPI_Allreduce(&bytes_read,&bytes_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
-    PRINT_SYNC1(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
+    PRINT_SYNC(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
     if (bytes_read_agg < bytes_read) {
         PRINT_SYNC("WARNING: bytes_read_agg<bytes_read\n");
     } else {
         PRINT_SYNC("bytes_read_agg OKAY\n");
     }
 
-    PRINT_SYNC1("Before allreduce bytes_write:     %lu\n", bytes_write);
+    PRINT_SYNC("Before allreduce bytes_write:     %lu\n", bytes_write);
     MPI_Allreduce(&bytes_write,&bytes_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
-    PRINT_SYNC1(" after allreduce bytes_write_agg: %lu\n", bytes_write_agg);
+    PRINT_SYNC(" after allreduce bytes_write_agg: %lu\n", bytes_write_agg);
     if (bytes_write_agg < bytes_write) {
         PRINT_SYNC("WARNING: bytes_write_agg<bytes_write\n");
     } else {
         PRINT_SYNC("bytes_write_agg OKAY\n");
     }
 
-    PRINT_SYNC1("Before allreduce times_read:      %lu\n", times_read);
+    PRINT_SYNC("Before allreduce times_read:      %lu\n", times_read);
     //MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
-    PRINT_SYNC1(" after allreduce times_read_agg:  %lu\n", times_read_agg);
+    PRINT_SYNC(" after allreduce times_read_agg:  %lu\n", times_read_agg);
     if (times_read_agg < times_read) {
         PRINT_SYNC("WARNING: times_read_agg<times_read\n");
     } else {
         PRINT_SYNC("times_read_agg OKAY\n");
     }
 
-    PRINT_SYNC1("Before allreduce times_write:     %lu\n", times_write);
+    PRINT_SYNC("Before allreduce times_write:     %lu\n", times_write);
     //MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
-    PRINT_SYNC1(" after allreduce times_write_agg: %lu\n", times_write_agg);
+    PRINT_SYNC(" after allreduce times_write_agg: %lu\n", times_write_agg);
     if (times_write_agg < times_write) {
         PRINT_SYNC("WARNING: times_write_agg<times_write\n");
     } else {

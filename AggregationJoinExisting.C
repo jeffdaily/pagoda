@@ -32,7 +32,7 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
     ,   vars()
 {
     TIMING("AggregationJoinExisting::AggregationJoinExisting(string)");
-    TRACER1("AggregationJoinExisting::ctor(%s)\n", name.c_str());
+    TRACER("AggregationJoinExisting::ctor(%s)\n", name.c_str());
 }
 
 
@@ -128,7 +128,7 @@ void AggregationJoinExisting::add(Dataset *dataset)
                 ERR("dynamic_cast of AggregationVariable failed");
             }
             agg_var->add(other_var);
-            TRACER1("agg_var->get_sizes()[0]=%ld\n", agg_var->get_sizes()[0]);
+            TRACER("agg_var->get_sizes()[0]=%ld\n", agg_var->get_sizes()[0]);
         }
     }
     TRACER("AggregationJoinExisting::add END\n");

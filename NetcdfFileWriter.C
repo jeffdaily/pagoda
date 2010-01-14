@@ -36,7 +36,7 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
     ,   filename(filename)
 {
     TIMING("NetcdfFileWriter::NetcdfFileWriter(string)");
-    TRACER1("NetcdfFileWriter ctor(%s)\n", filename.c_str());
+    TRACER("NetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
     ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
     //ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_DATA, MPI_INFO_NULL, &ncid);
@@ -67,7 +67,7 @@ void NetcdfFileWriter::def_dim(Dimension *dim)
         size = dim->get_size();
     }
     ncmpi::def_dim(ncid, name.c_str(), size, &id);
-    TRACER3("NetcdfFileWriter::def_dim %s=%lld id=%d\n", name.c_str(), size, id);
+    TRACER("NetcdfFileWriter::def_dim %s=%lld id=%d\n", name.c_str(), size, id);
     dim_id[name] = id;
 }
 
@@ -93,11 +93,11 @@ void NetcdfFileWriter::def_var(Variable *var)
     }
 #ifdef TRACE
     if (1 == ndim) {
-        TRACER2("NetcdfFileWriter::def_var %s(%d)\n", name.c_str(), dim_ids[0]);
+        TRACER("NetcdfFileWriter::def_var %s(%d)\n", name.c_str(), dim_ids[0]);
     } else if (2 == ndim) {
-        TRACER3("NetcdfFileWriter::def_var %s(%d,%d)\n", name.c_str(), dim_ids[0], dim_ids[1]);
+        TRACER("NetcdfFileWriter::def_var %s(%d,%d)\n", name.c_str(), dim_ids[0], dim_ids[1]);
     } else if (3 == ndim) {
-        TRACER4("NetcdfFileWriter::def_var %s(%d,%d,%d)\n", name.c_str(), dim_ids[0], dim_ids[1], dim_ids[2]);
+        TRACER("NetcdfFileWriter::def_var %s(%d,%d,%d)\n", name.c_str(), dim_ids[0], dim_ids[1], dim_ids[2]);
     }
 #endif
     type = var->get_type();
@@ -173,7 +173,7 @@ void NetcdfFileWriter::copy_att(Attribute *att, const string &name)
 void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 {
     TIMING("NetcdfFileWriter::copy_att_id(Attribute*,int)");
-    TRACER1("NetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
+    TRACER("NetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
     def_check();
     string name = attr->get_name();
     DataType dt = attr->get_type();
@@ -218,7 +218,7 @@ void NetcdfFileWriter::write(int handle, const string &name, int record)
 void NetcdfFileWriter::write(int handle, int varid, int record)
 {
     TIMING("NetcdfFileWriter::write(int,int,int)");
-    TRACER3("NetcdfFileWriter::write %d %d %d\n", handle, varid, record);
+    TRACER("NetcdfFileWriter::write %d %d %d\n", handle, varid, record);
     maybe_enddef();
     DataType type = NC_CHAR;
     int mt_type;
@@ -233,7 +233,7 @@ void NetcdfFileWriter::write(int handle, int varid, int record)
 
     NGA_Inquire64(handle, &mt_type, &ndim, dim_sizes);
     type = mt_type;
-    NGA_Distribution64(handle, ME, lo, hi);
+    NGA_Distribution64(handle, GA_Nodeid(), lo, hi);
 
     if (0 > lo[0] && 0 > hi[0]) {
         // make a non-participating process a no-op

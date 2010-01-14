@@ -60,12 +60,12 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
     int64_t max_size8 = max_size*8;
     double gigabytes = 1.0 / 1073741824.0 * max_size8;
 
-    TRACER3("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
+    TRACER("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
             max_name.c_str(), max_size8, gigabytes);
     max_size *= 0.04;
     max_size8 = max_size*8;
     gigabytes = 1.0 / 1073741824.0 * max_size8;
-    TRACER2("MA max memory %ld bytes (%f gigabytes)\n", max_size8, gigabytes);
+    TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size8, gigabytes);
 
     if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
         char msg[] = "MA_init failed";

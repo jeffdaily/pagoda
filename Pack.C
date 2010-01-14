@@ -141,7 +141,7 @@ void partial_sum(int g_src, int g_dst, int excl)
             for (int64_t i=0; i<elems; ++i) { \
                 dst[i] += value; \
             } \
-            TRACER1("partial_sum_op "#FMT"\n", value); \
+            TRACER("partial_sum_op "#FMT"\n", value); \
         } else
         partial_sum_op(C_INT,int,C_INT,int,armci_msg_igop,%d)
         partial_sum_op(C_INT,int,C_LONG,long,armci_msg_lgop,%ld)
@@ -164,7 +164,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 {
     TIMING("pack(int,int,int*,int*)");
-    TRACER("pack\n");
+    TRACER("pack BEGIN\n");
     //int nproc = GA_Nnodes();
     int me = GA_Nodeid();
 
@@ -200,8 +200,11 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 
     NGA_Distribution64(g_src, me, lo_src, hi_src);
 
-    if (0 > lo_src[0] && 0 > hi_src[0]); /* no elements on this process */
-    else {
+    if (0 > lo_src[0] && 0 > hi_src[0]) {
+        /* no elements on this process */
+        TRACER("no elements on this process\n");
+        TRACER("no elements on this process\n");
+    } else {
         /* Now get the portions of the masks associated with each dim */
         memset(local_counts, 0, sizeof(int64_t)*ndim_src);
         for (int i=0; i<ndim_src; ++i) {
@@ -218,9 +221,11 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
         }
         //print_local_masks(local_masks, elems, ndim);
 
-        /* if any of the local mask counts are zero, no work is needed */
-        if (0 == local_counts_product); 
-        else {
+        if (0 == local_counts_product) {
+            /* if any of the local mask counts are zero, no work is needed */
+            TRACER("0 == local_counts_product\n");
+            TRACER("0 == local_counts_product\n");
+        } else {
             /* determine where the data is to go */
             for (int i=0; i<ndim_src; ++i) {
                 int tmp;
@@ -237,13 +242,14 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
             
             /* Create the destination buffer */
             switch (type_src) {
-#define pack_bit_copy(MTYPE,TYPE) \
+#define pack_bit_copy(MTYPE,TYPE,FMT) \
                 case MTYPE: \
                     { \
                         int64_t buf_dst_index = 0; \
                         TYPE *buf_src = NULL; \
                         TYPE *buf_dst = new TYPE[local_counts_product]; \
                         NGA_Access64(g_src, lo_src, hi_src, &buf_src, ld_src); \
+                        TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
                         for (int64_t i=0; i<elems_product_src; ++i) { \
                             unravel64i(i, ndim_src, elems_src, index); \
                             int okay = 1; \
@@ -258,15 +264,16 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
                             printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
                             GA_Error("pack: mismatch", buf_dst_index); \
                         } \
+                        TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
                         NGA_Put64(g_dst, lo_dst, hi_dst, buf_dst, ld_dst); \
                         NGA_Release64(g_src, lo_src, hi_src); \
                         delete [] buf_dst; \
                         break; \
                     }
-                pack_bit_copy(C_INT,int)
-                pack_bit_copy(C_LONG,long)
-                pack_bit_copy(C_FLOAT,float)
-                pack_bit_copy(C_DBL,double)
+                pack_bit_copy(C_INT,int,%d)
+                pack_bit_copy(C_LONG,long,%ld)
+                pack_bit_copy(C_FLOAT,float,%f)
+                pack_bit_copy(C_DBL,double,%f)
 #undef pack_bit_copy
             }
         }
@@ -274,14 +281,14 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
     }
 
     // Clean up
-    //printf("before Clean up\n");
+    TRACER("before Clean up\n");
     /* Remove temporary partial sum arrays */
     for (int i=0; i<ndim_src; ++i) {
         int *tmp = local_masks[i];
         delete [] tmp;
         tmp = NULL;
     }
-    //printf("pack(%d,%d,...) END\n", g_src, g_dst);
+    TRACER("pack(%d,%d,...) END\n", g_src, g_dst);
 }
 
 
@@ -323,7 +330,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
     }
 
     NGA_Distribution64(g_src, me, &src_lo, &src_hi);
-    //TRACER2("enumerate lo,hi = %lld,%lld\n", src_lo, src_hi);
+    //TRACER("enumerate lo,hi = %lld,%lld\n", src_lo, src_hi);
     if (0 > src_lo && 0 > src_hi) {
         //TRACER("enumerate result = N/A\n");
         //TRACER("enumerate count = N/A\n");
@@ -332,7 +339,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
         loc_hi = src_size-1;
         count = 0;
         result = NGA_Locate_region64(g_src, &loc_lo, &loc_hi, map, procs);
-        //TRACER1("enumerate result = %d\n", result);
+        //TRACER("enumerate result = %d\n", result);
         for (int i=0; i<result; ++i) {
             if (procs[i] < me) {
                 count += map[i*2+1]-map[i*2]+1;
@@ -344,7 +351,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
             ptr += 2;
         }
         */
-        //TRACER1("enumerate count = %lld\n", count);
+        //TRACER("enumerate count = %lld\n", count);
 
         NGA_Access64(g_src, &src_lo, &src_hi, &buf, NULL);
 #define enumerate_op(MTYPE,TYPE) \
@@ -422,7 +429,7 @@ void unpack1d(int g_src, int g_dst, int g_msk)
                 lo_src += counts[i];
             }
             hi_src = lo_src + counts[me] - 1;
-            TRACER2("unpack1d lo,hi = %ld,%ld\n", lo_src, hi_src);
+            TRACER("unpack1d lo,hi = %ld,%ld\n", lo_src, hi_src);
             // do the unpacking
             // assumption is that dst array has same distribution as msk array
             // get src (and dst) type, that's all we want...

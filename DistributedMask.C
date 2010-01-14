@@ -31,7 +31,7 @@ DistributedMask::DistributedMask(Dimension *dim, int value)
 {
     TIMING("DistributedMask::DistributedMask(...)");
     handle = NGA_Create64(C_INT, 1, &size, const_cast<char*>(name.c_str()), NULL);
-    TRACER3("DistributedMask ctor name=%s,size=%ld,handle=%d\n",
+    TRACER("DistributedMask ctor name=%s,size=%ld,handle=%d\n",
             name.c_str(), size, handle);
     NGA_Distribution64(handle, ME, &lo, &hi);
     GA_Fill(handle, &value);

@@ -15,13 +15,12 @@
 #include <pnetcdf.h>
 
 #ifdef GATHER_PNETCDF_TIMING
-#   define PNETCDF_TIMING1(A1) PnetcdfTiming __timing_var(A1)
-#   define PNETCDF_TIMING4(A1,A2,A3,A4) \
-            PnetcdfTiming __timing_var(A1,A2,A3,A4)
+#   define PNETCDF_TIMING1(A1)          PnetcdfTiming __timing_var(A1)
+#   define PNETCDF_TIMING4(A1,A2,A3,A4) PnetcdfTiming __timing_var(A1,A2,A3,A4)
 #else
 #   define PNETCDF_TIMING1(A1)
 #   define PNETCDF_TIMING4(A1,A2,A3,A4)
-#   warning pnetcdf timing is turned off
+//#   warning pnetcdf timing is turned off
 #endif
 
 using std::map;

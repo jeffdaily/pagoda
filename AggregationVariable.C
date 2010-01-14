@@ -31,7 +31,7 @@ AggregationVariable::AggregationVariable(
     ,   vars()
 {
     TIMING("AggregationVariable::AggregationVariable(...)");
-    TRACER1("AggregationVariable ctor %s\n", var->get_name().c_str());
+    TRACER("AggregationVariable ctor %s\n", var->get_name().c_str());
     add(var);
 }
 
@@ -45,7 +45,7 @@ AggregationVariable::~AggregationVariable()
 void AggregationVariable::add(Variable *var)
 {
     TIMING("AggregationVariable::add(Variable*)");
-    TRACER1("AggregationVariable::add %s\n", var->get_name().c_str());
+    TRACER("AggregationVariable::add %s\n", var->get_name().c_str());
     vars.push_back(var);
 }
 
@@ -107,7 +107,7 @@ void AggregationVariable::release_handle()
 void AggregationVariable::set_record_index(size_t index)
 {
     TIMING("AggregationVariable::set_record_index(size_t)");
-    TRACER1("AggregationVariable::set_record_index(%zd)\n", index);
+    TRACER("AggregationVariable::set_record_index(%zd)\n", index);
     AbstractVariable::set_record_index(index);
 
     index_within_var = index;
@@ -127,9 +127,9 @@ void AggregationVariable::read()
 {
     TIMING("AggregationVariable::read()");
     TRACER("AggregationVariable::read() BEGIN\n");
-    TRACER1("vars.size()=%ld\n", vars.size());
+    TRACER("vars.size()=%ld\n", vars.size());
     if (has_record() && num_dims() > 1) {
-        TRACER2("record read from index_var=%zd, index_within_var=%ld\n",
+        TRACER("record read from index_var=%zd, index_within_var=%ld\n",
                 index_var, index_within_var);
         vars[index_var]->read();
     } else {
@@ -150,7 +150,7 @@ void AggregationVariable::read()
             }
             dst_hi[0] += src_hi[0];
             // do the copy
-            TRACER4("NGA_Copy_patch64 src_lo,hi=%ld,%ld, dst_lo,hi=%ld,%ld\n",
+            TRACER("NGA_Copy_patch64 src_lo,hi=%ld,%ld, dst_lo,hi=%ld,%ld\n",
                     src_lo[0], src_hi[0], dst_lo[0], dst_hi[0]);
             NGA_Copy_patch64('n', src->get_handle(), &src_lo[0], &src_hi[0],
                     get_handle(), &dst_lo[0], &dst_hi[0]);

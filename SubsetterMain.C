@@ -41,11 +41,11 @@ int main(int argc, char **argv)
 
 #ifdef GATHER_TIMING
     Timing::start_global = Timing::get_time();
-    PRINT_ZERO1("Timing::start_global=%ld\n\n", Timing::start_global);
+    PRINT_ZERO("Timing::start_global=%ld\n\n", Timing::start_global);
 #endif /* GATHER_TIMING */
 #ifdef GATHER_PNETCDF_TIMING
     PnetcdfTiming::start_global = PnetcdfTiming::get_time();
-    PRINT_ZERO1("PnetcdfTiming::start_global=%ld\n\n",
+    PRINT_ZERO("PnetcdfTiming::start_global=%ld\n\n",
             PnetcdfTiming::start_global);
 #endif /* GATHER_PNETCDF_TIMING */
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         cmd.parse(argc,argv);
     }
     catch (SubsetterException &ex) {
-        PRINT_ZERO1("%s\n", ex.what());
+        PRINT_ZERO("%s\n", ex.what());
         exit(EXIT_FAILURE);
     }
     TRACER("cmd line parsing END\n");
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
         dataset = agg = new AggregationJoinExisting(cmd.get_join_name());
     }
     for (size_t i=0,limit=infiles.size(); i<limit; ++i) {
-        TRACER1("adding %s\n", infiles[i].c_str());
+        TRACER("adding %s\n", infiles[i].c_str());
         agg->add(Dataset::open(infiles[i]));
     }
     dataset->decorate();
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
         if (mask) {
             int g_mask = mask->get_handle();
             if (sum_map.find(g_mask) == sum_map.end()) {
-                TRACER1("Creating partial sum for %s\n",
+                TRACER("Creating partial sum for %s\n",
                         mask->get_name().c_str());
                 sum_map[g_mask] = GA_Duplicate(g_mask, "maskcopy");
                 partial_sum(g_mask, sum_map[g_mask], 0);
@@ -128,21 +128,21 @@ int main(int argc, char **argv)
     TRACER("after delete dataset\n");
 
 #ifdef TRACE
-    if (0 == ME) {
+    if (0 == GA_Nodeid()) {
         GA_Print_stats();
     }
 #endif
 #ifdef GATHER_TIMING
     Timing::end_global = Timing::get_time();
-    PRINT_ZERO1("Timing::end_global=%ld\n", Timing::end_global);
-    PRINT_STRING_ZERO(Timing::get_stats_calls());
-    PRINT_STRING_ZERO(Timing::get_stats_total_time());
+    PRINT_ZERO("Timing::end_global=%ld\n", Timing::end_global);
+    PRINT_ZERO(Timing::get_stats_calls());
+    PRINT_ZERO(Timing::get_stats_total_time());
 #endif /* GATHER_TIMING */
 #ifdef GATHER_PNETCDF_TIMING
     PnetcdfTiming::end_global = PnetcdfTiming::get_time();
-    PRINT_ZERO1("PnetcdfTiming::end_global=%ld\n", PnetcdfTiming::end_global);
-    PRINT_STRING_ZERO(PnetcdfTiming::get_stats_calls());
-    PRINT_STRING_ZERO(PnetcdfTiming::get_stats_aggregate());
+    PRINT_ZERO("PnetcdfTiming::end_global=%ld\n", PnetcdfTiming::end_global);
+    PRINT_ZERO(PnetcdfTiming::get_stats_calls());
+    PRINT_ZERO(PnetcdfTiming::get_stats_aggregate());
 #endif /* GATHER_PNETCDF_TIMING */
     TRACER("just before GA_Terminate() and MPI_Finalize()\n");
     GA_Terminate();
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
 {
     const string name = var->get_name();
-    TRACER1("SubsetterMain::subset %s BEGIN\n", name.c_str());
+    TRACER("SubsetterMain::subset %s BEGIN\n", name.c_str());
 
     var->read();
     var->reindex(); // noop if not ConnectivityVariable
@@ -181,7 +181,7 @@ void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
                 GA_Error("missing partial sum", ga_masks[dimidx]);
             }
             ga_masksums[dimidx] = sum_map[ga_masks[dimidx]];
-            TRACER4("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
+            TRACER("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
                     dimidx, ga_masks[dimidx], dimidx, ga_masksums[dimidx]);
         }
 
@@ -196,7 +196,7 @@ void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
     }
 
     var->release_handle();
-    TRACER1("SubsetterMain::subset %s END\n", name.c_str());
+    TRACER("SubsetterMain::subset %s END\n", name.c_str());
 }
 
 
@@ -205,10 +205,10 @@ void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
 void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
 {
     const string name = var->get_name();
-    TRACER1("SubsetterMain::subset_record %s BEGIN\n", name.c_str());
+    TRACER("SubsetterMain::subset_record %s BEGIN\n", name.c_str());
     vector<Dimension*> dims = var->get_dims();
     size_t ndim = dims.size();
-    TRACER1("ndim=%zd\n", ndim);
+    TRACER("ndim=%zd\n", ndim);
     size_t ndim_1 = ndim - 1;
     vector<int> mask_rec;
     int ga_masks[ndim-1];
@@ -221,7 +221,16 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
     TRACER("Before record mask retrieval\n");
     if (dims[0]->get_mask()) {
         dims[0]->get_mask()->get_data(mask_rec);
+#ifdef TRACE
+        ostringstream os;
+        os << "Record mask is " << mask_rec[0]; 
+        for (size_t i=1; i<mask_rec.size(); ++i) {
+            os << ',' << mask_rec[i];
+        }
+        TRACER(os.str());
+#endif
     } else {
+        TRACER("No record mask, setting to all 1s\n");
         mask_rec.assign(dims[0]->get_size(), 1);
     }
 
@@ -238,7 +247,7 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
             GA_Error("missing partial sum", ga_masks[dimidx-1]);
         }
         ga_masksums[dimidx-1] = sum_map[ga_masks[dimidx-1]];
-        TRACER4("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
+        TRACER("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
                 dimidx, ga_masks[dimidx-1], dimidx, ga_masksums[dimidx-1]);
     }
 
@@ -255,5 +264,5 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
 
     GA_Destroy(ga_out);
     var->release_handle();
-    TRACER1("SubsetterMain::subset_record %s END\n", name.c_str());
+    TRACER("SubsetterMain::subset_record %s END\n", name.c_str());
 }

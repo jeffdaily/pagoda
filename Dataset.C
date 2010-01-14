@@ -202,7 +202,7 @@ void Dataset::adjust_masks(const vector<DimSlice> &slices)
         }
         if (dim_it == dims.end()) {
             const string name = slice.get_name();
-            PRINT_ZERO1("Sliced dimension '%s' does not exist\n", name.c_str());
+            PRINT_ZERO("Sliced dimension '%s' does not exist\n", name.c_str());
             continue;
         } else {
             Dimension *dim = *dim_it;
@@ -513,6 +513,7 @@ void Dataset::decorate()
         // deprecated
         vert_units.push_back(string("level"));
         vert_units.push_back(string("layer"));
+        vert_units.push_back(string("interface"));
         vert_units.push_back(string("sigma_level"));
     }
 

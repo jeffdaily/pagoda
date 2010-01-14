@@ -7,6 +7,7 @@
 
 #include "Attribute.H"
 #include "Common.H"
+#include "Debug.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
@@ -81,11 +82,13 @@ DataType NetcdfVariable::get_type() const
 
 void NetcdfVariable::read()
 {
+    TRACER("NetcdfVariable::read()\n");
     TIMING("NetcdfVariable::read()");
     int me = GA_Nodeid();
     int ncid = dataset->get_id();
     DataType type = get_type();
     size_t ndim = num_dims();
+    size_t ndim_fixed = ndim;
     size_t dimidx = 0;
     int64_t lo[ndim];
     int64_t hi[ndim];
@@ -93,7 +96,26 @@ void NetcdfVariable::read()
     MPI_Offset start[ndim];
     MPI_Offset count[ndim];
 
+    if (has_record() && ndim > 1) {
+        --ndim_fixed;
+    }
+
     NGA_Distribution64(get_handle(), me, lo, hi);
+#ifdef TRACE
+    if (ndim_fixed == 1) {
+        PRINT_SYNC("lo={%ld}\thi={%ld}\n",
+                lo[0], hi[0]);
+    } else if (ndim_fixed == 2) {
+        PRINT_SYNC("lo={%ld,%ld}\thi={%ld,%ld}\n",
+                lo[0], lo[1], hi[0], hi[1]);
+    } else if (ndim_fixed == 3) {
+        PRINT_SYNC("lo={%ld,%ld,%ld}\thi={%ld,%ld,%ld}\n",
+                lo[0], lo[1], lo[2], hi[0], hi[1], hi[2]);
+    } else if (ndim_fixed == 4) {
+        PRINT_SYNC("lo={%ld,%ld,%ld,%ld}\thi={%ld,%ld,%ld,%ld}\n",
+                lo[0], lo[1], lo[2], lo[3], hi[0], hi[1], hi[2], hi[3]);
+    }
+#endif
 
     if (0 > lo[0] && 0 > hi[0]) {
         // make a non-participating process a no-op
@@ -101,9 +123,24 @@ void NetcdfVariable::read()
             start[dimidx] = 0;
             count[dimidx] = 0;
         }
+#ifdef TRACE
+        if (ndim == 2) {
+            PRINT_SYNC("start={%ld,%ld}\tcount={%ld,%ld}\n",
+                    start[0], start[1], count[0], count[1]);
+        } else if (ndim == 3) {
+            PRINT_SYNC("start={%ld,%ld,%ld}\tcount={%ld,%ld,%ld}\n",
+                    start[0], start[1], start[2],
+                    count[0], count[1], count[2]);
+        } else if (ndim == 4) {
+            PRINT_SYNC("start={%ld,%ld,%ld,%ld}\tcount={%ld,%ld,%ld,%ld}\n",
+                    start[0], start[1], start[2], start[3],
+                    count[0], count[1], count[2], count[3]);
+        }
+#endif
 #define read_var_all(TYPE, NC_TYPE) \
         if (type == NC_TYPE) { \
             ncmpi::get_vara_all(ncid, id, start, count, (TYPE*)NULL); \
+            TRACER("no-op\n"); \
         } else
         read_var_all(int,    NC_INT)
         read_var_all(float,  NC_FLOAT)
@@ -124,15 +161,37 @@ void NetcdfVariable::read()
                 count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
             }
         }
-#define read_var_all(TYPE, NC_TYPE) \
+#ifdef TRACE
+        if (ndim == 2) {
+            PRINT_SYNC("start={%ld,%ld}\tcount={%ld,%ld}\n",
+                    start[0], start[1], count[0], count[1]);
+        } else if (ndim == 3) {
+            PRINT_SYNC("start={%ld,%ld,%ld}\tcount={%ld,%ld,%ld}\n",
+                    start[0], start[1], start[2],
+                    count[0], count[1], count[2]);
+        } else if (ndim == 4) {
+            PRINT_SYNC("start={%ld,%ld,%ld,%ld}\tcount={%ld,%ld,%ld,%ld}\n",
+                    start[0], start[1], start[2], start[3],
+                    count[0], count[1], count[2], count[3]);
+        }
+#endif
+#define read_var_all(TYPE, NC_TYPE, FMT) \
         if (type == NC_TYPE) { \
             TYPE *ptr; \
             NGA_Access64(get_handle(), lo, hi, &ptr, ld); \
             ncmpi::get_vara_all(ncid, id, start, count, ptr); \
+            TRACER("ptr[0]="#FMT"\n", ptr[0]); \
+            if (ndim_fixed == 2) { \
+                TRACER("ld={%ld}\n", ld[0]); \
+            } else if (ndim_fixed == 3) { \
+                TRACER("ld={%ld,%ld}\n", ld[0], ld[1]); \
+            } else if (ndim_fixed == 4) { \
+                TRACER("ld={%ld,%ld,%ld}\n", ld[0], ld[1], ld[2]); \
+            } \
         } else
-        read_var_all(int, NC_INT)
-        read_var_all(float, NC_FLOAT)
-        read_var_all(double, NC_DOUBLE)
+        read_var_all(int, NC_INT, %d)
+        read_var_all(float, NC_FLOAT, %f)
+        read_var_all(double, NC_DOUBLE, %f)
         ; // for last else above
 #undef read_var_all
         NGA_Release_update64(get_handle(), lo, hi);

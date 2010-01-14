@@ -125,7 +125,7 @@ void ConnectivityVariable::reindex()
                 }
                 NGA_Release64(var_handle, var_lo, var_hi);
                 size = m.size();
-                TRACER1("size = %ld\n", size);
+                TRACER("size = %ld\n", size);
 
                 TRACER("create the retarded array of pointers that GA wants\n");
                 subs = new int64_t*[size];

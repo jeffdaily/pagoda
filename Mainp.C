@@ -240,7 +240,7 @@ int main(int argc, char **argv)
 
         // open our input file and gather its header info
         DEBUG_ZERO("Before first file open, attempting to open\n");
-        DEBUG_ZERO1("%s\n", input_filename.c_str());
+        DEBUG_ZERO("%s\n", input_filename.c_str());
         error = ncmpi_open(MPI_COMM_WORLD, input_filename.c_str(), NC_NOWRITE,
                 MPI_INFO_NULL, &ncid_in);
         ERRNO_CHECK(error);
@@ -286,8 +286,8 @@ int main(int argc, char **argv)
         }
         // MA_init values based on max size / #procs
         int64_t max_size = max / GA_Nnodes();
-        DEBUG_ZERO1("MA max memory %llu bytes\n", max_size*8);
-        DEBUG_ZERO1("MA max variable %s\n", max_name.c_str());
+        DEBUG_ZERO("MA max memory %llu bytes\n", max_size*8);
+        DEBUG_ZERO("MA max variable %s\n", max_name.c_str());
         if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
             char msg[] = "MA_init failed";
             GA_Error(msg, 0);
@@ -330,7 +330,7 @@ int main(int argc, char **argv)
             for (int i=0,remap=-1; i<=hi; ++i) {
                 if (mask[i] >= 1) {
                     cells_map[i] = ++remap;
-                    //DEBUG_ZERO2("cells_map[%d]=%d\n", i, cells_map[i]);
+                    //DEBUG_ZERO("cells_map[%d]=%d\n", i, cells_map[i]);
                 }
             }
         }
@@ -344,7 +344,7 @@ int main(int argc, char **argv)
             for (int i=0,remap=-1; i<=hi; ++i) {
                 if (mask[i] >= 1) {
                     corners_map[i] = ++remap;
-                    //DEBUG_ZERO2("corners_map[%d]=%d\n", i, corners_map[i]);
+                    //DEBUG_ZERO("corners_map[%d]=%d\n", i, corners_map[i]);
                 }
             }
         }
@@ -358,7 +358,7 @@ int main(int argc, char **argv)
             for (int i=0,remap=-1; i<=hi; ++i) {
                 if (mask[i] >= 1) {
                     edges_map[i] = ++remap;
-                    //DEBUG_ZERO2("edges_map[%d]=%d\n", i, edges_map[i]);
+                    //DEBUG_ZERO("edges_map[%d]=%d\n", i, edges_map[i]);
                 }
             }
         }
@@ -374,7 +374,7 @@ int main(int argc, char **argv)
             if (name.find(COMPOSITE_PREFIX) == 0) continue; // skip composites
             Mask mask = it->second;
             MPI_Offset size = mask.global_count;
-            DEBUG_ZERO1("Defining dimension '%s'\n", name.c_str());
+            DEBUG_ZERO("Defining dimension '%s'\n", name.c_str());
             if (mask.dim.is_unlimited) size = NC_UNLIMITED;
             int idp;
             error = ncmpi_def_dim(ncid_out, name.c_str(), size, &idp);
@@ -403,7 +403,7 @@ int main(int argc, char **argv)
             int varidp;
             string var_name = it->first;
             VarInfo var_in = it->second;
-            DEBUG_ZERO1("Defining variable '%s' with dims ",var_name.c_str());
+            DEBUG_ZERO("Defining variable '%s' with dims ",var_name.c_str());
             int dims[var_in.ndim];
             bool skip = false;
             for (int dimidx=0; dimidx<var_in.ndim; ++dimidx) {
@@ -412,7 +412,7 @@ int main(int argc, char **argv)
                 skip |= (out_dims.find(var_in.dims[dimidx].name) == out_dims.end());
                 if (skip) break;
                 dims[dimidx] = out_dims[var_in.dims[dimidx].name].id;
-                DEBUG_ZERO1("%s,", var_in.dims[dimidx].name.c_str());
+                DEBUG_ZERO("%s,", var_in.dims[dimidx].name.c_str());
             }
             DEBUG_ZERO(skip ? ", skipping due to degenerate dimension\n" : "\n");
             if (skip) continue; // see note above
@@ -936,19 +936,19 @@ void create_composite_mask(MaskMap &masks, VarInfo varInfo)
     } else if (dims.size() == 2) {
         string name = composite_name(dims);
         if (masks.find(name) != masks.end()) {
-            DEBUG_ZERO1("dims.size() == 2, name=%s, skipping\n", name.c_str());
+            DEBUG_ZERO("dims.size() == 2, name=%s, skipping\n", name.c_str());
             return;
         } else {
-            DEBUG_ZERO1("dims.size() == 2, name=%s\n", name.c_str());
+            DEBUG_ZERO("dims.size() == 2, name=%s\n", name.c_str());
             masks[name] = create_composite_mask2d(masks, dims);
         }
     } else if (dims.size() == 3) {
         string name = composite_name(dims);
         if (masks.find(name) != masks.end()) {
-            DEBUG_ZERO1("dims.size() == 3, name=%s, skipping\n", name.c_str());
+            DEBUG_ZERO("dims.size() == 3, name=%s, skipping\n", name.c_str());
             return;
         } else {
-            DEBUG_ZERO1("dims.size() == 3, name=%s\n", name.c_str());
+            DEBUG_ZERO("dims.size() == 3, name=%s\n", name.c_str());
             masks[name] = create_composite_mask3d(masks, dims);
         }
     } else {
@@ -959,7 +959,7 @@ void create_composite_mask(MaskMap &masks, VarInfo varInfo)
 
 void create_composite_masks(MaskMap &masks, VarInfoVec varInfos)
 {
-    DEBUG_ZERO1("create_composite_masks size=%zu\n", varInfos.size());
+    DEBUG_ZERO("create_composite_masks size=%zu\n", varInfos.size());
     for (size_t idx=0; idx<varInfos.size(); ++idx) {
         VarInfo varInfo = varInfos[idx];
         create_composite_mask(masks, varInfo);
@@ -1109,11 +1109,11 @@ void copy_record_var(
         int64_t icount;
         DEBUG_ZERO("before pack\n");
         GA_Pack64(g_var_in, g_var_out, masks[mask_name].handle, 0, size_in-1, &icount);
-        DEBUG_ZERO1("after pack, icount=%lld\n", icount);
+        DEBUG_ZERO("after pack, icount=%lld\n", icount);
 
         // NO REMAPPING
 
-        DEBUG_ZERO1("WRITING: %s\n", name.c_str());
+        DEBUG_ZERO("WRITING: %s\n", name.c_str());
 
         // Write to file from local memory
         // NOTE: data type dependent call
@@ -1236,12 +1236,12 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
     int64_t icount;
     DEBUG_ZERO("before pack\n");
     GA_Pack64(g_var_in, g_var_out, masks[mask_name].handle, 0, size_in-1, &icount);
-    DEBUG_ZERO1("after pack, icount=%lld\n", icount);
+    DEBUG_ZERO("after pack, icount=%lld\n", icount);
 
     // If we have one of the special mapping variables, perform the
     // remapping now.
     if (mapping) {
-        DEBUG_ZERO1("MAPPING: %s\n", name.c_str());
+        DEBUG_ZERO("MAPPING: %s\n", name.c_str());
         int *ptr;
         NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
         MPI_Offset limit = hi_out - lo_out + 1;
@@ -1255,7 +1255,7 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         NGA_Release_update64(g_var_out, &lo_out, &hi_out);
     }
 
-    DEBUG_ZERO1("WRITING: %s\n", name.c_str());
+    DEBUG_ZERO("WRITING: %s\n", name.c_str());
 
     // Write to file from local memory
     // NOTE: data type dependent call
