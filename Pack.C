@@ -174,8 +174,6 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
     int64_t lo_src[ndim_src];
     int64_t hi_src[ndim_src];
     int64_t ld_src[ndim_src-1];
-    int64_t elems_src[ndim_src];
-    int64_t elems_product_src=1;
 
     int type_dst;
     int ndim_dst = GA_Ndim(g_dst);
@@ -183,11 +181,6 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
     int64_t lo_dst[ndim_dst];
     int64_t hi_dst[ndim_dst];
     int64_t ld_dst[ndim_dst-1];
-
-    int64_t index[ndim_src];
-    int64_t local_counts[ndim_src];
-    int64_t local_counts_product=1;
-    int *local_masks[ndim_src];
 
     if (ndim_src != ndim_dst) {
         GA_Error("pack: src and dst ndims don't match", 0);
@@ -204,7 +197,15 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
         /* no elements on this process */
         TRACER("no elements on this process\n");
         TRACER("no elements on this process\n");
+        TRACER("no Clean up\n");
     } else {
+        int64_t elems_src[ndim_src];
+        int64_t elems_product_src=1;
+        int64_t index[ndim_src];
+        int64_t local_counts[ndim_src];
+        int64_t local_counts_product=1;
+        int *local_masks[ndim_src];
+
         /* Now get the portions of the masks associated with each dim */
         memset(local_counts, 0, sizeof(int64_t)*ndim_src);
         for (int i=0; i<ndim_src; ++i) {
@@ -278,16 +279,16 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
             }
         }
         //print_local_masks(local_masks, elems, ndim);
+        // Clean up
+        TRACER("before Clean up\n");
+        /* Remove temporary partial sum arrays */
+        for (int i=0; i<ndim_src; ++i) {
+            int *tmp = local_masks[i];
+            delete [] tmp;
+            tmp = NULL;
+        }
     }
 
-    // Clean up
-    TRACER("before Clean up\n");
-    /* Remove temporary partial sum arrays */
-    for (int i=0; i<ndim_src; ++i) {
-        int *tmp = local_masks[i];
-        delete [] tmp;
-        tmp = NULL;
-    }
     TRACER("pack(%d,%d,...) END\n", g_src, g_dst);
 }
 
