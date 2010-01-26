@@ -1,0 +1,38 @@
+TODO: Look for where other tools got published (e.g. NCO)
+
+NOTES:
+* need section similar to whitepaper on inadequacies of other tools
+* need more detail on Climate Data Operators
+* scavenge some text from Bruce's API paper
+* need to cite paper expressing need for parallel climate tools
+
+1. Intro
+  a. problem statement
+  b. what's been done
+  c. deficiencies
+  d. lsupporting R12
+  e. greater I/O and memory limits
+2. API and capabilities
+  a. subsetting and aggregation
+  b. how it works
+  c. similar functionality to NCO
+  d. supporting emerging standards e.g. ugrid, gridspec, CF, NcML
+3. Implementation
+  a. GA operations used, useful ones, unique ones
+  b. Reindexing 'connectivity variables'
+  c. pnetcdf for parallel IO
+  d. Why GA?
+  e. C++ classes, dataset abstraction
+4. Performance/results
+  a. bigger problems (IO bound)
+  b. performance (mid-range cluster size)
+  c. 16,32,64,128 processors
+  d. weak scaling
+  e. strong scaling
+5. Related Work
+  a. NetCDF Operators (NCO)
+  b. Climate Data Operators (CDO)
+  c. NCAR Command Language (NCL)
+  d. Ferret
+  e. Climate Data Analysis Tools (CDAT)
+6. Conclusions

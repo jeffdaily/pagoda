@@ -1,0 +1,59 @@
+\documentclass[conference]{IEEEtran}
+
+% to enable \thanks
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+
+\begin{document}
+
+\title{Subsetter}
+
+\author{
+\IEEEauthorblockN{
+    Jeff Daily\IEEEauthorrefmark{1},
+    Karen Schuchardt\IEEEauthorrefmark{1} and
+    Bruce Palmer\IEEEauthorrefmark{1}
+}
+\IEEEauthorblockA{
+    \IEEEauthorrefmark{1}
+    Pacific Northwest National Laboratory\\
+    jeff.daily,karen.schuchardt,bruce.palmer@pnl.gov
+}
+\thanks{Wei-keng Liao}
+}
+
+\maketitle
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+\input{abstract}
+\input{introduction}
+\input{conclusion}
+\input{acknowledgment}
+
+\section*{Acknowledgment}
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,paper}
+
+% that's all folks
+\end{document}
