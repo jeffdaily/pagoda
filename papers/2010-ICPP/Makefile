@@ -1,11 +1,20 @@
-paper.pdf: paper.tex paper.bbl
-	pdflatex paper.tex
+TARGET = paper
+LATEX = latex
+DVIPDF = ./mydvipdf.sh
 
-paper.bbl: paper.bib paper.aux
-	bibtex paper.aux
-
-paper.aux: paper.tex
-	latex paper.tex
+paper:
+	cd plots && $(MAKE)
+	cp -f plots/*.eps .
+	$(LATEX) $@ && \
+	bibtex $@ && \
+	$(LATEX) $@ && \
+	$(LATEX) $@ && \
+	$(LATEX) $@ && \
+	$(DVIPDF) $@ && \
+	wc -w *.tex | tail -n 1
 
 clean:
-	rm -f paper.pdf paper.log paper.aux paper.dvi paper.blg paper.bbl
+	rm -rf *~ *.log *.lof *.lot *.aux *.bbl *.blg *.dvi *.eps $(TARGET).toc $(TARGET).ps $(TARGET).pdf
+	cd plots && $(MAKE) clean
+
+$(TARGET): *.tex
