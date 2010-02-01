@@ -10,7 +10,7 @@ used to process this data, however current climate analysis tools are at most
 task parallel and rely on a single data reader.\cite{CDAT}\cite{CDO}\cite{NCO}
 
 Many climate analysis tools robustly handle the manipulation and display of
-regularly gridded data.  However, these same applciations lack sufficient
+regularly gridded data.  However, these same applications lack sufficient
 features when handling unstructured or irregular grids such as the GCRM or
 cubed sphere models\cite{CUBE}.  Unstructured grids are gaining popularity,
 further widening the gap between current software and these types of models.
@@ -36,13 +36,13 @@ regular case.  When subsetting these unstructured grids, the explicitly
 defined topology must also be preserved.
 
 In this paper, we present a parallel tool for subsetting very large geodesic
-climate data.  Simliar to the interface of the NetCDF Operators's\cite{NCO}
+climate data.  Similar to the interface of the NetCDF Operators's\cite{NCO}
 ncks program, we have developed a tool for subsetting the GCRM data but it
 does so in parallel and also preserves the explicit topology.  The code is
 built using the Global Arrays (GA) toolkit which provides an efficient and
 portable "shared-memory" programming interface for distributed-memory
 computers.\cite{GA}  Further, GA is built on top of the Aggregate Remote
-Memeory Copy Interface (ARMCI)\cite{ARMCI} which allows for truly one-sided
+Memory Copy Interface (ARMCI)\cite{ARMCI} which allows for truly one-sided
 communication across nodes.  GA traditionally deals with dense arrays, however
 its sparse matrix operations as well as its one-sided operations allow for
 efficient subsetting over unstructured grids.  For efficient I/O, the

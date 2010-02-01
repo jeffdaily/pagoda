@@ -12,6 +12,12 @@ NOTES:
   c. deficiencies
   d. lsupporting R12
   e. greater I/O and memory limits
+  f. Related Work
+    1. NetCDF Operators (NCO)
+    2. Climate Data Operators (CDO)
+    3. NCAR Command Language (NCL)
+    4. Ferret
+    5. Climate Data Analysis Tools (CDAT)
 2. API and capabilities
   a. subsetting and aggregation
   b. how it works
@@ -29,10 +35,4 @@ NOTES:
   c. 16,32,64,128 processors
   d. weak scaling
   e. strong scaling
-5. Related Work
-  a. NetCDF Operators (NCO)
-  b. Climate Data Operators (CDO)
-  c. NCAR Command Language (NCL)
-  d. Ferret
-  e. Climate Data Analysis Tools (CDAT)
 6. Conclusions
