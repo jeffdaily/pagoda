@@ -256,6 +256,8 @@ void DistributedMask::recount()
     armci_msg_lgop(&counts[0], NPROC, "+");
 #elif SIZEOF_INT64_T == SIZEOF_LONG_LONG
     armci_msg_llgop(&counts[0], NPROC, "+");
+#else
+#   error SIZEOF_INT64_T == ???
 #endif
     count = accumulate(counts.begin(), counts.end(), ZERO);
 }

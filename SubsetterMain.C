@@ -35,119 +35,128 @@ int F77_DUMMY_MAIN() { return 1; }
 
 int main(int argc, char **argv)
 {
-    MPI_Init(&argc, &argv);
-    GA_Initialize();
-    TRACER("AFTER INITS\n");
+    try {
+        MPI_Init(&argc, &argv);
+        GA_Initialize();
+        TRACER("AFTER INITS\n");
 
 #ifdef GATHER_TIMING
-    Timing::start_global = Timing::get_time();
-    PRINT_ZERO("Timing::start_global=%ld\n\n", Timing::start_global);
+        Timing::start_global = Timing::get_time();
+        PRINT_ZERO("Timing::start_global=%ld\n\n", Timing::start_global);
 #endif /* GATHER_TIMING */
 #ifdef GATHER_PNETCDF_TIMING
-    PnetcdfTiming::start_global = PnetcdfTiming::get_time();
-    PRINT_ZERO("PnetcdfTiming::start_global=%ld\n\n",
-            PnetcdfTiming::start_global);
+        PnetcdfTiming::start_global = PnetcdfTiming::get_time();
+        PRINT_ZERO("PnetcdfTiming::start_global=%ld\n\n",
+                PnetcdfTiming::start_global);
 #endif /* GATHER_PNETCDF_TIMING */
 
-    SubsetterCommands cmd;
-    Dataset *dataset;
-    Aggregation *agg;
-    vector<Variable*> vars;
-    vector<Dimension*> dims;
-    FileWriter *writer;
-    map<int,int> sum_map;
+        SubsetterCommands cmd;
+        Dataset *dataset;
+        Aggregation *agg;
+        vector<Variable*> vars;
+        vector<Dimension*> dims;
+        FileWriter *writer;
+        map<int,int> sum_map;
 
-    TRACER("cmd line parsing BEGIN\n");
-    try {
-        cmd.parse(argc,argv);
-    }
-    catch (SubsetterException &ex) {
-        PRINT_ZERO("%s\n", ex.what());
-        exit(EXIT_FAILURE);
-    }
-    TRACER("cmd line parsing END\n");
+        TRACER("cmd line parsing BEGIN\n");
+        try {
+            cmd.parse(argc,argv);
+        }
+        catch (SubsetterException &ex) {
+            PRINT_ZERO("%s\n", ex.what());
+            exit(EXIT_FAILURE);
+        }
+        TRACER("cmd line parsing END\n");
 
-    const vector<string> &infiles = cmd.get_intput_filenames();
-    if (cmd.get_join_name().empty()) {
-        dataset = agg = new AggregationUnion;
-    } else {
-        dataset = agg = new AggregationJoinExisting(cmd.get_join_name());
-    }
-    for (size_t i=0,limit=infiles.size(); i<limit; ++i) {
-        TRACER("adding %s\n", infiles[i].c_str());
-        agg->add(Dataset::open(infiles[i]));
-    }
-    dataset->decorate();
+        const vector<string> &infiles = cmd.get_intput_filenames();
+        if (cmd.get_join_name().empty()) {
+            dataset = agg = new AggregationUnion;
+        } else {
+            dataset = agg = new AggregationJoinExisting(cmd.get_join_name());
+        }
+        for (size_t i=0,limit=infiles.size(); i<limit; ++i) {
+            TRACER("adding %s\n", infiles[i].c_str());
+            agg->add(Dataset::open(infiles[i]));
+        }
+        dataset->decorate();
 
-    Util::calculate_required_memory(dataset->get_vars());
+        Util::calculate_required_memory(dataset->get_vars());
 
-    dataset->create_masks();
-    dataset->adjust_masks(cmd.get_slices());
-    dataset->adjust_masks(cmd.get_box());
+        dataset->create_masks();
+        dataset->adjust_masks(cmd.get_slices());
+        dataset->adjust_masks(cmd.get_box());
 
-    vars = dataset->get_vars();
-    dims = dataset->get_dims();
+        vars = dataset->get_vars();
+        dims = dataset->get_dims();
 
-    TRACER("precompute partial sums BEGIN\n");
-    // TODO It was easier to simply create partial sums for all masks.
-    // It might be wiser to create partial sums for only those dimensions of
-    // variables which need subsetting.
-    for (vector<Dimension*>::iterator dimit=dims.begin();
-            dimit!=dims.end(); ++dimit) {
-        Dimension *dim = *dimit;
-        DistributedMask *mask;
-        mask = dynamic_cast<DistributedMask*>(dim->get_mask());
-        if (mask) {
-            int g_mask = mask->get_handle();
-            if (sum_map.find(g_mask) == sum_map.end()) {
-                TRACER("Creating partial sum for %s\n",
-                        mask->get_name().c_str());
-                sum_map[g_mask] = GA_Duplicate(g_mask, "maskcopy");
-                partial_sum(g_mask, sum_map[g_mask], 0);
+        TRACER("precompute partial sums BEGIN\n");
+        // TODO It was easier to simply create partial sums for all masks.
+        // It might be wiser to create partial sums for only those dimensions of
+        // variables which need subsetting.
+        for (vector<Dimension*>::iterator dimit=dims.begin();
+                dimit!=dims.end(); ++dimit) {
+            Dimension *dim = *dimit;
+            DistributedMask *mask;
+            mask = dynamic_cast<DistributedMask*>(dim->get_mask());
+            if (mask) {
+                int g_mask = mask->get_handle();
+                if (sum_map.find(g_mask) == sum_map.end()) {
+                    TRACER("Creating partial sum for %s\n",
+                            mask->get_name().c_str());
+                    sum_map[g_mask] = GA_Duplicate(g_mask, "maskcopy");
+                    partial_sum(g_mask, sum_map[g_mask], 0);
+                }
             }
         }
-    }
-    TRACER("precompute partial sums END\n");
+        TRACER("precompute partial sums END\n");
 
-    writer = FileWriter::create(cmd.get_output_filename());
-    writer->copy_atts(dataset->get_atts());
-    writer->def_dims(dataset->get_dims());
-    writer->def_vars(vars);
-    for (vector<Variable*>::iterator it=vars.begin(); it!=vars.end(); ++it) {
-        Variable *var = *it;
-        if (var->has_record() && var->num_dims() > 1) {
-            subset_record(var, writer, sum_map);
-        } else {
-            subset(var, writer, sum_map);
+        writer = FileWriter::create(cmd.get_output_filename());
+        TRACER("after writer = FileWriter::create(%s)\n",
+                cmd.get_output_filename().c_str());
+        writer->copy_atts(dataset->get_atts());
+        TRACER("after writer->copy_atts(dataset->get_atts());\n");
+        writer->def_dims(dataset->get_dims());
+        TRACER("after writer->def_dims(dataset->get_dims());\n");
+        writer->def_vars(vars);
+        TRACER("after writer->def_vars(vars);\n");
+        for (vector<Variable*>::iterator it=vars.begin(); it!=vars.end(); ++it) {
+            Variable *var = *it;
+            if (var->has_record() && var->num_dims() > 1) {
+                subset_record(var, writer, sum_map);
+            } else {
+                subset(var, writer, sum_map);
+            }
         }
-    }
 
-    delete writer; // also closes file
-    TRACER("after delete writer\n");
-    delete dataset;
-    TRACER("after delete dataset\n");
+        delete writer; // also closes file
+        TRACER("after delete writer\n");
+        delete dataset;
+        TRACER("after delete dataset\n");
 
 #ifdef TRACE
-    if (0 == GA_Nodeid()) {
-        GA_Print_stats();
-    }
+        if (0 == GA_Nodeid()) {
+            GA_Print_stats();
+        }
 #endif
 #ifdef GATHER_TIMING
-    Timing::end_global = Timing::get_time();
-    PRINT_ZERO("Timing::end_global=%ld\n", Timing::end_global);
-    PRINT_ZERO(Timing::get_stats_calls());
-    PRINT_ZERO(Timing::get_stats_total_time());
+        Timing::end_global = Timing::get_time();
+        PRINT_ZERO("Timing::end_global=%ld\n", Timing::end_global);
+        PRINT_ZERO(Timing::get_stats_calls());
+        PRINT_ZERO(Timing::get_stats_total_time());
 #endif /* GATHER_TIMING */
 #ifdef GATHER_PNETCDF_TIMING
-    PnetcdfTiming::end_global = PnetcdfTiming::get_time();
-    PRINT_ZERO("PnetcdfTiming::end_global=%ld\n", PnetcdfTiming::end_global);
-    PRINT_ZERO(PnetcdfTiming::get_stats_calls());
-    PRINT_ZERO(PnetcdfTiming::get_stats_aggregate());
+        PnetcdfTiming::end_global = PnetcdfTiming::get_time();
+        PRINT_ZERO("PnetcdfTiming::end_global=%ld\n", PnetcdfTiming::end_global);
+        PRINT_ZERO(PnetcdfTiming::get_stats_calls());
+        PRINT_ZERO(PnetcdfTiming::get_stats_aggregate());
 #endif /* GATHER_PNETCDF_TIMING */
-    TRACER("just before GA_Terminate() and MPI_Finalize()\n");
-    GA_Terminate();
-    MPI_Finalize();
-    return EXIT_SUCCESS;
+        TRACER("just before GA_Terminate() and MPI_Finalize()\n");
+        GA_Terminate();
+        MPI_Finalize();
+        return EXIT_SUCCESS;
+    } catch (exception &ex) {
+        GA_Error((char*)ex.what(),0);
+    }
 }
 
 

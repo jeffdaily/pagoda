@@ -21,7 +21,7 @@ GCRM_CXX_VARIADIC_MACROS([],
     [AC_MSG_WARN([C99 variadic macros not supported, IO timing disabled])])
 
 # Initialize automake and libtool.
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([silent-rules])
 AM_DISABLE_SHARED
 LT_INIT
 
