@@ -9,6 +9,6 @@ default: test.tex
 	gnuplot $<
 
 clean:
-	rm -rf *~ *.tex *.eps
+	rm -rf *~ *.tex *.eps *.png
 
 test.tex: test.dat test.gnuplot
