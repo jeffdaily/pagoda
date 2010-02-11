@@ -1,0 +1,139 @@
+\section{Design and Implementation}
+\label{section:design}
+
+Our goal when designing the subsetter was to create a data parallel tool for
+subsetting the results of the GCRM.  The subsets needed to preserve the
+explicit topology that is necessary for unstructured grids.  Unstructured
+grids present further challenges when post processing model output due to a
+general lack of cell neighbor locality.  These requirements are further
+detailed next.
+
+\subsection{Requirements}
+
+For these data sizes, I/O bandwidth represents the single greatest bottleneck
+for analysis tools and therefore parallel I/O libraries must be utilized.  The
+Parallel NetCDF Library\cite{PNETCDF} can use either collective or
+non-collective I/O routines, however maximum optimization can only be achieved
+when using the collective operations. Therefore, some degree of data
+parallelism is required.  Most climate analysis tools today are not data
+parallel and would likely require a hefty amount of re-engineering to correct.
+Data parallelism was necessary to handle the magnitude of the data produced by
+this model and modern models like it.  Our advantage is that data parallelism
+is designed into our data structures and is readily applicable to the
+programming model of GA.
+
+Datasets of this size will be stored as many hundreds or thousands of files.
+There are any number of schemes for organizing so many files e.g. one variable
+per file with multiple timesteps per file, separating out the grid into a
+separate file, one timestep per file with multiple variables. The subsetter
+minimally supports two forms of input file aggregation, either across a
+specified dimension e.g. time or by taking the union of all input files such
+that duplicate dimensions and variables within later files are ignored.
+These forms of aggregation are modeled after what is available when using
+NetCDF Markup Language.\cite{NcML} NcML input is not directly supported at
+this time but is planned for a future release. 
+
+The subsetter is the first in a series of parallel command-line tools
+akin to the NetCDF Operators.\cite{NCO}  Its features most closely resemble
+those of NCO's Kitchen Sink (ncks) program which allows for the extraction of
+variables and hyperslabs from one or more input files.
+
+\subsection{Data Format}
+
+The geodesic grid consists mostly of hexagons with a few pentagons.  Model
+data can be considered to reside at either a cell's center, its corners or its
+edges.  There are $N = 10 \times 2^{2R} + 2$ cells, $C = (N-2) \times 2$
+corners, and $E = (N-2) \times 3$ edges where $R$ is an integer representing
+the resolution of the model.  An $R$ value of 11 corresponds to a resolution
+of approximately 4Km.  For each of cells, corners, and edges there is a
+latitude and longitude array.  The vertical dimension is represented as either
+a layer (the cell volume) or an interface (the surface between cells).
+Lastly, there are a number of two-dimensional integer arrays mapping from a
+cell index to its neighbors, corners, or edges and from edges to corners.
+Those mapping arrays represent the connectivity or topology of the grid.  See
+REF TO CALLOUT for a detailed output of the ncdump program on our NetCDF data.
+
+\emph{NEED CALLOUT OF NCDUMP FOR TYPICAL HEADER FILE - TO SHOW USERS OUR DATA
+STRUCTURES}
+
+\subsection{Implementation}
+
+The subsetter was built using the GA library for the wealth of features it
+provides which are tailored to our problem domain.  GA provides a distributed
+dense multidimensional array programming abstraction and the data we will be
+operating over is stored as dense arrays within NetCDF files.  It should be
+noted that dense distributed arrays would also work well for regularly gridded
+data.  However, due to the use of unstructured grid data, the algorithm for
+subsetting the data will look quite different than for the structured case.
+Recall that for unstructured grids, logically adjacent cells are not
+necessarily adjacent in memory.  In order to evenly distribute a subset, a
+single process will need to send a varying amount of data to any number of
+other processes.  Certainly a collective operation could be considered, but GA
+provides the necessary functionality without needing any explicit cooperation
+from any other process.  Any given process will simply put the section of the
+subset into the remote process's memory.  It is unclear how point-to-point
+communications could mimic the ease of use of the interface provided by GA's
+one-sided operations.
+
+Each dimension of the data has two arrays associated with it, a bitmask and an
+integer array representing the new indices of the dimension in case of a
+subset.  For instance, if any of the bits are turned off, the corresponding
+index array will have negative values.  The remaining values of the index
+array will increase monotonically, skipping the negative or masked indices.
+The bitmasks are generated based on a rectangular latitude and longitude
+region specified on the command-line, or by specifying one or more indices of
+a dimension to select.  Although a rectangular region is currently used for
+simplicity, once translated the bitmasks allow for arbitrary subsets to be
+defined.  These bitmasks are then used to evenly distribute the resultant
+subset across all processes.  Note that these bitmask and associated index
+arrays are one-dimensional and distributed.
+
+REMOVE
+There are certain GA operations which are tailored for use on one-dimensional
+arrays such as the bitmasks.  These operations include \verb=GA_Patch_enum=,
+\verb=GA_Scan_add=, \verb=GA_Scan_copy=, \verb=GA_Pack=, and \verb=GA_Unpack=.
+The remaining GA operations are N-dimensional and one-sided and include
+\verb=NGA_Scatter=, \verb=NGA_Gather=, \verb=GA_Put=...
+REMOVE
+
+The vast majority of functionality within the subsetter is provided by either
+PnetCDF or GA.  GA allocates and evenly distributes the arrays which are then
+filled with data by PnetCDF.  GA operations are then used to prepare the data
+for packing at which point a custom n-dimensional packing routine is used.
+The packed, evenly-distributed data is then written back to disk using
+PnetCDF.  Of these algorithms, the novel ones include reindexing the masks,
+reindexing the connectivity variables, and the n-dimensional pack routine.
+
+\subsubsection{REINDEXING OF DISTRIBUTED MASKS}
+
+Creating the index array associated with a mask is the easiest of the
+algorithms.  It only requires three specific GA operations, \verb=GA_Fill=,
+\verb=GA_Patch_enum= and \verb=GA_Unpack=.  \verb=GA_Fill= fills the index
+array with a value of $-1$.  \verb=GA_Patch_enum= enumerates the values of a
+second array starting from zero with an increment of 1.  \verb=GA_Unpack=
+expands the enumerated array values into the filled array based on the
+associated mask array.
+
+\subsubsection{REINDEXING OF CONNECTIVITY VARIABLES}
+
+Recall that the connectivity variables are those which map from one index to
+one or more other indices such as from a cell index to each of its corner
+indices.  A typical subset operation reduces the number of cells, corners, and
+edges within the data, so it is important to maintain the integrity of these
+mapping arrays such that they map to real indices.
+
+The reindexing of the connectivity variables relies on the recalculated index
+array of the associated domain.  For example, when reindexing the mapping from
+cells to corners, the recalculated corners index array is required.  The
+mapping values represent indices into the recalculated index array, so the
+values are organized into set of indices for the GA routine \verb=NGA_Gather=
+to query.  The \verb=NGA_Gather= routine gathers array elements from a global
+array into a local array and in this case gathers the new values for the
+mapping.  The gathered values then appropriately replace the old mapping
+values.
+
+\subsubsection{N-DIMENSIONAL PACK ROUTINE}
+
+TODO -- Consider pseudo code?  \verb=GA_Scan_add= routine was used to perform
+partial sums on all masks. That helps determine where to \verb=NGA_Put= the
+subset data.
