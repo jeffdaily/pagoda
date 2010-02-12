@@ -1,0 +1,9 @@
+system   R   variable var_type  timesteps  Nodes   Cores   OSTs    read     write    ALIGN  Region  Wall Time   Wall Timep
+franklin 11  flux_ifc edge      24         8       32      48      N/A      N/A 2           MJO     OOM         OOM
+franklin 11  flux_ifc edge      24         16      64      48      0.241344 1.466600 2      MJO     777         1010
+franklin 11  flux_ifc edge      24         32      128     48      0.560806 2.010270 2      MJO     554         452
+franklin 11  flux_ifc edge      24         64      256     48      0.529082 3.837210 2      MJO     160         431
+franklin 11  flux_ifc edge      24         128     512     48      1.174360 4.479080 2      MJO     105         200
+franklin 11  flux_ifc edge      24         256     1024    48      1.015280 4.278410 2      MJO     68          222
+franklin 11  flux_ifc edge      24         512     2048    48      1.113340 4.514940 2      MJO     52          205
+
