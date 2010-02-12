@@ -2,8 +2,21 @@
 \label{section:future}
 
 We are currently developing a general C++ API for climate data analysis in a
-data parallel fashion.  The API will be leveraged to produce additional
-command-line tools, however it is intended primarily to be used by climate
-scientists to produce the kinds of tailored analyses which they require.  Time
-permitting, the API will be exposed to the Python language in order to
-facilitate ease of use in a scripted environment.
+data parallel fashion based on the PGAS model and one-sided communications.
+The API will be leveraged to produce additional command-line tools, however it
+is intended primarily to be used by climate scientists to produce the kinds of
+tailored analyses which they require.  Time permitting, the API will be
+exposed to the Python language in order to facilitate ease of use in a
+scripted environment.  Larson, Ong, and Tokarz also point out certain
+capabilities missing from popular climate data analysis packages such as
+probability density function (PDF) estimation as well as the sorting and
+ordering of data.
+
+The evaluation performed in \ref{section:evaluation} revealed that IO for our
+application remains the greatest bottleneck.  This fact is exacerbated when
+small regions representing a mere fraction of the entire grid are subset.  Our
+current strategy is terribly inefficient because it reads in entire variables
+only to immediately cull the majority of them.  If a masked read were
+available within the Parallel NetCDF library we would likely see performance
+gains.  The algorithms presented in this paper which evenly distribute the
+subset data will hopefully encourage work in this area.

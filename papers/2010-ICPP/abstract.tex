@@ -1,5 +1,16 @@
 \begin{abstract}
+\label{section:abstract}
 
-TODO
+Parallel programming is needed to analyze the vast amount of data produced by
+today's climate models, however the majority of climate analysis software
+remain at the scale of workstations.  Many climate analysis tools adequately
+process regularly gridded data but lack sufficient features when handling
+unstructured grids.  This paper presents a data-parallel subusetter capable of
+correctly handling unstructured grids while scaling to the size of modest
+analysis clusters.  The approach is based on the partitioned global address
+space (PGAS) parallel programming model and one-sided communications.  The
+paper demonstrates that IO remains the single greatest bottleneck for this
+domain of applications and that parallel analysis of climate data succeeds in
+practice.
 
 \end{abstract}
