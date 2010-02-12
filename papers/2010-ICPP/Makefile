@@ -3,8 +3,8 @@ LATEX = latex
 DVIPDF = ./mydvipdf.sh
 
 paper:
-	cd plots && $(MAKE)
-	cp -f plots/*.eps .
+	#cd plots && $(MAKE)
+	#cp -f plots/*.eps .
 	$(LATEX) $@ && \
 	bibtex $@ && \
 	$(LATEX) $@ && \
