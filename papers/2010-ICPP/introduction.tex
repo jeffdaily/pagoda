@@ -30,20 +30,20 @@ logically adjacent cells scattered across memory partitions than in the
 regular case.
 
 Subsetting is a fundamental capability for any analysis tool and allows users
-to operate over the regions of the data with which they are interested. The
+to operate over the regions of the data in which they are interested. The
 subsetting operation is useful as part of a larger operation over the data,
-such as for regional averages, but is also useful to post-process data into a
-new dataset such that the cost of subsetting can be amortized across future
-operations over the same region. Further, as the size of datasets grow
-subsetting is important to reduce the data to a size that traditional analysis
-tools are capable of handling. 
+such as for obtaining regional averages, but is also useful to post-process
+data into a new dataset such that the cost of subsetting can be amortized
+across future operations over the same region. Further, as the size of
+datasets grow subsetting is important to reduce the data to a size that
+traditional analysis tools are capable of handling. 
 
 In this paper, we present a parallel tool for subsetting very large geodesic
 climate data in parallel while preserving the explicit topology.  The code is
 built using the Global Arrays (GA) toolkit which provides an efficient and
 portable "shared-memory" programming interface for distributed-memory
 computers and features truly one-sided communications.\cite{GA}  GA
-traditionally deals with dense arrays, however its sparse matrix operations as
+traditionally deals with dense arrays, however its sparse data operations as
 well as its one-sided operations allow for efficient subsetting over
 unstructured grids.
 

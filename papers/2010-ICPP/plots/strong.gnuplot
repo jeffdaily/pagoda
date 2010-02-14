@@ -2,18 +2,19 @@ set term epslatex color
 set output "strong.tex"
 
 #set key inside left Left reverse
-#set title "Strong" offset character 0, 0, 0 font "" norotate
-set xlabel "X"
-set ylabel "Y"
+set title "Strong" offset character 0, 0, 0 font "" norotate
+set xlabel "Cores"
+set ylabel "Time (s)"
 
 set data style linespoints
 
 set logscale xy
-#set xtics (10, 20, 50, 100, 200, 500, 1000, 2000, 5000) rotate by -45 nomirror
+set xtics (16, 32, 64, 128, 256, 512, 1024, 2048)
+#set xtics (16, 32, 64, 128, 256, 512, 1024, 2048) rotate by -45 nomirror
 
-#plot 'strong.dat' u 7:13 t "Cores:Time" lc rgbcolor "#00ff00" pt 7 lt 1
-plot 'strong.dat' u 7:13 t "Cores:Time"
+plot 'strong.dat' u 7:13 t "Cores:Time" lc rgbcolor "#00ff00" pt 7 lt 1
+#plot 'strong.dat' u 7:13 t "Cores:Time"
 
 set term png
-set output "test.png"
+set output "strong.png"
 replot

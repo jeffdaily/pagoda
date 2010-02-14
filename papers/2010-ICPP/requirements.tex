@@ -101,27 +101,27 @@ custom data analysis tools are currently required.
 
 Larson, Ong, and Tokarz note that the current popular climate data analysis
 packages remain single-processor applications which lack the memory required
-to handle the large data volumes as well as the processing power to analyse
-the data in a timely fashion.\cite{MODSIM07:LOT}  Although they emphasize
-using OpenMP as a first step toward parallism, we instead emphasize using the
-message-passing model first.  Well designed message-passing libraries such as
+to handle large data volumes as well as the processing power to analyse the
+data in a timely fashion.\cite{MODSIM07:LOT}  Although they emphasize using
+OpenMP as a first step toward parallism, we instead emphasize using a
+distributed data model first.  Well designed communication libraries such as
 MPI may already take advantage of shared-memory parallelism within a compute
 node or multi-core desktop computer.
 
 The data parallelism offered by libraries such as MPI or Global Arrays is
 absolutely necessary to handle the size of data of modern climate models.  An
-edge data variable of the geodesic grid at an approximate resolution of 2Km
+edge data variable of the geodesic grid at an approximate resolution of 4Km
 and 100 levels is nearly $10 \times 2^{2R} \times 3 \times 100 \times 4
 \unit{bytes} \approx 50 \unit{gigabytes}$ in size.  Even a modest number of
-these variables will surpass the memory available in most desktop and even
-some small clusters.
+these variables will surpass the memory available in most desktop systems and
+even some small clusters.
 
 \subsection{Fast IO}
 
 For data of this size, efficiently reading from and writing to disk requires
-the use of parallel IO libraries such as the Parallel NetCDF\cite{PNETCDF} or
-the HDF5/NetCDF4\cite{HDF5}\cite{NETCDF} libraries, both of which are in turn
-built on top of the MPI-IO libraries\cite{MPIIO}.  Model output is stored in
+the use of parallel IO libraries such as Parallel NetCDF\cite{PNETCDF} or the
+HDF5/NetCDF4\cite{HDF5}\cite{NETCDF}, both of which are in turn built on top
+of the MPI-IO libraries\cite{MPIIO}.  Currently, GCRM output is stored in
 netCDF\cite{NETCDF} files, a format for storing array-oriented
 machine-independent data.
 
@@ -145,9 +145,14 @@ adjacent cells are either adjacent in memory or can be located via a
 shape-based index calculation.  Although some attempt is made to keep
 logically adjacent cells nearby in memory, geodesic grids do not have the
 luxury of using relatively simple shape-based index arithmetic to locate
-neighbors.  The topology variables mentioned in \ref{subsection:grid} are
-unique to our grid.  When a subset occurs, the indices must be updated to
-reflect the remaining corners, edges, and cells.
+neighbors.
+
+The topology variables mentioned in \ref{subsection:grid} are not unique to
+our grid; any grid could be described using a similar set of variables.
+However, since topology is often implicitly defined by other grids, these
+variables are not correctly handled by current software.  When a subset
+occurs, the indices of these variables must be updated to reflect the
+remaining corners, edges, and cells.
 
 \subsection{Maintain Integrity of Entire Grid Cells}
 

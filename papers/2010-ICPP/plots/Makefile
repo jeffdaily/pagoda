@@ -1,6 +1,6 @@
 .SUFFIXES: .gnuplot .tex .eps .dat
 
-default: test.tex
+default: strong.tex
 
 .gnuplot.tex: $<
 	gnuplot $<
@@ -11,4 +11,4 @@ default: test.tex
 clean:
 	rm -rf *~ *.tex *.eps *.png
 
-test.tex: test.dat test.gnuplot
+strong.tex: strong.dat strong.gnuplot
