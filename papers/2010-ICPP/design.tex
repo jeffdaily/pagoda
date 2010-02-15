@@ -31,12 +31,14 @@ ignored.  These forms of aggregation are modeled after what is available when
 using NetCDF Markup Language.\cite{NcML} NcML input is not directly supported
 at this time but is planned for a future release. 
 
-TODO
-
 \subsection{Parallel IO Abstraction}
 
-The use of Parallel NetCDF was selected because of the ubiquity of the NetCDF
-libraries and data format in climate applications.
+IO operations are hidden behind abstract base classes.  Any IO library can be
+supported.  This is similar to how the Java NetCDF library works
+\cite{JavaNetCDF}.  Further, differing IO strategies using the same IO library
+can also be developed behind the same API.  The use of Parallel NetCDF was
+selected because of the ubiquity of the NetCDF libraries and data format in
+climate applications.
 
 \subsection{The Global Arrays Library}
 
@@ -84,7 +86,7 @@ with data by PnetCDF.  GA operations are then used to prepare the data for
 packing at which point a custom n-dimensional packing routine is used.  The
 packed, evenly-distributed data is then written back to disk using PnetCDF.
 Of these algorithms, the novel ones include reindexing the masks, reindexing
-the connectivity variables, and the n-dimensional pack routine.
+the topology variables, and the n-dimensional pack routine.
 
 Each dimension of the data has two arrays associated with it, a bitmask and an
 integer array representing the new indices of the dimension in case of a
@@ -103,7 +105,7 @@ index arrays are one-dimensional and distributed.
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/partialsum}
+\includegraphics[width=3.5in]{images/partialsum_label}
 \caption{Distributed partial sum on a 1-D array}
 \label{fig:partialsum}
 \end{figure}
@@ -117,58 +119,87 @@ computes a series of sums over an array from the first element through the
 element of a destination array.
 
 The partial sum is computed by first performing partial sums of each local
-portion of the source array.  This operation is the first line in
-\ref{fig:partialsum}.  The last value of each local sum is then collectively
-distributed to each process as seen in the second line of the figure.  As the
-last step and list line in the figure, each local portion adds the last values
-of each process's sum which come before.
+portion of the source array.  This operation is represented by
+\ref{fig:partialsum} A.  The last value of each local sum is then collectively
+distributed to each process as seen in \ref{fig:partialsum} B.
+\ref{fig:partialsum} C is the last step where each local portion adds the last
+values of each process's sum which come before.
 
 \subsubsection{Reindexing of Dimension Index}
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/unpack}
+\includegraphics[width=3.5in]{images/unpack_label}
 \caption{Reindexing of a Dimension Index}
 \label{fig:unpack}
 \end{figure}
 
-Creating the index array associated with a mask is the easiest of the
-algorithms.  It only requires three specific GA operations, \verb=GA_Fill=,
-\verb=GA_Patch_enum= and \verb=GA_Unpack=.  \verb=GA_Fill= fills the index
-array with a value of $-1$.  \verb=GA_Patch_enum= enumerates the values of a
-second array starting from zero with an increment of 1.  \verb=GA_Unpack=
-expands the enumerated array values into the filled array based on the
-associated mask array.
+Creating the index array associated with a mask requires three specific GA
+operations, \verb=GA_Fill=, \verb=GA_Patch_enum= and \verb=GA_Unpack=.  The
+mask array is represented in \ref{fig:unpack} A.  \verb=GA_Fill= fills the
+index array, the bottom array in \ref{fig:unpack} B,  with a value of $-1$.  A
+second array is created after each process counts how many masked bits are
+present and collectively sums to get the size of the array to create.
+\verb=GA_Patch_enum= enumerates the values in the second array starting from
+zero with an increment of 1.  The enumerated array is shown in
+\ref{fig:unpack} B.  \verb=GA_Unpack= expands the enumerated array values into
+the filled array based on the associated mask array, seen as \ref{fig:unpack}
+B.
 
-\subsubsection{REINDEXING OF CONNECTIVITY VARIABLES}
+\subsubsection{Reindexing of Topology Variables}
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/reindex}
+\includegraphics[width=3.5in]{images/reindex_label}
 \caption{Reindexing of Topology Variables}
 \label{fig:reindex}
 \end{figure}
 
-Recall that the connectivity variables are those which map from one index to
+Recall that the topology variables are those which map from one index to
 one or more other indices such as from a cell index to each of its corner
 indices.  A typical subset operation reduces the number of cells, corners, and
-edges within the data, so it is important to maintain the integrity of these
+edges within the grid, so it is important to maintain the integrity of these
 mapping arrays such that they map to real indices.
 
-The reindexing of the connectivity variables relies on the recalculated index
+The reindexing of the topology variables relies on the recalculated index
 array of the associated domain.  For example, when reindexing the mapping from
-cells to corners, the recalculated corners index array is required.  The
-mapping values represent indices into the recalculated index array, so the
-values are organized into set of indices for the GA routine \verb=NGA_Gather=
-to query.  The \verb=NGA_Gather= routine gathers array elements from a global
-array into a local array and in this case gathers the new values for the
-mapping.  The gathered values then appropriately replace the old mapping
-values.
+edges to corners, the recalculated corners index array is required.  The
+mapping values represent indices into the recalculated index array.  The
+mapping arrays are iterated over to gather the required indices for the
+subsequent GA routine \verb=NGA_Gather= to query, represented in
+\ref{fig:reindex} A.  The \verb=NGA_Gather= routine gathers array elements
+from a global array into a local array.  In this each process gathers the new
+values for the mapping from the index array (\ref{fig:reindex} B) and
+then appropriately replaces the old mapping values in \ref{fig:reindex} C.
 
-\subsubsection{N-DIMENSIONAL PACK ROUTINE}
+\subsubsection{N-Dimensional Pack}
 \label{section:alg_pack}
 
-TODO -- Consider pseudo code?  \verb=GA_Scan_add= routine was used to perform
-partial sums on all masks. That helps determine where to \verb=NGA_Put= the
-subset data.
+\begin{figure}[!t]
+\center
+\includegraphics[width=3.5in]{images/pack}
+\caption{Pack}
+\label{fig:pack}
+\end{figure}
 
+The goal of the pack routine is to evenly distribute the subset destination
+array from the already evenly distributed source array.  The subset is
+specified using mask arrays, one for each dimension of the source array.  The
+problem lies with where to put the data once each process computes its portion
+of the subset; each process would need to know a priori the size of the
+subsets that logically come before their own computed portion and
+\verb=NGA_Put()= their data after then.
+
+The partial sum of the mask array is a convenient solution to this problem.
+Each process owns a portion of the source array in terms of the global address
+space of the array.  For each dimension, the value in the corresponding
+partial sum array at the index represented by the lowest index owned by each
+local portion describes where to put the subset data.
+
+Figure \ref{fig:pack} should clarify this.  In the figure, the blue arrays
+represent both the mask arrays as well as the partial sum arrays.  The masked
+bits are indicated in black.  Each of the four processes query the partial sum
+arrays using \verb=NGA_Get()= at the corresponding locations indicated in
+orange and the small blue arrows.  Now knowing where to put their subset data,
+each process can \verb=NGA_Put()= their portions resulting in the subset
+array.
