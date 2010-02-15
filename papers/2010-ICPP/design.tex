@@ -77,7 +77,7 @@ data.
 
 \subsection{The Algorithms}
 
-The one-sided communications and PGAS model supported by GA allowed us to
+The one-sided communication and PGAS model supported by GA allowed us to
 develop some novel algorithms for the manipulation of unstructured grids.  In
 this section we diagram and describe the algorithms we developed.  The vast
 majority of functionality within the subsetter is provided by either PnetCDF
@@ -119,10 +119,10 @@ computes a series of sums over an array from the first element through the
 element of a destination array.
 
 The partial sum is computed by first performing partial sums of each local
-portion of the source array.  This operation is represented by
-\ref{fig:partialsum} A.  The last value of each local sum is then collectively
-distributed to each process as seen in \ref{fig:partialsum} B.
-\ref{fig:partialsum} C is the last step where each local portion adds the last
+portion of the source array.  This operation is represented by Figure
+\ref{fig:partialsum}A.  The last value of each local sum is then collectively
+distributed to each process as seen in Figure \ref{fig:partialsum}B.  Figure
+\ref{fig:partialsum}C is the last step where each local portion adds the last
 values of each process's sum which come before.
 
 \subsubsection{Reindexing of Dimension Index}
@@ -136,15 +136,15 @@ values of each process's sum which come before.
 
 Creating the index array associated with a mask requires three specific GA
 operations, \verb=GA_Fill=, \verb=GA_Patch_enum= and \verb=GA_Unpack=.  The
-mask array is represented in \ref{fig:unpack} A.  \verb=GA_Fill= fills the
-index array, the bottom array in \ref{fig:unpack} B,  with a value of $-1$.  A
-second array is created after each process counts how many masked bits are
-present and collectively sums to get the size of the array to create.
+mask array is represented in Figure \ref{fig:unpack}A.  \verb=GA_Fill= fills
+the index array, the bottom array in Figure \ref{fig:unpack}B,  with a value
+of $-1$.  A second array is created after each process counts how many masked
+bits are present and collectively sums to get the size of the array to create.
 \verb=GA_Patch_enum= enumerates the values in the second array starting from
-zero with an increment of 1.  The enumerated array is shown in
-\ref{fig:unpack} B.  \verb=GA_Unpack= expands the enumerated array values into
-the filled array based on the associated mask array, seen as \ref{fig:unpack}
-B.
+zero with an increment of 1.  The enumerated array is shown in Figure
+\ref{fig:unpack}B.  \verb=GA_Unpack= expands the enumerated array values into
+the filled array based on the associated mask array, seen as Figure
+\ref{fig:unpack}B.
 
 \subsubsection{Reindexing of Topology Variables}
 
@@ -166,11 +166,12 @@ array of the associated domain.  For example, when reindexing the mapping from
 edges to corners, the recalculated corners index array is required.  The
 mapping values represent indices into the recalculated index array.  The
 mapping arrays are iterated over to gather the required indices for the
-subsequent GA routine \verb=NGA_Gather= to query, represented in
-\ref{fig:reindex} A.  The \verb=NGA_Gather= routine gathers array elements
-from a global array into a local array.  In this each process gathers the new
-values for the mapping from the index array (\ref{fig:reindex} B) and
-then appropriately replaces the old mapping values in \ref{fig:reindex} C.
+subsequent GA routine \verb=NGA_Gather= to query, represented in Figure
+\ref{fig:reindex}A.  The \verb=NGA_Gather= routine gathers array elements from
+a global array into a local array.  In this each process gathers the new
+values for the mapping from the index array (Figure \ref{fig:reindex}B) and
+then appropriately replaces the old mapping values in Figure
+\ref{fig:reindex}C.
 
 \subsubsection{N-Dimensional Pack}
 \label{section:alg_pack}
@@ -182,13 +183,13 @@ then appropriately replaces the old mapping values in \ref{fig:reindex} C.
 \label{fig:pack}
 \end{figure}
 
-The goal of the pack routine is to evenly distribute the subset destination
-array from the already evenly distributed source array.  The subset is
-specified using mask arrays, one for each dimension of the source array.  The
-problem lies with where to put the data once each process computes its portion
-of the subset; each process would need to know a priori the size of the
-subsets that logically come before their own computed portion and
-\verb=NGA_Put()= their data after then.
+The goal of the pack routine is to start with an evenly distributed source
+array, subset it, and evenly distribute the subset.  The subset is specified
+using mask arrays, one for each dimension of the source array.  The problem
+lies with where to put the data once each process computes its portion of the
+subset; each process would need to know a priori the size of the subsets that
+logically come before their own computed portion and \verb=NGA_Put()= their
+data after then.
 
 The partial sum of the mask array is a convenient solution to this problem.
 Each process owns a portion of the source array in terms of the global address
@@ -202,4 +203,7 @@ bits are indicated in black.  Each of the four processes query the partial sum
 arrays using \verb=NGA_Get()= at the corresponding locations indicated in
 orange and the small blue arrows.  Now knowing where to put their subset data,
 each process can \verb=NGA_Put()= their portions resulting in the subset
-array.
+array.  Because the destination array was created using GA, it is by
+definition evenly distributed.  The \verb=NGA_Get()= and \verb=NGA_Put()=
+operations do not require explicit knowledge of where the data lives,
+aleviating the burder of the programmer.
