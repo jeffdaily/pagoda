@@ -12,7 +12,7 @@ Until recently, climate and weather models have primarily been simulated on
 structured grids that divide the latitude and longitude axes in even
 increments, resulting in logically structured simulation grids. Standard
 conventions for describing this data in the NetCDF data model have been
-formalized by the Climate and Forecast (CF) conventions. CF defines
+formalized by the Climate and Forecast (CF) conventions\cite{CF}. CF defines
 conventions and metadata standards that enable both human and computer
 interpretation of the data.  Human interpretation is supported through the use
 of standard names while definition of spatial and temporal properties of the
@@ -25,7 +25,7 @@ The GCRM uses a geodesic grid.  The geodesic grid is created by recursively
 bisecting an icosahedron of 20 triangular faces and twelve vertices and
 projecting the resulting faces onto a unit sphere.  The resulting vertices
 represent the centers of hexagonal grid cells with the exception of twelve
-pentagons (the centers of the original twelve vertices.) See
+pentagons (the centers of the original twelve vertices.) See Figure
 \ref{fig:geodesic} for an example of the first stage of bisection and
 projection, followed by the definition of one of the hexagons.  Further
 details can be found in \cite{GEODESIC}.
@@ -73,12 +73,20 @@ corners, a mapping between cells and cell edges, and a mapping between edges
 and corners.  Because neighbor lists are important for visualization programs
 but difficult to generate in the general case, they are included as part of
 the topology as the \verb+cell_neighbors(cells,neighbors=6)+ variable.  The
-vast majority of cells are hexagons, so we have
-\verb+cell_corners(cells,cellcorners=6)+,
-\verb+cell_edges(cells,celledges=6)+, and
-\verb+edge_corners(edges,edgecorners=2)+.  For the twelve pentagons, the last
-values in these arrays are repeated but could just have easily been set to a
-negative index.
+full list of topology variables include:
+
+\begin{itemize}
+\item \verb+cell_neighbors(cells,neighbors=6)+,
+\item \verb+cell_corners(cells,cellcorners=6)+,
+\item \verb+cell_edges(cells,celledges=6)+, and
+\item \verb+edge_corners(edges,edgecorners=2)+
+\end{itemize}
+
+The vast majority of cells are hexagons which is why most of the last
+dimensions are of size six except for the obvious case of \verb+edge_corners+.
+For the twelve pentagons, the sixth value in these arrays are repeated but
+could just have easily been set to a negative index and interpreted
+appropriately.
 
 The horizontal geometry describes the longitude and latitude location of each
 object.  That is, there is one latitude and one longitude array for each of
@@ -102,11 +110,12 @@ custom data analysis tools are currently required.
 Larson, Ong, and Tokarz note that the current popular climate data analysis
 packages remain single-processor applications which lack the memory required
 to handle large data volumes as well as the processing power to analyse the
-data in a timely fashion.\cite{MODSIM07:LOT}  Although they emphasize using
+data in a timely fashion\cite{MODSIM07:LOT}.  Although they emphasize using
 OpenMP as a first step toward parallism, we instead emphasize using a
 distributed data model first.  Well designed communication libraries such as
-MPI may already take advantage of shared-memory parallelism within a compute
-node or multi-core desktop computer.
+the Message Passing Interface (MPI)\cite{MPI} may already take advantage of
+shared-memory parallelism within a compute node or multi-core desktop
+computer.
 
 The data parallelism offered by libraries such as MPI or Global Arrays is
 absolutely necessary to handle the size of data of modern climate models.  An
@@ -132,10 +141,10 @@ There are any number of schemes for organizing so many files e.g. one variable
 per file with multiple timesteps per file, separating out the grid into a
 separate file, one timestep per file with multiple variables.  The
 reconstitution of these files into a logical set of variables and metadata is
-an established practice.\cite{NcML}\cite{THREDDS}  We emphasize that the
-aggregation of files into an abstract dataset is required in order to operate
-on the data itself.  Operations on a dataset are more intuitive than needing
-to know the addling details of which files hold which variables.
+an established practice\cite{NcML,THREDDS}.  We emphasize that the aggregation
+of files into an abstract dataset is required in order to operate on the data
+itself.  Operations on a dataset are more intuitive than needing to know the
+addling details of which files hold which variables.
 
 \subsection{Maintenance of Topology Variables}
 

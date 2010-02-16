@@ -6,19 +6,23 @@ the requirements established in \ref{section:requirements}.
 
 \subsection{How to Run the Subsetter}
 
-The success of the NetCDF Operators and similar tools demonstrate the need for
-user-ready applications for the analysis of their data while the success of
-tools such as CDAT validate the need for a scriptable interface and customization of
-basic and advanced operators.  We plan to provide both the scriptable
-interface as well as a set of predefined tools.
+The success of the NetCDF Operators\cite{NCO} and similar tools demonstrate
+the need for user-ready applications for the analysis of their data.  The
+success of tools such as CDAT\cite{CDAT} validate the need for a scriptable
+interface and customization of basic and advanced operators.  We plan to
+provide both the scriptable interface as well as a set of predefined
+command-line tools.
 
 The subsetter is the first in a series of planned parallel command-line tools
-based on unstructured grids and the PGAS programming model.  It takes
-arguments specifying specific variables (-v) or dimension ranges (-d) to
+based on unstructured grids, the PGAS model, and one-sided communication.  It
+takes arguments specifying specific variables (-v) or dimension ranges (-d) to
 extract, or at a higher level a latitude and longitude bounding box (-b).  In
 this way it is most akin to the NetCDF Operators' "kitchen sink" application.
-Example usage looks like: \begin{itemize} \item mpiexec -np 128 subsetter -b
-20,-20,160,90 -v vorticity january.nc february.nc MJO\_vorticity\_janfeb.nc
+Besides the particular use of "mpiexec -np" below to invoke our MPI program
+with a given number of processors, example usage of the subsetter looks like:
+
+\begin{itemize}
+\item mpiexec -np 128 subsetter -b 20,-20,160,90 -v vorticity january.nc february.nc MJO\_vorticity\_janfeb.nc
 \item mpiexec -np 64 subsetter -b 90,0,180,-180 -d levels,1,5 geopotential.nc
 \end{itemize}
 
@@ -28,27 +32,26 @@ The subsetter minimally supports two forms of input file aggregation, either
 across a specified dimension e.g. time or by taking the union of all input
 files such that duplicate dimensions and variables within later files are
 ignored.  These forms of aggregation are modeled after what is available when
-using NetCDF Markup Language.\cite{NcML} NcML input is not directly supported
+using NetCDF Markup Language\cite{NcML}.  NcML input is not directly supported
 at this time but is planned for a future release. 
 
 \subsection{Parallel IO Abstraction}
 
 IO operations are hidden behind abstract base classes.  Any IO library can be
-supported.  This is similar to how the Java NetCDF library works
-\cite{JavaNetCDF}.  Further, differing IO strategies using the same IO library
-can also be developed behind the same API.  The use of Parallel NetCDF was
-selected because of the ubiquity of the NetCDF libraries and data format in
-climate applications.
+supported.  This is similar to how the Java NetCDF library
+works\cite{JavaNetCDF}.  Further, differing IO strategies using the same IO
+library can also be developed behind the same API.  The use of Parallel NetCDF
+was selected because of the ubiquity of the NetCDF libraries and data format
+in climate applications.
 
 \subsection{The Global Arrays Library}
 
-The partitioned global address space (PGAS) programming model assumes a global
-address space which is partitioned such that each process is associated with a
-local portion of the space.  One-sided communication allows a process to
-access another process's address space without any explicit participation by
-the latter process.  Such communication can reduce synchronization, reduce
-data movement, and can simplify programming.  The Global Arrays (GA) library
-supports both models.
+The PGAS programming model assumes a global address space which is partitioned
+such that each process is associated with a local portion of the space.
+One-sided communication allows a process to access another process's address
+space without any explicit participation by the latter process.  Such
+communication can reduce synchronization, reduce data movement, and can
+simplify programming.  The Global Arrays (GA) library supports both models.
 
 The subsetter was built using the GA library for the wealth of features it
 provides which are tailored to our problem domain.  GA provides a distributed
@@ -67,13 +70,31 @@ subset into the remote process's memory.
 
 There are certain GA one-sided operations which are tailored for use on
 one-dimensional arrays which are prevalent within our data.  These operations
-include \verb=GA_Patch_enum=, \verb=GA_Scan_add=, \verb=GA_Scan_copy=,
-\verb=GA_Pack=, and \verb=GA_Unpack=.  Those operations have been demonstrated
-in the computation of sparse matrix multiplication\cite{GA} but are equally
-useful in the manipulation of unstructured grids.  The remaining GA operations
-are N-dimensional and include \verb=NGA_Scatter=, \verb=NGA_Gather=,
-\verb=GA_Put=.  Those operations are useful for redistributing the subset
-data.
+include:
+
+\begin{itemize}
+\item \verb=GA_Patch_enum=,
+\item \verb=GA_Scan_add=,
+\item \verb=GA_Scan_copy=,
+\item \verb=GA_Pack=, and
+\item \verb=GA_Unpack=
+\end{itemize}
+
+Those operations have been demonstrated in the computation of sparse matrix
+multiplication\cite{GA} but are equally useful in the manipulation of
+unstructured grids.  The remaining GA operations are N-dimensional and
+include:
+
+\begin{itemize}
+\item \verb=NGA_Scatter=,
+\item \verb=NGA_Gather=,
+\item \verb=NGA_Put=, and
+\item \verb=NGA_Get=
+\end{itemize}
+
+Those operations are useful for redistributing the subset data and for
+querying the values of the various distributed arrays without regard to which
+process owns the data being queried.
 
 \subsection{The Algorithms}
 

@@ -1,6 +1,6 @@
 .SUFFIXES: .gnuplot .tex .eps .dat
 
-default: strong.tex
+default: strong.tex strong_io.tex
 
 .gnuplot.tex: $<
 	gnuplot $<

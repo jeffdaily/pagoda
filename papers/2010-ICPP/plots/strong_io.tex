@@ -75,25 +75,35 @@
   \begin{picture}(7200.00,5040.00)%
     \gplgaddtomacro\gplbacktext{%
       \csname LTb\endcsname%
-      \put(1342,704){\makebox(0,0)[r]{\strut{} 10}}%
-      \put(1342,2542){\makebox(0,0)[r]{\strut{} 100}}%
-      \put(1342,4380){\makebox(0,0)[r]{\strut{} 1000}}%
-      \put(1474,484){\makebox(0,0){\strut{} 64}}%
-      \put(2553,484){\makebox(0,0){\strut{} 128}}%
-      \put(3632,484){\makebox(0,0){\strut{} 256}}%
-      \put(4712,484){\makebox(0,0){\strut{} 512}}%
-      \put(5791,484){\makebox(0,0){\strut{} 1024}}%
+      \put(1210,704){\makebox(0,0)[r]{\strut{} 0}}%
+      \put(1210,1072){\makebox(0,0)[r]{\strut{} 0.5}}%
+      \put(1210,1439){\makebox(0,0)[r]{\strut{} 1}}%
+      \put(1210,1807){\makebox(0,0)[r]{\strut{} 1.5}}%
+      \put(1210,2174){\makebox(0,0)[r]{\strut{} 2}}%
+      \put(1210,2542){\makebox(0,0)[r]{\strut{} 2.5}}%
+      \put(1210,2910){\makebox(0,0)[r]{\strut{} 3}}%
+      \put(1210,3277){\makebox(0,0)[r]{\strut{} 3.5}}%
+      \put(1210,3645){\makebox(0,0)[r]{\strut{} 4}}%
+      \put(1210,4012){\makebox(0,0)[r]{\strut{} 4.5}}%
+      \put(1210,4380){\makebox(0,0)[r]{\strut{} 5}}%
+      \put(1342,484){\makebox(0,0){\strut{} 64}}%
+      \put(2448,484){\makebox(0,0){\strut{} 128}}%
+      \put(3553,484){\makebox(0,0){\strut{} 256}}%
+      \put(4659,484){\makebox(0,0){\strut{} 512}}%
+      \put(5764,484){\makebox(0,0){\strut{} 1024}}%
       \put(6870,484){\makebox(0,0){\strut{} 2048}}%
-      \put(440,2542){\rotatebox{90}{\makebox(0,0){\strut{}Time (s)}}}%
-      \put(4172,154){\makebox(0,0){\strut{}Cores}}%
-      \put(4172,4710){\makebox(0,0){\strut{}Strong Scaling Test}}%
+      \put(440,2542){\rotatebox{90}{\makebox(0,0){\strut{}Bandwidth (GB/s)}}}%
+      \put(4106,154){\makebox(0,0){\strut{}Cores}}%
+      \put(4106,4710){\makebox(0,0){\strut{}Strong Scaling - IO - 48 OSTs}}%
     }%
     \gplgaddtomacro\gplfronttext{%
       \csname LTb\endcsname%
-      \put(5883,4207){\makebox(0,0)[r]{\strut{}Cores:Time}}%
+      \put(5883,4207){\makebox(0,0)[r]{\strut{}Read}}%
+      \csname LTb\endcsname%
+      \put(5883,3987){\makebox(0,0)[r]{\strut{}Write}}%
     }%
     \gplbacktext
-    \put(0,0){\includegraphics{strong}}%
+    \put(0,0){\includegraphics{strong_io}}%
     \gplfronttext
   \end{picture}%
 \endgroup

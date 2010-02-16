@@ -2,23 +2,23 @@
 \label{section:introduction}
 
 Parallel programming is needed to analyze the size of output data produced by
-today's climate models.\cite{MODSIM07:LOT}  A single snapshot of Randall's
+today's climate models\cite{MODSIM07:LOT}.  A single snapshot of Randall's
 Global Cloud Resolving Model will produce terabytes of data\cite{GCRM}; the
 analysis of even a modest time series of this data will quickly overwhelm
 today's software and traditional climate analysis systems.  For these data
 sizes, I/O bandwidth represents the single greatest bottleneck for analysis
 tools.  Parallel software leveraging parallel file systems must be used to
 process this data, however current climate analysis tools are at most task
-parallel and rely on a single data reader.\cite{CDAT}\cite{CDO}\cite{NCO}
+parallel and rely on a single data reader\cite{CDAT,CDO,NCO}.
 
 Many climate analysis tools robustly handle the manipulation and display of
 regularly gridded data.  However, these same applications lack sufficient
-features when handling unstructured or irregular grids such as the geodesic or
-cubed sphere\cite{CUBE}.  Unstructured grids are gaining popularity, further
-widening the gap between current software and these types of models.  For
-unstructured grids it is necessary to provide more information about the
-topology of the grid and maintain the integrity of this topology information
-in the face of data culling.
+features when handling unstructured or irregular grids such as the
+geodesic\cite{GEODESIC} or cubed sphere\cite{CUBE}.  Unstructured grids are
+gaining popularity, further widening the gap between current software and
+these types of models.  For unstructured grids it is necessary to provide more
+information about the topology of the grid and maintain the integrity of this
+topology information in the face of data culling.
 
 Regular grids allow for the topology to be implicitly defined by how
 the data is stored; coordinate variables are generally monotonic and cell
@@ -40,9 +40,9 @@ traditional analysis tools are capable of handling.
 
 In this paper, we present a parallel tool for subsetting very large geodesic
 climate data in parallel while preserving the explicit topology.  The code is
-built using the Global Arrays (GA) toolkit which provides an efficient and
-portable "shared-memory" programming interface for distributed-memory
-computers and features truly one-sided communications.\cite{GA}  GA
+built using the Global Arrays (GA) toolkit\cite{GA} which provides an
+efficient and portable "shared-memory" programming interface for
+distributed-memory computers and features truly one-sided communications.  GA
 traditionally deals with dense arrays, however its sparse data operations as
 well as its one-sided operations allow for efficient subsetting over
 unstructured grids.
@@ -58,10 +58,9 @@ The primary contributions of the paper are:
 The paper is organized as follows.  Section \ref{section:requirements}
 describes the requirements while \ref{section:design} describes the design of
 the subsetter, its algorithms, and how GA's unique features were leveraged.
-Section \ref{section:implementation} briefly describes how the subsetter was
-implemented.  Section \ref{section:evaluation} presents our experimental design
-and the performance characteristics of the subsetter on nearly full-scale data
-set sizes of model data up to a resolution of 4Km.  We present the
-capabilities under development as well as the capabilities we would like to
-see in section \ref{section:future}.  Finally, section
-\ref{section:conclusion} presents our conclusions.
+Section \ref{section:evaluation} presents our experimental design and the
+performance characteristics of the subsetter on nearly full-scale data set
+sizes of model data up to a resolution of 4Km.  We present the capabilities
+under development as well as the capabilities we would like to see in section
+\ref{section:future}.  Finally, section \ref{section:conclusion} presents our
+conclusions.
