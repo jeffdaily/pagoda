@@ -12,3 +12,4 @@ clean:
 	rm -rf *~ *.tex *.eps *.png
 
 strong.tex: strong.dat strong.gnuplot
+strong_io.tex: strong.dat strong.gnuplot
