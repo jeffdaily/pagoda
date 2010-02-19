@@ -47,15 +47,10 @@ triangular, cubed sphere \cite{CUBE}, and arbitrary unstructured polygons are
 also being applied to various models.  There is a recognized need to extend
 the CF conventions to unstructured grids so that general data analysis,
 regridding, and display tools can be developed. As yet, no such standard
-exists.  Balaji has cataloged a number of unstructured grids \cite{Balaji} and
-proposes a tiling approach to describing grids.  The tiling approach supports
-embedded and nested grids but has been slow to gain momentum, in part due to
-its complexity.  In the ocean modeling community, workshops to discuss
-standards have taken place \cite{UGRIDS}, however, these efforts are still in
-the early stages of development and acceptance.   Lacking a standard,
-development of general purpose tools has been slowed.  However some
-preliminary tools and approaches have progressed by focusing on the in-memory
-operations and abstracting the data loading from the processing \cite{UGRID}. 
+exists.  Lacking a standard, development of general purpose tools has been
+slowed.  However some preliminary tools and approaches have progressed by
+focusing on the in-memory operations and abstracting the data loading from the
+processing \cite{UGRID}. 
 
 Although the geodesic grid is fairly structured, we choose to represent it in
 an unstructured way.  Each of the grid's cells, corners, and edges are
@@ -63,7 +58,7 @@ uniquely indexed from zero.  For a given positive integer $R$, there are $N =
 10 \times 2^{2R} + 2$ cells, $C = (N-2) \times 2$ corners, and $E = (N-2)
 \times 3$ edges.  Increasing the value of $R$ increases the resolution of the
 model.  For example, a value of $R=10$ is approximately 8Km while $R=11$ is
-approximately 4Km.  The cells, corners, and edges are represented as
+approximately 4Km.  The number of cells, corners, and edges are represented as
 dimensions within a NetCDF file.
 
 The horizontal topology describes the connectivity relationships between
@@ -83,7 +78,7 @@ full list of topology variables include:
 \end{itemize}
 
 The vast majority of cells are hexagons which is why most of the last
-dimensions are of size six except for the obvious case of \verb+edge_corners+.
+dimensions are of size six except for the obvious case of \verb+edgecorners+.
 For the twelve pentagons, the sixth value in these arrays are repeated but
 could just have easily been set to a negative index and interpreted
 appropriately.
@@ -99,7 +94,7 @@ defined as dimensions.  They can be thought of as two distinct vertical grids
 from a representation standpoint.
 
 The data model is designed to support efficient model output, fully describe
-the grid topology, and provide the sufficient information for tessellation to
+the grid topology, and provide sufficient information for tessellation to
 triangles for 3D visualization.  The approach taken with the model is to adopt
 the CF conventions to the extent possible and adopt early ideas circulating
 within the community.  However, as many of the details have not been decided,

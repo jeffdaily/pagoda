@@ -2,20 +2,20 @@
 \label{section:introduction}
 
 Parallel programming is needed to analyze the size of output data produced by
-today's climate models\cite{MODSIM07:LOT}.  A single snapshot of Randall's
-Global Cloud Resolving Model will produce terabytes of data\cite{GCRM}; the
-analysis of even a modest time series of this data will quickly overwhelm
-today's software and traditional climate analysis systems.  For these data
-sizes, I/O bandwidth represents the single greatest bottleneck for analysis
-tools.  Parallel software leveraging parallel file systems must be used to
-process this data, however current climate analysis tools are at most task
-parallel and rely on a single data reader\cite{CDAT,CDO,NCO}.
+today's climate models\cite{MODSIM07:LOT}.  A single snapshot of a Global
+Cloud Resolving Model at 4Km resolution will produce terabytes of
+data\cite{GCRM}; the analysis of even a modest time series of this data will
+quickly overwhelm today's software and traditional climate analysis systems.
+For these data sizes, I/O bandwidth represents the single greatest bottleneck
+for analysis tools.  Parallel software leveraging parallel file systems must
+be used to process this data, however current climate analysis tools are at
+most task parallel and rely on a single data reader\cite{CDAT,CDO,NCO}.
 
 Many climate analysis tools robustly handle the manipulation and display of
 regularly gridded data.  However, these same applications lack sufficient
 features when handling unstructured or irregular grids such as the
-geodesic\cite{GEODESIC} or cubed sphere\cite{CUBE}.  Unstructured grids are
-gaining popularity, further widening the gap between current software and
+geodesic\cite{GEODESIC} or cubed sphere\cite{CUBE} grids.  Unstructured grids
+are gaining popularity, further widening the gap between current software and
 these types of models.  For unstructured grids it is necessary to provide more
 information about the topology of the grid and maintain the integrity of this
 topology information in the face of data culling.
