@@ -2,7 +2,11 @@
 #   include <config.h>
 #endif
 
+#include <exception>
 #include <iostream>
+
+using std::exception;
+using std::ostringstream;
 
 #include <ga.h>
 
@@ -63,7 +67,10 @@ int main(int argc, char **argv)
             cmd.parse(argc,argv);
         }
         catch (SubsetterException &ex) {
-            PRINT_ZERO("%s\n", ex.what());
+            if (0 == GA_Nodeid()) {
+                fprintf(stderr, "%s\n", ex.what());
+                fflush(stderr);
+            }
             exit(EXIT_FAILURE);
         }
         TRACER("cmd line parsing END\n");

@@ -294,18 +294,18 @@ static inline void adjust_corners_edges_mask(
 
     if (!var) {
         if (corners)
-            PRINT_ZERO("no cell_corners found to subset");
+            PRINT_ZERO("no cell_corners found to subset\n");
         else
-            PRINT_ZERO("no cell_edges found to subset");
+            PRINT_ZERO("no cell_edges found to subset\n");
         return;
     }
     if (!dim) {
         if (corners) {
-            PRINT_ZERO("missing associated dimension 'corners' for cell_corners");
-            PRINT_ZERO("cannot subset cell_corners");
+            PRINT_ZERO("missing associated dimension 'corners' for cell_corner\n");
+            PRINT_ZERO("cannot subset cell_corner\n");
         } else {
-            PRINT_ZERO("missing associated dimension 'edges' for cell_edgess");
-            PRINT_ZERO("cannot subset cell_edges");
+            PRINT_ZERO("missing associated dimension 'edges' for cell_edges\n");
+            PRINT_ZERO("cannot subset cell_edge\n");
         }
         return;
     }
@@ -398,8 +398,10 @@ static inline bool adjust_centers_mask(Dataset *dataset, const LatLonBox &box)
     lat_var->read();
     lon_var->read();
     if (!cells_mask->access(lo, hi, cells_mask_data)) {
-        // this process doesn't own any of the cells_mask, so return
+        DEBUG_SYNC("this process doesn't own any of the cells_mask, return\n");
         return false;
+    } else {
+        DEBUG_SYNC("this process owns some of the cells_mask, continue\n");
     }
     // just need the type of the lat/lon vars
     NGA_Inquire64(lat_var->get_handle(), &type, &ndim, dims);

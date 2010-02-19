@@ -8,6 +8,7 @@
 #include "Attribute.H"
 #include "Common.H"
 #include "Debug.H"
+#include "Mask.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
@@ -82,7 +83,7 @@ DataType NetcdfVariable::get_type() const
 
 void NetcdfVariable::read()
 {
-    TRACER("NetcdfVariable::read()\n");
+    TRACER("NetcdfVariable::read() %s\n", get_name().c_str());
     TIMING("NetcdfVariable::read()");
     int me = GA_Nodeid();
     int ncid = dataset->get_id();
@@ -117,7 +118,39 @@ void NetcdfVariable::read()
     }
 #endif
 
-    if (0 > lo[0] && 0 > hi[0]) {
+#ifdef READ_OPT
+    bool found_bit = true;
+    // only attempt the optimization for record variables
+    if (has_record() && ndim > 1) {
+        PRINT_ZERO("\nattempting READ_OPT for %s\n", get_name().c_str());
+        if (0 > lo[0] && 0 > hi[0]) {
+            PRINT_SYNC("found_bit=non-participating\n");
+        } else {
+            for (size_t i=0; i<ndim_fixed; ++i) {
+                bool current_found_bit = false;
+                Dimension *dim = dims[i+1];
+                vector<int> data;
+                dim->get_mask()->get_data(data, lo[i], hi[i]);
+                for (size_t j=0,limit=data.size(); j<limit; ++j) {
+                    if (data[j] != 0) {
+                        current_found_bit = true;
+                        break;
+                    }
+                }
+                found_bit &= current_found_bit;
+            }
+            if (found_bit) {
+                PRINT_SYNC("found_bit=true\n");
+            } else {
+                PRINT_SYNC("found_bit=false\n");
+            }
+        }
+    }
+    if ((0 > lo[0] && 0 > hi[0]) || !found_bit)
+#else
+    if (0 > lo[0] && 0 > hi[0])
+#endif
+    {
         // make a non-participating process a no-op
         for (dimidx=0; dimidx<ndim; ++dimidx) {
             start[dimidx] = 0;
