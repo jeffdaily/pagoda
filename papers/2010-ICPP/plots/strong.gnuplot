@@ -14,7 +14,8 @@ set xtics (16, 32, 64, 128, 256, 512, 1024, 2048)
 #set xtics (16, 32, 64, 128, 256, 512, 1024, 2048) rotate by -45 nomirror
 
 #plot 'strong.dat' u 7:13 t "Cores:Time" lc rgbcolor "#00ff00" pt 7 lt 1
-plot 'strong.dat' u 1:2 t "Cores:Time"
+plot 'strong.dat' u 1:2 t "subsetter",\
+     'strong.dat' u 1:5 t "algorithms"
 
 set term png
 set output "strong.png"

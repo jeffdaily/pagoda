@@ -127,7 +127,10 @@ index arrays are one-dimensional and distributed.
 \begin{figure}[!t]
 \center
 \includegraphics[width=3.5in]{images/partialsum_label}
-\caption{Distributed partial sum on a 1-D array}
+\caption{A distributed partial sum over a 1-D array.  A partial sum is first
+computed over the local portions (A), the last values of each portion are
+collected on each process (B), and lastly each local portion adds the last
+values taken from each previous process (C).}
 \label{fig:partialsum}
 \end{figure}
 
