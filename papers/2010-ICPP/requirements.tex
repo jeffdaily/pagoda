@@ -10,9 +10,9 @@ the use of the geodesic grid.
 
 Until recently, climate and weather models have primarily been simulated on
 structured grids that divide the latitude and longitude axes in even
-increments, resulting in logically structured simulation grids. Standard
+increments, resulting in logically structured simulation grids.  Standard
 conventions for describing this data in the NetCDF data model have been
-formalized by the Climate and Forecast (CF) conventions\cite{CF}. CF defines
+formalized by the Climate and Forecast (CF) conventions\cite{CF}.  CF defines
 conventions and metadata standards that enable both human and computer
 interpretation of the data.  Human interpretation is supported through the use
 of standard names while definition of spatial and temporal properties of the
@@ -41,15 +41,15 @@ here.}
 \end{figure}
 
 From the previous description, it can be seen that the geodesic grid used by
-the GCRM is fairly regular. However, the horizontal dimension has some
+the GCRM is fairly regular.  However, the horizontal dimension has some
 important properties in common with unstructured grids: the grid coordinates
 are not monotonic and simple conventions are not available for identifying the
 neighbors of all cells.  As a consequence, it is necessary provide more
-information about the topology of the grid. Other unstructured grids such as
+information about the topology of the grid.  Other unstructured grids such as
 triangular, cubed sphere \cite{CUBE}, and arbitrary unstructured polygons are
 also being applied to various models.  There is a recognized need to extend
 the CF conventions to unstructured grids so that general data analysis,
-regridding, and display tools can be developed. As yet, no such standard
+regridding, and display tools can be developed.  As yet, no such standard
 exists.  Lacking a standard, development of general purpose tools has been
 slowed.  However some preliminary tools and approaches have progressed by
 focusing on the in-memory operations and abstracting the data loading from the

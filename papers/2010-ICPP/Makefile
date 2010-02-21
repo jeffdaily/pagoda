@@ -14,6 +14,5 @@ paper:
 
 clean:
 	rm -rf *~ *.log *.lof *.lot *.aux *.bbl *.blg *.dvi *.eps $(TARGET).toc $(TARGET).ps $(TARGET).pdf
-	cd plots && $(MAKE) clean
 
 $(TARGET): *.tex

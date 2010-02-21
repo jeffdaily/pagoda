@@ -6,20 +6,17 @@ the requirements established in \ref{section:requirements}.
 
 \subsection{How to Run the Subsetter}
 
-The success of the NetCDF Operators\cite{NCO} and similar tools demonstrate
-the need for user-ready applications for the analysis of their data.  The
-success of tools such as CDAT\cite{CDAT} validate the need for a scriptable
-interface and customization of basic and advanced operators.  We plan to
-provide both the scriptable interface as well as a set of predefined
-command-line tools.
-
 The subsetter is the first in a series of planned parallel command-line tools
 based on unstructured grids, the PGAS model, and one-sided communication.  It
 takes arguments specifying specific variables (-v) or dimension ranges (-d) to
 extract, or at a higher level a latitude and longitude bounding box (-b).  In
-this way it is most akin to the NetCDF Operators' "kitchen sink" application.
-Besides the particular use of "mpiexec -np" below to invoke our MPI program
-with a given number of processors, example usage of the subsetter looks like:
+this way it is most akin to the NetCDF Operators' "kitchen sink"
+application\cite{NCO}.  Parallel climate analysis tools will likely require
+the use of common startup programs such as the use of "mpirun" or "mpiexec"
+for MPI programs.  Users of these tools must become familiar with how to run
+parallel software.  Looking past the particular use of "mpiexec -np" below to
+invoke our MPI program with a given number of processors, example usage of the
+subsetter looks like:
 
 \begin{itemize}
 \item mpiexec -np 128 subsetter -b 20,-20,160,90 -v vorticity january.nc february.nc MJO\_vorticity\_janfeb.nc
@@ -28,6 +25,8 @@ with a given number of processors, example usage of the subsetter looks like:
 
 \subsection{Dataset Abstraction}
 
+A dataset abstraction is essential for the efficient comprehension of these
+large datasets, hiding the addling details of which files contain which data.
 The subsetter minimally supports two forms of input file aggregation, either
 across a specified dimension e.g. time or by taking the union of all input
 files such that duplicate dimensions and grid and topology variables within
@@ -38,11 +37,13 @@ directly supported at this time but is planned for a future release.
 \subsection{Parallel IO Abstraction}
 
 IO operations are hidden behind abstract base classes.  Any IO library can be
-supported.  This is similar to how the Java NetCDF library
-works\cite{JavaNetCDF}.  Further, differing IO strategies using the same IO
-library can also be developed behind the same API.  The use of Parallel NetCDF
-was selected because of the ubiquity of the NetCDF libraries and data format
-in climate applications.
+supported so long as the data structures conform to the Common Data Model
+(CDM)\cite{CDM}.  This is similar to how the Java NetCDF library works,
+supporting many different data formats conforming to the CDM\cite{JavaNetCDF}.
+Further, differing IO strategies using the same IO library can also be
+developed behind the same API.  The use of Parallel NetCDF was selected
+because of the ubiquity of the NetCDF libraries and data format in climate
+applications.
 
 \subsection{The Global Arrays Library}
 
@@ -126,7 +127,7 @@ index arrays are one-dimensional and distributed.
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/partialsum_label}
+\includegraphics[width=3.5in]{images/partialsum}
 \caption{A distributed partial sum over a 1-D array.  A partial sum is first
 computed over the local portions (A), the last values of each portion are
 collected on each process (B), and lastly each local portion adds the last
@@ -153,7 +154,7 @@ values of each process's sum which come before.
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/unpack_label}
+\includegraphics[width=3.5in]{images/unpack}
 \caption{Reindexing of a Dimension Index}
 \label{fig:unpack}
 \end{figure}
@@ -174,7 +175,7 @@ the filled array based on the associated mask array seen as Figure
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/reindex_label}
+\includegraphics[width=3.5in]{images/reindex}
 \caption{Reindexing of Topology Variables}
 \label{fig:reindex}
 \end{figure}

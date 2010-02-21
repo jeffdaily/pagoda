@@ -6,7 +6,7 @@ today's climate models\cite{MODSIM07:LOT}.  A single snapshot of a Global
 Cloud Resolving Model at 4Km resolution will produce terabytes of
 data\cite{GCRM}; the analysis of even a modest time series of this data will
 quickly overwhelm today's software and traditional climate analysis systems.
-For these data sizes, I/O bandwidth represents the single greatest bottleneck
+For these data sizes, IO bandwidth represents the single greatest bottleneck
 for analysis tools.  Parallel software leveraging parallel file systems must
 be used to process this data, however current climate analysis tools are at
 most task parallel and rely on a single data reader\cite{CDAT,CDO,NCO}.
@@ -22,35 +22,36 @@ topology information in the face of data culling.
 
 Regular grids allow for the topology to be implicitly defined by how
 the data is stored; coordinate variables are generally monotonic and cell
-neighbors are adjacent both logically and in memory. These assumptions allow
+neighbors are adjacent both logically and in memory.  These assumptions allow
 for operations over regular grids which are otherwise more difficult to
-perform over unstructured grids. In the case of partitioning these grids for
+perform over unstructured grids.  In the case of partitioning these grids for
 data parallel processing, unstructured grids will often have more of the
 logically adjacent cells scattered across memory partitions than in the
 regular case.
 
 Subsetting is a fundamental capability for any analysis tool and allows users
-to operate over the regions of the data in which they are interested. The
+to operate over the regions of the data in which they are interested.  The
 subsetting operation is useful as part of a larger operation over the data,
 such as for obtaining regional averages, but is also useful to post-process
 data into a new dataset such that the cost of subsetting can be amortized
-across future operations over the same region. Further, as the size of
-datasets grow subsetting is important to reduce the data to a size that
+across future operations over the same region.  Further, as the size of
+datasets grow, subsetting is important to reduce the data to a size that
 traditional analysis tools are capable of handling. 
 
 In this paper, we present a parallel tool for subsetting very large geodesic
-climate data in parallel while preserving the explicit topology.  The code is
-built using the Global Arrays (GA) toolkit\cite{GA} which provides an
-efficient and portable "shared-memory" programming interface for
-distributed-memory computers and features truly one-sided communications.  GA
-traditionally deals with dense arrays, however its sparse data operations as
-well as its one-sided operations allow for efficient subsetting over
-unstructured grids.
+climate data while preserving the explicit topology.  The code is built using
+the Global Arrays (GA) toolkit\cite{GA} which provides an efficient and
+portable "shared-memory" programming interface for distributed-memory
+computers and features truly one-sided communications.  GA traditionally
+represents dense arrays, however its sparse data operations over
+one-dimensional arrays as well as its one-sided operations allow for efficient
+subsetting over unstructured grids.
 
 The primary contributions of the paper are:
 \begin{itemize}
-\item A parallel subsetter of geodesic data based on the partitioned global address space programming model and one-sided communications
-\item A novel algorithm for the maintenance of unstructured grid data
+\item A parallel subsetter of geodesic data based on the partitioned global
+address space (PGAS) programming model and one-sided communications
+\item Novel algorithms for the maintenance of unstructured grid topology data
 \item A novel algorithm for the subset and even distribution of unstructured grid data
 \item Evaluation showing IO to be the greatest bottleneck in scaling these types of applications
 \end{itemize}
@@ -59,7 +60,7 @@ The paper is organized as follows.  Section \ref{section:requirements}
 describes the requirements while \ref{section:design} describes the design of
 the subsetter, its algorithms, and how GA's unique features were leveraged.
 Section \ref{section:evaluation} presents our experimental design and the
-performance characteristics of the subsetter on nearly full-scale data set
+performance characteristics of the subsetter on nearly full-scale dataset
 sizes of model data up to a resolution of 4Km.  We present the capabilities
 under development as well as the capabilities we would like to see in section
 \ref{section:future}.  Finally, section \ref{section:conclusion} presents our
