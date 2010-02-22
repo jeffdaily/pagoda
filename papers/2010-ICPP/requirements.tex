@@ -25,7 +25,7 @@ The GCRM uses a geodesic grid.  The geodesic grid is created by recursively
 bisecting an icosahedron of 20 triangular faces and twelve vertices and
 projecting the resulting faces onto a unit sphere.  The resulting vertices
 represent the centers of hexagonal grid cells with the exception of twelve
-pentagons (the centers of the original twelve vertices.) See Figure
+pentagons (the centers of the original twelve vertices.) See Fig.
 \ref{fig:geodesic} for an example of the first stage of bisection and
 projection, followed by the definition of one of the hexagons.  Further
 details can be found in \cite{GEODESIC}.
@@ -60,9 +60,9 @@ an unstructured way.  Each of the grid's cells, corners, and edges are
 uniquely indexed from zero.  For a given positive integer $R$, there are $N =
 10 \times 2^{2R} + 2$ cells, $C = (N-2) \times 2$ corners, and $E = (N-2)
 \times 3$ edges.  Increasing the value of $R$ increases the resolution of the
-model.  For example, a value of $R=10$ is approximately 8Km while $R=11$ is
-approximately 4Km.  The number of cells, corners, and edges are represented as
-dimensions within a NetCDF file.
+model.  For example, a value of $R=10$ is approximately 8 kilometers while
+$R=11$ is approximately 4 kilometers.  The number of cells, corners, and edges
+are represented as dimensions within a NetCDF file.
 
 The horizontal topology describes the connectivity relationships between
 cells, nodes, and edges, all of which may have associated 3D data.  The
@@ -117,11 +117,11 @@ computer.
 
 The data parallelism offered by libraries such as MPI or Global Arrays is
 absolutely necessary to handle the size of data of modern climate models.  An
-edge data variable of the geodesic grid at an approximate resolution of 4Km
-and 100 levels is nearly $10 \times 2^{2R} \times 3 \times 100 \times 4
-\unit{bytes} \approx 50 \unit{gigabytes}$ in size.  Even a modest number of
-these variables will surpass the memory available in most desktop systems and
-even some small clusters.
+edge data variable of the geodesic grid at an approximate resolution of 4
+kilometers and 100 levels is nearly $10 \times 2^{2R} \times 3 \times 100
+\times 4 \unit{bytes} \approx 50 \unit{gigabytes}$ in size.  Even a modest
+number of these variables will surpass the memory available in most desktop
+systems and even some small clusters.
 
 \subsection{Fast IO}
 
