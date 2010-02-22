@@ -24,7 +24,9 @@ for our application remains the greatest bottleneck.  This fact is exacerbated
 when small regions representing a mere fraction of the entire grid are subset.
 Our current strategy is to read in entire variables and in the case of small
 subsets immediately cull the majority of them.  If a masked read or a read
-based on individual array index tuples similar to \verb+NGA_Gater+ were
+based on individual array index tuples similar to \verb+NGA_Gather+ were
 available within the Parallel-NetCDF library we would likely see performance
 gains.  The algorithms presented in this paper which evenly distribute the
-subset data will hopefully encourage work in this area.
+subset data will hopefully encourage work in this area.  We are currently
+evaluating a strategy of non-collective reads for only those processes which
+would eventually participate in the subset.

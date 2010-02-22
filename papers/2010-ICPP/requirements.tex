@@ -107,9 +107,9 @@ custom data analysis tools are currently required.
 
 Larson, Ong, and Tokarz note that the current popular climate data analysis
 packages remain single-processor applications which lack the memory required
-to handle large data volumes as well as the processing power to analyse the
+to handle large data volumes as well as the processing power to analyze the
 data in a timely fashion\cite{MODSIM07:LOT}.  Although they emphasize using
-OpenMP as a first step toward parallism, we instead emphasize using a
+OpenMP as a first step toward parallelism, we instead emphasize using a
 distributed data model first.  Well designed communication libraries such as
 the Message Passing Interface (MPI)\cite{MPI} may already take advantage of
 shared-memory parallelism within a compute node or multi-core desktop
@@ -158,11 +158,11 @@ addling details of which files hold which variables.
 \includegraphics[width=3.5in]{images/Subset1}
 \caption{Maintenance of Topology Variables and Integrity of Entire Grid Cells.
 The hexagonal cells remain well-formed during extraction while the indices of
-the corners are adjusted to reflect the fewer overall corners in the subset.}
+the corners are reindexed to reflect the fewer overall corners in the subset.}
 \label{fig:subset}
 \end{figure}
 
-Regular grids such as the cartesian, rectilinear, or curvilinear lend
+Regular grids such as the Cartesian, rectilinear, or curvilinear lend
 themselves to representations as multidimensional arrays such that logically
 adjacent cells are either adjacent in memory or can be located via a
 shape-based index calculation.  Although some attempt is made to keep

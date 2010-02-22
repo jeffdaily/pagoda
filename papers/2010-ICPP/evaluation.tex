@@ -74,7 +74,7 @@ operations, the "Algorithms" case is an accurate representation of
 communication only.  In the "Algorithms" case, reading of the grid topology was
 still required resulting in an insubstantial amount of IO.  Clearly, IO
 represents a significant portion of the execution time.  The benefit of
-additonal processors appears to have reached a plateau near 1024 processors for
+additional processors appears to have reached a plateau near 1024 processors for
 both the "Subsetter" and "Algorithms" cases, however this may be due to the
 size of the problem since run times at this scale are only a few minutes in
 length.
@@ -86,21 +86,22 @@ benefited from additional cores beyond 2048, the write bandwidth appears to
 have reached a plateau.  The hardware is likely reaching its saturation point
 if not already there.
 
-Table \ref{tab:strong_prof} is represents a profile for process zero for the
-1024 process run.  The function names are sufficiently self-documenting for
-those familiar with C++ syntax.  The zeroth process represents a worst-case
-scenario since the default distribution of data using GA will always put data
-on at least the zeroth process implying process zero should have at least as
-much work to perform as any other processor.  The profile for the 1024 run was
+Table \ref{tab:strong_prof} represents a profile for process zero for the 2048
+process run.  The function names are sufficiently self-documenting for those
+familiar with C++ syntax.  The zeroth process represents a worst-case scenario
+since the default distribution of data using GA will always put data on at
+least the zeroth process implying process zero should have at least as much
+work to perform as any other processor.  The profile for the 2048 run was
 selected arbitrarily, however the profiles for the other strong scaling runs
 demonstrated a similar trend.  The functions which did not contribute a
 significant amount of time to the program were removed and the table is sorted
 by time.  The number of calls to the read and write routines were small; not
-shown in \ref{tab:strong_prof} is the number of calls to the function
-comparing each latitude/longitude pair to the desired subset region.  However,
-the amount of time spent in the read and write routines was significant.  In
-all cases, the amount of time spent in IO was at least 75\% of the program's
-execution.  IO is clearly the dominant factor in running our code.
+shown in Table \ref{tab:strong_prof} is the number of calls to the function
+comparing each latitude/longitude pair to the desired subset region which
+accounts for the over 60\% of function calls.  However, the amount of time
+spent in the read and write routines was significant.  In all cases, the
+amount of time spent in IO was at least 75\% of the program's execution.  IO
+is clearly the dominant factor in running our code.
 
 \subsection{Discussion}
 

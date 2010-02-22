@@ -170,8 +170,8 @@ y_3 &= x_0 + x_1 + x_2 + x_3\\
 %\ref{fig:partialsum}C is the last step where each local portion adds the last
 %values of each process's sum which come before.
 
-The partial sum is elegently computed using a single call to the
-\verb+GA_Scan_add+ routine taking the mask as both inputs.
+The partial sum is elegantly computed using a single call to the
+\verb+GA_Scan_add+ routine.
 
 \subsubsection{Reindexing of Dimension Index}
 
@@ -201,11 +201,13 @@ into the filled array based on the associated mask array as seen in Fig.
 
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/reindex}
-\caption{Reindexing of Topology Variables.  The recalculated index array (B)
-will replace values found within the topology array (A).  Each process gathers
-values from the index array after using the original values from (A) in an
-NGA\_Gather call indicated by the arrows in (C).}
+\includegraphics[width=3.5in]{images/reindex2}
+\caption{Reindexing of Topology Variables.  The recalculated index array from
+the Fig. \ref{fig:unpack} reindexing operation, seen here as (A), will replace
+values found within the topology array (B).  Each process gathers values from
+the index array after using the original values from (B) in an NGA\_Gather
+call.  All values from the original index array are replaced (only replacement
+of non-negative indices is shown for clarity).}
 \label{fig:reindex}
 \end{figure}
 
@@ -218,15 +220,16 @@ mapping arrays such that they map to real indices.
 The reindexing of the topology variables relies on the recalculated index
 array of the associated domain.  For example, when reindexing the mapping from
 edges to corners, the recalculated corners index array is required (Fig.
-\ref{fig:reindex}B).  The mapping values represent indices into the
-recalculated index array.  The mapping arrays are iterated over to prepare the
-required indices for the subsequent GA routine \verb=NGA_Gather= to query,
-represented in Fig.  \ref{fig:reindex}A.  The \verb=NGA_Gather= routine
-gathers array elements from a global array into a local array.  In this way
-each process gathers the new values for the mapping from the index array and
-then appropriately replaces the old mapping values.  For clarity, Fig.
-\ref{fig:reindex}C shows four processes gathering and replacing indices, but
-only the indices from a single process are colored.
+\ref{fig:reindex}A).  The mapping values represent indices into the
+recalculated index array.  The original mapping arrays are iterated over to
+prepare the required indices for the subsequent GA routine \verb=NGA_Gather=
+to query.  The \verb=NGA_Gather= routine gathers array elements from a global
+array into a local array by specifying the desired indices.  In this way each
+process gathers the new values for the mapping from the index array and then
+appropriately replaces the old mapping values.  For clarity, Fig.
+\ref{fig:reindex}B shows four processes gathering and replacing only the
+non-negative indices, but it should be noted that all indices are replaced by
+this operation.
 
 \subsubsection{N-Dimensional Pack}
 \label{section:alg_pack}
@@ -264,14 +267,14 @@ corresponding locations indicated in orange and the small blue arrows.  Now
 knowing where to put their subset data, each process can \verb=NGA_Put()=
 their portions resulting in the subset array.  The \verb=NGA_Get()= and
 \verb=NGA_Put()= operations do not require explicit knowledge of where the
-data lives, reducing the burder of the programmer.
+data lives, reducing the burden of the programmer.
 
 The data location abstraction offered by GA is even more important as
 differing numbers of processors and/or different data distributions are used.
 As can be seen in the case diagrammed in Fig. \ref{fig:pack}, the partial sum
 arrays are as evenly distributed as the data arrays.  Although GA evenly
 distributes arrays by default, different distributions can be specified.  For
-example, it might be benficial to keep all vertical levels for a given region
+example, it might be beneficial to keep all vertical levels for a given region
 local to a process.  The desired values from the partial sum arrays will
 change process owners depending on how many processes are used or how the data
 is distributed.  \verb+GA_Get+ and \verb+GA_Put+ abstract away that need to
