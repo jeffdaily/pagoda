@@ -2,32 +2,38 @@
 \label{section:design}
 
 In this section we describe the design of our classes and algorithms based on
-the requirements established in \ref{section:requirements}.
+the requirements established in Section \ref{section:requirements}.
 
-\subsection{How to Run the Subsetter}
+\subsection{Subsetter User Interface}
 
 The subsetter is the first in a series of planned parallel command-line tools
 based on unstructured grids, the PGAS model, and one-sided communication.  It
-takes arguments indicating specific variables (-v) or dimension ranges (-d) to
-extract, or more abstractly a latitude and longitude bounding box (-b).  In
-this way it is most akin to the NetCDF Operators' "kitchen sink"
-application\cite{NCO}.  Parallel climate analysis tools will likely require
-the use of common startup programs such as "mpirun" or "mpiexec" for MPI
-programs.  Users of these tools must become familiar with how to run parallel
-software.  Looking past the particular use of "mpiexec -np" below to invoke
-our MPI program with a given number of processors, example usage of the
-subsetter looks like:
+takes arguments indicating specific variables (-v), dimension ranges (-d) to
+extract, or a latitude and longitude bounding box (-b).  Parallel climate
+analysis tools will likely require the use of common startup programs such as
+"mpirun" or "mpiexec" for MPI programs.  Users of these tools must become
+familiar with how to run parallel software.  Looking past the particular use
+of "mpiexec -np" below to invoke our MPI program with a given number of
+processors, example usage of the subsetter looks like:
 
 \begin{itemize}
 \item mpiexec -np 128 subsetter -b 20,-20,160,90 -v vorticity january.nc february.nc MJO\_vorticity\_janfeb.nc
-\item mpiexec -np 64 subsetter -b 90,0,180,-180 -d levels,1,5 geopotential.nc
+\item mpiexec -np 64 subsetter -b 90,0,180,-180 -d levels,1,5 geopotential.nc out.nc
+\end{itemize}
+
+Similarly, the NetCDF Operator's \emph{ncks} application\cite{NCO} is run
+like the following, noting that \emph{ncks} does not aggregate input files:
+
+\begin{itemize}
+\item ncks -X 90,160,-20,20 -v vorticity january.nc MJO\_vorticity\_january.nc
+\item ncks -X -180,180,0,90 -d levels,1,5 geopotential.nc out.nc
 \end{itemize}
 
 \subsection{Dataset Abstraction}
 
 A dataset abstraction is essential for the comprehension of these large
 datasets, hiding the addling details of which files contain which data.  The
-subsetter minimally supports two forms of input file aggregation, either
+subsetter currently supports two forms of input file aggregation, either
 across a specified dimension e.g. time or by taking the union of all input
 files such that duplicate dimensions and grid and topology variables within
 later files are ignored.  These forms of aggregation are modeled after what is
@@ -41,7 +47,7 @@ supported so long as the data structures conform to the Common Data Model
 (CDM)\cite{CDM}.  This is similar to how the Java NetCDF library works,
 supporting many different data formats conforming to the CDM\cite{JavaNetCDF}.
 Further, differing IO strategies using the same IO library can also be
-developed behind the same API.  The use of Parallel NetCDF was selected
+developed behind the same API.  The use of Parallel-NetCDF was selected
 because of the ubiquity of the NetCDF libraries and data format in climate
 applications.
 
@@ -51,8 +57,8 @@ The PGAS programming model assumes a global address space which is partitioned
 such that each process is associated with a local portion of the space.
 One-sided communication allows a process to access another process's address
 space without any explicit participation by the latter process.  Such
-communication can reduce synchronization, reduce data movement, and can
-simplify programming.  The Global Arrays (GA) library supports both models.
+communication can reduce synchronization, data movement, and can simplify
+programming.  The Global Arrays (GA) library supports both models.
 
 The subsetter was built using the GA library for the wealth of features it
 provides which are tailored to our problem domain.  GA provides a distributed
@@ -70,14 +76,12 @@ from any other process.  Any given process will simply put the section of the
 subset into the remote process's memory which owns the subset.
 
 There are certain GA one-sided operations which are tailored for use on
-one-dimensional arrays which are prevalent within our program.  These
-operations include:
+one-dimensional arrays which are used within our program.  These operations
+include:
 
 \begin{itemize}
 \item \verb=GA_Patch_enum=,
-\item \verb=GA_Scan_add=,
-\item \verb=GA_Scan_copy=,
-\item \verb=GA_Pack=, and
+\item \verb=GA_Scan_add=, and
 \item \verb=GA_Unpack=
 \end{itemize}
 
@@ -104,12 +108,12 @@ develop some novel algorithms for the manipulation of unstructured grids.  In
 this section we diagram and describe the algorithms we developed.  The vast
 majority of functionality within the subsetter is provided by either
 Parallel-NetCDF or GA.  GA allocates and evenly distributes the arrays.  The
-starting and ending indices owned by each process are then used directly to
-fill the arrays using Parallel-NetCDf.  GA operations are then used to prepare
-the data for packing, at which point a custom n-dimensional packing routine is
-used.  The packed, evenly-distributed data is then written back to disk using
+starting and ending indices owned by each process are used directly to fill
+the arrays using Parallel-NetCDF.  GA operations are then used to prepare the
+data for packing, at which point a custom n-dimensional packing routine is
+used.  After packing, evenly-distributed data is written back to disk using
 Parallel-NetCDF.  (Note that instead of immediately writing the data back to
-disk, any number of other mathematical operations could take place.)  Of these
+disk, any number of other mathematical operations could take place.) Of these
 algorithms, the novel ones include reindexing the masks, reindexing the
 topology variables, and the n-dimensional pack routine.
 
@@ -129,25 +133,25 @@ distributed.
 
 \subsubsection{Partial Sum}
 
-\begin{figure}[!t]
-\center
-\includegraphics[width=3.5in]{images/partialsum}
-\caption{A distributed partial sum over a 1-D array.  A partial sum is first
-computed over the local portions (A), the last values of each portion are
-collected on each process (B), and lastly each local portion adds the last
-values taken from each previous process (C).}
-\label{fig:partialsum}
-\end{figure}
+%\begin{figure}[!t]
+%\center
+%\includegraphics[width=3.5in]{images/partialsum}
+%\caption{A distributed partial sum over a 1-D array.  A partial sum is first
+%computed over the local portions (A), the last values of each portion are
+%collected on each process (B), and lastly each local portion adds the last
+%values taken from each previous process (C).}
+%\label{fig:partialsum}
+%\end{figure}
 
 A partial sum of the index array associated with each dimension is useful for
 later determining where subset data is to be placed.  That feature will be
-explained in more detail in \ref{section:alg_pack}.  The partial sum operation
-here is semantically similar to the one found in the C++ STL\cite{CXXSTL}.  It
-computes a series of sums over an array from the first element through the
-\emph{i}th element and stores the result of each such sum in the \emph{i}th
-element of a destination array.  For example, if $x$ represents an element in
-the array and $y$ represents an element in the destination array, the $y$s can
-be calculated as:
+explained in more detail in Section \ref{section:alg_pack}.  The partial sum
+operation here is semantically similar to the one found in the C++
+STL\cite{CXXSTL}.  It computes a series of sums over an array from the first
+element through the \emph{i}th element and stores the result of each such sum
+in the \emph{i}th element of a destination array.  For example, if $x$
+represents an element in the array and $y$ represents an element in the
+destination array, the $y$s can be calculated as:
 
 \begin{equation}
 \begin{split}
@@ -159,12 +163,15 @@ y_3 &= x_0 + x_1 + x_2 + x_3\\
 \end{split}
 \end{equation}
 
-The partial sum is computed by first performing partial sums of each local
-portion of the source array.  This operation is represented by Fig.
-\ref{fig:partialsum}A.  The last value of each local sum is then collectively
-distributed to each process as seen in Fig. \ref{fig:partialsum}B.  Fig.
-\ref{fig:partialsum}C is the last step where each local portion adds the last
-values of each process's sum which come before.
+%The partial sum is computed by first performing partial sums of each local
+%portion of the source array.  This operation is represented by Fig.
+%\ref{fig:partialsum}A.  The last value of each local sum is then collectively
+%distributed to each process as seen in Fig. \ref{fig:partialsum}B.  Fig.
+%\ref{fig:partialsum}C is the last step where each local portion adds the last
+%values of each process's sum which come before.
+
+The partial sum is elegently computed using a single call to the
+\verb+GA_Scan_add+ routine taking the mask as both inputs.
 
 \subsubsection{Reindexing of Dimension Index}
 
@@ -187,7 +194,7 @@ many masked bits are present and collectively sums to get the size of the
 array to create.  \verb=GA_Patch_enum= enumerates the values in the second
 array starting from zero with an increment of 1 (indicated by the arrows in
 Fig. \ref{fig:unpack}C).  \verb=GA_Unpack= expands the enumerated array values
-into the filled array based on the associated mask array seen as Fig.
+into the filled array based on the associated mask array as seen in Fig.
 \ref{fig:unpack}D.
 
 \subsubsection{Reindexing of Topology Variables}
@@ -249,16 +256,15 @@ space of the array.  For each dimension, the value in the corresponding
 partial sum array at the index represented by the lowest index owned by each
 local portion describes where to put the subset data.
 
-Fig. \ref{fig:pack} should clarify this.  In the figure, the blue arrays
-represent the mask arrays and the olive arrays the partial sums.  The masked
-bits are indicated in black.  Each of the four processes query the partial sum
-arrays using \verb=NGA_Get()= at the corresponding locations indicated in
-orange and the small blue arrows.  Now knowing where to put their subset data,
-each process can \verb=NGA_Put()= their portions resulting in the subset
-array.  Because the destination array was created using GA, it is by
-definition evenly distributed.  The \verb=NGA_Get()= and \verb=NGA_Put()=
-operations do not require explicit knowledge of where the data lives, reducing
-the burder of the programmer.
+Fig. \ref{fig:pack} illustrates the n-dimensional pack routine schematically.
+In the figure, the blue arrays represent the mask arrays and the olive arrays
+the partial sums.  The masked bits are indicated in black.  Each of the four
+processes query the partial sum arrays using \verb=NGA_Get()= at the
+corresponding locations indicated in orange and the small blue arrows.  Now
+knowing where to put their subset data, each process can \verb=NGA_Put()=
+their portions resulting in the subset array.  The \verb=NGA_Get()= and
+\verb=NGA_Put()= operations do not require explicit knowledge of where the
+data lives, reducing the burder of the programmer.
 
 The data location abstraction offered by GA is even more important as
 differing numbers of processors and/or different data distributions are used.

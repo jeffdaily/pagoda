@@ -19,7 +19,7 @@ of standard names while definition of spatial and temporal properties of the
 data have enabled an extensive set of tools for data manipulation and display
 such as \cite{NCO}, \cite{OPeNDAP}, and \cite{FERRET}.  The CF Conventions
 have been evolving to support many variations of structured grids including
-Orthographic, Polar stereographic, Transverse Mercator, and many others . 
+Orthographic, Polar stereographic, Transverse Mercator, and many others. 
 
 The GCRM uses a geodesic grid.  The geodesic grid is created by recursively
 bisecting an icosahedron of 20 triangular faces and twelve vertices and
@@ -118,19 +118,26 @@ computer.
 The data parallelism offered by libraries such as MPI or Global Arrays is
 absolutely necessary to handle the size of data of modern climate models.  An
 edge data variable of the geodesic grid at an approximate resolution of 4
-kilometers and 100 levels is nearly $10 \times 2^{2R} \times 3 \times 100
-\times 4 \unit{bytes} \approx 50 \unit{gigabytes}$ in size.  Even a modest
-number of these variables will surpass the memory available in most desktop
-systems and even some small clusters.
+kilometers and 100 levels is nearly $10 \times 2^{2 \times R} \times 3 \times
+100 \times 4 \unit{bytes} \approx 50 \unit{gigabytes}$ in size, where $R=11$.
+Even a modest number of these variables will surpass the memory available in
+most desktop systems and even some small clusters.
 
 \subsection{Fast IO}
 
 For data of this size, efficiently reading from and writing to disk requires
-the use of parallel IO libraries such as Parallel NetCDF\cite{PNETCDF} or the
+the use of parallel IO libraries such as Parallel-NetCDF\cite{PNETCDF} or
 HDF5/NetCDF4\cite{HDF5}\cite{NETCDF}, both of which are in turn built on top
 of the MPI-IO libraries\cite{MPIIO}.  Currently, GCRM output is stored in
 netCDF\cite{NETCDF} files, a format for storing array-oriented
 machine-independent data.
+
+\subsection{64bit Libraries}
+
+64bit libraries are also required for the GCRM output at 4 kilometer
+resolution.  At this resolution, the GCRM output already requires 64bit file
+offsets.  At resolutions smaller than 4 kilometers, the GCRM output will begin
+to produce edge variables that exceed the 4 byte limit for array indexing.
 
 \subsection{Dataset Abstraction}
 
@@ -146,6 +153,15 @@ addling details of which files hold which variables.
 
 \subsection{Maintenance of Topology Variables}
 
+\begin{figure}[!t]
+\center
+\includegraphics[width=3.5in]{images/Subset1}
+\caption{Maintenance of Topology Variables and Integrity of Entire Grid Cells.
+The hexagonal cells remain well-formed during extraction while the indices of
+the corners are adjusted to reflect the fewer overall corners in the subset.}
+\label{fig:subset}
+\end{figure}
+
 Regular grids such as the cartesian, rectilinear, or curvilinear lend
 themselves to representations as multidimensional arrays such that logically
 adjacent cells are either adjacent in memory or can be located via a
@@ -154,16 +170,17 @@ logically adjacent cells nearby in memory, geodesic grids do not have the
 luxury of using relatively simple shape-based index arithmetic to locate
 neighbors.
 
-The topology variables mentioned in \ref{subsection:grid} are not unique to
-our grid; any grid could be described using a similar set of variables.
-However, since topology is often implicitly defined by other grids, these
-variables are not correctly handled by current software.  When a subset
-occurs, the indices of these variables must be updated to reflect the
-remaining corners, edges, and cells.
+The topology variables mentioned in Section \ref{subsection:grid} are not
+unique to our grid; any grid could be described using a similar set of
+variables.  However, since topology is often implicitly defined by other
+grids, these variables are not correctly handled by current software.  When a
+subset occurs, the indices of these variables must be updated to reflect the
+remaining corners, edges, and cells as seen in Fig. \ref{fig:subset}.
 
 \subsection{Maintain Integrity of Entire Grid Cells}
 
 Howe and Maier detail the properties of well-formed grids in \cite{UGRID}.
 Proper subsets should maintain the same well-formed properties of the original
 in order to remain useful to further analysis.  Therefore, the cell and its
-surrounding corners and edges must remain intact during a subset.
+surrounding corners and edges must remain intact during a subset as seen in
+Fig. \ref{fig:subset}.

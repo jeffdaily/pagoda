@@ -19,12 +19,12 @@ capabilities missing from popular climate data analysis packages such as
 probability density function (PDF) estimation as well as the sorting and
 ordering of data.
 
-The evaluation performed in \ref{section:evaluation} revealed that IO for our
-application remains the greatest bottleneck.  This fact is exacerbated when
-small regions representing a mere fraction of the entire grid are subset.  Our
-current strategy is to read in entire variables and in the case of small
+The evaluation performed in Section \ref{section:evaluation} revealed that IO
+for our application remains the greatest bottleneck.  This fact is exacerbated
+when small regions representing a mere fraction of the entire grid are subset.
+Our current strategy is to read in entire variables and in the case of small
 subsets immediately cull the majority of them.  If a masked read or a read
 based on individual array index tuples similar to \verb+NGA_Gater+ were
-available within the Parallel NetCDF library we would likely see performance
+available within the Parallel-NetCDF library we would likely see performance
 gains.  The algorithms presented in this paper which evenly distribute the
 subset data will hopefully encourage work in this area.
