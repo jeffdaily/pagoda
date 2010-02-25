@@ -27,8 +27,13 @@ projecting the resulting faces onto a unit sphere.  The resulting vertices
 represent the centers of hexagonal grid cells with the exception of twelve
 pentagons (the centers of the original twelve vertices.) See Fig.
 \ref{fig:geodesic} for an example of the first stage of bisection and
-projection, followed by the definition of one of the hexagons.  Further
-details can be found in \cite{GEODESIC}.
+projection, followed by the definition of one of the hexagons.  Once the
+desired grid resolution is reached (Fig. \ref{fig:panels}(left)), if the
+original triangles of the icosahedron are paired such that each pair shares an
+edge, then the grid points generated from each pair form a logically
+structured block (Fig. \ref{fig:panels}(right)).  These blocks can be stored
+as a set of regular square arrays of data points.  Further details can be
+found in \cite{GEODESIC}.
 
 \begin{figure}[!t]
 \center
@@ -38,6 +43,17 @@ of 20 triangular faces and 12 vertices and projecting the resulting faces on
 to a unit sphere.  The first recursion and a sample hexagonal cell can be seen
 here.}
 \label{fig:geodesic}
+\end{figure}
+
+\begin{figure}[!t]
+\center
+\includegraphics[width=2.5in]{images/panels}
+\caption{Once the desired grid resolution is reached (left), if the original
+triangles of the icosahedron are paired such that each pair shares an edge,
+then the grid points generated from each pair form a logically structured
+block (right).  These blocks can be stored as a set of regular square arrays
+of data points.}
+\label{fig:panels}
 \end{figure}
 
 From the previous description, it can be seen that the geodesic grid used by
@@ -63,6 +79,28 @@ uniquely indexed from zero.  For a given positive integer $R$, there are $N =
 model.  For example, a value of $R=10$ is approximately 8 kilometers while
 $R=11$ is approximately 4 kilometers.  The number of cells, corners, and edges
 are represented as dimensions within a NetCDF file.
+
+The data for the GCRM is ordered using a space-filling curve.  As seen in Fig.
+\ref{fig:panels}, the data is divided into square panels.  The data within
+each panel can be reorganized using a Morton-ordering scheme (also referred to
+as Z-ordering).  This has the advantage that it is much easier to guarantee
+that each read or write represents a contiguous chunk in the file.  The
+Morton-ordering scheme works very well for square arrays that are an integral
+power of 2 in dimension and is illustrated schematically in Fig.
+\ref{fig:morton}.  Each array element is indexed by successive locations in
+the self-similar space-filling curve.  Fig. \ref{fig:morton} shows a panel
+that has been divided up into 16 blocks.  Note, however, that if the panel had
+been divided into only 4 blocks, the points within each block would still lie
+along a continuous segment of the space-filling curve.
+
+\begin{figure}[!t]
+\center
+\includegraphics[width=3.5in]{images/morton}
+\caption{Illustration of Morton-ordering curve for a 16x16 array of points.
+Each array element is indexed by successive locations in the self-similar
+space-filling curve.}
+\label{fig:morton}
+\end{figure}
 
 The horizontal topology describes the connectivity relationships between
 cells, nodes, and edges, all of which may have associated 3D data.  The
@@ -153,15 +191,6 @@ addling details of which files hold which variables.
 
 \subsection{Maintenance of Topology Variables}
 
-\begin{figure}[!t]
-\center
-\includegraphics[width=3.5in]{images/Subset1}
-\caption{Maintenance of Topology Variables and Integrity of Entire Grid Cells.
-The hexagonal cells remain well-formed during extraction while the indices of
-the corners are reindexed to reflect the fewer overall corners in the subset.}
-\label{fig:subset}
-\end{figure}
-
 Regular grids such as the Cartesian, rectilinear, or curvilinear lend
 themselves to representations as multidimensional arrays such that logically
 adjacent cells are either adjacent in memory or can be located via a
@@ -176,6 +205,15 @@ variables.  However, since topology is often implicitly defined by other
 grids, these variables are not correctly handled by current software.  When a
 subset occurs, the indices of these variables must be updated to reflect the
 remaining corners, edges, and cells as seen in Fig. \ref{fig:subset}.
+
+\begin{figure}[!t]
+\center
+\includegraphics[width=3.5in]{images/Subset1}
+\caption{Maintenance of Topology Variables and Integrity of Entire Grid Cells.
+The hexagonal cells remain well-formed during extraction while the indices of
+the corners are reindexed to reflect the fewer overall corners in the subset.}
+\label{fig:subset}
+\end{figure}
 
 \subsection{Maintain Integrity of Entire Grid Cells}
 

@@ -21,12 +21,11 @@ ordering of data.
 
 The evaluation performed in Section \ref{section:evaluation} revealed that IO
 for our application remains the greatest bottleneck.  This fact is exacerbated
-when small regions representing a mere fraction of the entire grid are subset.
-Our current strategy is to read in entire variables and in the case of small
-subsets immediately cull the majority of them.  If a masked read or a read
-based on individual array index tuples similar to \verb+NGA_Gather+ were
-available within the Parallel-NetCDF library we would likely see performance
-gains.  The algorithms presented in this paper which evenly distribute the
-subset data will hopefully encourage work in this area.  We are currently
-evaluating a strategy of non-collective reads for only those processes which
-would eventually participate in the subset.
+when large regions representing the entire grid are subset.  Our current
+optimized strategy of reading chunks of variables based on whether a process
+participates in the later subset still reads more data than is eventually
+redistributed.  If a masked read or a read based on individual array index
+tuples similar to \verb+NGA_Gather+ were available within the Parallel-NetCDF
+library we might see further performance gains.  The algorithms presented in
+this paper which evenly distribute the subset data will hopefully encourage
+work in this area.

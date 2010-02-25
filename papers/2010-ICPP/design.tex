@@ -175,16 +175,6 @@ The partial sum is elegantly computed using a single call to the
 
 \subsubsection{Reindexing of Dimension Index}
 
-\begin{figure}[!t]
-\center
-\includegraphics[width=3.5in]{images/unpack}
-\caption{Reindexing of a Dimension Index.  The index array (B) is filled with
-a value of $-1$.  The masked bits of (A) are tallied such that a new array (C)
-is created based on the tallied size.  The new array C is enumerated and then
-unpacked into the index array (D).}
-\label{fig:unpack}
-\end{figure}
-
 Creating the index array associated with a mask requires three specific GA
 operations, \verb=GA_Fill=, \verb=GA_Patch_enum= and \verb=GA_Unpack=.  The
 mask array is represented in Fig. \ref{fig:unpack}A.  \verb=GA_Fill= fills the
@@ -197,19 +187,17 @@ Fig. \ref{fig:unpack}C).  \verb=GA_Unpack= expands the enumerated array values
 into the filled array based on the associated mask array as seen in Fig.
 \ref{fig:unpack}D.
 
-\subsubsection{Reindexing of Topology Variables}
-
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/reindex2}
-\caption{Reindexing of Topology Variables.  The recalculated index array from
-the Fig. \ref{fig:unpack} reindexing operation, seen here as (A), will replace
-values found within the topology array (B).  Each process gathers values from
-the index array after using the original values from (B) in an NGA\_Gather
-call.  All values from the original index array are replaced (only replacement
-of non-negative indices is shown for clarity).}
-\label{fig:reindex}
+\includegraphics[width=3.5in]{images/unpack}
+\caption{Reindexing of a Dimension Index.  The index array (B) is filled with
+a value of $-1$.  The masked bits of (A) are tallied such that a new array (C)
+is created based on the tallied size.  The new array C is enumerated and then
+unpacked into the index array (D).}
+\label{fig:unpack}
 \end{figure}
+
+\subsubsection{Reindexing of Topology Variables}
 
 Recall that the topology variables are those which map from one index to
 one or more other indices such as from a cell index to each of its corner
@@ -231,19 +219,20 @@ appropriately replaces the old mapping values.  For clarity, Fig.
 non-negative indices, but it should be noted that all indices are replaced by
 this operation.
 
-\subsubsection{N-Dimensional Pack}
-\label{section:alg_pack}
-
 \begin{figure}[!t]
 \center
-\includegraphics[width=3.5in]{images/pack}
-\caption{Pack.  The blue arrays are the masks and the olive arrays are the
-partial sums over the masks.  Each process queries for where to put their
-subset data (orange values following the small blue arrows), packs their local
-data based on the mask bits, and calls NGA\_Put to deliver the subset data.
-The destination array is by default evenly distributed.}
-\label{fig:pack}
+\includegraphics[width=3.5in]{images/reindex2}
+\caption{Reindexing of Topology Variables.  The recalculated index array from
+the Fig. \ref{fig:unpack} reindexing operation, seen here as (A), will replace
+values found within the topology array (B).  Each process gathers values from
+the index array after using the original values from (B) in an NGA\_Gather
+call.  All values from the original index array are replaced (only replacement
+of non-negative indices is shown for clarity).}
+\label{fig:reindex}
 \end{figure}
+
+\subsubsection{N-Dimensional Pack}
+\label{section:alg_pack}
 
 The goal of the pack routine is to start with an evenly distributed source
 array, subset it, and evenly distribute the subset.  The subset is specified
@@ -268,6 +257,17 @@ knowing where to put their subset data, each process can \verb=NGA_Put()=
 their portions resulting in the subset array.  The \verb=NGA_Get()= and
 \verb=NGA_Put()= operations do not require explicit knowledge of where the
 data lives, reducing the burden of the programmer.
+
+\begin{figure}[!t]
+\center
+\includegraphics[width=3.5in]{images/pack}
+\caption{Pack.  The blue arrays are the masks and the olive arrays are the
+partial sums over the masks.  Each process queries for where to put their
+subset data (orange values following the small blue arrows), packs their local
+data based on the mask bits, and calls NGA\_Put to deliver the subset data.
+The destination array is by default evenly distributed.}
+\label{fig:pack}
+\end{figure}
 
 The data location abstraction offered by GA is even more important as
 differing numbers of processors and/or different data distributions are used.

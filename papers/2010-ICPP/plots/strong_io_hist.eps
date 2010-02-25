@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0 EPSF-2.0
 %%Title: strong_io_hist.tex
-%%Creator: gnuplot 4.2 patchlevel 3 
-%%CreationDate: Sun Feb 21 22:35:56 2010
+%%Creator: gnuplot 4.2 patchlevel 6 
+%%CreationDate: Thu Feb 25 09:20:24 2010
 %%DocumentFonts: 
 %%BoundingBox: 50 50 410 302
 %%EndComments
@@ -44,11 +44,11 @@ systemdict /pdfmark known not {
 SDict begin [
   /Title (strong_io_hist.tex)
   /Subject (gnuplot plot)
-  /Creator (gnuplot 4.2 patchlevel 3 )
-  /Author (d3n000)
+  /Creator (gnuplot 4.2 patchlevel 6 )
+  /Author (Jeff Daily)
 %  /Producer (gnuplot)
 %  /Keywords ()
-  /CreationDate (Sun Feb 21 22:35:56 2010)
+  /CreationDate (Thu Feb 25 09:20:24 2010)
   /DOCINFO pdfmark
 end
 } ifelse
@@ -428,110 +428,65 @@ gsave
 0.050 0.050 scale
 0 setgray
 newpath
-gsave % colour palette begin
-/maxcolors 0 def
-/HSV2RGB {  exch dup 0.0 eq {pop exch pop dup dup} % achromatic gray
-  { /HSVs exch def /HSVv exch def 6.0 mul dup floor dup 3 1 roll sub
-     /HSVf exch def /HSVi exch cvi def /HSVp HSVv 1.0 HSVs sub mul def
-	 /HSVq HSVv 1.0 HSVs HSVf mul sub mul def 
-	 /HSVt HSVv 1.0 HSVs 1.0 HSVf sub mul sub mul def
-	 /HSVi HSVi 6 mod def 0 HSVi eq {HSVv HSVt HSVp}
-	 {1 HSVi eq {HSVq HSVv HSVp}{2 HSVi eq {HSVp HSVv HSVt}
-	 {3 HSVi eq {HSVp HSVq HSVv}{4 HSVi eq {HSVt HSVp HSVv}
-	 {HSVv HSVp HSVq} ifelse} ifelse} ifelse} ifelse} ifelse
-  } ifelse} def
-/Constrain {
-  dup 0 lt {0 exch pop}{dup 1 gt {1 exch pop} if} ifelse} def
-/YIQ2RGB {
-  3 copy -1.702 mul exch -1.105 mul add add Constrain 4 1 roll
-  3 copy -0.647 mul exch -0.272 mul add add Constrain 5 1 roll
-  0.621 mul exch -0.956 mul add add Constrain 3 1 roll } def
-/CMY2RGB {  1 exch sub exch 1 exch sub 3 2 roll 1 exch sub 3 1 roll exch } def
-/XYZ2RGB {  3 copy -0.9017 mul exch -0.1187 mul add exch 0.0585 mul exch add
-  Constrain 4 1 roll 3 copy -0.0279 mul exch 1.999 mul add exch
-  -0.9844 mul add Constrain 5 1 roll -0.2891 mul exch -0.5338 mul add
-  exch 1.91 mul exch add Constrain 3 1 roll} def
-/SelectSpace {ColorSpace (HSV) eq {HSV2RGB}{ColorSpace (XYZ) eq {
-  XYZ2RGB}{ColorSpace (CMY) eq {CMY2RGB}{ColorSpace (YIQ) eq {YIQ2RGB}
-  if} ifelse} ifelse} ifelse} def
-/InterpolatedColor false def
-/cF7 {sqrt} bind def	% sqrt(x)
-/cF5 {dup dup mul mul} bind def	% x^3
-/cF15 {360 mul sin} bind def	% sin(360x)
-/pm3dround {maxcolors 0 gt {dup 1 ge
-	{pop 1} {maxcolors mul floor maxcolors 1 sub div} ifelse} if} def
-/pm3dGamma 1.0 1.5 div def
-/ColorSpace (RGB) def
-Color true and { % COLOUR vs. GRAY map
-  InterpolatedColor { %% Interpolation vs. RGB-Formula
-    /g {stroke pm3dround /grayv exch def interpolate
-        SelectSpace setrgbcolor} bind def
-  }{
-  /g {stroke pm3dround dup cF7 Constrain exch dup cF5 Constrain exch cF15 Constrain 
-       SelectSpace setrgbcolor} bind def
-  } ifelse
-}{
-  /g {stroke pm3dround pm3dGamma exp setgray} bind def
-} ifelse
 1.000 UL
 LTb
 LCb setrgbcolor
-858 660 M
+1078 704 M
 63 0 V
-5905 0 R
+5729 0 R
 -63 0 V
 stroke
 LTb
-858 1336 M
+1078 1372 M
 63 0 V
-5905 0 R
+5729 0 R
 -63 0 V
-858 2013 M
+1078 2041 M
 63 0 V
-5905 0 R
+5729 0 R
 -63 0 V
-858 2689 M
+1078 2709 M
 63 0 V
-5905 0 R
+5729 0 R
 -63 0 V
-858 3365 M
+1078 3377 M
 63 0 V
-5905 0 R
+5729 0 R
 -63 0 V
-858 4042 M
+1078 4046 M
 63 0 V
-5905 0 R
+5729 0 R
 -63 0 V
-1711 660 M
+1905 704 M
 0 63 V
-0 3657 R
+0 3613 R
 0 -63 V
-2563 660 M
+2733 704 M
 0 63 V
-0 3657 R
+0 3613 R
 0 -63 V
-3416 660 M
+3560 704 M
 0 63 V
-0 3657 R
+0 3613 R
 0 -63 V
-4268 660 M
+4388 704 M
 0 63 V
-0 3657 R
+0 3613 R
 0 -63 V
-5121 660 M
+5215 704 M
 0 63 V
-0 3657 R
+0 3613 R
 0 -63 V
-5973 660 M
+6043 704 M
 0 63 V
-0 3657 R
+0 3613 R
 0 -63 V
 stroke
-858 4380 N
-858 660 L
-5968 0 V
-0 3720 V
--5968 0 V
+1078 4380 N
+0 -3676 V
+5792 0 V
+0 3676 V
+-5792 0 V
 Z stroke
 1.000 UP
 1.000 UL
@@ -539,98 +494,98 @@ LTb
 1.000 UL
 LT0
 LC0 setrgbcolor
-0.00 0.00 1.00 C LTb
-LCb setrgbcolor
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 5971 4152 N 0 -110 591 0 0 110 h
-LTb
-LCb setrgbcolor
-5971 4152 N
-591 0 V
-0 110 V
--591 0 V
-0 -110 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 1441 660 N 0 -223 256 0 0 223 h
-LTb
-LCb setrgbcolor
-1441 660 N
-0 222 V
-255 0 V
-0 -222 V
--255 0 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 2293 660 N 0 -397 257 0 0 397 h
-LTb
-LCb setrgbcolor
-2293 660 N
-0 396 V
-256 0 V
-0 -396 V
--256 0 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 3146 660 N 0 -680 257 0 0 680 h
-LTb
-LCb setrgbcolor
-3146 660 N
-0 679 V
-256 0 V
-0 -679 V
--256 0 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 3998 660 N 0 -833 257 0 0 833 h
-LTb
-LCb setrgbcolor
-3998 660 N
-0 832 V
-256 0 V
-0 -832 V
--256 0 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 4851 660 N 0 -1202 257 0 0 1202 h
-LTb
-LCb setrgbcolor
-4851 660 N
-0 1201 V
-256 0 V
-0 -1201 V
--256 0 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 5703 660 N 0 -1364 257 0 0 1364 h
-LTb
-LCb setrgbcolor
-5703 660 N
-0 1363 V
-256 0 V
-0 -1363 V
--256 0 V
-Z stroke
-LT0
-LC0 setrgbcolor
-0.00 0.00 1.00 C 1.000 UL
-LT1
-LC1 setrgbcolor
 0.68 0.85 0.90 C LTb
 LCb setrgbcolor
-LT1
-LC1 setrgbcolor
-0.68 0.85 0.90 C 5971 3932 N 0 -110 591 0 0 110 h
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 2398 4152 N 0 -110 591 0 0 110 h
 LTb
 LCb setrgbcolor
-5971 3932 N
+2398 4152 N
+591 0 V
+0 110 V
+-591 0 V
+0 -110 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 1583 704 N 0 -219 149 0 0 219 h
+LTb
+LCb setrgbcolor
+1583 704 N
+0 219 V
+149 0 V
+0 -219 V
+-149 0 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 2410 704 N 0 -391 149 0 0 391 h
+LTb
+LCb setrgbcolor
+2410 704 N
+0 391 V
+149 0 V
+0 -391 V
+-149 0 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 3238 704 N 0 -671 149 0 0 671 h
+LTb
+LCb setrgbcolor
+3238 704 N
+0 671 V
+149 0 V
+0 -671 V
+-149 0 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 4065 704 N 0 -822 149 0 0 822 h
+LTb
+LCb setrgbcolor
+4065 704 N
+0 822 V
+149 0 V
+0 -822 V
+-149 0 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 4892 704 N 0 -1187 149 0 0 1187 h
+LTb
+LCb setrgbcolor
+4892 704 N
+0 1187 V
+149 0 V
+0 -1187 V
+-149 0 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 5720 704 N 0 -1347 149 0 0 1347 h
+LTb
+LCb setrgbcolor
+5720 704 N
+0 1347 V
+149 0 V
+0 -1347 V
+-149 0 V
+Z stroke
+LT0
+LC0 setrgbcolor
+0.68 0.85 0.90 C 1.000 UL
+LT1
+LC1 setrgbcolor
+0.25 0.88 0.82 C LTb
+LCb setrgbcolor
+LT1
+LC1 setrgbcolor
+0.25 0.88 0.82 C 2398 3932 N 0 -110 591 0 0 110 h
+LTb
+LCb setrgbcolor
+2398 3932 N
 591 0 V
 0 110 V
 -591 0 V
@@ -638,85 +593,252 @@ LCb setrgbcolor
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 1725 660 N 0 -823 257 0 0 823 h
+0.25 0.88 0.82 C 1748 704 N 0 -186 149 0 0 186 h
 LTb
 LCb setrgbcolor
-1725 660 N
-0 822 V
-256 0 V
-0 -822 V
--256 0 V
+1748 704 N
+0 186 V
+149 0 V
+0 -186 V
+-149 0 V
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 2577 660 N 0 -1576 257 0 0 1576 h
+0.25 0.88 0.82 C 2576 704 N 0 -388 149 0 0 388 h
 LTb
 LCb setrgbcolor
-2577 660 N
-0 1575 V
-256 0 V
-0 -1575 V
--256 0 V
+2576 704 N
+0 388 V
+149 0 V
+0 -388 V
+-149 0 V
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 3430 660 N 0 -2631 257 0 0 2631 h
+0.25 0.88 0.82 C 3403 704 N 0 -702 149 0 0 702 h
 LTb
 LCb setrgbcolor
-3430 660 N
-0 2630 V
-256 0 V
-0 -2630 V
--256 0 V
+3403 704 N
+0 702 V
+149 0 V
+0 -702 V
+-149 0 V
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 4282 660 N 0 -3050 257 0 0 3050 h
+0.25 0.88 0.82 C 4231 704 N 0 -737 148 0 0 737 h
 LTb
 LCb setrgbcolor
-4282 660 N
-0 3049 V
-256 0 V
-0 -3049 V
--256 0 V
+4231 704 N
+0 737 V
+148 0 V
+0 -737 V
+-148 0 V
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 5135 660 N 0 -3242 257 0 0 3242 h
+0.25 0.88 0.82 C 5058 704 N 0 -751 149 0 0 751 h
 LTb
 LCb setrgbcolor
-5135 660 N
-0 3241 V
-256 0 V
-0 -3241 V
--256 0 V
+5058 704 N
+0 751 V
+149 0 V
+0 -751 V
+-149 0 V
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 5988 660 N 0 -3190 256 0 0 3190 h
+0.25 0.88 0.82 C 5885 704 N 0 -751 149 0 0 751 h
 LTb
 LCb setrgbcolor
-5988 660 N
-0 3189 V
-255 0 V
-0 -3189 V
--255 0 V
+5885 704 N
+0 751 V
+149 0 V
+0 -751 V
+-149 0 V
 Z stroke
 LT1
 LC1 setrgbcolor
-0.68 0.85 0.90 C 1.000 UL
+0.25 0.88 0.82 C 1.000 UL
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C LTb
+LCb setrgbcolor
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 2398 3712 N 0 -110 591 0 0 110 h
 LTb
 LCb setrgbcolor
-858 4380 N
-858 660 L
-5968 0 V
-0 3720 V
--5968 0 V
+2398 3712 N
+591 0 V
+0 110 V
+-591 0 V
+0 -110 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 1914 704 N 0 -812 149 0 0 812 h
+LTb
+LCb setrgbcolor
+1914 704 N
+0 812 V
+149 0 V
+0 -812 V
+-149 0 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 2741 704 N 0 -1556 149 0 0 1556 h
+LTb
+LCb setrgbcolor
+2741 704 N
+0 1556 V
+149 0 V
+0 -1556 V
+-149 0 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 3569 704 N 0 -2598 148 0 0 2598 h
+LTb
+LCb setrgbcolor
+3569 704 N
+0 2598 V
+148 0 V
+0 -2598 V
+-148 0 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 4396 704 N 0 -3012 149 0 0 3012 h
+LTb
+LCb setrgbcolor
+4396 704 N
+0 3012 V
+149 0 V
+0 -3012 V
+-149 0 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 5223 704 N 0 -3203 149 0 0 3203 h
+LTb
+LCb setrgbcolor
+5223 704 N
+0 3203 V
+149 0 V
+0 -3203 V
+-149 0 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 6051 704 N 0 -3151 149 0 0 3151 h
+LTb
+LCb setrgbcolor
+6051 704 N
+0 3151 V
+149 0 V
+0 -3151 V
+-149 0 V
+Z stroke
+LT2
+LC2 setrgbcolor
+0.00 0.00 1.00 C 1.000 UL
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C LTb
+LCb setrgbcolor
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 2398 3492 N 0 -110 591 0 0 110 h
+LTb
+LCb setrgbcolor
+2398 3492 N
+591 0 V
+0 110 V
+-591 0 V
+0 -110 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 2079 704 N 0 -993 149 0 0 993 h
+LTb
+LCb setrgbcolor
+2079 704 N
+0 993 V
+149 0 V
+0 -993 V
+-149 0 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 2907 704 N 0 -1446 149 0 0 1446 h
+LTb
+LCb setrgbcolor
+2907 704 N
+0 1446 V
+149 0 V
+0 -1446 V
+-149 0 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 3734 704 N 0 -2379 149 0 0 2379 h
+LTb
+LCb setrgbcolor
+3734 704 N
+0 2379 V
+149 0 V
+0 -2379 V
+-149 0 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 4561 704 N 0 -2930 149 0 0 2930 h
+LTb
+LCb setrgbcolor
+4561 704 N
+0 2930 V
+149 0 V
+0 -2930 V
+-149 0 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 5389 704 N 0 -3156 149 0 0 3156 h
+LTb
+LCb setrgbcolor
+5389 704 N
+0 3156 V
+149 0 V
+0 -3156 V
+-149 0 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 6216 704 N 0 -3210 149 0 0 3210 h
+LTb
+LCb setrgbcolor
+6216 704 N
+0 3210 V
+149 0 V
+0 -3210 V
+-149 0 V
+Z stroke
+LT3
+LC3 setrgbcolor
+0.00 0.00 0.55 C 1.000 UL
+LTb
+LCb setrgbcolor
+1078 4380 N
+0 -3676 V
+5792 0 V
+0 3676 V
+-5792 0 V
 Z stroke
 1.000 UP
 1.000 UL
 LTb
-grestore % colour palette end
 stroke
 grestore
 end
