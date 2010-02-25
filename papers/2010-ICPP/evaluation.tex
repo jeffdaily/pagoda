@@ -51,7 +51,7 @@ of the code were run.  "Subsetter" represents the original program,
 executing with nearly all IO turned off.  Comparing the original subsetter to
 the algorithms case, clearly, IO represents a significant portion of the
 execution time.  As the number of cores increases, the optimized case more
-closely resembles the alrogithms alone.  The benefit of additional processors
+closely resembles the algorithms alone.  The benefit of additional processors
 appears to have reached a plateau near 1024 processors for all cases, however
 this may be due to the size of the problem since run times at this scale are
 only a few minutes in length.
@@ -134,7 +134,7 @@ between Table \ref{tab:strong_prof_opt} and Table \ref{tab:strong_prof} are
 the total time and percentage of time spent in each function.  Although the
 optimized subsetter spends substantially less time reading, the majority of
 time is still spent in IO.  Although still dominant, IO is a less significant
-contributer to the total execution time.
+contributor to the total execution time.
 
 \begin{table*}[!t]
 \center
@@ -157,10 +157,15 @@ NetcdfFileWriter::NetcdfFileWriter(string)&  1&0.0& 0.4& 1.1&0.37\\
 Running our subsetter at a scale of over 2000 cores is initially promising.
 Fig. \ref{fig:strong} demonstrates that the algorithms we developed scale
 regardless of the time spent in IO.  The performance of the original subsetter
-can be considered as the case where global operations are performed such that
-subset operations are not needed.  These global operations will stress the IO
-system the greatest.  The optimized subsetter will not help in cases of global
-operations. 
+can be considered as the case where global operations are performed since the
+original subsetter was reading all of the available data.  These global
+operations will stress the IO system the greatest.  The optimized subsetter
+will not help in cases of global operations.  The significant improvement
+afforded by the optimized subsetter is likely due to the data layout using a
+space-filling curve as explained in Section \ref{subsection:grid}.  The
+space-filling curve places logically adjacent cells near each other in memory
+allowing for the maximum number of nonparticipating processes during the read
+operation.
 
 The global profile in Table \ref{tab:strong_prof} suggests that IO accounts
 for nearly 95\% of program execution at 2048 cores.  This is not a stretch of
