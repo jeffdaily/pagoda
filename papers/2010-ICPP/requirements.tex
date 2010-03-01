@@ -15,7 +15,7 @@ conventions for describing this data in the NetCDF data model have been
 formalized by the Climate and Forecast (CF) conventions\cite{CF}.  CF defines
 conventions and metadata standards that enable both human and computer
 interpretation of the data.  Human interpretation is supported through the use
-of standard names while definition of spatial and temporal properties of the
+of standard names while the definition of spatial and temporal properties of the
 data have enabled an extensive set of tools for data manipulation and display
 such as \cite{NCO}, \cite{OPeNDAP}, and \cite{FERRET}.  The CF Conventions
 have been evolving to support many variations of structured grids including
@@ -23,15 +23,15 @@ Orthographic, Polar stereographic, Transverse Mercator, and many others.
 
 The GCRM uses a geodesic grid.  The geodesic grid is created by recursively
 bisecting an icosahedron of 20 triangular faces and twelve vertices and
-projecting the resulting faces onto a unit sphere.  The resulting vertices
+projecting the resulting faces onto a unit sphere.  These vertices
 represent the centers of hexagonal grid cells with the exception of twelve
 pentagons (the centers of the original twelve vertices.) See Fig.
 \ref{fig:geodesic} for an example of the first stage of bisection and
 projection, followed by the definition of one of the hexagons.  Once the
-desired grid resolution is reached (Fig. \ref{fig:panels}(left)), if the
+desired grid resolution is reached (Fig. \ref{fig:panels}(left)), the
 original triangles of the icosahedron are paired such that each pair shares an
-edge, then the grid points generated from each pair form a logically
-structured block (Fig. \ref{fig:panels}(right)).  These blocks can be stored
+edge. The grid points generated from each pair form a logically
+structured block (Fig. \ref{fig:panels}(right)) that can be stored
 as a set of regular square arrays of data points.  Further details can be
 found in \cite{GEODESIC}.
 
@@ -60,7 +60,7 @@ From the previous description, it can be seen that the geodesic grid used by
 the GCRM is fairly regular.  However, the horizontal dimension has some
 important properties in common with unstructured grids: the grid coordinates
 are not monotonic and simple conventions are not available for identifying the
-neighbors of all cells.  As a consequence, it is necessary provide more
+neighbors of all cells.  As a consequence, it is necessary to provide more
 information about the topology of the grid.  Other unstructured grids such as
 triangular, cubed sphere \cite{CUBE}, and arbitrary unstructured polygons are
 also being applied to various models.  There is a recognized need to extend
@@ -139,12 +139,13 @@ the grid topology, and provide sufficient information for tessellation to
 triangles for 3D visualization.  The approach taken with the model is to adopt
 the CF conventions to the extent possible and adopt early ideas circulating
 within the community.  However, as many of the details have not been decided,
-custom data analysis tools are currently required.
+custom data analysis tools are currently required and further modifications to
+the tools may be needed to conform to evolving standards.
 
 \subsection{Data Parallelism}
 
 Larson, Ong, and Tokarz note that the current popular climate data analysis
-packages remain single-processor applications which lack the memory required
+packages remain single-processor applications. These lack the memory required
 to handle large data volumes as well as the processing power to analyze the
 data in a timely fashion\cite{MODSIM07:LOT}.  Although they emphasize using
 OpenMP as a first step toward parallelism, we instead emphasize using a
@@ -180,7 +181,7 @@ to produce edge variables that exceed the 4 byte limit for array indexing.
 \subsection{Dataset Abstraction}
 
 Model output is often distributed across many files for a given model run.
-There are any number of schemes for organizing so many files e.g. one variable
+There are any number of schemes for organizing so many files, e.g. one variable
 per file with multiple timesteps per file, separating out the grid into a
 separate file, one timestep per file with multiple variables.  The
 reconstitution of these files into a logical set of variables and metadata is
@@ -191,7 +192,7 @@ addling details of which files hold which variables.
 
 \subsection{Maintenance of Topology Variables}
 
-Regular grids such as the Cartesian, rectilinear, or curvilinear lend
+Regular grids such as the Cartesian, rectilinear, or curvilinear grids lend
 themselves to representations as multidimensional arrays such that logically
 adjacent cells are either adjacent in memory or can be located via a
 shape-based index calculation.  Although some attempt is made to keep
@@ -201,7 +202,7 @@ neighbors.
 
 The topology variables mentioned in Section \ref{subsection:grid} are not
 unique to our grid; any grid could be described using a similar set of
-variables.  However, since topology is often implicitly defined by other
+variables.  However, since topology is often implicitly defined for other
 grids, these variables are not correctly handled by current software.  When a
 subset occurs, the indices of these variables must be updated to reflect the
 remaining corners, edges, and cells as seen in Fig. \ref{fig:subset}.
@@ -215,10 +216,13 @@ the corners are reindexed to reflect the fewer overall corners in the subset.}
 \label{fig:subset}
 \end{figure}
 
-\subsection{Maintain Integrity of Entire Grid Cells}
+\subsection{Maintaining Integrity of Entire Grid Cells}
 
 Howe and Maier detail the properties of well-formed grids in \cite{UGRID}.
 Proper subsets should maintain the same well-formed properties of the original
 in order to remain useful to further analysis.  Therefore, the cell and its
 surrounding corners and edges must remain intact during a subset as seen in
-Fig. \ref{fig:subset}.
+Fig. \ref{fig:subset}. The first step in forming a subset results in a
+collection of cell and corner indices that do not form a contiguous sequence
+of integers. The cells and corners must be reindexed the corresponding topology
+lists updated to give a well formed description of the topology.

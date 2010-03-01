@@ -10,8 +10,9 @@ The subsetter is the first in a series of planned parallel command-line tools
 based on unstructured grids, the PGAS model, and one-sided communication.  It
 takes arguments indicating specific variables (-v), dimension ranges (-d) to
 extract, or a latitude and longitude bounding box (-b).  Parallel climate
-analysis tools will likely require the use of common startup programs such as
-"mpirun" or "mpiexec" for MPI programs.  Users of these tools must become
+analysis tools require the use of common startup programs (such as
+"mpirun" or "mpiexec" for MPI programs) capable of spawning parallel jobs on a
+cluster of other parallel architecture.  Users of these tools must become
 familiar with how to run parallel software.  Looking past the particular use
 of "mpiexec -np" below to invoke our MPI program with a given number of
 processors, example usage of the subsetter looks like:
@@ -32,7 +33,7 @@ like the following, noting that \emph{ncks} does not aggregate input files:
 \subsection{Dataset Abstraction}
 
 A dataset abstraction is essential for the comprehension of these large
-datasets, hiding the addling details of which files contain which data.  The
+datasets, hiding the details of which files contain which data.  The
 subsetter currently supports two forms of input file aggregation, either
 across a specified dimension e.g. time or by taking the union of all input
 files such that duplicate dimensions and grid and topology variables within
@@ -57,8 +58,9 @@ The PGAS programming model assumes a global address space which is partitioned
 such that each process is associated with a local portion of the space.
 One-sided communication allows a process to access another process's address
 space without any explicit participation by the latter process.  Such
-communication can reduce synchronization, data movement, and can simplify
-programming.  The Global Arrays (GA) library supports both models.
+communication can reduce synchronization and can simplify
+programming.  The Global Arrays (GA) library supports both global address spaces
+and onesided communication.
 
 The subsetter was built using the GA library for the wealth of features it
 provides which are tailored to our problem domain.  GA provides a distributed
