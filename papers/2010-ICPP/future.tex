@@ -28,4 +28,7 @@ redistributed.  If a masked read or a read based on individual array index
 tuples similar to \verb+NGA_Gather+ were available within the Parallel-NetCDF
 library we might see further performance gains.  The algorithms presented in
 this paper which evenly distribute the subset data will hopefully encourage
-work in this area.
+work in this area.  We are also investigating recent advances in the
+Parallel-NetCDF library \cite{PNETCDFOPT} which addresses the limitation in
+the current interface of only allowing access to one array variable per
+function call.
