@@ -146,14 +146,14 @@ distributed.
 %\end{figure}
 
 A partial sum of the index array associated with each dimension is useful for
-later determining where subset data is to be placed.  That feature will be
-explained in more detail in Section \ref{section:alg_pack}.  The partial sum
-operation here is semantically similar to the one found in the C++
-STL\cite{CXXSTL}.  It computes a series of sums over an array from the first
-element through the \emph{i}th element and stores the result of each such sum
-in the \emph{i}th element of a destination array.  For example, if $x$
-represents an element in the array and $y$ represents an element in the
-destination array, the $y$s can be calculated as:
+later determining which process is to receive which portion of the subset
+data.  That feature will be explained in more detail in Section
+\ref{section:alg_pack}.  The partial sum operation here is semantically
+similar to the one found in the C++ STL\cite{CXXSTL}.  It computes a series of
+sums over an array from the first element through the \emph{i}th element and
+stores the result of each such sum in the \emph{i}th element of a destination
+array.  For example, if $x$ represents an element in the array and $y$
+represents an element in the destination array, the $y$s can be calculated as:
 
 \begin{equation}
 \begin{split}
@@ -179,15 +179,15 @@ The partial sum is elegantly computed using a single call to the
 
 Creating the index array associated with a mask requires three specific GA
 operations, \verb=GA_Fill=, \verb=GA_Patch_enum= and \verb=GA_Unpack=.  The
-mask array is represented in Fig. \ref{fig:unpack}A.  \verb=GA_Fill= fills the
-index array, the array in Fig. \ref{fig:unpack}B, with a value of $-1$.  A
-third array is created (Fig. \ref{fig:unpack}C) after each process counts how
-many masked bits are present and collectively sums to get the size of the
-array to create.  \verb=GA_Patch_enum= enumerates the values in the second
-array starting from zero with an increment of 1 (indicated by the arrows in
-Fig. \ref{fig:unpack}C).  \verb=GA_Unpack= expands the enumerated array values
-into the filled array based on the associated mask array as seen in Fig.
-\ref{fig:unpack}D.
+mask array is represented in Fig. \ref{fig:unpack}A with the masked bits
+indicated in black.  \verb=GA_Fill= fills the index array, the array in Fig.
+\ref{fig:unpack}B, with a value of $-1$.  Each process counts how many masked
+bits they own and then collectively sums their count.  A third array is
+created (Fig. \ref{fig:unpack}C) based on this count.  \verb=GA_Patch_enum=
+enumerates the values in the newly created array starting from zero with an
+increment of 1 (indicated by the arrows in Fig. \ref{fig:unpack}C).
+\verb=GA_Unpack= expands the enumerated array values into the filled array
+based on the associated mask array as seen in Fig. \ref{fig:unpack}D.
 
 \begin{figure}[!t]
 \center
@@ -238,36 +238,26 @@ of non-negative indices is shown for clarity).}
 
 The goal of the pack routine is to start with an evenly distributed source
 array, subset it, and evenly distribute the subset.  The subset is specified
-using mask arrays, one for each dimension of the source array.  The problem
-lies with where to put the data once each process computes its portion of the
-subset; each process would need to know a priori the size of the subsets that
-logically come before their own computed portion and \verb=NGA_Put()= their
-data after then.
-
-The partial sum of the mask array is a convenient solution to this problem.
-Each process owns a portion of the source array in terms of the global address
-space of the array.  For each dimension, the value in the corresponding
-partial sum array at the index represented by the lowest index owned by each
-local portion describes where to put the subset data.
-
-Fig. \ref{fig:pack} illustrates the n-dimensional pack routine schematically.
-In the figure, the blue arrays represent the mask arrays and the olive arrays
-the partial sums.  The masked bits are indicated in black.  Each of the four
-processes query the partial sum arrays using \verb=NGA_Get()= at the
-corresponding locations indicated in orange and the small blue arrows.  Now
-knowing where to put their subset data, each process can \verb=NGA_Put()=
-their portions resulting in the subset array.  The \verb=NGA_Get()= and
-\verb=NGA_Put()= operations do not require explicit knowledge of where the
-data lives, reducing the burden of the programmer.
+using mask arrays, one for each dimension of the source array (the blue arrays
+in Fig. \ref{fig:pack} with masked bits indicated in black).  The size of the
+subset is determined by counting the number of masked bits per dimension.
+Each process determines where to \verb=NGA_Put()= its portion of the subset by
+examining the partial sum array (the olive arrays in Fig. \ref{fig:pack}).
+The values indicated in orange in Fig. \ref{fig:pack} represent the values of
+partial sum array at those particular indices and are used by each process to
+know where to put their portion of the subset data into the subset array.  For
+example, process 1 in Fig. \ref{fig:pack} calls \verb=NGA_Put()= to place its
+data starting at index (3,0).
 
 \begin{figure}[!t]
 \center
 \includegraphics[width=3.5in]{images/pack}
-\caption{Pack.  The blue arrays are the masks and the olive arrays are the
-partial sums over the masks.  Each process queries for where to put their
-subset data (orange values following the small blue arrows), packs their local
-data based on the mask bits, and calls NGA\_Put to deliver the subset data.
-The destination array is by default evenly distributed.}
+\caption{Pack.  The blue arrays represent the masks with masked bits indicated
+in black.  The olive arrays are the partial sums over the masks.  The orange
+values represent the values of the partial sum array at those indices.  Each
+process queries the partial sum arrays for where to put their subset data,
+packs their local data based on the mask bits, and calls NGA\_Put to deliver
+the subset data.  The destination array is by default evenly distributed.}
 \label{fig:pack}
 \end{figure}
 
