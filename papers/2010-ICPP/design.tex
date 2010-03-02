@@ -10,12 +10,12 @@ The subsetter is the first in a series of planned parallel command-line tools
 based on unstructured grids, the PGAS model, and one-sided communication.  It
 takes arguments indicating specific variables (-v), dimension ranges (-d) to
 extract, or a latitude and longitude bounding box (-b).  Parallel climate
-analysis tools require the use of common startup programs (such as
-"mpirun" or "mpiexec" for MPI programs) capable of spawning parallel jobs on a
-cluster of other parallel architecture.  Users of these tools must become
-familiar with how to run parallel software.  Looking past the particular use
-of "mpiexec -np" below to invoke our MPI program with a given number of
-processors, example usage of the subsetter looks like:
+analysis tools require the use of common startup programs (such as "mpirun" or
+"mpiexec" for MPI programs) capable of spawning parallel jobs on a cluster of
+other parallel architecture.  Users of these tools must become familiar with
+how to run parallel software.  Looking past the particular use of "mpiexec
+-np" below to invoke our MPI program with a given number of processors,
+example usage of the subsetter looks like:
 
 \begin{itemize}
 \item mpiexec -np 128 subsetter -b 20,-20,160,90 -v vorticity january.nc february.nc MJO\_vorticity\_janfeb.nc
@@ -33,13 +33,13 @@ like the following, noting that \emph{ncks} does not aggregate input files:
 \subsection{Dataset Abstraction}
 
 A dataset abstraction is essential for the comprehension of these large
-datasets, hiding the details of which files contain which data.  The
-subsetter currently supports two forms of input file aggregation, either
-across a specified dimension e.g. time or by taking the union of all input
-files such that duplicate dimensions and grid and topology variables within
-later files are ignored.  These forms of aggregation are modeled after what is
-available when using NetCDF Markup Language\cite{NcML}.  NcML input is not
-directly supported at this time but is planned for a future release. 
+datasets, hiding the details of which files contain which data.  The subsetter
+currently supports two forms of input file aggregation, either across a
+specified dimension e.g. time or by taking the union of all input files such
+that duplicate dimensions and grid and topology variables within later files
+are ignored.  These forms of aggregation are modeled after what is available
+when using NetCDF Markup Language\cite{NcML}.  NcML input is not directly
+supported at this time but is planned for a future release. 
 
 \subsection{Parallel IO Abstraction}
 
@@ -58,9 +58,9 @@ The PGAS programming model assumes a global address space which is partitioned
 such that each process is associated with a local portion of the space.
 One-sided communication allows a process to access another process's address
 space without any explicit participation by the latter process.  Such
-communication can reduce synchronization and can simplify
-programming.  The Global Arrays (GA) library supports both global address spaces
-and onesided communication.
+communication can reduce synchronization and can simplify programming.  The
+Global Arrays (GA) library supports both global address spaces and onesided
+communication.
 
 The subsetter was built using the GA library for the wealth of features it
 provides which are tailored to our problem domain.  GA provides a distributed
@@ -121,12 +121,12 @@ topology variables, and the n-dimensional pack routine.
 
 Each dimension of the data has two arrays associated with it, an integer array
 representing a bitmask and an integer array representing the new indices of
-the dimension in case of a subset.  For instance, if any of the bits are
-zero (off), the corresponding indices of the index array will have negative
-values.  The remaining values of the index array will increase monotonically,
-skipping the negative or masked indices.  The bitmasks are generated based on
-a rectangular latitude and longitude region specified on the command-line, or
-by specifying one or more indices of a dimension to select.  Although a
+the dimension in case of a subset.  For instance, if any of the bits are zero
+(off), the corresponding indices of the index array will have negative values.
+The remaining values of the index array will increase monotonically, skipping
+the negative or masked indices.  The bitmasks are generated based on a
+rectangular latitude and longitude region specified on the command-line, or by
+specifying one or more indices of a dimension to select.  Although a
 rectangular region is currently used for simplicity, once translated the
 bitmasks allow for arbitrary subsets to be defined.  These bitmasks are then
 used to evenly distribute the resultant subset across all processes.  Note
@@ -201,11 +201,11 @@ unpacked into the index array (D).}
 
 \subsubsection{Reindexing of Topology Variables}
 
-Recall that the topology variables are those which map from one index to
-one or more other indices such as from a cell index to each of its corner
-indices.  A typical subset operation reduces the number of cells, corners, and
-edges within the grid, so it is important to maintain the integrity of these
-mapping arrays such that they map to real indices.
+Recall that the topology variables are those which map from one index to one
+or more other indices such as from a cell index to each of its corner indices.
+A typical subset operation reduces the number of cells, corners, and edges
+within the grid, so it is important to maintain the integrity of these mapping
+arrays such that they map to real indices.
 
 The reindexing of the topology variables relies on the recalculated index
 array of the associated domain.  For example, when reindexing the mapping from

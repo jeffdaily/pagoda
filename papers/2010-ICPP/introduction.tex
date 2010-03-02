@@ -18,17 +18,16 @@ features when handling unstructured or irregular grids such as the
 geodesic\cite{GEODESIC} or cubed sphere\cite{CUBE} grids.  Unstructured grids
 are gaining popularity, further widening the gap between current software and
 these types of models.  For unstructured grids it is necessary to provide more
-information about the topology of the grid and to maintain the integrity of this
-topology information in the face of data culling.
+information about the topology of the grid and to maintain the integrity of
+this topology information in the face of data culling.
 
-Regular grids allow for the topology to be implicitly defined by how
-the data is stored; coordinate variables are generally monotonic and cell
-neighbors are adjacent both logically and in memory.  These assumptions allow
-for operations over regular grids which are otherwise more difficult to
-perform over unstructured grids.  In the case of partitioning these grids for
-data parallel processing, unstructured grids will often have more of the
-logically adjacent cells scattered across memory partitions than in the
-regular case.
+Regular grids allow for the topology to be implicitly defined by how the data
+is stored; coordinate variables are generally monotonic and cell neighbors are
+adjacent both logically and in memory.  These assumptions allow for operations
+over regular grids which are otherwise more difficult to perform over
+unstructured grids.  In the case of partitioning these grids for data parallel
+processing, unstructured grids will often have more of the logically adjacent
+cells scattered across memory partitions than in the regular case.
 
 Subsetting is a fundamental capability for any analysis tool and allows users
 to operate over regions of the data in which they are interested.  The

@@ -2,8 +2,8 @@
 \label{section:requirements}
 
 The requirements for our software stem from the growing need for parallel
-analysis in the domain of climate science\cite{MODSIM07:LOT} but also from
-the use of the geodesic grid.
+analysis in the domain of climate science\cite{MODSIM07:LOT} but also from the
+use of the geodesic grid.
 
 \subsection{Geodesic Grid}
 \label{subsection:grid}
@@ -15,25 +15,25 @@ conventions for describing this data in the NetCDF data model have been
 formalized by the Climate and Forecast (CF) conventions\cite{CF}.  CF defines
 conventions and metadata standards that enable both human and computer
 interpretation of the data.  Human interpretation is supported through the use
-of standard names while the definition of spatial and temporal properties of the
-data have enabled an extensive set of tools for data manipulation and display
-such as \cite{NCO}, \cite{OPeNDAP}, and \cite{FERRET}.  The CF Conventions
-have been evolving to support many variations of structured grids including
-Orthographic, Polar stereographic, Transverse Mercator, and many others. 
+of standard names while the definition of spatial and temporal properties of
+the data have enabled an extensive set of tools for data manipulation and
+display such as \cite{NCO}, \cite{OPeNDAP}, and \cite{FERRET}.  The CF
+Conventions have been evolving to support many variations of structured grids
+including Orthographic, Polar stereographic, Transverse Mercator, and many
+others. 
 
 The GCRM uses a geodesic grid.  The geodesic grid is created by recursively
 bisecting an icosahedron of 20 triangular faces and twelve vertices and
-projecting the resulting faces onto a unit sphere.  These vertices
-represent the centers of hexagonal grid cells with the exception of twelve
-pentagons (the centers of the original twelve vertices.) See Fig.
-\ref{fig:geodesic} for an example of the first stage of bisection and
-projection, followed by the definition of one of the hexagons.  Once the
-desired grid resolution is reached (Fig. \ref{fig:panels}(left)), the
-original triangles of the icosahedron are paired such that each pair shares an
-edge. The grid points generated from each pair form a logically
-structured block (Fig. \ref{fig:panels}(right)) that can be stored
-as a set of regular square arrays of data points.  Further details can be
-found in \cite{GEODESIC}.
+projecting the resulting faces onto a unit sphere.  These vertices represent
+the centers of hexagonal grid cells with the exception of twelve pentagons
+(the centers of the original twelve vertices.) See Fig.  \ref{fig:geodesic}
+for an example of the first stage of bisection and projection, followed by the
+definition of one of the hexagons.  Once the desired grid resolution is
+reached (Fig. \ref{fig:panels}(left)), the original triangles of the
+icosahedron are paired such that each pair shares an edge. The grid points
+generated from each pair form a logically structured block (Fig.
+\ref{fig:panels}(right)) that can be stored as a set of regular square arrays
+of data points.  Further details can be found in \cite{GEODESIC}.
 
 \begin{figure}[!t]
 \center
@@ -181,9 +181,9 @@ to produce edge variables that exceed the 4 byte limit for array indexing.
 \subsection{Dataset Abstraction}
 
 Model output is often distributed across many files for a given model run.
-There are any number of schemes for organizing so many files, e.g. one variable
-per file with multiple timesteps per file, separating out the grid into a
-separate file, one timestep per file with multiple variables.  The
+There are any number of schemes for organizing so many files, e.g. one
+variable per file with multiple timesteps per file, separating out the grid
+into a separate file, one timestep per file with multiple variables.  The
 reconstitution of these files into a logical set of variables and metadata is
 an established practice\cite{NcML,THREDDS}.  We emphasize that the aggregation
 of files into an abstract dataset is required in order to operate on the data
@@ -224,5 +224,5 @@ in order to remain useful to further analysis.  Therefore, the cell and its
 surrounding corners and edges must remain intact during a subset as seen in
 Fig. \ref{fig:subset}. The first step in forming a subset results in a
 collection of cell and corner indices that do not form a contiguous sequence
-of integers. The cells and corners must be reindexed the corresponding topology
-lists updated to give a well formed description of the topology.
+of integers. The cells and corners must be reindexed the corresponding
+topology lists updated to give a well formed description of the topology.
