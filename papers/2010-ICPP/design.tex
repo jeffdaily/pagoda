@@ -121,6 +121,19 @@ topology variables, and the n-dimensional pack routine.
 
 Each dimension of the data has two arrays associated with it, an integer array
 representing a bitmask and an integer array representing the new indices of
+<<<<<<< .mine
+the dimension in case of a subset.  For instance, if any of the bits are
+zero (off), the corresponding indices of the index array will have negative
+values.  The remaining values of the index array will increase monotonically,
+skipping the negative or masked indices.  The bitmasks are generated based on
+a rectangular latitude and longitude region specified on the command-line, or
+by specifying one or more indices of a dimension to select. Although the
+bitmasks are currently created using a relatively simple latitude-longitude
+bounding box, arbitrary bitmasks could be created and fed into the subsetter
+without modification of the remaining algorithms. This would allow for data sets
+based on feature extraction (e.g. cyclones) or continental datasets.
+These bitmasks are then
+=======
 the dimension in case of a subset.  For instance, if any of the bits are zero
 (off), the corresponding indices of the index array will have negative values.
 The remaining values of the index array will increase monotonically, skipping
@@ -129,6 +142,7 @@ rectangular latitude and longitude region specified on the command-line, or by
 specifying one or more indices of a dimension to select.  Although a
 rectangular region is currently used for simplicity, once translated the
 bitmasks allow for arbitrary subsets to be defined.  These bitmasks are then
+>>>>>>> .r218
 used to evenly distribute the resultant subset across all processes.  Note
 that these bitmask and associated index arrays are one-dimensional and
 distributed.
@@ -146,6 +160,16 @@ distributed.
 %\end{figure}
 
 A partial sum of the index array associated with each dimension is useful for
+<<<<<<< .mine
+later determining where subset data is to be placed.  That feature will be
+explained in more detail in Section \ref{section:alg_pack}.  The partial sum
+operation here is semantically similar to the one found in the C++
+STL\cite{CXXSTL}.  It computes a series of sums over an array from the first
+element through the \emph{i}th element and stores the result of each such sum
+in the \emph{i}th element of a destination array.  For example, if $x$
+represents an element in the source array and $y$ represents an element in the
+destination array, the $y$s can be calculated as:
+=======
 later determining which process is to receive which portion of the subset
 data.  That feature will be explained in more detail in Section
 \ref{section:alg_pack}.  The partial sum operation here is semantically
@@ -154,6 +178,7 @@ sums over an array from the first element through the \emph{i}th element and
 stores the result of each such sum in the \emph{i}th element of a destination
 array.  For example, if $x$ represents an element in the array and $y$
 represents an element in the destination array, the $y$s can be calculated as:
+>>>>>>> .r218
 
 \begin{equation}
 \begin{split}
@@ -248,6 +273,23 @@ partial sum array at those particular indices and are used by each process to
 know where to put their portion of the subset data into the subset array.  For
 example, process 1 in Fig. \ref{fig:pack} calls \verb=NGA_Put()= to place its
 data starting at index (3,0).
+
+The partial sum of the mask array is a convenient solution to this problem.
+Each process owns a portion of the source array in terms of the global address
+space of the array.  For each dimension, the value in the corresponding
+partial sum array at the index represented by the lowest index owned by each
+local portion describes where to put the subset data.
+
+Fig. \ref{fig:pack} illustrates the n-dimensional pack routine schematically.
+In the figure, the blue arrays represent the mask arrays and the olive arrays
+the partial sums.  The masked bits are indicated in black.  Each of the four
+processes query the partial sum arrays using \verb=NGA_Get()= at the
+corresponding locations indicated in orange and the small blue arrows.  Now
+knowing where to put their subset data, each process can pack their data into a
+small local block and then \verb=NGA_Put()=
+the resulting portions into the final subset array.  The \verb=NGA_Get()= and
+\verb=NGA_Put()= operations do not require explicit knowledge of where the
+data lives, reducing the burden of the programmer.
 
 \begin{figure}[!t]
 \center
