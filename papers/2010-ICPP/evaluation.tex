@@ -165,20 +165,18 @@ NetcdfFileWriter::NetcdfFileWriter(string)&  1&0.0& 0.4& 1.1&0.37\\
 \subsection{Discussion}
 
 Running our subsetter at a scale of over 2000 cores is initially promising.
-Fig. \ref{fig:strong} demonstrates that the algorithms we developed scale
-to at least 1024 processors.  The performance of the original subsetter
-can be considered as the case where operations on the entire globe are
-performed. For these operations, the subsetter would be reading
-all of the available data.  These global subset will stress the IO system
-the greatest.  The optimized subsetter will not help in cases of operations on
-the entire globe.  The significant improvement
-afforded by the optimized subsetter is likely due to both the data layout using a
-space-filling curve as explained in Section \ref{subsection:grid} and
-optimization of collective read operations in both the Parallel-NetCDF and
-MPI-IO libraries.  The
-space-filling curve places logically adjacent cells near each other in memory
-allowing for the maximum number of nonparticipating processes during the read
-operation.
+Fig. \ref{fig:strong} demonstrates that the algorithms we developed scale to
+at least 1024 processors.  The performance of the original subsetter can be
+considered as the case where operations on the entire globe are performed. For
+these operations, the subsetter would be reading all of the available data.
+These global subset will stress the IO system the greatest.  The optimized
+subsetter will not help in cases of operations on the entire globe.  The
+significant improvement afforded by the optimized subsetter is likely due to
+both the data layout using a space-filling curve as explained in Section
+\ref{subsection:grid} and optimization of collective read operations in both
+the Parallel-NetCDF and MPI-IO libraries.  The space-filling curve places
+logically adjacent cells near each other in memory allowing for the maximum
+number of nonparticipating processes during the read operation.
 
 The profile of the global reads in Table \ref{tab:strong_prof} suggests that
 IO accounts for nearly 95\% of program execution at 2048 cores.  This is not a
