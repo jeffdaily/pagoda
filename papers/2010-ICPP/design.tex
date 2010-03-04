@@ -8,14 +8,14 @@ the requirements established in Section \ref{section:requirements}.
 
 The subsetter is the first in a series of planned parallel command-line tools
 based on unstructured grids, the PGAS model, and one-sided communication.  It
-takes arguments indicating specific variables (-v), dimension ranges (-d) to
-extract, or a latitude and longitude bounding box (-b).  Parallel climate
-analysis tools require the use of common startup programs (such as "mpirun" or
-"mpiexec" for MPI programs) capable of spawning parallel jobs on a cluster of
-other parallel architecture.  Users of these tools must become familiar with
-how to run parallel software.  Looking past the particular use of "mpiexec
--np" below to invoke our MPI program with a given number of processors,
-example usage of the subsetter looks like:
+takes arguments indicating specific variables (-v), dimension ranges (-d), or
+a latitude and longitude bounding box (-b) to extract.  Parallel software
+requires the use of common startup programs (such as "mpirun" or "mpiexec" for
+MPI programs) capable of spawning parallel jobs on a cluster or some other
+parallel architecture.  Users of serial climate analysis tools must become
+familiar with how to run parallel software.  Looking past the particular use
+of ``mpiexec -np'' below to invoke our MPI program with a given number of
+processors, example usage of the subsetter looks like:
 
 \begin{itemize}
 \item mpiexec -np 128 subsetter -b 20,-20,160,90 -v vorticity january.nc february.nc MJO\_vorticity\_janfeb.nc
@@ -89,7 +89,7 @@ include:
 
 Those operations have been demonstrated in the computation of sparse matrix
 multiplication\cite{GA} but are equally useful in the manipulation of
-unstructured grids.  The remaining GA operations are N-dimensional and
+unstructured grids.  The remaining GA operations used are n-dimensional and
 include:
 
 \begin{itemize}
@@ -105,7 +105,7 @@ process owns the data being queried.
 
 \subsection{The Algorithms}
 
-The one-sided communication and PGAS model supported by GA allowed us to
+The one-sided communication and PGAS models supported by GA allowed us to
 develop some novel algorithms for the manipulation of unstructured grids.  In
 this section we diagram and describe the algorithms we developed.  The vast
 majority of functionality within the subsetter is provided by either
@@ -246,10 +246,10 @@ subset is determined by counting the number of masked bits per dimension.
 Each process determines where to \verb=NGA_Put()= its portion of the subset by
 examining the partial sum array (the olive arrays in Fig. \ref{fig:pack}).
 The values indicated in orange in Fig. \ref{fig:pack} represent the values of
-partial sum array at those particular indices and are used by each process to
-know where to put their portion of the subset data into the subset array.  For
-example, process 1 in Fig. \ref{fig:pack} calls \verb=NGA_Put()= to place its
-data starting at index (3,0).
+the partial sum array at those particular indices and are used by each process
+to know where to put their portion of the subset data into the subset array.
+For example, process 1 in Fig. \ref{fig:pack} calls \verb=NGA_Put()= to place
+its data starting at index (3,0).
 
 \begin{figure}[!t]
 \center
