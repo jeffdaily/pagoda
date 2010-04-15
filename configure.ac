@@ -100,6 +100,5 @@ AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 # putting this here will at least put mpi.h before any OTHER include files.
 AH_BOTTOM([#include <mpi.h>])
 
-AC_CONFIG_FILES([Makefile
-                 tests/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

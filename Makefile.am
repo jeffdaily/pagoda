@@ -1,86 +1,5 @@
 ACLOCAL_AMFLAGS = -I config
 
-SUBDIRS = tests
-
-HEADERS_PRIVATE = \
-AbstractVariable.H \
-AggregationDimension.H \
-Aggregation.H \
-AggregationJoinExisting.H \
-AggregationUnion.H \
-AggregationVariable.H \
-Attribute.H \
-BoundaryVariable.H \
-CommandLineParser.H \
-Common.H \
-ConnectivityVariable.H \
-CoordinateVariable.H \
-Dataset.H \
-DataType.H \
-Debug.H \
-Dimension.H \
-DistributedMask.H \
-Error.H \
-FileWriter.H \
-LatLonBox.H \
-LocalMask.H \
-Mask.H \
-NetcdfAttribute.H \
-NetcdfDataset.H \
-NetcdfDimension.H \
-NetcdfError.H \
-NetcdfFileWriter.H \
-NetcdfVariable.H \
-Pack.H \
-PnetcdfTiming.H \
-RangeException.H \
-Slice.H \
-StringComparator.H \
-SubsetterCommands.H \
-SubsetterException.H \
-Timing.H \
-TypedValues.H \
-Util.H \
-Values.H \
-VariableDecorator.H \
-Variable.H
-
-SOURCE = \
-AbstractVariable.C \
-Aggregation.C \
-AggregationDimension.C \
-AggregationJoinExisting.C \
-AggregationUnion.C \
-AggregationVariable.C \
-Attribute.C \
-BoundaryVariable.C \
-CommandLineParser.C \
-ConnectivityVariable.C \
-CoordinateVariable.C \
-Dataset.C \
-DataType.C \
-Debug.C \
-Dimension.C \
-DistributedMask.C \
-FileWriter.C \
-LatLonBox.C \
-LocalMask.C \
-Mask.C \
-NetcdfAttribute.C \
-NetcdfDataset.C \
-NetcdfDimension.C \
-NetcdfFileWriter.C \
-NetcdfVariable.C \
-Pack.C \
-PnetcdfTiming.C \
-StringComparator.C \
-SubsetterCommands.C \
-Timing.C \
-Util.C \
-Values.C \
-Variable.C \
-VariableDecorator.C
-
 if WARNINGS
 WALL = -Wall
 endif
@@ -93,14 +12,127 @@ AM_CPPFLAGS = $(GA_INCS)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(CFLAGS) $(WALL) $(PROFILE)
 AM_LDFLAGS = $(GA_LIBS) $(FLIBS) $(PROFILE)
-
-lib_LTLIBRARIES = libsubsetter.la
-libsubsetter_la_SOURCES = $(SOURCE) $(HEADERS_PRIVATE)
+LDADD = libsubsetter.la
 
 check_PROGRAMS = subsetter_old
-subsetter_old_SOURCES = Mainp.C
-subsetter_old_LDADD = libsubsetter.la
-
 bin_PROGRAMS = subsetter
+lib_LTLIBRARIES = libsubsetter.la
+
+subsetter_old_SOURCES = Mainp.C
+
 subsetter_SOURCES = SubsetterMain.C
-subsetter_LDADD = libsubsetter.la
+
+libsubsetter_la_SOURCES = \
+AbstractVariable.C        \
+AbstractVariable.H        \
+Aggregation.C             \
+AggregationDimension.C    \
+AggregationDimension.H    \
+Aggregation.H             \
+AggregationJoinExisting.C \
+AggregationJoinExisting.H \
+AggregationUnion.C        \
+AggregationUnion.H        \
+AggregationVariable.C     \
+AggregationVariable.H     \
+Attribute.C               \
+Attribute.H               \
+BoundaryVariable.C        \
+BoundaryVariable.H        \
+CommandLineParser.C       \
+CommandLineParser.H       \
+Common.H                  \
+ConnectivityVariable.C    \
+ConnectivityVariable.H    \
+CoordinateVariable.C      \
+CoordinateVariable.H      \
+Dataset.C                 \
+Dataset.H                 \
+DataType.C                \
+DataType.H                \
+Debug.C                   \
+Debug.H                   \
+Dimension.C               \
+Dimension.H               \
+DistributedMask.C         \
+DistributedMask.H         \
+Error.H                   \
+FileWriter.C              \
+FileWriter.H              \
+LatLonBox.C               \
+LatLonBox.H               \
+LocalMask.C               \
+LocalMask.H               \
+Mask.C                    \
+Mask.H                    \
+NetcdfAttribute.C         \
+NetcdfAttribute.H         \
+NetcdfDataset.C           \
+NetcdfDataset.H           \
+NetcdfDimension.C         \
+NetcdfDimension.H         \
+NetcdfError.H             \
+NetcdfFileWriter.C        \
+NetcdfFileWriter.H        \
+NetcdfVariable.C          \
+NetcdfVariable.H          \
+Pack.C                    \
+Pack.H                    \
+PnetcdfTiming.C           \
+PnetcdfTiming.H           \
+RangeException.H          \
+Slice.H                   \
+StringComparator.C        \
+StringComparator.H        \
+SubsetterCommands.C       \
+SubsetterCommands.H       \
+SubsetterException.H      \
+Timing.C                  \
+Timing.H                  \
+TypedValues.H             \
+Util.C                    \
+Util.H                    \
+Values.C                  \
+Values.H                  \
+Variable.C                \
+VariableDecorator.C       \
+VariableDecorator.H       \
+Variable.H
+
+#############################################################################
+# tests
+#
+check_PROGRAMS +=       \
+tests/Test              \
+tests/TestAttribute     \
+tests/TestDimension     \
+tests/TestDistance      \
+tests/TestEnum          \
+tests/TestGet           \
+tests/TestLocateRegion  \
+tests/TestJoin          \
+tests/TestNetcdfDataset \
+tests/TestOpen          \
+tests/TestPartialSum    \
+tests/TestRavel         \
+tests/TestRead          \
+tests/TestScanAdd       \
+tests/TestUnion         \
+tests/TestUnpack
+
+tests_Test_SOURCES              = tests/Test.C
+tests_TestAttribute_SOURCES     = tests/TestAttribute.C
+tests_TestDimension_SOURCES     = tests/TestDimension.C
+tests_TestDistance_SOURCES      = tests/TestDistance.C
+tests_TestEnum_SOURCES          = tests/TestEnum.C
+tests_TestGet_SOURCES           = tests/TestGet.C
+tests_TestJoin_SOURCES          = tests/TestJoin.C
+tests_TestLocateRegion_SOURCES  = tests/TestLocateRegion.C
+tests_TestNetcdfDataset_SOURCES = tests/TestNetcdfDataset.C
+tests_TestOpen_SOURCES          = tests/TestOpen.C
+tests_TestPartialSum_SOURCES    = tests/TestPartialSum.C
+tests_TestRavel_SOURCES         = tests/TestRavel.C
+tests_TestRead_SOURCES          = tests/TestRead.C
+tests_TestScanAdd_SOURCES       = tests/TestScanAdd.C
+tests_TestUnion_SOURCES         = tests/TestUnion.C
+tests_TestUnpack_SOURCES        = tests/TestUnpack.c

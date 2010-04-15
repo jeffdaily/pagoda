@@ -5,8 +5,8 @@
 #include <algorithm>
 #include <numeric>
 
+#include <armci.h>
 #include <macdecls.h>
-#include <message.h>
 
 #include "Common.H"
 #include "Debug.H"
