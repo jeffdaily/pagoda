@@ -1,73 +1,85 @@
-# Initialize autoconf.
+#####################################################3
+# autoconf
+#####################################################3
 AC_PREREQ([2.64])
-AC_INIT([GCRM PARALLEL SUBSETTER], [0.1], [jeff.daily@pnl.gov])
+AC_INIT([pagoda], [0.2], [jeff.daily@pnl.gov])
 AC_CONFIG_SRCDIR([Mainp.C])
 AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
 
-AC_LANG([C++])
-
-# Checks for compilers and compiler characteristics.
-AC_PROG_CC([mpicc hcc mpxlc_r mpxlc mpcc cmpicc cc])
-AC_PROG_CXX([mpic++ mpicxx mpiCC hcp mpxlC_r mpxlC mpCC cmpic++ CC])
-AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
-#AC_PROG_FC([mpif90 mpxlf95_r mpxlf90_r mpxlf95 mpxlf90 mpf90 cmpif90c ftn])
-#AC_FC_LIBRARY_LDFLAGS
-#AC_FC_DUMMY_MAIN
-AC_F77_LIBRARY_LDFLAGS
-AC_F77_DUMMY_MAIN
-GCRM_CXX_VARIADIC_MACROS([],
-    [AC_MSG_WARN([C99 variadic macros not supported, IO timing disabled])])
-
-# Initialize automake and libtool.
+#####################################################3
+# automake
+#####################################################3
 AM_INIT_AUTOMAKE([silent-rules])
 AM_DISABLE_SHARED
-LT_INIT
 
-# Checks for libraries.
-GCRM_CHECK_PACKAGE([pnetcdf], [ncmpi_open], [pnetcdf], [pnetcdf.h],
-  [AC_SUBST([LIBPNETCDF], [-lpnetcdf])
-   AC_DEFINE([HAVE_LIBPNETCDF], [1], [Define if you have libpnetcdf])
-  ],
-  [AC_MSG_FAILURE([--with-pnetcdf was given, but test for pnetcdf failed])]
-)
+#####################################################3
+# Fortran 77
+#####################################################3
+AC_LANG_PUSH([Fortran 77])
 
-# Where to find Global Arrays.
-AC_ARG_VAR([GA_INCS], [Global Arrays include directives])
-AC_SUBST([GA_INCS])
-AC_ARG_VAR([GA_LIBS], [Global Arrays C linker directives])
-AC_SUBST([GA_LIBS])
+# Checks for Fortran 77 programs.
+AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
 
-# Debug helper stuff.
-AC_ARG_ENABLE([debug],
-    [AS_HELP_STRING([--enable-debug], [stderr: unordered debug messages])],
-    [AC_DEFINE_UNQUOTED([DEBUG], [1], [stderr: unordered debug messages])])
-AC_ARG_ENABLE([trace],
-    [AS_HELP_STRING([--enable-trace], [stderr: ordered function calls])],
-    [AC_DEFINE_UNQUOTED([TRACE], [1], [stderr: ordered function calls])])
-AC_ARG_ENABLE([profile],
-    [AS_HELP_STRING([--enable-profile], [enable gprof symbols])])
-AM_CONDITIONAL([PROFILE], [test x$enable_profile = xyes])
-AC_ARG_ENABLE([warnings],
-    [AS_HELP_STRING([--enable-warnings], [enable -Wall warnings])])
-AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
+# Checks for Fortran 77 header files.
 
-# Checks for header files.
+# Checks for Fortran 77 typedefs, structures, and compiler characteristics.
+
+# Checks for Fortran 77 type sizes.
+
+# Checks for Fortran 77 library functions.
+
+# Checks for Fortran 77 libraries.
+
+AC_LANG_POP([Fortran 77])
+
+#####################################################3
+# C
+#####################################################3
+AC_LANG_PUSH([C])
+
+# Checks for C programs.
+AC_PROG_CC([mpicc hcc mpxlc_r mpxlc mpcc cmpicc cc])
+
+# Checks for C header files.
 AC_CHECK_HEADERS([inttypes.h stdint.h stdlib.h sys/time.h time.h unistd.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
+# Checks for C typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_INLINE
+
+# Checks for C type sizes.
+
+# Checks for C library functions.
+
+# Checks for C libraries.
+
+AC_LANG_POP([C])
+
+#####################################################3
+# C++
+#####################################################3
+AC_LANG_PUSH([C++])
+
+# Checks for C++ programs.
+AC_PROG_CXX([mpic++ mpicxx mpiCC hcp mpxlC_r mpxlC mpCC cmpic++ CC])
+
+# Checks for C++ header files.
+
+# Checks for C++ typedefs, structures, and compiler characteristics.
+AC_F77_LIBRARY_LDFLAGS
+AC_F77_DUMMY_MAIN
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_TYPE_INT64_T
 AC_TYPE_UINT64_T
 AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
 AC_TYPE_LONG_DOUBLE
-AM_PROG_CC_C_O
+GCRM_CXX_VARIADIC_MACROS([],
+    [AC_MSG_WARN([C99 variadic macros not supported, IO timing disabled])])
 
-# Check for type sizes.
+# Checks for C++ type sizes.
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF([char])
 AC_CHECK_SIZEOF([unsigned char])
@@ -92,13 +104,46 @@ AS_IF([test x$ac_cv_type_long_double = xyes],
 AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
       [AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])])
 
-# Checks for library functions.
+# Checks for C++ library functions.
 AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 
+# Checks for C++ libraries.
+GCRM_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [])
+GCRM_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS])
+
+AC_LANG_POP([C++])
+
+#####################################################3
+# Libtool.
+#####################################################3
+LT_INIT
+
+#####################################################3
+# Debug helper stuff.
+#####################################################3
+AC_ARG_ENABLE([debug],
+    [AS_HELP_STRING([--enable-debug], [stderr: unordered debug messages])],
+    [AC_DEFINE_UNQUOTED([DEBUG], [1], [stderr: unordered debug messages])])
+AC_ARG_ENABLE([trace],
+    [AS_HELP_STRING([--enable-trace], [stderr: ordered function calls])],
+    [AC_DEFINE_UNQUOTED([TRACE], [1], [stderr: ordered function calls])])
+AC_ARG_ENABLE([profile],
+    [AS_HELP_STRING([--enable-profile], [enable gprof symbols])])
+AM_CONDITIONAL([PROFILE], [test x$enable_profile = xyes])
+AC_ARG_ENABLE([warnings],
+    [AS_HELP_STRING([--enable-warnings], [enable -Wall warnings])])
+AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
+
+#####################################################3
+# Misc.
+#####################################################3
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but
 # putting this here will at least put mpi.h before any OTHER include files.
 AH_BOTTOM([#include <mpi.h>])
 
+#####################################################3
+# The End.
+#####################################################3
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

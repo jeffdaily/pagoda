@@ -4,9 +4,9 @@
 
 #include <cstring> // for memset
 
-#include <armci.h>
 #include <ga.h>
 #include <macdecls.h>
+#include <message.h>
 
 #include "Debug.H"
 #include "Pack.H"

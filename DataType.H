@@ -6,12 +6,7 @@
 #include <string>
 
 #include <macdecls.h>
-#if HAVE_PNETCDF_H
-#   include <pnetcdf.h>
-#endif
-#if HAVE_NETCDF_H
-#   include <netcdf.h>
-#endif
+#include <pnetcdf.h>
 
 using std::ostream;
 using std::runtime_error;

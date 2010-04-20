@@ -8,11 +8,12 @@ if PROFILE
 PROFILE = -pg
 endif
 
-AM_CPPFLAGS = $(GA_INCS)
+AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(ga_CPPFLAGS)
+AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
-AM_CXXFLAGS = $(CFLAGS) $(WALL) $(PROFILE)
-AM_LDFLAGS = $(GA_LIBS) $(FLIBS) $(PROFILE)
-LDADD = libsubsetter.la
+AM_CXXFLAGS = $(WALL) $(PROFILE)
+AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(ga_LDFLAGS)
+LDADD = libsubsetter.la $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
 
 check_PROGRAMS = subsetter_old
 bin_PROGRAMS = subsetter
