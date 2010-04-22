@@ -180,16 +180,14 @@ int main(int argc, char **argv)
     PRINT_SYNC("bin_lat.size()=%lu\n", (long unsigned)bin_lat.size());
 
     // Now start sending all skipped data to the next process.
+    int send_to = me + 1;
+    int recv_from = me - 1;
+    if (send_to >= nproc) send_to = 0;
+    if (recv_from < 0) recv_from = nproc-1;
     for (int proc=0; proc<nproc; ++proc) {
-        int send_to = me + 1;
-        int recv_from = me - 1;
-        int err;
         MPI_Request request;
         MPI_Status recv_status;
         MPI_Status wait_status;
-
-        if (send_to >= nproc) send_to = 0;
-        if (recv_from < 0) recv_from = nproc-1;
 
         check(MPI_Isend(&skipped_lat[0], skipped_lat.size(), MPI_FLOAT, send_to, 0, MPI_COMM_WORLD, &request));
         check(MPI_Recv(received_lat, buffsize, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, &recv_status));
