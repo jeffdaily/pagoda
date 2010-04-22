@@ -118,6 +118,7 @@ tests/TestPartialSum    \
 tests/TestRavel         \
 tests/TestRead          \
 tests/TestScanAdd       \
+tests/TestSort          \
 tests/TestUnion         \
 tests/TestUnpack
 
@@ -135,5 +136,6 @@ tests_TestPartialSum_SOURCES    = tests/TestPartialSum.C
 tests_TestRavel_SOURCES         = tests/TestRavel.C
 tests_TestRead_SOURCES          = tests/TestRead.C
 tests_TestScanAdd_SOURCES       = tests/TestScanAdd.C
+tests_TestSort_SOURCES          = tests/TestSort.C
 tests_TestUnion_SOURCES         = tests/TestUnion.C
 tests_TestUnpack_SOURCES        = tests/TestUnpack.c

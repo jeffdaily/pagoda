@@ -22,8 +22,7 @@ AS_CASE([$with_$1],
 # Check for header.
 # Add $1_CPPFLAGS to CPPFLAGS first.
 CPPFLAGS="$CPPFLAGS $$1_CPPFLAGS"
-AC_CHECK_HEADER([$2], [],
-    [AC_MSG_FAILURE([$2 is required])])
+AC_CHECK_HEADER([$2], [], [$7])
 CPPFLAGS="$gcrm_check_$1_save_CPPFLAGS"
 
 # Check for library.
@@ -40,13 +39,13 @@ AC_CACHE_CHECK([for $4 in -l$3], [gcrm_Lib],
        [AS_VAR_SET([gcrm_Lib], [yes])],
        [AS_VAR_SET([gcrm_Lib], [no])])])
 LIBS="$gcrm_check_$1_save_LIBS"
-AS_IF([test "x$gcrm_Lib" = xno],
-    [AC_MSG_FAILURE([Could not link -l$3])])
 LDFLAGS="$gcrm_check_$1_save_LDFLAGS"
-AS_VAR_POPDEF([gcrm_Lib])
 
 AC_SUBST([$1_LIBS])
 AC_SUBST([$1_LDFLAGS])
 AC_SUBST([$1_CPPFLAGS])
+
+AS_IF([test "x$gcrm_Lib" = xno], [$7], [$6])
+AS_VAR_POPDEF([gcrm_Lib])
 
 ])dnl

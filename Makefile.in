@@ -42,8 +42,8 @@ check_PROGRAMS = subsetter_old$(EXEEXT) tests/Test$(EXEEXT) \
 	tests/TestJoin$(EXEEXT) tests/TestNetcdfDataset$(EXEEXT) \
 	tests/TestOpen$(EXEEXT) tests/TestPartialSum$(EXEEXT) \
 	tests/TestRavel$(EXEEXT) tests/TestRead$(EXEEXT) \
-	tests/TestScanAdd$(EXEEXT) tests/TestUnion$(EXEEXT) \
-	tests/TestUnpack$(EXEEXT)
+	tests/TestScanAdd$(EXEEXT) tests/TestSort$(EXEEXT) \
+	tests/TestUnion$(EXEEXT) tests/TestUnpack$(EXEEXT)
 bin_PROGRAMS = subsetter$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
@@ -198,6 +198,11 @@ tests_TestScanAdd_OBJECTS = $(am_tests_TestScanAdd_OBJECTS)
 tests_TestScanAdd_LDADD = $(LDADD)
 tests_TestScanAdd_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_tests_TestSort_OBJECTS = TestSort.$(OBJEXT)
+tests_TestSort_OBJECTS = $(am_tests_TestSort_OBJECTS)
+tests_TestSort_LDADD = $(LDADD)
+tests_TestSort_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_tests_TestUnion_OBJECTS = TestUnion.$(OBJEXT)
 tests_TestUnion_OBJECTS = $(am_tests_TestUnion_OBJECTS)
 tests_TestUnion_LDADD = $(LDADD)
@@ -259,7 +264,8 @@ SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
-	$(tests_TestUnion_SOURCES) $(tests_TestUnpack_SOURCES)
+	$(tests_TestSort_SOURCES) $(tests_TestUnion_SOURCES) \
+	$(tests_TestUnpack_SOURCES)
 DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
 	$(tests_TestAttribute_SOURCES) $(tests_TestDimension_SOURCES) \
@@ -269,7 +275,8 @@ DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
-	$(tests_TestUnion_SOURCES) $(tests_TestUnpack_SOURCES)
+	$(tests_TestSort_SOURCES) $(tests_TestUnion_SOURCES) \
+	$(tests_TestUnpack_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -513,6 +520,7 @@ tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 tests_TestRavel_SOURCES = tests/TestRavel.C
 tests_TestRead_SOURCES = tests/TestRead.C
 tests_TestScanAdd_SOURCES = tests/TestScanAdd.C
+tests_TestSort_SOURCES = tests/TestSort.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
 tests_TestUnpack_SOURCES = tests/TestUnpack.c
 all: all-am
@@ -706,6 +714,9 @@ tests/TestRead$(EXEEXT): $(tests_TestRead_OBJECTS) $(tests_TestRead_DEPENDENCIES
 tests/TestScanAdd$(EXEEXT): $(tests_TestScanAdd_OBJECTS) $(tests_TestScanAdd_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestScanAdd$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestScanAdd_OBJECTS) $(tests_TestScanAdd_LDADD) $(LIBS)
+tests/TestSort$(EXEEXT): $(tests_TestSort_OBJECTS) $(tests_TestSort_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestSort$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestSort_OBJECTS) $(tests_TestSort_LDADD) $(LIBS)
 tests/TestUnion$(EXEEXT): $(tests_TestUnion_OBJECTS) $(tests_TestUnion_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestUnion$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestUnion_OBJECTS) $(tests_TestUnion_LDADD) $(LIBS)
@@ -764,6 +775,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestRead.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestScanAdd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestSort.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnpack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timing.Plo@am__quote@
@@ -1019,6 +1031,22 @@ TestScanAdd.obj: tests/TestScanAdd.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestScanAdd.C' object='TestScanAdd.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestScanAdd.obj `if test -f 'tests/TestScanAdd.C'; then $(CYGPATH_W) 'tests/TestScanAdd.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestScanAdd.C'; fi`
+
+TestSort.o: tests/TestSort.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestSort.o -MD -MP -MF $(DEPDIR)/TestSort.Tpo -c -o TestSort.o `test -f 'tests/TestSort.C' || echo '$(srcdir)/'`tests/TestSort.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestSort.Tpo $(DEPDIR)/TestSort.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestSort.C' object='TestSort.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestSort.o `test -f 'tests/TestSort.C' || echo '$(srcdir)/'`tests/TestSort.C
+
+TestSort.obj: tests/TestSort.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestSort.obj -MD -MP -MF $(DEPDIR)/TestSort.Tpo -c -o TestSort.obj `if test -f 'tests/TestSort.C'; then $(CYGPATH_W) 'tests/TestSort.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestSort.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestSort.Tpo $(DEPDIR)/TestSort.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestSort.C' object='TestSort.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestSort.obj `if test -f 'tests/TestSort.C'; then $(CYGPATH_W) 'tests/TestSort.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestSort.C'; fi`
 
 TestUnion.o: tests/TestUnion.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestUnion.o -MD -MP -MF $(DEPDIR)/TestUnion.Tpo -c -o TestUnion.o `test -f 'tests/TestUnion.C' || echo '$(srcdir)/'`tests/TestUnion.C

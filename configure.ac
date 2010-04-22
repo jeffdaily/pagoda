@@ -108,8 +108,11 @@ AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
 AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 
 # Checks for C++ libraries.
-GCRM_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [])
-GCRM_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS])
+GCRM_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
+    [AC_MSG_FAILURE([Could not locate pnetcdf])])
+GCRM_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
+    [GCRM_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize], [$FLIBS], [],
+        [AC_MSG_FAILURE([Could not locate ga5x nor ga4x])])])
 
 AC_LANG_POP([C++])
 
