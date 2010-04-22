@@ -36,14 +36,15 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = subsetter_old$(EXEEXT) tests/Test$(EXEEXT) \
-	tests/TestAttribute$(EXEEXT) tests/TestDimension$(EXEEXT) \
-	tests/TestDistance$(EXEEXT) tests/TestEnum$(EXEEXT) \
-	tests/TestGet$(EXEEXT) tests/TestLocateRegion$(EXEEXT) \
-	tests/TestJoin$(EXEEXT) tests/TestNetcdfDataset$(EXEEXT) \
-	tests/TestOpen$(EXEEXT) tests/TestPartialSum$(EXEEXT) \
-	tests/TestRavel$(EXEEXT) tests/TestRead$(EXEEXT) \
-	tests/TestScanAdd$(EXEEXT) tests/TestSort$(EXEEXT) \
-	tests/TestUnion$(EXEEXT) tests/TestUnpack$(EXEEXT)
+	tests/TestAttribute$(EXEEXT) tests/TestBin$(EXEEXT) \
+	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
+	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
+	tests/TestLocateRegion$(EXEEXT) tests/TestJoin$(EXEEXT) \
+	tests/TestNetcdfDataset$(EXEEXT) tests/TestOpen$(EXEEXT) \
+	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
+	tests/TestRead$(EXEEXT) tests/TestScanAdd$(EXEEXT) \
+	tests/TestSort$(EXEEXT) tests/TestUnion$(EXEEXT) \
+	tests/TestUnpack$(EXEEXT)
 bin_PROGRAMS = subsetter$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
@@ -132,6 +133,11 @@ tests_TestAttribute_LDADD = $(LDADD)
 tests_TestAttribute_DEPENDENCIES = libsubsetter.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
+am_tests_TestBin_OBJECTS = TestBin.$(OBJEXT)
+tests_TestBin_OBJECTS = $(am_tests_TestBin_OBJECTS)
+tests_TestBin_LDADD = $(LDADD)
+tests_TestBin_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_tests_TestDimension_OBJECTS = TestDimension.$(OBJEXT)
 tests_TestDimension_OBJECTS = $(am_tests_TestDimension_OBJECTS)
 tests_TestDimension_LDADD = $(LDADD)
@@ -257,10 +263,10 @@ am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestAttribute_SOURCES) $(tests_TestDimension_SOURCES) \
-	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
-	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
-	$(tests_TestLocateRegion_SOURCES) \
+	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
+	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
@@ -268,10 +274,10 @@ SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(tests_TestUnpack_SOURCES)
 DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestAttribute_SOURCES) $(tests_TestDimension_SOURCES) \
-	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
-	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
-	$(tests_TestLocateRegion_SOURCES) \
+	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
+	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
@@ -508,6 +514,7 @@ Variable.H
 
 tests_Test_SOURCES = tests/Test.C
 tests_TestAttribute_SOURCES = tests/TestAttribute.C
+tests_TestBin_SOURCES = tests/TestBin.C
 tests_TestDimension_SOURCES = tests/TestDimension.C
 tests_TestDistance_SOURCES = tests/TestDistance.C
 tests_TestEnum_SOURCES = tests/TestEnum.C
@@ -678,6 +685,9 @@ tests/Test$(EXEEXT): $(tests_Test_OBJECTS) $(tests_Test_DEPENDENCIES) tests/$(am
 tests/TestAttribute$(EXEEXT): $(tests_TestAttribute_OBJECTS) $(tests_TestAttribute_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestAttribute$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestAttribute_OBJECTS) $(tests_TestAttribute_LDADD) $(LIBS)
+tests/TestBin$(EXEEXT): $(tests_TestBin_OBJECTS) $(tests_TestBin_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestBin$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestBin_OBJECTS) $(tests_TestBin_LDADD) $(LIBS)
 tests/TestDimension$(EXEEXT): $(tests_TestDimension_OBJECTS) $(tests_TestDimension_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestDimension$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestDimension_OBJECTS) $(tests_TestDimension_LDADD) $(LIBS)
@@ -763,6 +773,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterMain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestAttribute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestBin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDimension.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDistance.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestEnum.Po@am__quote@
@@ -839,6 +850,22 @@ TestAttribute.obj: tests/TestAttribute.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestAttribute.C' object='TestAttribute.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute.obj `if test -f 'tests/TestAttribute.C'; then $(CYGPATH_W) 'tests/TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestAttribute.C'; fi`
+
+TestBin.o: tests/TestBin.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestBin.o -MD -MP -MF $(DEPDIR)/TestBin.Tpo -c -o TestBin.o `test -f 'tests/TestBin.C' || echo '$(srcdir)/'`tests/TestBin.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestBin.Tpo $(DEPDIR)/TestBin.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestBin.C' object='TestBin.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestBin.o `test -f 'tests/TestBin.C' || echo '$(srcdir)/'`tests/TestBin.C
+
+TestBin.obj: tests/TestBin.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestBin.obj -MD -MP -MF $(DEPDIR)/TestBin.Tpo -c -o TestBin.obj `if test -f 'tests/TestBin.C'; then $(CYGPATH_W) 'tests/TestBin.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestBin.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestBin.Tpo $(DEPDIR)/TestBin.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestBin.C' object='TestBin.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestBin.obj `if test -f 'tests/TestBin.C'; then $(CYGPATH_W) 'tests/TestBin.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestBin.C'; fi`
 
 TestDimension.o: tests/TestDimension.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestDimension.o -MD -MP -MF $(DEPDIR)/TestDimension.Tpo -c -o TestDimension.o `test -f 'tests/TestDimension.C' || echo '$(srcdir)/'`tests/TestDimension.C

@@ -106,6 +106,7 @@ Variable.H
 check_PROGRAMS +=       \
 tests/Test              \
 tests/TestAttribute     \
+tests/TestBin           \
 tests/TestDimension     \
 tests/TestDistance      \
 tests/TestEnum          \
@@ -124,6 +125,7 @@ tests/TestUnpack
 
 tests_Test_SOURCES              = tests/Test.C
 tests_TestAttribute_SOURCES     = tests/TestAttribute.C
+tests_TestBin_SOURCES           = tests/TestBin.C
 tests_TestDimension_SOURCES     = tests/TestDimension.C
 tests_TestDistance_SOURCES      = tests/TestDistance.C
 tests_TestEnum_SOURCES          = tests/TestEnum.C
