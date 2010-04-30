@@ -43,11 +43,124 @@ using std::vector;
 typedef pair<float,float> bin_index_t;
 typedef map<bin_index_t,vector<float> > bin_t;
 
-static inline void check(int err) {
+
+static inline void check(int err)
+{
     if (MPI_SUCCESS != err) {
         GA_Error("MPI call failed", err);
     }
 }
+
+
+static inline void read_data(int g_a, int ncid, int varid)
+{
+    int me = GA_Nodeid();
+    int64_t lo;
+    int64_t hi;
+    MPI_Offset start;
+    MPI_Offset count;
+    float *data=NULL;
+
+    NGA_Distribution64(g_a, me, &lo, &hi);
+
+    if (0 > lo && 0 > hi) {
+        start = 0;
+        count = 0;
+        ncmpi::get_vara_all(ncid, varid, &start, &count, data);
+    } else {
+        start = lo;
+        count = hi-lo+1;
+        NGA_Access64(g_a, &lo, &hi, &data, NULL);
+        ncmpi::get_vara_all(ncid, varid, &start, &count, data);
+        NGA_Release_update64(g_a, &lo, &hi);
+    }
+}
+
+
+// Open the source file.  Create g_a's to hold lat/lons.
+static inline int create_array_and_read(int ncid, char *name)
+{
+    int varid;
+    int dimid;
+    MPI_Offset dimlen;
+    int64_t shape;
+    int g_a;
+
+    ncmpi::inq_varid(ncid, name, &varid);
+    ncmpi::inq_vardimid(ncid, varid, &dimid);
+    ncmpi::inq_dimlen(ncid, dimid, &dimlen);
+    shape = dimlen;
+    g_a = NGA_Create64(C_FLOAT, 1, &shape, name, NULL);
+    read_data(g_a, ncid, varid);
+
+    return g_a;
+}
+
+
+static inline int calc_extents_minmax(int g_lat)
+{
+    int me = GA_Nodeid();
+    int64_t nbins = 1000; // arbitrary
+    float lat_min;
+    float lat_max;
+    int64_t lat_min_idx;
+    int64_t lat_max_idx;
+    float diff;
+    float portion;
+    int g_extents;
+    int64_t bin_lo;
+    int64_t bin_hi;
+    int64_t bin_extents_lo[2];
+    int64_t bin_extents_hi[2];
+    int64_t bin_extents_dims[2] = {nbins,2};
+    int64_t bin_extents_chunk[2] = {0,2};
+    float *bin_extents;
+    int64_t bin_extents_ld;
+
+    // Create bin extents g_a.
+    // Procs might want to know the bin ranges owned by other procs.
+    g_extents = NGA_Create64(C_FLOAT, 2, bin_extents_dims,
+            "bin_extents", bin_extents_chunk);
+    NGA_Distribution64(g_extents, me, bin_extents_lo, bin_extents_hi);
+    bin_lo = bin_extents_lo[0];
+    bin_hi = bin_extents_hi[0];
+    PRINT_SYNC("bin_extents lo,hi = {%ld,%ld},{%ld,%ld}\n", bin_lo, bin_hi,
+            bin_extents_hi[0], bin_extents_hi[1]);
+
+    NGA_Select_elem64(g_lat, "min", &lat_min, &lat_min_idx);
+    NGA_Select_elem64(g_lat, "max", &lat_max, &lat_max_idx);
+
+    // Determine bin extents.  Currently the range for each bin is uniform.
+    diff = fabs(lat_max-lat_min);
+    portion = diff/nbins;
+    PRINT_ZERO("    min=%f, idx=%ld\n", lat_min, lat_min_idx);
+    PRINT_ZERO("    max=%f, idx=%ld\n", lat_max, lat_max_idx);
+    PRINT_ZERO("   diff=%f\n", diff);
+    PRINT_ZERO("portion=%f\n", portion);
+    PRINT_SYNC("bin lo,hi=%ld,%ld\n", bin_lo, bin_hi);
+    PRINT_SYNC("range=[%f,%f)\n",
+            lat_min+bin_lo*portion, lat_min+(bin_hi+1)*portion);
+    // Put bin extents into g_extents in case other procs need the info.
+    if (0 > bin_lo && 0 > bin_hi) {
+        // nothing to do
+        PRINT_SYNC("bin_extents_ld=NONE\n");
+    } else {
+        NGA_Access64(g_extents, bin_extents_lo, bin_extents_hi,
+                &bin_extents, &bin_extents_ld);
+        PRINT_SYNC("bin_extents_ld={%ld}\n", bin_extents_ld);
+        for (int64_t binidx=bin_lo;
+                binidx<=bin_hi; ++binidx) {
+            *bin_extents = binidx*portion + lat_min;
+            ++bin_extents;
+            *bin_extents = (binidx+1)*portion + lat_min;
+            ++bin_extents;
+        }
+        NGA_Release_update64(g_extents, bin_extents_lo, bin_extents_hi);
+    }
+
+    return g_extents;
+}
+
 
 static inline void do_bin(
         bin_t &bin_lat, bin_t &bin_lon, float *extents, int64_t nbins,
@@ -89,89 +202,40 @@ static inline void do_bin(
     }
 }
 
-int main(int argc, char **argv)
+
+static inline void bin(
+        bin_t &bin_lat, bin_t &bin_lon,
+        int g_lat, int g_lon, int g_extents)
 {
-    int me = -1;
-    int nproc = -1;
-    int64_t nbins = 1000; // arbitrary
-    char *name_lat = "grid_center_lat";
-    char *name_lon = "grid_center_lon";
-    int src_ncid = 0;
-    int src_varid_lat = 0;
-    int src_varid_lon = 0;
-    int src_dimid_ctr = 0;
-    int64_t src_shape = 0;
-    int64_t src_lo = 0;
-    int64_t src_hi = 0;
-    MPI_Offset src_dimlen = 0;
-    MPI_Offset src_start = 0;
-    MPI_Offset src_count = 0;
-    int g_src_lat = 0;
-    int g_src_lon = 0;
-    float *src_lat = NULL;
-    float *src_lon = NULL;
-    float lat_min = 0;
-    float lat_max = 0;
-    int64_t lat_min_idx = 0;
-    int64_t lat_max_idx = 0;
-    float diff;
-    float portion;
-    bin_t bin_lat;
-    bin_t bin_lon;
-    int g_bin_extents = 0;
-    int64_t bin_extents_lo[2];
-    int64_t bin_extents_hi[2];
-    int64_t bin_extents_dims[2] = {nbins,2};
-    int64_t bin_extents_chunk[2] = {0,2};
-    float *bin_extents;
-    int64_t bin_extents_ld;
-    int64_t bin_lo = 0;
-    int64_t bin_hi = 0;
+    int me = GA_Nodeid();
+    int nproc = GA_Nnodes();
+    int64_t lo;
+    int64_t hi;
+    int64_t limit;
+    float *lat;
+    float *lon;
+    float *extents;
+    int64_t buffsize;
+    int64_t extents_lo[2];
+    int64_t extents_hi[2];
+    int64_t extents_ld;
+    int64_t bin_lo;
+    int64_t bin_hi;
+    int64_t nbins;
     vector<float> skipped_lat;
     vector<float> skipped_lon;
     float *received_lat;
     float *received_lon;
     int received_lat_count;
     int received_lon_count;
-    long buffsize = 0;
 
-    MPI_Init(&argc, &argv);
-    GA_Initialize();
-
-    me = GA_Nodeid();
-    nproc = GA_Nnodes();
-
-    if (2 != argc) {
-        PRINT_ZERO("Usage: TestSort <filename>\n");
-        for (int i=0; i<argc; ++i) {
-            PRINT_ZERO("argv[%d]=%s\n", i, argv[i]);
-        }
-        return 1;
-    }
-
-    // Create bin extents g_a.
-    // Procs might want to know the bin ranges owned by other procs.
-    g_bin_extents = NGA_Create64(C_FLOAT, 2, bin_extents_dims,
-            "bin_extents", bin_extents_chunk);
-    NGA_Distribution64(g_bin_extents, me, bin_extents_lo, bin_extents_hi);
-    bin_lo = bin_extents_lo[0];
-    bin_hi = bin_extents_hi[0];
-    PRINT_SYNC("bin_extents lo,hi = {%ld,%ld},{%ld,%ld}\n",
-            bin_extents_lo[0], bin_extents_lo[1],
-            bin_extents_hi[0], bin_extents_hi[1]);
-
-    // Open the input file.  Create g_a's to hold lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &src_ncid);
-    ncmpi::inq_varid(src_ncid, name_lat, &src_varid_lat);
-    ncmpi::inq_varid(src_ncid, name_lon, &src_varid_lon);
-    ncmpi::inq_vardimid(src_ncid, src_varid_lat, &src_dimid_ctr);
-    ncmpi::inq_dimlen(src_ncid, src_dimid_ctr, &src_dimlen);
-    src_shape = src_dimlen;
-    g_src_lat = NGA_Create64(C_FLOAT, 1, &src_shape, "lat", NULL);
-    g_src_lon = NGA_Create64(C_FLOAT, 1, &src_shape, "lon", NULL);
-    // Determine size of largest buffer used to pass lat/lon data around.
-    NGA_Distribution64(g_src_lat, me, &src_lo, &src_hi);
-    buffsize = src_hi-src_lo+1;
+    NGA_Distribution64(g_lat, me, &lo, &hi);
+    NGA_Distribution64(g_extents, me, extents_lo, extents_hi);
+    bin_lo = extents_lo[0];
+    bin_hi = extents_hi[0];
+    nbins = bin_hi-bin_lo+1;
+    limit = hi-lo+1;
+    buffsize = limit;
     GA_Lgop(&buffsize, 1, "max");
     PRINT_ZERO("buffsize=%ld\n", buffsize);
     skipped_lat.reserve(buffsize);
@@ -179,82 +243,27 @@ int main(int argc, char **argv)
     received_lat = new float[buffsize];
     received_lon = new float[buffsize];
 
-    // Read in src lat,lon.
-    if (0 > src_lo && 0 > src_hi) {
-        src_start = 0;
-        src_count = 0;
-        ncmpi::get_vara_all(src_ncid, src_varid_lat,
-                &src_start, &src_count, src_lat);
-        ncmpi::get_vara_all(src_ncid, src_varid_lon,
-                &src_start, &src_count, src_lon);
-    } else {
-        src_start = src_lo;
-        src_count = src_hi-src_lo+1;
-        NGA_Access64(g_src_lat, &src_lo, &src_hi, &src_lat, NULL);
-        NGA_Access64(g_src_lon, &src_lo, &src_hi, &src_lon, NULL);
-        ncmpi::get_vara_all(src_ncid, src_varid_lat,
-                &src_start, &src_count, src_lat);
-        ncmpi::get_vara_all(src_ncid, src_varid_lon,
-                &src_start, &src_count, src_lon);
-        NGA_Release_update64(g_src_lat, &src_lo, &src_hi);
-        NGA_Release_update64(g_src_lon, &src_lo, &src_hi);
-    }
-
-    NGA_Select_elem64(g_src_lat, "min", &lat_min, &lat_min_idx);
-    NGA_Select_elem64(g_src_lat, "max", &lat_max, &lat_max_idx);
-
-    // Determine bin extents.  Currently the range for each bin is uniform.
-    diff = fabs(lat_max-lat_min);
-    portion = diff/nbins;
-    PRINT_ZERO("    min=%f, idx=%ld\n", lat_min, lat_min_idx);
-    PRINT_ZERO("    max=%f, idx=%ld\n", lat_max, lat_max_idx);
-    PRINT_ZERO("   diff=%f\n", diff);
-    PRINT_ZERO("portion=%f\n", portion);
-    PRINT_SYNC("src lo,hi=%ld,%ld\n", src_lo, src_hi);
-    PRINT_SYNC("bin lo,hi=%ld,%ld\n", bin_lo, bin_hi);
-    PRINT_SYNC("range=[%f,%f)\n",
-            lat_min+bin_lo*portion, lat_min+(bin_hi+1)*portion);
-    // Put bin extents into g_bin_extents in case other procs need the info.
-    if (0 > bin_lo && 0 > bin_hi) {
-        // nothing to do
-        PRINT_SYNC("bin_extents_ld=NONE\n");
-    } else {
-        NGA_Access64(g_bin_extents, bin_extents_lo, bin_extents_hi,
-                &bin_extents, &bin_extents_ld);
-        PRINT_SYNC("bin_extents_ld={%ld}\n", bin_extents_ld);
-        for (int64_t binidx=bin_lo;
-                binidx<=bin_hi; ++binidx) {
-            *bin_extents = binidx*portion + lat_min;
-            ++bin_extents;
-            *bin_extents = (binidx+1)*portion + lat_min;
-            ++bin_extents;
-        }
-        NGA_Release_update64(g_bin_extents, bin_extents_lo, bin_extents_hi);
-    }
-
     // First, iterate over the data we own and bin it if it belongs here.
-    if (0 > src_lo && 0 > src_hi) {
+    if (0 > lo && 0 > hi) {
         // nothing to do
     } else {
-        NGA_Access64(g_src_lat, &src_lo, &src_hi, &src_lat, NULL);
-        NGA_Access64(g_src_lon, &src_lo, &src_hi, &src_lon, NULL);
-        int64_t limit = src_hi-src_lo+1;
+        NGA_Access64(g_lat, &lo, &hi, &lat, NULL);
+        NGA_Access64(g_lon, &lo, &hi, &lon, NULL);
         // It's possible to own data but not own any bins.
         if (0 > bin_lo && 0 > bin_hi) {
             // own data, but no bin extents
             // All data is "skipped".
-            skipped_lat.assign(src_lat,src_lat+limit);
-            skipped_lon.assign(src_lon,src_lon+limit);
+            skipped_lat.assign(lat,lat+limit);
+            skipped_lon.assign(lon,lon+limit);
         } else {
-            NGA_Access64(g_bin_extents, bin_extents_lo, bin_extents_hi,
-                    &bin_extents, &bin_extents_ld);
-            int64_t nbins = bin_hi-bin_lo+1;
-            do_bin(bin_lat, bin_lon, bin_extents, nbins,
-                    src_lat, src_lon, limit, skipped_lat, skipped_lon);
-            NGA_Release_update64(g_bin_extents, bin_extents_lo, bin_extents_hi);
+            NGA_Access64(g_extents, extents_lo, extents_hi,
+                    &extents, &extents_ld);
+            do_bin(bin_lat, bin_lon, extents, nbins,
+                    lat, lon, limit, skipped_lat, skipped_lon);
+            NGA_Release_update64(g_extents, extents_lo, extents_hi);
         }
-        NGA_Release_update64(g_src_lat, &src_lo, &src_hi);
-        NGA_Release_update64(g_src_lon, &src_lo, &src_hi);
+        NGA_Release_update64(g_lat, &lo, &hi);
+        NGA_Release_update64(g_lon, &lo, &hi);
     }
     PRINT_SYNC("bin_lat.size()=%lu\n", (long unsigned)bin_lat.size());
 
@@ -297,27 +306,86 @@ int main(int argc, char **argv)
             skipped_lat.assign(received_lat,received_lat+received_lat_count);
             skipped_lon.assign(received_lon,received_lon+received_lon_count);
         } else {
-            NGA_Access64(g_bin_extents, bin_extents_lo, bin_extents_hi,
-                    &bin_extents, &bin_extents_ld);
-            int64_t nbins = bin_hi-bin_lo+1;
-            do_bin(bin_lat, bin_lon, bin_extents, nbins,
+            NGA_Access64(g_extents, extents_lo, extents_hi,
+                    &extents, &extents_ld);
+            do_bin(bin_lat, bin_lon, extents, nbins,
                     received_lat, received_lon, received_lat_count,
                     skipped_lat, skipped_lon);
-            NGA_Release_update64(g_bin_extents, bin_extents_lo, bin_extents_hi);
+            NGA_Release_update64(g_extents, extents_lo, extents_hi);
         }
     }
+    delete [] received_lat;
+    delete [] received_lon;
+}
 
-    PRINT_SYNC("bin_lat.size()=%lu\n", (long unsigned)bin_lat.size());
+int main(int argc, char **argv)
+{
+    int me = -1;
+    int nproc = -1;
+    char *name_lat = "grid_center_lat";
+    char *name_lon = "grid_center_lon";
+
+    int src_ncid = 0;
+    int64_t src_lo = 0;
+    int64_t src_hi = 0;
+    int g_src_lat = 0;
+    int g_src_lon = 0;
+
+    int dst_ncid = 0;
+    int64_t dst_lo = 0;
+    int64_t dst_hi = 0;
+    int g_dst_lat = 0;
+    int g_dst_lon = 0;
+
+    bin_t src_bin_lat;
+    bin_t src_bin_lon;
+    bin_t dst_bin_lat;
+    bin_t dst_bin_lon;
+    int g_bin_extents = 0;
+
+    MPI_Init(&argc, &argv);
+    GA_Initialize();
+
+    me = GA_Nodeid();
+    nproc = GA_Nnodes();
+
+    if (3 != argc) {
+        PRINT_ZERO("Usage: TestSort <source grid> <dest grid>\n");
+        for (int i=0; i<argc; ++i) {
+            PRINT_ZERO("argv[%d]=%s\n", i, argv[i]);
+        }
+        return 1;
+    }
+
+    // Open the source file.  Create g_a's and read lat/lons.
+    ncmpi::open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &src_ncid);
+    g_src_lat = create_array_and_read(src_ncid, name_lat);
+    g_src_lon = create_array_and_read(src_ncid, name_lon);
+    NGA_Distribution64(g_src_lat, me, &src_lo, &src_hi);
+
+    // Open the destination file.  Create g_a's and read lat/lons.
+    ncmpi::open(MPI_COMM_WORLD, argv[2], NC_NOWRITE, MPI_INFO_NULL, &dst_ncid);
+    g_dst_lat = create_array_and_read(dst_ncid, name_lat);
+    g_dst_lon = create_array_and_read(dst_ncid, name_lon);
+    NGA_Distribution64(g_dst_lat, me, &dst_lo, &dst_hi);
+
+    g_bin_extents = calc_extents_minmax(g_src_lat);
+
+    bin(src_bin_lat, src_bin_lon, g_src_lat, g_src_lon, g_bin_extents);
+    bin(dst_bin_lat, dst_bin_lon, g_dst_lat, g_dst_lon, g_bin_extents);
+
+    PRINT_SYNC("src_bin_lat.size()=%lu\n", (long unsigned)src_bin_lat.size());
 
     long unsigned points = 0;
     bin_t::iterator it,end;
-    for (it=bin_lat.begin(),end=bin_lat.end(); it!=end; ++it) {
+    for (it=src_bin_lat.begin(),end=src_bin_lat.end(); it!=end; ++it) {
         points += it->second.size();
     }
     PRINT_SYNC("points=%lu\n", points);
 
     // Cleanup.
     ncmpi::close(src_ncid);
+    ncmpi::close(dst_ncid);
 
     GA_Terminate();
     MPI_Finalize();
