@@ -44,7 +44,94 @@ typedef pair<float,float> bin_index_t;
 typedef map<bin_index_t,vector<float> > bin_t;
 
 
-static inline void check(int err)
+static void check(int err);
+static void read_data(int g_a, int ncid, int varid);
+static int create_array_and_read(int ncid, char *name);
+static int calc_extents_minmax(int g_lat);
+static void do_bin(
+        bin_t &bin_lat, bin_t &bin_lon, float *extents, int64_t nbins,
+        float *lat, float *lon, int n,
+        vector<float> &skipped_lat, vector<float> &skipped_lon);
+static void bin(
+        bin_t &bin_lat, bin_t &bin_lon,
+        int g_lat, int g_lon, int g_extents);
+
+
+int main(int argc, char **argv)
+{
+    int me = -1;
+    int nproc = -1;
+    char *name_lat = "grid_center_lat";
+    char *name_lon = "grid_center_lon";
+
+    int src_ncid = 0;
+    int64_t src_lo = 0;
+    int64_t src_hi = 0;
+    int g_src_lat = 0;
+    int g_src_lon = 0;
+
+    int dst_ncid = 0;
+    int64_t dst_lo = 0;
+    int64_t dst_hi = 0;
+    int g_dst_lat = 0;
+    int g_dst_lon = 0;
+
+    bin_t src_bin_lat;
+    bin_t src_bin_lon;
+    bin_t dst_bin_lat;
+    bin_t dst_bin_lon;
+    int g_bin_extents = 0;
+
+    MPI_Init(&argc, &argv);
+    GA_Initialize();
+
+    me = GA_Nodeid();
+    nproc = GA_Nnodes();
+
+    if (3 != argc) {
+        PRINT_ZERO("Usage: TestSort <source grid> <dest grid>\n");
+        for (int i=0; i<argc; ++i) {
+            PRINT_ZERO("argv[%d]=%s\n", i, argv[i]);
+        }
+        return 1;
+    }
+
+    // Open the source file.  Create g_a's and read lat/lons.
+    ncmpi::open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &src_ncid);
+    g_src_lat = create_array_and_read(src_ncid, name_lat);
+    g_src_lon = create_array_and_read(src_ncid, name_lon);
+    NGA_Distribution64(g_src_lat, me, &src_lo, &src_hi);
+
+    // Open the destination file.  Create g_a's and read lat/lons.
+    ncmpi::open(MPI_COMM_WORLD, argv[2], NC_NOWRITE, MPI_INFO_NULL, &dst_ncid);
+    g_dst_lat = create_array_and_read(dst_ncid, name_lat);
+    g_dst_lon = create_array_and_read(dst_ncid, name_lon);
+    NGA_Distribution64(g_dst_lat, me, &dst_lo, &dst_hi);
+
+    g_bin_extents = calc_extents_minmax(g_src_lat);
+
+    bin(src_bin_lat, src_bin_lon, g_src_lat, g_src_lon, g_bin_extents);
+    bin(dst_bin_lat, dst_bin_lon, g_dst_lat, g_dst_lon, g_bin_extents);
+
+    PRINT_SYNC("src_bin_lat.size()=%lu\n", (long unsigned)src_bin_lat.size());
+
+    long unsigned points = 0;
+    bin_t::iterator it,end;
+    for (it=src_bin_lat.begin(),end=src_bin_lat.end(); it!=end; ++it) {
+        points += it->second.size();
+    }
+    PRINT_SYNC("points=%lu\n", points);
+
+    // Cleanup.
+    ncmpi::close(src_ncid);
+    ncmpi::close(dst_ncid);
+
+    GA_Terminate();
+    MPI_Finalize();
+}
+
+
+static void check(int err)
 {
     if (MPI_SUCCESS != err) {
         GA_Error("MPI call failed", err);
@@ -52,7 +139,7 @@ static inline void check(int err)
 }
 
 
-static inline void read_data(int g_a, int ncid, int varid)
+static void read_data(int g_a, int ncid, int varid)
 {
     int me = GA_Nodeid();
     int64_t lo;
@@ -78,7 +165,7 @@ static inline void read_data(int g_a, int ncid, int varid)
 
 
 // Open the source file.  Create g_a's to hold lat/lons.
-static inline int create_array_and_read(int ncid, char *name)
+static int create_array_and_read(int ncid, char *name)
 {
     int varid;
     int dimid;
@@ -97,7 +184,7 @@ static inline int create_array_and_read(int ncid, char *name)
 }
 
 
-static inline int calc_extents_minmax(int g_lat)
+static int calc_extents_minmax(int g_lat)
 {
     int me = GA_Nodeid();
     int64_t nbins = 1000; // arbitrary
@@ -162,7 +249,7 @@ static inline int calc_extents_minmax(int g_lat)
 }
 
 
-static inline void do_bin(
+static void do_bin(
         bin_t &bin_lat, bin_t &bin_lon, float *extents, int64_t nbins,
         float *lat, float *lon, int n,
         vector<float> &skipped_lat, vector<float> &skipped_lon)
@@ -203,7 +290,7 @@ static inline void do_bin(
 }
 
 
-static inline void bin(
+static void bin(
         bin_t &bin_lat, bin_t &bin_lon,
         int g_lat, int g_lon, int g_extents)
 {
@@ -318,75 +405,3 @@ static inline void bin(
     delete [] received_lon;
 }
 
-int main(int argc, char **argv)
-{
-    int me = -1;
-    int nproc = -1;
-    char *name_lat = "grid_center_lat";
-    char *name_lon = "grid_center_lon";
-
-    int src_ncid = 0;
-    int64_t src_lo = 0;
-    int64_t src_hi = 0;
-    int g_src_lat = 0;
-    int g_src_lon = 0;
-
-    int dst_ncid = 0;
-    int64_t dst_lo = 0;
-    int64_t dst_hi = 0;
-    int g_dst_lat = 0;
-    int g_dst_lon = 0;
-
-    bin_t src_bin_lat;
-    bin_t src_bin_lon;
-    bin_t dst_bin_lat;
-    bin_t dst_bin_lon;
-    int g_bin_extents = 0;
-
-    MPI_Init(&argc, &argv);
-    GA_Initialize();
-
-    me = GA_Nodeid();
-    nproc = GA_Nnodes();
-
-    if (3 != argc) {
-        PRINT_ZERO("Usage: TestSort <source grid> <dest grid>\n");
-        for (int i=0; i<argc; ++i) {
-            PRINT_ZERO("argv[%d]=%s\n", i, argv[i]);
-        }
-        return 1;
-    }
-
-    // Open the source file.  Create g_a's and read lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &src_ncid);
-    g_src_lat = create_array_and_read(src_ncid, name_lat);
-    g_src_lon = create_array_and_read(src_ncid, name_lon);
-    NGA_Distribution64(g_src_lat, me, &src_lo, &src_hi);
-
-    // Open the destination file.  Create g_a's and read lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, argv[2], NC_NOWRITE, MPI_INFO_NULL, &dst_ncid);
-    g_dst_lat = create_array_and_read(dst_ncid, name_lat);
-    g_dst_lon = create_array_and_read(dst_ncid, name_lon);
-    NGA_Distribution64(g_dst_lat, me, &dst_lo, &dst_hi);
-
-    g_bin_extents = calc_extents_minmax(g_src_lat);
-
-    bin(src_bin_lat, src_bin_lon, g_src_lat, g_src_lon, g_bin_extents);
-    bin(dst_bin_lat, dst_bin_lon, g_dst_lat, g_dst_lon, g_bin_extents);
-
-    PRINT_SYNC("src_bin_lat.size()=%lu\n", (long unsigned)src_bin_lat.size());
-
-    long unsigned points = 0;
-    bin_t::iterator it,end;
-    for (it=src_bin_lat.begin(),end=src_bin_lat.end(); it!=end; ++it) {
-        points += it->second.size();
-    }
-    PRINT_SYNC("points=%lu\n", points);
-
-    // Cleanup.
-    ncmpi::close(src_ncid);
-    ncmpi::close(dst_ncid);
-
-    GA_Terminate();
-    MPI_Finalize();
-}
