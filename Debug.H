@@ -7,6 +7,8 @@
 
 using std::string;
 
+#define TAG_DEBUG 33284
+
 void print_zero(const char *fmt, ...);
 void print_zero(const string &str);
 void print_zero_dummy(const char *fmt, ...);

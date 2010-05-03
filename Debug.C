@@ -93,9 +93,11 @@ void print_sync(const string &str)
             int count;
             char *msg;
            
-            MPI_Recv(&count, 1, MPI_INT, proc, 1, MPI_COMM_WORLD, &stat);
+            MPI_Recv(&count, 1, MPI_INT, proc, TAG_DEBUG, MPI_COMM_WORLD,
+                    &stat);
             msg = new char[count];
-            MPI_Recv(msg, count, MPI_CHAR, proc, 1, MPI_COMM_WORLD, &stat);
+            MPI_Recv(msg, count, MPI_CHAR, proc, TAG_DEBUG, MPI_COMM_WORLD,
+                    &stat);
             fprintf(stderr, "[%*d] ", get_precision(), proc);
             fprintf(stderr, msg);
             delete [] msg;
@@ -104,7 +106,8 @@ void print_sync(const string &str)
     } else {
         int count = str.size() + 1;
        
-        MPI_Send(&count, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-        MPI_Send((void*)str.c_str(), count, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&count, 1, MPI_INT, 0, TAG_DEBUG, MPI_COMM_WORLD);
+        MPI_Send((void*)str.c_str(), count, MPI_CHAR, 0, TAG_DEBUG,
+                MPI_COMM_WORLD);
     }
 }
