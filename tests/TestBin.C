@@ -97,7 +97,7 @@ const bool operator< (const LatLonIdx &ths, const LatLonIdx &that)
     return ths.lat < that.lat;
 }
 static long max(const long &a, const size_t&b) {
-    return (b<a)?a:(long)b;
+    return ((long)b<a)?a:(long)b;
 }
 
 typedef pair<float,float> bin_index_t;
@@ -106,8 +106,8 @@ MPI_Datatype LatLonIdxType;
 
 static void create_type();
 static void check(int err);
-static void read_data(int g_a, int ncid, int varid);
-static int create_array_and_read(int ncid, char *name);
+static void read_data(int g_a, int ncid, int varid, bool first_only=false);
+static int create_array_and_read(int ncid, char *name, bool first_only=false);
 static int calc_extents_minmax(int g_lat);
 static void bin_latitudes_create(bin_t &bin, float *extents, int64_t nbins);
 static void bin_latitudes_worker(bin_t &bin, float *extents, int64_t nbins,
@@ -120,6 +120,8 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents);
 static void calc_weights(int g_weights, int g_indices,
         const bin_t &src_bin, const bin_t &dst_bin, int n);
 static float calc_distance(const LatLonIdx &src, const LatLonIdx &dst);
+static int interpolate(int g_data, int g_weights, int g_indices);
+static void write_results(int g_results, int ncid_orig);
 
 
 int main(int argc, char **argv)
@@ -141,6 +143,10 @@ int main(int argc, char **argv)
     int g_dst_lat = 0;
     int g_dst_lon = 0;
 
+    int data_ncid = 0;
+    int g_data = 0;
+    int g_results = 0;
+
     bin_t src_bin;
     bin_t dst_bin;
     int g_bin_extents = 0;
@@ -154,16 +160,10 @@ int main(int argc, char **argv)
     float NEG_ONE_F = -1;
     int NEG_ONE_I = -1;
 
-    string usage=
-"Usage: TestBin [options] source dest variable\n"
-"Allowed options:\n"
-"\n"
-"  -s (source grid)           use if source file requires external grid\n"
-"  -d (dest grid)             use if source file requires external grid\n";
-    string filename_source_grid;
-    string filename_source;
-    string filename_dest_grid;
-    string filename_dest;
+    string usage= "Usage: TestBin sourcegrid destgrid datafile variable\n";
+    string filename_grid_source;
+    string filename_grid_destination;
+    string filename_data;
     string variable_name;
     bool perform_ghost_exchange = false;
     int c;
@@ -175,14 +175,8 @@ int main(int argc, char **argv)
     nproc = GA_Nnodes();
 
     opterr = 0;
-    while ((c = getopt(argc,argv, "s:d:g")) != -1) {
+    while ((c = getopt(argc,argv, "g")) != -1) {
         switch (c) {
-            case 's':
-                filename_source_grid = optarg;
-                break;
-            case 'd':
-                filename_dest_grid = optarg;
-                break;
             case 'g':
                 perform_ghost_exchange = true;
                 break;
@@ -195,44 +189,43 @@ int main(int argc, char **argv)
     }
 
     if (optind == argc) {
-        PRINT_ZERO("ERROR: source data required\n");
+        PRINT_ZERO("ERROR: source grid required\n");
         PRINT_ZERO(usage);
         return 1;
     } else if (optind+1 == argc) {
-        PRINT_ZERO("ERROR: dest data required\n");
+        PRINT_ZERO("ERROR: destination grid required\n");
         PRINT_ZERO(usage);
         return 1;
     } else if (optind+2 == argc) {
-        PRINT_ZERO("ERROR: variable name required\n");
+        PRINT_ZERO("ERROR: data file required\n");
         PRINT_ZERO(usage);
         return 1;
     } else if (optind+3 == argc) {
-        filename_source = argv[optind];
-        filename_dest = argv[optind+1];
-        variable_name = argv[optind+2];
+        PRINT_ZERO("ERROR: variable name required\n");
+        PRINT_ZERO(usage);
+        return 1;
+    } else if (optind+4 == argc) {
+        filename_grid_source = argv[optind];
+        filename_grid_destination = argv[optind+1];
+        filename_data = argv[optind+2];
+        variable_name = argv[optind+3];
     } else {
         PRINT_ZERO("ERROR: too many positional arguments\n");
         PRINT_ZERO(usage);
         return 1;
     }
 
-    if (filename_source_grid.empty()) {
-        filename_source_grid = filename_source;
-    }
-    if (filename_dest_grid.empty()) {
-        filename_dest_grid = filename_dest;
-    }
     create_type();
 
-    // Open the source file.  Create g_a's and read lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, filename_source_grid.c_str(), NC_NOWRITE,
+    // Open the source grid file.  Create g_a's and read lat/lons.
+    ncmpi::open(MPI_COMM_WORLD, filename_grid_source.c_str(), NC_NOWRITE,
             MPI_INFO_NULL, &src_ncid);
     g_src_lat = create_array_and_read(src_ncid, name_lat);
     g_src_lon = create_array_and_read(src_ncid, name_lon);
     NGA_Distribution64(g_src_lat, me, &src_lo, &src_hi);
 
-    // Open the destination file.  Create g_a's and read lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, filename_dest_grid.c_str(), NC_NOWRITE,
+    // Open the destination grid file.  Create g_a's and read lat/lons.
+    ncmpi::open(MPI_COMM_WORLD, filename_grid_destination.c_str(), NC_NOWRITE,
             MPI_INFO_NULL, &dst_ncid);
     g_dst_lat = create_array_and_read(dst_ncid, name_lat);
     g_dst_lon = create_array_and_read(dst_ncid, name_lon);
@@ -246,7 +239,7 @@ int main(int argc, char **argv)
 
     bin_sort(src_bin);
     bin_sort(dst_bin);
-    PRINT_SYNC("finished sorting\n");
+    PRINT_ZERO("finished sorting\n");
 
     long unsigned points = 0;
     bin_t::iterator it,end;
@@ -258,7 +251,7 @@ int main(int argc, char **argv)
     if (perform_ghost_exchange) {
         long unsigned points_after = 0;
         bin_ghost_exchange(src_bin, g_bin_extents);
-        PRINT_SYNC("finished bin ghost exchange\n");
+        PRINT_ZERO("finished bin ghost exchange\n");
         for (it=src_bin.begin(),end=src_bin.end(); it!=end; ++it) {
             points_after += it->second.size();
         }
@@ -279,12 +272,22 @@ int main(int argc, char **argv)
     GA_Fill(g_indices, &NEG_ONE_I);
     calc_weights(g_weights, g_indices, src_bin, dst_bin, N);
 
-    // verify the weights (and indices? TODO) we computed
+    // verify the weights and indices we computed
+    ncmpi::open(MPI_COMM_WORLD, filename_data.c_str(), NC_NOWRITE,
+            MPI_INFO_NULL, &data_ncid);
+    g_data = create_array_and_read(data_ncid, (char*)variable_name.c_str(), true);
 
+    g_results = interpolate(g_data, g_weights, g_indices);
 
+    // write the results to a file!
+    PRINT_ZERO("before write_results\n");
+    write_results(g_results, data_ncid);
+
+    PRINT_ZERO("before cleanup\n");
     // Cleanup.
     ncmpi::close(src_ncid);
     ncmpi::close(dst_ncid);
+    ncmpi::close(data_ncid);
 
     GA_Terminate();
     MPI_Finalize();
@@ -317,46 +320,74 @@ static void check(int err)
 }
 
 
-static void read_data(int g_a, int ncid, int varid)
+static void read_data(int g_a, int ncid, int varid, bool first_only)
 {
     int me = GA_Nodeid();
-    int64_t lo;
-    int64_t hi;
-    MPI_Offset start;
-    MPI_Offset count;
+    int ndims;
+    int64_t lo[NC_MAX_VAR_DIMS];
+    int64_t hi[NC_MAX_VAR_DIMS];
+    int64_t ld[NC_MAX_VAR_DIMS];
+    MPI_Offset start[NC_MAX_VAR_DIMS];
+    MPI_Offset count[NC_MAX_VAR_DIMS];
     float *data=NULL;
 
-    NGA_Distribution64(g_a, me, &lo, &hi);
+    ncmpi::inq_varndims(ncid, varid, &ndims);
+    NGA_Distribution64(g_a, me, lo, hi);
 
     if (0 > lo && 0 > hi) {
-        start = 0;
-        count = 0;
-        ncmpi::get_vara_all(ncid, varid, &start, &count, data);
+        for (int i=0; i<ndims; ++i) {
+            start[i] = 0;
+            count[i] = 0;
+        }
+        ncmpi::get_vara_all(ncid, varid, start, count, data);
     } else {
-        start = lo;
-        count = hi-lo+1;
-        NGA_Access64(g_a, &lo, &hi, &data, NULL);
-        ncmpi::get_vara_all(ncid, varid, &start, &count, data);
-        NGA_Release_update64(g_a, &lo, &hi);
+        if (first_only) {
+            start[0] = 0;
+            count[0] = 1;
+            for (int i=1; i<ndims; ++i) {
+                start[i] = lo[i-1];
+                count[i] = hi[i-1]-lo[i-1]+1;
+            }
+        } else {
+            for (int i=0; i<ndims; ++i) {
+                start[i] = lo[i];
+                count[i] = hi[i]-lo[i]+1;
+            }
+        }
+        NGA_Access64(g_a, lo, hi, &data, ld);
+        ncmpi::get_vara_all(ncid, varid, start, count, data);
+        NGA_Release_update64(g_a, lo, hi);
     }
 }
 
 
-// Open the source file.  Create g_a's to hold lat/lons.
-static int create_array_and_read(int ncid, char *name)
+// Read the source file.  Create g_a's to hold variable.
+static int create_array_and_read(int ncid, char *name, bool first_only)
 {
+    PRINT_ZERO("create_array_and_read first_only=%d name=%s\n", first_only, name);
     int varid;
-    int dimid;
-    MPI_Offset dimlen;
-    int64_t shape;
+    int ndim;
+    int dimids[NC_MAX_VAR_DIMS];
+    int64_t shape[NC_MAX_VAR_DIMS];
     int g_a;
 
     ncmpi::inq_varid(ncid, name, &varid);
-    ncmpi::inq_vardimid(ncid, varid, &dimid);
-    ncmpi::inq_dimlen(ncid, dimid, &dimlen);
-    shape = dimlen;
-    g_a = NGA_Create64(C_FLOAT, 1, &shape, name, NULL);
-    read_data(g_a, ncid, varid);
+    ncmpi::inq_varndims(ncid, varid, &ndim);
+    ncmpi::inq_vardimid(ncid, varid, dimids);
+    for (int i=0; i<ndim; ++i) {
+        MPI_Offset tmp;
+        ncmpi::inq_dimlen(ncid, dimids[i], &tmp);
+        shape[i] = tmp;
+        PRINT_ZERO("shape[%d]=%ld\n", i, (long)shape[i]);
+    }
+    if (first_only) {
+        PRINT_ZERO("first_only shape[0]=%ld\n", (long)*(shape+1));
+        g_a = NGA_Create64(C_FLOAT, ndim-1, shape+1, name, NULL);
+    } else {
+        g_a = NGA_Create64(C_FLOAT, ndim, shape, name, NULL);
+    }
+    PRINT_ZERO("read_data %s\n", name);
+    read_data(g_a, ncid, varid, first_only);
 
     return g_a;
 }
@@ -533,7 +564,7 @@ static void bin_latitudes(bin_t &bin, int g_lat, int g_lon, int g_extents)
     buffsize = limit;
     PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
     GA_Lgop(&buffsize, 1, "max");
-    PRINT_SYNC(" after lgop buffsize=%ld\n", buffsize);
+    PRINT_ZERO(" after lgop buffsize=%ld\n", buffsize);
     skipped.reserve(buffsize);
     received = new LatLonIdx[buffsize];
 
@@ -636,11 +667,9 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     bin_t extras_upper;
     int64_t extents_lo[2];
     int64_t extents_hi[2];
-    int64_t extents_ld[1];
     int64_t extents_dims[2];
     int extents_ndim;
     int extents_type;
-    float *extents;
     int64_t firstproc_subscript[2] = {0,0};
     int64_t  lastproc_subscript[2] = {0,0};
     int firstproc;
@@ -676,7 +705,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         PRINT_ZERO("blank\n");
         PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
         GA_Lgop(&buffsize, 1, "max");
-        PRINT_SYNC("after lgop buffsize=%ld\n", buffsize);
+        PRINT_ZERO("after lgop buffsize=%ld\n", buffsize);
         PRINT_ZERO("blank\n");
         PRINT_ZERO("blank\n");
         PRINT_ZERO("blank\n");
@@ -705,7 +734,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     PRINT_ZERO("after collect extras\n");
     PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
     GA_Lgop(&buffsize, 1, "max");
-    PRINT_SYNC("after lgop buffsize=%ld\n", buffsize);
+    PRINT_ZERO("after lgop buffsize=%ld\n", buffsize);
     lower_received = new LatLonIdx[buffsize];
     upper_received = new LatLonIdx[buffsize];
 
@@ -812,7 +841,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
 static void calc_weights(int g_weights, int g_indices,
         const bin_t &src_bin, const bin_t &dst_bin, int n)
 {
-    PRINT_SYNC("BEGIN calc_weights\n");
+    PRINT_ZERO("BEGIN calc_weights\n");
     int binidx=-1;
     bin_t::const_iterator dst_bin_it = dst_bin.begin();
     bin_t::const_iterator dst_bin_end = dst_bin.end();
@@ -919,4 +948,163 @@ static void calc_weights(int g_weights, int g_indices,
 static float calc_distance(const LatLonIdx &src, const LatLonIdx &dst)
 {
     return acos(cos(dst.lat)*cos(src.lat)*(cos(dst.lon)*cos(src.lon) + sin(dst.lon)*sin(src.lon)) + sin(dst.lat)*sin(src.lat));
+}
+
+
+/**
+ * TODO
+ *
+ * Input weights and indices will have the same distributions.  Iterate over
+ * the weights per processor and get/gather from the data array.  The data
+ * array is assumed to have its first dimension as "cells" or something
+ * similar e.g. "corners", "edges" and a second dimension indicating levels or
+ * something similar.  This affects our get/gather call(s).
+ */
+static int interpolate(int g_data, int g_weights, int g_indices)
+{
+    int me = GA_Nodeid();
+
+    int data_type;
+    int data_ndim;
+    int64_t data_shape[NC_MAX_VAR_DIMS];
+    float *data;
+
+    int weights_type;
+    int weights_ndim;
+    int64_t weights_lo[NC_MAX_VAR_DIMS];
+    int64_t weights_hi[NC_MAX_VAR_DIMS];
+    int64_t weights_ld[NC_MAX_VAR_DIMS];
+    int64_t weights_shape[NC_MAX_VAR_DIMS];
+    float *weights;
+
+    int indices_type;
+    int indices_ndim;
+    int64_t indices_shape[NC_MAX_VAR_DIMS];
+    int *indices;
+
+    int g_result;
+    int64_t results_shape[NC_MAX_VAR_DIMS];
+    int64_t results_chunk[NC_MAX_VAR_DIMS];
+
+    int64_t ignore_ld[NC_MAX_VAR_DIMS];
+    int64_t get_lo[NC_MAX_VAR_DIMS];
+    int64_t get_hi[NC_MAX_VAR_DIMS];
+    int64_t acc_lo[NC_MAX_VAR_DIMS];
+    int64_t acc_hi[NC_MAX_VAR_DIMS];
+    int64_t acc_ld[NC_MAX_VAR_DIMS];
+    int samples;
+    float F_ZERO = 0;
+    float F_ONE = 1;
+    
+    PRINT_ZERO("Begin interpolation\n");
+
+    NGA_Inquire64(g_data, &data_type, &data_ndim, data_shape);
+    NGA_Inquire64(g_weights, &weights_type, &weights_ndim, weights_shape);
+    NGA_Inquire64(g_indices, &indices_type, &indices_ndim, indices_shape);
+    NGA_Distribution64(g_weights, me, weights_lo, weights_hi);
+    PRINT_ZERO("   data_shape={%ld,%ld}\n", data_shape[0], data_shape[1]);
+    PRINT_ZERO("weights_shape={%ld,%ld}\n", weights_shape[0], weights_shape[1]);
+    PRINT_ZERO("indices_shape={%ld,%ld}\n", indices_shape[0], indices_shape[1]);
+
+    get_lo[1] = 0;
+    get_hi[1] = data_shape[1]-1;
+    acc_lo[1] = 0;
+    acc_hi[1] = data_shape[1]-1;
+    acc_ld[0] = data_shape[1];
+    samples = weights_shape[1];
+
+    results_shape[0] = weights_shape[0];
+    results_shape[1] = data_shape[1];
+    results_chunk[0] = 0;
+    results_chunk[1] = results_shape[1];
+    g_result = NGA_Create64(C_FLOAT, weights_ndim, results_shape,
+            "results", results_chunk);
+    GA_Fill(g_result, &F_ZERO);
+    PRINT_ZERO("results_shape={%ld,%ld}\n", results_shape[0], results_shape[1]);
+
+    if (0 > weights_lo[0] && 0 > weights_hi[0]) {
+        // nothing to do on this proc
+        return g_result;
+    }
+
+    PRINT_ZERO("before get loop\n");
+    data = new float[data_shape[1]];
+    NGA_Access64(g_weights, weights_lo, weights_hi, &weights, weights_ld);
+    NGA_Access64(g_indices, weights_lo, weights_hi, &indices, weights_ld);
+    for (int i=0,limit=weights_hi[0]-weights_lo[0]+1; i<limit; ++i) {
+        for (int j=0; j<samples; ++j) {
+            int idx = indices[i*samples+j];
+            get_lo[0] = idx;
+            get_hi[0] = idx;
+            acc_lo[0] = i+weights_lo[0];
+            acc_hi[0] = acc_lo[0];
+            if (0 > idx) {
+                // negative index; don't get
+            } else {
+                float weight = weights[i*samples+j];
+                NGA_Get64(g_data, get_lo, get_hi, data, ignore_ld);
+                for (int k=0; k<data_shape[1]; ++k) {
+                    data[k] *= weight;
+                }
+                NGA_Acc64(g_result, acc_lo, acc_hi, data, acc_ld, &F_ONE);
+            }
+        }
+    }
+    NGA_Release64(g_weights, weights_lo, weights_hi);
+    NGA_Release64(g_indices, weights_lo, weights_hi);
+    delete [] data;
+
+    return g_result;
+}
+
+
+static void write_results(int g_results, int ncid_orig)
+{
+    int me = GA_Nodeid();
+
+    char *name = GA_Inquire_name(g_results);
+    int results_type;
+    int results_ndim;
+    int64_t results_shape[NC_MAX_VAR_DIMS];
+    int64_t results_lo[NC_MAX_VAR_DIMS];
+    int64_t results_hi[NC_MAX_VAR_DIMS];
+    int64_t results_ld[NC_MAX_VAR_DIMS];
+    float *results = NULL;
+
+    int ncid;
+    MPI_Offset start[NC_MAX_VAR_DIMS];
+    MPI_Offset count[NC_MAX_VAR_DIMS];
+    MPI_Offset dims_shape[NC_MAX_VAR_DIMS];
+    int dims[NC_MAX_VAR_DIMS];
+    int varid;
+
+    NGA_Inquire64(g_results, &results_type, &results_ndim, results_shape);
+    for (int i=0; i<results_ndim; ++i) {
+        dims_shape[i] = results_shape[i];
+    }
+
+    ncmpi::create(MPI_COMM_WORLD, "out.nc", NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
+    ncmpi::def_dim(ncid, "cells", dims_shape[0], &dims[0]);
+    ncmpi::def_dim(ncid, "interfaces", dims_shape[1], &dims[1]);
+    ncmpi::def_var(ncid, "geopotential", NC_FLOAT, 2, dims, &varid);
+    ncmpi::enddef(ncid);
+
+    NGA_Distribution64(g_results, me, results_lo, results_hi);
+    if (0 > results_lo[0] && 0 > results_hi[0]) {
+        for (int i=0; i<results_ndim; ++i) {
+            start[i] = 0;
+            count[i] = 0;
+        }
+        ncmpi::put_vara_all(ncid, varid, start, count, results);
+    } else {
+        for (int i=0; i<results_ndim; ++i) {
+            start[i] = results_lo[i];
+            count[i] = results_hi[i]-results_lo[i]+1;
+        }
+        NGA_Access64(g_results, results_lo, results_hi, &results, results_ld);
+        ncmpi::put_vara_all(ncid, varid, start, count, results);
+        NGA_Release64(g_results, results_lo, results_hi);
+    }
+
+    ncmpi::close(ncid);
 }
