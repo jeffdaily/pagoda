@@ -20,7 +20,6 @@ int main(int argc, char **argv)
     }
 
     int me = GA_Nodeid();
-    int nproc = GA_Nnodes();
     int size = 10;
     int g_src = NGA_Create(MT_INT, 1, &size, "src", NULL);
     int g_dst0 = GA_Duplicate(g_src, "dst0");
@@ -34,8 +33,6 @@ int main(int argc, char **argv)
         int vals[] = {1,1,1,1,1,1,1,1,1,1}; // 10 == size
         int lo = 0;
         int hi = size-1;
-        int ONE = 1;
-        int ZERO = 0;
         NGA_Put(g_src, &lo, &hi, vals, NULL);
     }
     partial_sum(g_src, g_dst0, 0);

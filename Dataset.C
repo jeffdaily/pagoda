@@ -286,7 +286,6 @@ static inline void adjust_corners_edges_mask(
     string var_name = corners ? "cell_corners" : "cell_edges";
     string dim_name = corners ? "corners" : "edges";
     int ZERO = 0;
-    int me = GA_Nodeid();
     int64_t cells_count = chi-clo+1;
     
     var = dataset->find_var(var_name, false, true);
@@ -360,7 +359,7 @@ static inline void adjust_corners_edges_mask(
     NGA_Scatter64(mask->get_handle(), ones, subs, size);
     
     // Clean up!
-    for (int64_t idx=0; idx<size; ++idx) {
+    for (int64_t idx=0,limit=size; idx<limit; ++idx) {
         delete subs[idx];
     }
 }
@@ -604,7 +603,7 @@ void Dataset::decorate()
         }
     }
 #ifdef DEBUG
-    if (0 == me) {
+    if (0 == GA_Nodeid()) {
         cerr << "Variables after decoration" << endl;
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             cerr << (*var_it) << endl;

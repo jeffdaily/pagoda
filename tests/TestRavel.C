@@ -60,10 +60,10 @@ int main(int argc, char **argv)
     //printf("dims=[%lld,%lld,%lld]\n", dims1[0], dims1[1], dims1[2]);
     for (size_t i=0; i<26; ++i) {
         unravel64(i, 3, dims1, result1);
-        printf("unravel64(%zd, %d, [%lld,%lld,%lld], [%lld,%lld,%lld])\n",
+        printf("unravel64(%zd, %d, [%ld,%ld,%ld], [%ld,%ld,%ld])\n",
                 i, ndim,
-                dims1[0], dims1[1], dims1[2],
-                result1[0], result1[1], result1[2]);
+                (long)dims1[0], (long)dims1[1], (long)dims1[2],
+                (long)result1[0], (long)result1[1], (long)result1[2]);
         //result2 = Util::unravel_index(i, dims2);
         //cout << setw(2) << i << " --> " << result2 << " ";
         //printf("[%lld,%lld,%lld]", result1[0], result1[1], result1[2]);

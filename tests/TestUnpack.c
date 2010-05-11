@@ -13,7 +13,6 @@ int main(int argc, char **argv)
     }
 
     int me = GA_Nodeid();
-    int nproc = GA_Nnodes();
     int size_dst = 10;
     int size_src = 6; // MUST MATCH proc 0 put of mask below
     //int g_src = NGA_Create(MT_INT, 1, &size_src, "src", NULL);

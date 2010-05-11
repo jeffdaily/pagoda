@@ -13,7 +13,6 @@ int main(int argc, char **argv)
     }
 
     int me = GA_Nodeid();
-    int nproc = GA_Nnodes();
     int dims = 10;
     int g_src = NGA_Create(MT_INT, 1, &dims, "src", NULL);
     int g_dst0 = NGA_Create(MT_INT, 1, &dims, "Scan_add_excl0", NULL);

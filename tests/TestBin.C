@@ -694,9 +694,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     long buffsize = 0;
     int send_to;
     int recv_from;
-    MPI_Request request;
     MPI_Status recv_status;
-    MPI_Status wait_status;
 
     me = GA_Nodeid();
     nproc = GA_Nnodes();
@@ -747,62 +745,72 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     lower_received = new LatLonIdx[buffsize];
     upper_received = new LatLonIdx[buffsize];
 
-    PRINT_ZERO("before sending left\n");
     // First, ship the lowest left.
     send_to = me - 1;
     recv_from = me + 1;
-    // All but the first proc sends left.
-    if (me != firstproc) {
-        check(MPI_Isend(&extras_lower.begin()->second[0],
-                extras_lower.begin()->second.size(), LatLonIdxType,
-                send_to, 0, MPI_COMM_WORLD, &request));
-    }
-    // All but the last proc receives.
-    if (me != lastproc) {
-        check(MPI_Recv(lower_received, buffsize, LatLonIdxType,
-                recv_from, 0, MPI_COMM_WORLD, &recv_status));
+    // All but first and last procs send and receive.
+    if (me != firstproc && me != lastproc) {
+        check(MPI_Sendrecv( &extras_lower.begin()->second[0],
+                    extras_lower.begin()->second.size(), LatLonIdxType,
+                    send_to, TAG_GHOST,
+                    lower_received, buffsize, LatLonIdxType,
+                    recv_from, TAG_GHOST, MPI_COMM_WORLD, &recv_status));
         check(MPI_Get_count(&recv_status,LatLonIdxType,&lower_received_count));
     }
-    // All but the first proc waits on the send.
-    if (me != firstproc) {
-        check(MPI_Wait(&request, &wait_status));
+    // Last proc sends left as well.
+    if (me == lastproc) {
+        check(MPI_Send(&extras_lower.begin()->second[0],
+                extras_lower.begin()->second.size(), LatLonIdxType,
+                send_to, TAG_GHOST, MPI_COMM_WORLD));
+    }
+    // First proc receives from right as well.
+    if (me == firstproc) {
+        check(MPI_Recv(lower_received, buffsize, LatLonIdxType,
+                recv_from, TAG_GHOST, MPI_COMM_WORLD, &recv_status));
+        check(MPI_Get_count(&recv_status,LatLonIdxType,&lower_received_count));
     }
     PRINT_ZERO("after sending left\n");
 
     // Next, ship the highest right.
     send_to = me + 1;
     recv_from = me - 1;
-    // All but the last proc sends right.
-    if (me != lastproc) {
-        check(MPI_Isend(&extras_upper.begin()->second[0],
+    // All but the first and last procs send and receive.
+    if (me != firstproc && me != lastproc) {
+        check(MPI_Sendrecv(&extras_upper.begin()->second[0],
                 extras_upper.begin()->second.size(), LatLonIdxType,
-                send_to, 0, MPI_COMM_WORLD, &request));
-    }
-    // All but the first proc receives.
-    if (me != firstproc) {
-        check(MPI_Recv(upper_received, buffsize, LatLonIdxType,
-                recv_from, 0, MPI_COMM_WORLD, &recv_status));
+                send_to, TAG_GHOST,
+                upper_received, buffsize, LatLonIdxType,
+                recv_from, TAG_GHOST, MPI_COMM_WORLD, &recv_status));
         check(MPI_Get_count(&recv_status,LatLonIdxType,&upper_received_count));
     }
-    // All but the last proc waits on the send.
-    if (me != lastproc) {
-        check(MPI_Wait(&request, &wait_status));
+    // Last proc receives from left as well.
+    if (me == lastproc) {
+        check(MPI_Recv(upper_received, buffsize, LatLonIdxType,
+                recv_from, TAG_GHOST, MPI_COMM_WORLD, &recv_status));
+        check(MPI_Get_count(&recv_status,LatLonIdxType,&upper_received_count));
+    }
+    // First proc sends right as well.
+    if (me == firstproc) {
+        check(MPI_Send(&extras_upper.begin()->second[0],
+                extras_upper.begin()->second.size(), LatLonIdxType,
+                send_to, TAG_GHOST, MPI_COMM_WORLD));
     }
     PRINT_ZERO("after sending right\n");
 
-    PRINT_ZERO("before insertions\n");
     // First, append received from right into last bin.
     if (me != lastproc) {
         it = --bin.end();
         it->second.insert(it->second.end(),
                 lower_received, lower_received+lower_received_count);
     }
+    PRINT_ZERO("after first insertions\n");
     // Second, insert received from left into first bin.
     if (me != firstproc) {
         it = bin.begin();
         it->second.insert(it->second.begin(),
                 upper_received, upper_received+upper_received_count);
     }
+    PRINT_ZERO("after second insertions\n");
     // Third, append local next-to-first.
     it = bin.begin();
     it_next = ++extras_lower.begin();
@@ -810,6 +818,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         it->second.insert(it->second.end(),
                 it_next->second.begin(), it_next->second.end());
     }
+    PRINT_ZERO("after third insertions\n");
     // Fourth, insert local next-to-last.
     it = --bin.end();
     it_prev = --extras_upper.end();
@@ -818,6 +827,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         it->second.insert(it->second.begin(),
                 it_prev->second.begin(), it_prev->second.end());
     }
+    PRINT_ZERO("after fourth insertions\n");
     // Lastly, insert within all middle bins.
     end = --bin.end();
     it_prev = extras_upper.begin();
@@ -832,7 +842,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         ++it_next;
         ++it_prev;
     }
-    PRINT_ZERO("after insertions\n");
+    PRINT_ZERO("after all insertions\n");
 
     delete [] lower_received;
     delete [] upper_received;

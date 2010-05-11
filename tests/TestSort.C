@@ -140,9 +140,9 @@ int main(int argc, char **argv)
     }
     GA_Lgop(bin_counts, nproc, "+");
     if (0 == me) {
-        printf("bin_counts={%d", bin_counts[0]);
+        printf("bin_counts={%ld", bin_counts[0]);
         for (int i=1; i<nproc; ++i) {
-            printf(",%d", bin_counts[i]);
+            printf(",%ld", bin_counts[i]);
         }
         printf("}\n");
     }
