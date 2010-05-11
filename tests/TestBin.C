@@ -685,12 +685,14 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     int lastproc;
     bin_t::iterator it;
     bin_t::iterator end;
-    bin_t::iterator it_next;
-    bin_t::iterator it_prev;
-    LatLonIdx *lower_received;
-    LatLonIdx *upper_received;
-    int lower_received_count;
-    int upper_received_count;
+    bin_t::iterator it_lower;
+    bin_t::reverse_iterator rit;
+    bin_t::reverse_iterator rend;
+    bin_t::reverse_iterator rit_upper;
+    LatLonIdx *lower_received = NULL;
+    LatLonIdx *upper_received = NULL;
+    int lower_received_count = 0;
+    int upper_received_count = 0;
     long buffsize = 0;
     int send_to;
     int recv_from;
@@ -713,11 +715,13 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
         GA_Lgop(&buffsize, 1, "max");
         PRINT_ZERO("after lgop buffsize=%ld\n", buffsize);
-        PRINT_ZERO("blank\n");
-        PRINT_ZERO("blank\n");
-        PRINT_ZERO("blank\n");
-        PRINT_ZERO("blank\n");
-        PRINT_ZERO("blank\n");
+        PRINT_SYNC("blank\n");
+        PRINT_SYNC("blank\n");
+        PRINT_SYNC("blank\n");
+        PRINT_SYNC("blank\n");
+        PRINT_SYNC("blank\n");
+        PRINT_SYNC("blank\n");
+        // PRINT_ZERO("blank\n");
         return;
     }
 
@@ -769,7 +773,8 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
                 recv_from, TAG_GHOST, MPI_COMM_WORLD, &recv_status));
         check(MPI_Get_count(&recv_status,LatLonIdxType,&lower_received_count));
     }
-    PRINT_ZERO("after sending left\n");
+    PRINT_SYNC("after sending left, lower_received_count=%d\n",
+            lower_received_count);
 
     // Next, ship the highest right.
     send_to = me + 1;
@@ -795,54 +800,42 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
                 extras_upper.begin()->second.size(), LatLonIdxType,
                 send_to, TAG_GHOST, MPI_COMM_WORLD));
     }
-    PRINT_ZERO("after sending right\n");
+    PRINT_SYNC("after sending right, upper_received_count=%d\n",
+            upper_received_count);
 
-    // First, append received from right into last bin.
+    // First, iterate over bins while inserting from the right.
+    it = bin.begin();
+    it_lower = ++extras_lower.begin();
+    end = extras_lower.end();
+    while (it_lower != end) {
+        it->second.insert(it->second.end(),
+                it_lower->second.begin(), it_lower->second.end());
+        ++it;
+        ++it_lower;
+    }
+    PRINT_SYNC("after back insertions, local\n");
     if (me != lastproc) {
-        it = --bin.end();
         it->second.insert(it->second.end(),
                 lower_received, lower_received+lower_received_count);
     }
-    PRINT_ZERO("after first insertions\n");
-    // Second, insert received from left into first bin.
+    PRINT_SYNC("after back insertion,  remote\n");
+
+    // Next, iterate over bins backwards while inserting from the left.
+    rit = bin.rbegin();
+    rit_upper = ++extras_upper.rbegin();
+    rend = extras_upper.rend();
+    while (rit_upper != rend) {
+        rit->second.insert(rit->second.begin(),
+                rit_upper->second.begin(), rit_upper->second.end());
+        ++rit;
+        ++rit_upper;
+    }
+    PRINT_SYNC("after front insertions, local\n");
     if (me != firstproc) {
-        it = bin.begin();
-        it->second.insert(it->second.begin(),
+        rit->second.insert(rit->second.begin(),
                 upper_received, upper_received+upper_received_count);
     }
-    PRINT_ZERO("after second insertions\n");
-    // Third, append local next-to-first.
-    it = bin.begin();
-    it_next = ++extras_lower.begin();
-    if (it_next != extras_lower.end()) {
-        it->second.insert(it->second.end(),
-                it_next->second.begin(), it_next->second.end());
-    }
-    PRINT_ZERO("after third insertions\n");
-    // Fourth, insert local next-to-last.
-    it = --bin.end();
-    it_prev = --extras_upper.end();
-    if (it_prev != extras_upper.begin()) {
-        --it_prev;
-        it->second.insert(it->second.begin(),
-                it_prev->second.begin(), it_prev->second.end());
-    }
-    PRINT_ZERO("after fourth insertions\n");
-    // Lastly, insert within all middle bins.
-    end = --bin.end();
-    it_prev = extras_upper.begin();
-    it = ++bin.begin();
-    it_next = ++extras_lower.begin(); ++it_next;
-    while (it != end) {
-        it->second.insert(it->second.begin(),
-                it_prev->second.begin(), it_prev->second.end());
-        it->second.insert(it->second.end(),
-                it_next->second.begin(), it_next->second.end());
-        ++it;
-        ++it_next;
-        ++it_prev;
-    }
-    PRINT_ZERO("after all insertions\n");
+    PRINT_SYNC("after front insertion,  remote\n");
 
     delete [] lower_received;
     delete [] upper_received;
