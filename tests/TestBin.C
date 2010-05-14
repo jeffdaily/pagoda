@@ -65,6 +65,7 @@ using std::vector;
 #define EPSILON 0.0001
 #define N 3
 #define TAG_GHOST 44678
+#define TAG_DATA   3282
 
 class LatLonIdx
 {
@@ -249,12 +250,16 @@ int main(int argc, char **argv)
     bin_sort(dst_bin);
     PRINT_ZERO("finished sorting\n");
 
-    long unsigned points = 0;
+    long points = 0;
+    long points_sum = 0;
     bin_t::iterator it,end;
     for (it=src_bin.begin(),end=src_bin.end(); it!=end; ++it) {
         points += it->second.size();
     }
-    PRINT_SYNC("points=%lu\n", points);
+    PRINT_SYNC("points=%ld\n", points);
+    points_sum = points;
+    GA_Lgop(&points_sum, 1, "+");
+    PRINT_ZERO("points_sum=%ld\n", points_sum);
 
     if (perform_ghost_exchange) {
         long unsigned points_after = 0;
@@ -617,15 +622,11 @@ static void bin_latitudes(bin_t &bin, int g_lat, int g_lon, int g_extents)
     if (send_to >= nproc) send_to = 0;
     if (recv_from < 0) recv_from = nproc-1;
     for (int proc=0; proc<nproc; ++proc) {
-        MPI_Request request;
         MPI_Status recv_status;
-        MPI_Status wait_status;
-
-        check(MPI_Isend(&skipped[0], skipped.size(), LatLonIdxType,
-                    send_to, 0, MPI_COMM_WORLD, &request));
-        check(MPI_Recv(received, buffsize, LatLonIdxType,
-                    recv_from, 0, MPI_COMM_WORLD, &recv_status));
-        check(MPI_Wait(&request, &wait_status));
+        check(MPI_Sendrecv(&skipped[0], skipped.size(), LatLonIdxType,
+                    send_to, TAG_DATA,
+                    received, buffsize, LatLonIdxType,
+                    recv_from, TAG_DATA, MPI_COMM_WORLD, &recv_status));
         check(MPI_Get_count(&recv_status, LatLonIdxType, &received_count));
         PRINT_SYNC("sent=%lu,recv=%d\n",
                 (long unsigned)skipped.size(), received_count);
@@ -858,8 +859,11 @@ static void calc_weights(int g_weights, int g_indices,
     bin_t::const_iterator dst_bin_it = dst_bin.begin();
     bin_t::const_iterator dst_bin_end = dst_bin.end();
     int missing_src_bin = 0;
+    int missing_src_bin_sum = 0;
     int empty_src_bin = 0;
+    int empty_src_bin_sum = 0;
     int empty_dst_bin = 0;
+    int empty_dst_bin_sum = 0;
 
     // iterate over dst bins
     for (/*empty*/; dst_bin_it!=dst_bin_end; ++dst_bin_it) {
@@ -901,6 +905,7 @@ static void calc_weights(int g_weights, int g_indices,
             float denominator = 0;
             int i;
 
+            distances.clear();
             src_data_it = src_bin_it->second.begin();
             src_data_end = src_bin_it->second.end();
 
@@ -914,8 +919,8 @@ static void calc_weights(int g_weights, int g_indices,
             }
             up  = upper_bound(src_data_it, src_data_end, *dst_data_it);
             if (up != src_data_end) {
-                ++up;
-                up = lower_bound(src_data_it, src_data_end, *up);
+                //++up;
+                up = upper_bound(src_data_it, src_data_end, *up);
             }
 
             // iterate over src data to calc distances to current dst point
@@ -932,10 +937,19 @@ static void calc_weights(int g_weights, int g_indices,
             dist_it  = distances.begin();
             for (i=0; i<n && dist_it!=dist_end; ++i,++dist_it) {
                 weights[i] = (1/(dist_it->first + EPSILON))/denominator;
-                if (weights[i] > 1 || weights[i] < 0) {
+                if (weights[i] > 1) {
+                    weights[i] = 1;
+                    cerr << "weights[i] > 1" << endl;
+                }
+                if (weights[i] < 0) {
                     weights[i] = 0;
+                    cerr << "weights[i] < 0" << endl;
                 }
                 indices[i] = dist_it->second.idx;
+            }
+            if (0==i) {
+                cerr << "[" << GA_Nodeid() << "] i = 0 for "
+                    << dst_data_it->idx << endl;
             }
             /*
             if (i<n) {
@@ -957,9 +971,18 @@ static void calc_weights(int g_weights, int g_indices,
             NGA_Put64(g_indices, lo, hi, indices, ld);
         }
     }
-    PRINT_SYNC("dst bins without src bins=%d\n", missing_src_bin);
-    PRINT_SYNC("empty src bins=%d\n", empty_src_bin);
-    PRINT_SYNC("empty dst bins=%d\n", empty_dst_bin);
+    missing_src_bin_sum = missing_src_bin;
+    empty_src_bin_sum = empty_src_bin;
+    empty_dst_bin_sum = empty_dst_bin;
+    GA_Igop(&missing_src_bin_sum, 1, "+");
+    GA_Igop(&empty_src_bin_sum, 1, "+");
+    GA_Igop(&empty_dst_bin_sum, 1, "+");
+    PRINT_SYNC("dst bins without src bins=%3d/%3d\n",
+            missing_src_bin, missing_src_bin_sum);
+    PRINT_SYNC("           empty src bins=%3d/%3d\n",
+            empty_src_bin, empty_src_bin_sum);
+    PRINT_SYNC("           empty dst bins=%3d/%3d\n",
+            empty_dst_bin, empty_dst_bin_sum);
     int64_t print_lo[2] = {0,0};
     int64_t print_hi[2] = {4,2};
     GA_Sync();
@@ -1007,6 +1030,7 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     int g_result;
     int64_t results_shape[NC_MAX_VAR_DIMS];
     int64_t results_chunk[NC_MAX_VAR_DIMS];
+    float *result;
 
     int64_t ignore_ld[NC_MAX_VAR_DIMS];
     int64_t get_lo[NC_MAX_VAR_DIMS];
@@ -1016,7 +1040,6 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     int64_t acc_ld[NC_MAX_VAR_DIMS];
     int samples;
     float F_ZERO = 0;
-    float F_ONE = 1;
     
     PRINT_ZERO("Begin interpolation\n");
 
@@ -1027,6 +1050,8 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     PRINT_ZERO("   data_shape={%ld,%ld}\n", data_shape[0], data_shape[1]);
     PRINT_ZERO("weights_shape={%ld,%ld}\n", weights_shape[0], weights_shape[1]);
     PRINT_ZERO("indices_shape={%ld,%ld}\n", indices_shape[0], indices_shape[1]);
+    PRINT_SYNC("weights_lo/hi={%ld,%ld}/{%ld,%ld}\n",
+            weights_lo[0], weights_lo[1], weights_hi[0], weights_hi[1]);
 
     get_lo[1] = 0;
     get_hi[1] = data_shape[1]-1;
@@ -1049,21 +1074,23 @@ static int interpolate(int g_data, int g_weights, int g_indices)
         return g_result;
     }
 
+#if 0
     PRINT_ZERO("before get loop\n");
     data = new float[data_shape[1]];
+    result = new float[data_shape[1]];
     NGA_Access64(g_weights, weights_lo, weights_hi, &weights, weights_ld);
     NGA_Access64(g_indices, weights_lo, weights_hi, &indices, weights_ld);
     for (int i=0,limit=weights_hi[0]-weights_lo[0]+1; i<limit; ++i) {
         bool missed_all = true;
+        acc_lo[0] = i+weights_lo[0];
+        acc_hi[0] = i+weights_lo[0];
         for (int j=0; j<samples; ++j) {
             int idx = indices[i*samples+j];
             get_lo[0] = idx;
             get_hi[0] = idx;
-            acc_lo[0] = i+weights_lo[0];
-            acc_hi[0] = i+weights_lo[0];
             if (0 > idx) {
                 // negative index; don't get
-                cerr << "[" << me << "] not getting " << i+weights_lo[0] << " because idx=" << idx << endl;
+                //cerr << "[" << me << "] not getting " << i+weights_lo[0] << " because idx=" << idx << endl;
             } else {
                 float weight = weights[i*samples+j];
                 missed_all = false;
@@ -1081,6 +1108,54 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     NGA_Release64(g_weights, weights_lo, weights_hi);
     NGA_Release64(g_indices, weights_lo, weights_hi);
     delete [] data;
+    delete [] result;
+#else
+    PRINT_ZERO("before get loop\n");
+    data = new float[data_shape[1]];
+    result = new float[data_shape[1]];
+    NGA_Access64(g_weights, weights_lo, weights_hi, &weights, weights_ld);
+    NGA_Access64(g_indices, weights_lo, weights_hi, &indices, weights_ld);
+    for (int i=0,limit=weights_hi[0]-weights_lo[0]+1; i<limit; ++i) {
+        bool missed_all = true;
+        acc_lo[0] = i+weights_lo[0];
+        acc_hi[0] = i+weights_lo[0];
+        std::fill(result,result+data_shape[1],0);
+        for (int j=0; j<samples; ++j) {
+            int idx = indices[i*samples+j];
+            float weight = weights[i*samples+j];
+            get_lo[0] = idx;
+            get_hi[0] = idx;
+            if (0 > idx) {
+                // negative index; don't get
+                //cerr << "[" << me << "] not getting " << i+weights_lo[0] << " because idx=" << idx << endl;
+            } else {
+                missed_all = false;
+                NGA_Get64(g_data, get_lo, get_hi, data, ignore_ld);
+                for (int k=0; k<data_shape[1]; ++k) {
+                    if (data[k] == 0) {
+                        cerr << "[" << me << "] data[k] zero for "
+                            << i+weights_lo[0] << "," << k << endl;
+                    }
+                    result[k] += data[k]*weight;
+                }
+            }
+        }
+        for (int j=0; j<data_shape[1]; ++j) {
+            if (result[j] == 0) {
+                cerr << "[" << me << "] zero value for "
+                    << i+weights_lo[0] << "," << j << endl;
+            }
+        }
+        NGA_Put64(g_result, acc_lo, acc_hi, result, acc_ld);
+        if (missed_all) {
+            cerr << "[" << me << "] MISSED ALL SAMPLES" << endl;
+        }
+    }
+    NGA_Release64(g_weights, weights_lo, weights_hi);
+    NGA_Release64(g_indices, weights_lo, weights_hi);
+    delete [] data;
+    delete [] result;
+#endif
 
     GA_Sync();
 
@@ -1131,6 +1206,8 @@ static void write_results(int g_results, int ncid_orig,
     ncmpi::enddef(ncid);
 
     NGA_Distribution64(g_results, me, results_lo, results_hi);
+    PRINT_SYNC("results_lo/hi={%ld,%ld}/{%ld,%ld}\n",
+            results_lo[0], results_lo[1], results_hi[0], results_hi[1]);
     if (0 > results_lo[0] && 0 > results_hi[0]) {
         for (int i=0; i<results_ndim; ++i) {
             start[i] = 0;
@@ -1145,6 +1222,21 @@ static void write_results(int g_results, int ncid_orig,
             count[i] = results_hi[i-1]-results_lo[i-1]+1;
         }
         NGA_Access64(g_results, results_lo, results_hi, &results, results_ld);
+        int limit = 1;
+        bool had_a_zero = false;
+        limit *= results_hi[0]-results_lo[0]+1;
+        limit *= results_hi[1]-results_lo[1]+1;
+        for (int i=0; i<limit; ++i) {
+            if (results[i] == 0) {
+                had_a_zero = true;
+                break;
+            }
+        }
+        if (had_a_zero) {
+            PRINT_SYNC("had a zero\n");
+        } else {
+            PRINT_SYNC("data okay\n");
+        }
         ncmpi::put_vara_all(ncid, varid, start, count, results);
         NGA_Release64(g_results, results_lo, results_hi);
     }
