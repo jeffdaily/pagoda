@@ -19,7 +19,7 @@ using std::ostringstream;
 #include "DistributedMask.H"
 #include "FileWriter.H"
 #include "Pack.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 #include "SubsetterCommands.H"
 #include "SubsetterException.H"
 #include "Util.H"

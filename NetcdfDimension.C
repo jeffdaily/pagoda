@@ -8,7 +8,7 @@
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 #include "Timing.H"
 
 

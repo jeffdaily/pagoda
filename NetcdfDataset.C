@@ -9,7 +9,7 @@
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 #include "Timing.H"
 #include "Util.H"
 

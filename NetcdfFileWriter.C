@@ -20,7 +20,7 @@
 #include "NetcdfFileWriter.H"
 #include "NetcdfVariable.H"
 #include "Pack.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Values.H"

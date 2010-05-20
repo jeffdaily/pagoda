@@ -42,7 +42,7 @@ using std::vector;
 #include <pnetcdf.h>
 
 #include "Debug.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 
 void MY_Select_elem64(int, bool, float*, int64_t*);
 

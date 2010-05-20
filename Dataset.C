@@ -21,7 +21,7 @@
 #include "Mask.H"
 #include "NetcdfDataset.H"
 #include "NetcdfVariable.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 #include "Slice.H"
 #include "StringComparator.H"
 #include "Timing.H"

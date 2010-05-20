@@ -24,7 +24,7 @@
 #include <iostream>
 
 #include "Debug.H"
-#include "PnetcdfTiming.H"
+#include "Pnetcdf.H"
 
 int main(int argc, char **argv)
 {

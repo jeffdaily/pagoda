@@ -79,6 +79,8 @@ NetcdfVariable.C          \
 NetcdfVariable.H          \
 Pack.C                    \
 Pack.H                    \
+Pnetcdf.C                 \
+Pnetcdf.H                 \
 PnetcdfTiming.C           \
 PnetcdfTiming.H           \
 RangeException.H          \

@@ -102,9 +102,9 @@ am_libsubsetter_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
 	DataType.lo Debug.lo Dimension.lo DistributedMask.lo \
 	FileWriter.lo LatLonBox.lo LocalMask.lo Mask.lo \
 	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
-	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo PnetcdfTiming.lo \
-	StringComparator.lo SubsetterCommands.lo Timing.lo Util.lo \
-	Values.lo Variable.lo VariableDecorator.lo
+	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo Pnetcdf.lo \
+	PnetcdfTiming.lo StringComparator.lo SubsetterCommands.lo \
+	Timing.lo Util.lo Values.lo Variable.lo VariableDecorator.lo
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -491,6 +491,8 @@ NetcdfVariable.C          \
 NetcdfVariable.H          \
 Pack.C                    \
 Pack.H                    \
+Pnetcdf.C                 \
+Pnetcdf.H                 \
 PnetcdfTiming.C           \
 PnetcdfTiming.H           \
 RangeException.H          \
@@ -767,6 +769,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfFileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pnetcdf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
