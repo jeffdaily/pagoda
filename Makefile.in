@@ -96,8 +96,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libsubsetter_la_LIBADD =
 am_libsubsetter_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
 	AggregationDimension.lo AggregationJoinExisting.lo \
-	AggregationUnion.lo AggregationVariable.lo Attribute.lo \
-	BoundaryVariable.lo CommandLineParser.lo \
+	AggregationUnion.lo AggregationVariable.lo Array.lo \
+	Attribute.lo BoundaryVariable.lo CommandLineParser.lo \
 	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
 	DataType.lo Debug.lo Dimension.lo DistributedMask.lo \
 	FileWriter.lo LatLonBox.lo LocalMask.lo Mask.lo \
@@ -448,6 +448,8 @@ AggregationUnion.C        \
 AggregationUnion.H        \
 AggregationVariable.C     \
 AggregationVariable.H     \
+Array.C                   \
+Array.H                   \
 Attribute.C               \
 Attribute.H               \
 BoundaryVariable.C        \
@@ -748,6 +750,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationJoinExisting.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationUnion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BoundaryVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommandLineParser.Plo@am__quote@

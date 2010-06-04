@@ -36,6 +36,8 @@ AggregationUnion.C        \
 AggregationUnion.H        \
 AggregationVariable.C     \
 AggregationVariable.H     \
+Array.C                   \
+Array.H                   \
 Attribute.C               \
 Attribute.H               \
 BoundaryVariable.C        \
