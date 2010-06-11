@@ -2,9 +2,10 @@
 #define AGGREGATION_H_
 
 #include <iostream>
-    using std::ostream;
 #include <vector>
-    using std::vector;
+
+using std::ostream;
+using std::vector;
 
 #include "Dataset.H"
 

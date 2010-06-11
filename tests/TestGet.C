@@ -35,9 +35,9 @@ int main(int argc, char **argv)
     int buf[buf_size];
 
     int lo[] = {10,0};
-    int hi[] = {14,4};
+    int hi[] = {14,5};
     //int ld[] = {10};
-    int ld[] = {10};
+    int ld[] = {6};
 
     cout << "data" << endl;
     NGA_Distribution(g_a, me, data_lo, data_hi);

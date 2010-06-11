@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <algorithm>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -13,8 +15,20 @@
 #include "Util.H"
 #include "Variable.H"
 
+using std::accumulate;
+using std::copy;
+using std::multiplies;
 using std::string;
 using std::vector;
+
+
+/**
+ * Returns the total number of elements in the given array shape.
+ */
+int64_t Util::shape_to_size(const vector<int64_t> &shape)
+{
+    return accumulate(shape.begin(),shape.end(),1,multiplies<int64_t>());
+}
 
 
 /**
@@ -50,7 +64,7 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
     vector<Variable*>::const_iterator var;
 
     for (var=vars.begin(); var!=vars.end(); ++var) {
-        int64_t var_size = (*var)->get_size();
+        int64_t var_size = shape_to_size((*var)->get_shape());
         if (var_size > max_size) {
             max_size = var_size;
             max_name = (*var)->get_name();
@@ -62,7 +76,7 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
 
     TRACER("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
             max_name.c_str(), max_size8, gigabytes);
-    max_size *= 0.04;
+    max_size = int64_t(max_size * 0.04);
     max_size8 = max_size*8;
     gigabytes = 1.0 / 1073741824.0 * max_size8;
     TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size8, gigabytes);

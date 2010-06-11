@@ -3,14 +3,19 @@
 #endif
 
 #include <cstring> // for memset
+#include <vector>
 
 #include <ga.h>
 #include <macdecls.h>
 #include <message.h>
 
+#include "Array.H"
 #include "Debug.H"
 #include "Pack.H"
 #include "Timing.H"
+
+using std::vector;
+using namespace pagoda;
 
 
 static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *result)
@@ -30,7 +35,7 @@ static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *resul
 }
 
 
-void partial_sum(int g_src, int g_dst, int excl)
+void pagoda::partial_sum(int g_src, int g_dst, int excl)
 {
     TIMING("partial_sum(int,int,int)");
     TRACER("partial_sum\n");
@@ -161,7 +166,7 @@ void partial_sum(int g_src, int g_dst, int excl)
 
 
 
-void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
+void pagoda::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 {
     TIMING("pack(int,int,int*,int*)");
     TRACER("pack BEGIN\n");
@@ -293,7 +298,7 @@ void pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 }
 
 
-void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
+void pagoda::unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
     TIMING("unravel64(int64_t,int,int64_t*,int64_t*)");
     unravel64i(x,ndim,dims,result);
@@ -305,7 +310,7 @@ void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
  *
  * Assumes g_src is a 1D array.
  */
-void enumerate(int g_src, void *start_val, void *inc_val)
+void pagoda::enumerate(int g_src, void *start_val, void *inc_val)
 {
     TIMING("enumerate(int,void*,void*)");
     TRACER("enumerate BEGIN\n");
@@ -388,7 +393,7 @@ void enumerate(int g_src, void *start_val, void *inc_val)
  *
  * Assumes g_dst and g_msk have the same distributions.
  */
-void unpack1d(int g_src, int g_dst, int g_msk)
+void pagoda::unpack1d(int g_src, int g_dst, int g_msk)
 {
     TIMING("unpack1d(int,int,int)");
     TRACER("unpack1d BEGIN\n");
@@ -463,6 +468,87 @@ void unpack1d(int g_src, int g_dst, int g_msk)
 #undef unpack1d_op
             }
         }
+    }
+    TRACER("unpack1d END\n");
+}
+
+
+/**
+ * Unpack g_src into g_dst based on the mask g_msk.
+ *
+ * Assumes g_dst and g_msk have the same distributions.
+ */
+void pagoda::unpack1d(Array *src, Array *dst, Array *msk)
+{
+    int me = GA_Nodeid();
+    int nproc = GA_Nnodes();
+    int *mask;
+    long counts[nproc];
+    vector<int64_t> lo_src(1,0);
+    vector<int64_t> hi_src(1,0);
+
+    TIMING("unpack1d(Array*,Array*,Mask*)");
+    TRACER("unpack1d BEGIN\n");
+
+    if (!dst->same_distribution(msk)) {
+        GA_Error("unpack1d: dst and msk distributions differ", 0);
+    }
+
+    // count mask bits on each proc
+    memset(counts, 0, sizeof(long)*nproc);
+    if (!msk->owns_data()) {
+        GA_Lgop(counts, nproc, "+");
+        TRACER("unpack1d lo,hi N/A 1\n");
+        TRACER("unpack1d END\n");
+        return; // this process doesn't participate
+    } else {
+        mask = (int*)msk->access();
+        for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) {
+            if (0 != mask[i]) ++(counts[me]);
+        }
+        msk->release();
+        GA_Lgop(counts, nproc, "+");
+        if (0 == counts[me]) {
+            TRACER("unpack1d lo,hi N/A 2\n");
+            TRACER("unpack1d END\n");
+            return; // this process doesn't participate
+        }
+    }
+
+    // tally up where to start the 'get' of the packed array
+    for (int i=0; i<me; ++i) {
+        lo_src[0] += counts[i];
+    }
+    hi_src[0] = lo_src[0] + counts[me] - 1;
+    TRACER("unpack1d lo,hi = %ld,%ld\n", lo_src[0], hi_src[0]);
+    // do the unpacking
+    // assumption is that dst array has same distribution as msk array
+    switch (src->get_type().as_ma()) {
+#define unpack1d_op(MTYPE,TYPE) \
+        case MTYPE: { \
+            TYPE *src_data = (TYPE*)src->get(lo_src, hi_src); \
+            TYPE *dst_data = (TYPE*)dst->access(); \
+            TYPE *src_origin = src_data; \
+            int  *msk_data = (int*)msk->access(); \
+            for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) \
+            { \
+                if (msk_data[i] != 0) { \
+                    dst_data[i] = *src_data; \
+                    ++src_data; \
+                } \
+            } \
+            delete src_origin; \
+            dst->release_update(); \
+            msk->release(); \
+            break; \
+        }
+        unpack1d_op(C_INT,int)
+        unpack1d_op(C_LONG,long)
+        unpack1d_op(C_LONGLONG,long long)
+        unpack1d_op(C_FLOAT,float)
+        unpack1d_op(C_DBL,double)
+        unpack1d_op(C_LDBL,long double)
+#undef unpack1d_op
     }
     TRACER("unpack1d END\n");
 }

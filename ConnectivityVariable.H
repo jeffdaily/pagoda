@@ -16,7 +16,7 @@ class ConnectivityVariable : public VariableDecorator
         Dimension* get_from_dim() const;
         Dimension* get_to_dim() const;
 
-        virtual void reindex();
+        //virtual void reindex();
 
         virtual ostream& print(ostream &os) const;
 

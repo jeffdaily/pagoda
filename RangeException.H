@@ -2,7 +2,9 @@
 #define RANGEEXCEPTION_H_
 
 #include <stdexcept>
-  using std::runtime_error;
+
+using std::runtime_error;
+
 
 class RangeException : public runtime_error
 {

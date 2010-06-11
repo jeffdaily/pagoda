@@ -10,10 +10,12 @@
 
 #include "AggregationDimension.H"
 #include "AggregationVariable.H"
+#include "Array.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
+#include "IndexOutOfBoundsException.H"
 #include "Timing.H"
 #include "Variable.H"
 
@@ -81,86 +83,82 @@ DataType AggregationVariable::get_type() const
 }
 
 
-int AggregationVariable::get_handle()
+Array* AggregationVariable::read()
 {
-    TIMING("AggregationVariable::get_handle()");
-    if (has_record() && num_dims() > 1) {
-        return vars[index_var]->get_handle();
-    } else {
-        return AbstractVariable::get_handle();
-    }
+    Array *dst = Array::create(get_type(), get_shape());
+    return read(dst);
 }
 
 
-void AggregationVariable::release_handle()
+Array* AggregationVariable::read(Array *dst)
 {
-    TIMING("AggregationVariable::release_handle()");
-    TRACER("AggregationVariable::release_handle() BEGIN\n");
-    AbstractVariable::release_handle();
-    for (size_t varidx=0; varidx<vars.size(); ++varidx) {
-        vars[varidx]->release_handle();
+    Array *src;
+    int ndim;
+    vector<int64_t> dst_lo;
+    vector<int64_t> dst_hi;
+    vector<int64_t> src_lo;
+    vector<int64_t> src_hi;
+
+    ndim = num_dims();
+    dst_lo.assign(ndim, 0);     // only first index will change, rest zeros
+    src_lo.assign(ndim-1, 0);   // will not change; always zeros
+
+    dst_hi = dst->get_shape();
+    dst_hi[0] = 0;
+    for (int64_t i=1,limit=dst_hi.size(); i<limit; ++i) {
+        dst_hi[i] -= 1;
     }
-    TRACER("AggregationVariable::release_handle() END\n");
+
+    src = read(int64_t(0));
+    src_hi = src->get_shape();
+    for (int64_t i=1,limit=src_hi.size(); i<limit; ++i) {
+        src_hi[i] -= 1;
+    }
+    dst->copy(src, src_lo, src_hi, dst_lo, dst_hi);
+    for (int64_t i=1,limit=get_shape().at(0); i<limit; ++i) {
+        src = read(i, src);
+        dst_lo[0] += 1;
+        dst_hi[0] += 1;
+        dst->copy(src, src_lo, src_hi, dst_lo, dst_hi);
+    }
+
+    delete src;
+
+    return dst;
 }
 
 
-void AggregationVariable::set_record_index(size_t index)
+Array* AggregationVariable::read(int64_t record)
 {
-    TIMING("AggregationVariable::set_record_index(size_t)");
-    TRACER("AggregationVariable::set_record_index(%zd)\n", index);
-    AbstractVariable::set_record_index(index);
+    vector<int64_t> shape;
+    Array *dst;
+    
+    shape = get_shape();
+    shape.erase(shape.begin());
+    dst = Array::create(get_type(), shape);
 
-    index_within_var = index;
-    for (index_var=0; index_var<vars.size(); ++index_var) {
-        int64_t size = vars.at(index_var)->get_dims().at(0)->get_size();
-        if (index_within_var < size) {
-            break;
+    return read(record, dst);
+}
+
+
+Array* AggregationVariable::read(int64_t record, Array *dst)
+{
+    int64_t index_within_var = record;
+
+    if (record < 0 || record > get_shape().at(0)) {
+        throw IndexOutOfBoundsException("AggregationVariable::read");
+    }
+
+    for (int64_t index_var=0; index_var<vars.size(); ++index_var) {
+        int64_t num_records = vars.at(index_var)->get_shape().at(0);
+        if (index_within_var < num_records) {
+            return vars.at(index_var)->read(index_within_var, dst);
         } else {
-            index_within_var -= size;
+            index_within_var -= num_records;
         }
     }
-    vars.at(index_var)->set_record_index(index_within_var);
-}
 
-
-void AggregationVariable::read()
-{
-    TIMING("AggregationVariable::read()");
-    TRACER("AggregationVariable::read() BEGIN\n");
-    TRACER("vars.size()=%ld\n", vars.size());
-    if (has_record() && num_dims() > 1) {
-        TRACER("record read from index_var=%zd, index_within_var=%ld\n",
-                index_var, index_within_var);
-        vars[index_var]->read();
-    } else {
-        int ndim = num_dims();
-        vector<int64_t> src_lo(ndim, 0);
-        vector<int64_t> src_hi(ndim, 0);
-        vector<int64_t> dst_lo(ndim, 0);
-        vector<int64_t> dst_hi(ndim, 0);
-        vector<Variable*>::iterator var_it = vars.begin();
-        vector<Variable*>::iterator var_end = vars.end();
-        for (; var_it!=var_end; ++var_it) {
-            Variable *src = *var_it;
-            // prep for the copy
-            src->read();
-            src_hi = src->get_sizes();
-            for (size_t i=0; i<src_hi.size(); ++i) {
-                src_hi[i] -= 1;
-            }
-            dst_hi[0] += src_hi[0];
-            // do the copy
-            TRACER("NGA_Copy_patch64 src_lo,hi=%ld,%ld, dst_lo,hi=%ld,%ld\n",
-                    src_lo[0], src_hi[0], dst_lo[0], dst_hi[0]);
-            NGA_Copy_patch64('n', src->get_handle(), &src_lo[0], &src_hi[0],
-                    get_handle(), &dst_lo[0], &dst_hi[0]);
-            // prepare for next iteration
-            dst_hi[0] += 1;
-            dst_lo[0] = dst_hi[0];
-            src->release_handle();
-        }
-    }
-    TRACER("AggregationVariable::read() END\n");
+    return NULL;
 }
 
 

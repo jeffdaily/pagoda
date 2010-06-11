@@ -21,9 +21,8 @@ class AggregationUnion : public Aggregation
         virtual ~AggregationUnion();
 
         virtual vector<Attribute*> get_atts();
-        virtual vector<Dimension*> get_dims();
+        virtual vector<Dimension*> get_dims() const;
         virtual vector<Variable*> get_vars();
-        virtual void populate_masks(const vector<Mask*> &masks);
 
         virtual void add(Dataset *dataset);
 

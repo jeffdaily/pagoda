@@ -18,8 +18,6 @@ using std::ostringstream;
 
 AbstractVariable::AbstractVariable()
     :   Variable()
-    ,   handle(NULL)
-    ,   record_index(0)
 {
     TIMING("AbstractVariable::AbstractVariable()");
 }
@@ -28,7 +26,6 @@ AbstractVariable::AbstractVariable()
 AbstractVariable::~AbstractVariable()
 {
     TIMING("AbstractVariable::~AbstractVariable()");
-    release_handle();
 }
 
 
@@ -39,81 +36,30 @@ bool AbstractVariable::has_record() const
 }
 
 
-size_t AbstractVariable::num_dims() const
+int64_t AbstractVariable::num_dims() const
 {
     TIMING("AbstractVariable::num_dims()");
     return get_dims().size();
 }
 
 
-int64_t AbstractVariable::get_size(bool use_masks) const
-{
-    TIMING("AbstractVariable::get_size(bool)");
-    int64_t result = 1;
-    vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::const_iterator it = dims.begin();
-    vector<Dimension*>::const_iterator end = dims.end();
-
-    for (; it!=end; ++it) {
-        if (! (*it)->is_unlimited()) {
-            Mask *mask = (*it)->get_mask();
-            if (use_masks && mask) {
-                result *= mask->get_count();
-            } else {
-                result *= (*it)->get_size();
-            }
-        }
-    }
-
-    return result;
-}
-
-
-vector<int64_t> AbstractVariable::get_sizes(bool use_masks) const
+vector<int64_t> AbstractVariable::get_shape() const
 {
     TIMING("AbstractVariable::get_sizes(bool)");
-    vector<int64_t> sizes;
+    vector<int64_t> shape;
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
     vector<Dimension*>::const_iterator end = dims.end();
 
     for (; it!=end; ++it) {
-        Mask *mask = (*it)->get_mask();
-        int64_t size;
-        if (use_masks && mask) {
-            size = mask->get_count();
-        } else {
-            size = (*it)->get_size();
-        }
-        sizes.push_back(size);
+        shape.push_back((*it)->get_size());
     }
 
-    return sizes;
+    return shape;
 }
 
 
-bool AbstractVariable::needs_subset() const
-{
-    TIMING("AbstractVariable::needs_subset()");
-    vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::const_iterator it = dims.begin();
-    vector<Dimension*>::const_iterator end = dims.end();
-
-    for (; it!=end; ++it) {
-        Dimension *dim = *it;
-        Mask *mask = dim->get_mask();;
-        if (mask) {
-            if (mask->get_size() != mask->get_count()) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-
-size_t AbstractVariable::num_atts() const
+int64_t AbstractVariable::num_atts() const
 {
     TIMING("AbstractVariable::num_atts()");
     return get_atts().size();
@@ -176,60 +122,6 @@ Attribute* AbstractVariable::find_att(
     }
 
     return NULL;
-}
-
-
-int AbstractVariable::get_handle()
-{
-    TIMING("AbstractVariable::get_handle()");
-    if (! handle) {
-        vector<int64_t> dim_sizes = get_sizes();
-        char *name = const_cast<char*>(get_name().c_str());
-        int64_t *size_tmp; // because NGA_Create64 expects int64_t pointer
-        int ndim;
-        int tmp_handle;
-        if (has_record() && num_dims() > 1) {
-            size_tmp = &dim_sizes[1];
-            ndim = num_dims() - 1;
-        } else {
-            size_tmp = &dim_sizes[0];
-            ndim = num_dims();
-        }
-        tmp_handle = NGA_Create64(get_type(), ndim, size_tmp, name, NULL);
-        handle = new int(tmp_handle);
-    }
-    return *handle;
-}
-
-
-void AbstractVariable::release_handle()
-{
-    TIMING("AbstractVariable::release_handle()");
-    if (handle) {
-        GA_Destroy(*handle);
-        delete handle;
-        handle = NULL;
-    }
-}
-
-
-void AbstractVariable::set_record_index(size_t index)
-{
-    TIMING("AbstractVariable::set_record_index(size_t)");
-    record_index = index;
-}
-
-
-size_t AbstractVariable::get_record_index() const
-{
-    TIMING("AbstractVariable::get_record_index()");
-    return record_index;
-}
-
-
-void AbstractVariable::reindex()
-{
-    TIMING("AbstractVariable::reindex()");
 }
 
 

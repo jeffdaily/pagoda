@@ -31,6 +31,7 @@ class LatLonBox
         bool contains(long long lat, long long lon) const;
         bool contains(float lat, float lon) const;
         bool contains(double lat, double lon) const;
+        bool contains(long double lat, long double lon) const;
         void scale(double value);
 
         static LatLonBox enclose(const LatLonBox &first, const LatLonBox &second);

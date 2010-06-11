@@ -14,6 +14,7 @@ AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
 AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(ga_LDFLAGS)
 LDADD = libsubsetter.la $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
+LDADD_STANDALONE = $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
 
 check_PROGRAMS = subsetter_old
 bin_PROGRAMS = subsetter
@@ -57,17 +58,17 @@ Debug.C                   \
 Debug.H                   \
 Dimension.C               \
 Dimension.H               \
-DistributedMask.C         \
-DistributedMask.H         \
 Error.H                   \
 FileWriter.C              \
 FileWriter.H              \
+GlobalArray.C             \
+GlobalArray.H             \
 LatLonBox.C               \
 LatLonBox.H               \
-LocalMask.C               \
-LocalMask.H               \
 Mask.C                    \
 Mask.H                    \
+MaskMap.C                 \
+MaskMap.H                 \
 NetcdfAttribute.C         \
 NetcdfAttribute.H         \
 NetcdfDataset.C           \
@@ -145,3 +146,5 @@ tests_TestScanAdd_SOURCES       = tests/TestScanAdd.C
 tests_TestSort_SOURCES          = tests/TestSort.C
 tests_TestUnion_SOURCES         = tests/TestUnion.C
 tests_TestUnpack_SOURCES        = tests/TestUnpack.c
+
+tests_TestGet_LDADD = $(LDADD_STANDALONE)

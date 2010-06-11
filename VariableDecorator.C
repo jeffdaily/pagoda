@@ -47,31 +47,17 @@ bool VariableDecorator::has_record() const
 }
 
 
-size_t VariableDecorator::num_dims() const
+int64_t VariableDecorator::num_dims() const
 {
     TIMING("VariableDecorator::num_dims()");
     return var->num_dims();
 }
 
 
-int64_t VariableDecorator::get_size(bool use_masks) const
-{
-    TIMING("VariableDecorator::get_size()");
-    return var->get_size(use_masks);
-}
-
-
-vector<int64_t> VariableDecorator::get_sizes(bool use_masks) const
+vector<int64_t> VariableDecorator::get_shape() const
 {
     TIMING("VariableDecorator::get_sizes()");
-    return var->get_sizes(use_masks);
-}
-
-
-bool VariableDecorator::needs_subset() const
-{
-    TIMING("VariableDecorator::needs_subset()");
-    return var->needs_subset();
+    return var->get_shape();
 }
 
 
@@ -82,7 +68,7 @@ vector<Attribute*> VariableDecorator::get_atts() const
 }
 
 
-size_t VariableDecorator::num_atts() const
+int64_t VariableDecorator::num_atts() const
 {
     TIMING("VariableDecorator::num_atts()");
     return var->num_atts();
@@ -121,45 +107,31 @@ DataType VariableDecorator::get_type() const
 }
 
 
-int VariableDecorator::get_handle()
-{
-    TIMING("VariableDecorator::get_handle()");
-    return var->get_handle();
-}
-
-
-void VariableDecorator::release_handle()
-{
-    TIMING("VariableDecorator::release_handle()");
-    return var->release_handle();
-}
-
-
-void VariableDecorator::read()
+Array* VariableDecorator::read()
 {
     TIMING("VariableDecorator::read()");
     return var->read();
 }
 
 
-void VariableDecorator::set_record_index(size_t index)
+Array* VariableDecorator::read(Array *dst)
 {
-    TIMING("VariableDecorator::set_record_index(size_t)");
-    return var->set_record_index(index);
+    TIMING("VariableDecorator::read(Array*)");
+    return var->read(dst);
 }
 
 
-size_t VariableDecorator::get_record_index() const
+Array* VariableDecorator::read(int64_t record)
 {
-    TIMING("VariableDecorator::get_record_index()");
-    return var->get_record_index();
+    TIMING("VariableDecorator::read(int64_t)");
+    return var->read(record);
 }
 
 
-void VariableDecorator::reindex()
+Array* VariableDecorator::read(int64_t record, Array *dst)
 {
-    TIMING("VariableDecorator::reindex()");
-    return var->reindex();
+    TIMING("VariableDecorator::read(int64_t,Array*)");
+    return var->read(record, dst);
 }
 
 

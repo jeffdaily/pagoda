@@ -15,6 +15,7 @@ using std::vector;
 
 class AggregationDimension;
 class AggregationVariable;
+class Array;
 class Attribute;
 class Dataset;
 class Dimension;
@@ -28,10 +29,15 @@ class AggregationJoinExisting : public Aggregation
         virtual ~AggregationJoinExisting();
 
         virtual vector<Attribute*> get_atts();
-        virtual vector<Dimension*> get_dims();
+        virtual vector<Dimension*> get_dims() const;
         virtual vector<Variable*> get_vars();
 
         virtual void add(Dataset *dataset);
+
+        virtual Array* read();
+        virtual Array* read(Array *dst);
+        virtual Array* read(int64_t record);
+        virtual Array* read(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;
 

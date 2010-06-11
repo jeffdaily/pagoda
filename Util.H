@@ -25,6 +25,7 @@ namespace Util
 {
 
 
+int64_t shape_to_size(const vector<int64_t> &shape);
 bool ends_with(const string &str, const string &end);
 void calculate_required_memory(const vector<Variable*> &vars);
 template <class T> T ptr_deleter(T object);

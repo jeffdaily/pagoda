@@ -2,11 +2,12 @@
 #define NETCDFVARIABLE_H_
 
 #include <iostream>
-    using std::ostream;
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
+
+using std::ostream;
+using std::string;
+using std::vector;
 
 #include "AbstractVariable.H"
 #include "DataType.H"
@@ -31,7 +32,10 @@ class NetcdfVariable : public AbstractVariable
 
         virtual DataType get_type() const;
 
-        virtual void read();
+        virtual Array* read();
+        virtual Array* read(Array *dst);
+        virtual Array* read(int64_t record);
+        virtual Array* read(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;
 

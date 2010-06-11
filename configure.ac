@@ -11,7 +11,7 @@ AC_CONFIG_MACRO_DIR([config])
 #####################################################3
 # automake
 #####################################################3
-AM_INIT_AUTOMAKE([silent-rules])
+AM_INIT_AUTOMAKE([foreign silent-rules])
 AM_DISABLE_SHARED
 
 #####################################################3

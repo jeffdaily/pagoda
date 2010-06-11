@@ -21,32 +21,20 @@ class AbstractVariable : public Variable
         virtual ~AbstractVariable();
 
         virtual bool has_record() const;
-        virtual size_t num_dims() const;
-        virtual int64_t get_size(bool use_masks=false) const;
-        virtual vector<int64_t> get_sizes(bool use_masks=false) const;
-        virtual bool needs_subset() const;
+        virtual int64_t num_dims() const;
+        virtual vector<int64_t> get_shape() const;
 
-        virtual size_t num_atts() const;
+        virtual int64_t num_atts() const;
         virtual string get_long_name() const;
         virtual Attribute* find_att(const string &name,
                 bool ignore_case=false) const;
         virtual Attribute* find_att(const vector<string> &names,
                 bool ignore_case=false) const;
 
-        virtual int get_handle();
-        virtual void release_handle();
-        virtual void set_record_index(size_t index);
-        virtual size_t get_record_index() const;
-
-        virtual void reindex();
-
         virtual ostream& print(ostream &os) const;
 
     protected:
         AbstractVariable();
-
-        int *handle;
-        size_t record_index;
 };
 
 #endif // ABSTRACTVARIABLE_H_

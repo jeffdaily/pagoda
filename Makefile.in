@@ -99,12 +99,12 @@ am_libsubsetter_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
 	AggregationUnion.lo AggregationVariable.lo Array.lo \
 	Attribute.lo BoundaryVariable.lo CommandLineParser.lo \
 	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
-	DataType.lo Debug.lo Dimension.lo DistributedMask.lo \
-	FileWriter.lo LatLonBox.lo LocalMask.lo Mask.lo \
-	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
-	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo Pnetcdf.lo \
-	PnetcdfTiming.lo StringComparator.lo SubsetterCommands.lo \
-	Timing.lo Util.lo Values.lo Variable.lo VariableDecorator.lo
+	DataType.lo Debug.lo Dimension.lo FileWriter.lo GlobalArray.lo \
+	LatLonBox.lo Mask.lo MaskMap.lo NetcdfAttribute.lo \
+	NetcdfDataset.lo NetcdfDimension.lo NetcdfFileWriter.lo \
+	NetcdfVariable.lo Pack.lo Pnetcdf.lo PnetcdfTiming.lo \
+	StringComparator.lo SubsetterCommands.lo Timing.lo Util.lo \
+	Values.lo Variable.lo VariableDecorator.lo
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -157,9 +157,9 @@ tests_TestEnum_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_tests_TestGet_OBJECTS = TestGet.$(OBJEXT)
 tests_TestGet_OBJECTS = $(am_tests_TestGet_OBJECTS)
-tests_TestGet_LDADD = $(LDADD)
-tests_TestGet_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+tests_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_tests_TestJoin_OBJECTS = TestJoin.$(OBJEXT)
 tests_TestJoin_OBJECTS = $(am_tests_TestJoin_OBJECTS)
 tests_TestJoin_LDADD = $(LDADD)
@@ -432,6 +432,7 @@ AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
 AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(ga_LDFLAGS)
 LDADD = libsubsetter.la $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
+LDADD_STANDALONE = $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libsubsetter.la
 subsetter_old_SOURCES = Mainp.C
 subsetter_SOURCES = SubsetterMain.C
@@ -469,17 +470,17 @@ Debug.C                   \
 Debug.H                   \
 Dimension.C               \
 Dimension.H               \
-DistributedMask.C         \
-DistributedMask.H         \
 Error.H                   \
 FileWriter.C              \
 FileWriter.H              \
+GlobalArray.C             \
+GlobalArray.H             \
 LatLonBox.C               \
 LatLonBox.H               \
-LocalMask.C               \
-LocalMask.H               \
 Mask.C                    \
 Mask.H                    \
+MaskMap.C                 \
+MaskMap.H                 \
 NetcdfAttribute.C         \
 NetcdfAttribute.H         \
 NetcdfDataset.C           \
@@ -534,6 +535,7 @@ tests_TestScanAdd_SOURCES = tests/TestScanAdd.C
 tests_TestSort_SOURCES = tests/TestSort.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
 tests_TestUnpack_SOURCES = tests/TestUnpack.c
+tests_TestGet_LDADD = $(LDADD_STANDALONE)
 all: all-am
 
 .SUFFIXES:
@@ -544,15 +546,15 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu Makefile
+	  $(AUTOMAKE) --foreign Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -760,12 +762,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DistributedMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GlobalArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LocalMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MaskMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfAttribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDimension.Plo@am__quote@

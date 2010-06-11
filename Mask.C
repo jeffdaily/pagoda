@@ -2,48 +2,52 @@
 #   include <config.h>
 #endif
 
+#include "Debug.H"
 #include "Dimension.H"
+#include "GlobalMask.H"
 #include "Mask.H"
 #include "Timing.H"
 
 
-Mask::Mask(Dimension *dim)
-    :   name(dim->get_name())
-    ,   size(dim->get_size())
-    ,   count(0)
-    ,   need_recount(true)
-    ,   cleared(false)
+/**
+ * Mask factory create method.
+ *
+ * Construct Mask based on the size of the given Dimension.
+ *
+ * @param dim Dimension to base size on
+ */
+Mask* Mask::create(Dimension *dim)
 {
-    TIMING("Mask::Mask(...)");
+    Mask *mask;
+
+    TIMING("Mask::create(Dimension*)");
+    TRACER("Mask::create(Dimension*) size=%ld\n", dim->get_size());
+
+    mask = new GlobalMask(dim);
+    mask->fill();
+    return mask;
 }
 
 
+/**
+ * Constructor.
+ */
+Mask::Mask()
+{
+    TIMING("Mask::Mask()");
+}
+
+
+/**
+ * Destructor.
+ */
 Mask::~Mask()
 {
     TIMING("Mask::~Mask()");
 }
 
 
-string Mask::get_name() const
+ostream& operator << (ostream &os, const Mask *mask)
 {
-    TIMING("Mask::get_name()");
-    return name;
-}
-
-
-int64_t Mask::get_size() const
-{
-    TIMING("Mask::get_size()");
-    return size;
-}
-
-
-int64_t Mask::get_count()
-{
-    TIMING("Mask::get_count()");
-    if (need_recount) {
-        need_recount = false;
-        recount();
-    }
-    return count;
+    return mask->print(os);
 }

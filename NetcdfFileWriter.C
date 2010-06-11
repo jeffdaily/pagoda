@@ -13,7 +13,6 @@
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
-#include "DistributedMask.H"
 #include "Mask.H"
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
@@ -55,7 +54,9 @@ void NetcdfFileWriter::def_dim(Dimension *dim)
     TIMING("NetcdfFileWriter::def_dim(Dimension*)");
     def_check();
     string name = dim->get_name();
-    Mask *mask = dim->get_mask();
+    //TODO HANDLE MASK LOOKUP OR DATASET-->MASKMAP-->MASK LOOKUP
+    //Mask *mask = dim->get_mask();
+    Mask *mask = NULL;
     MPI_Offset size;
     int id;
 

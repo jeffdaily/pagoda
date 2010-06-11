@@ -48,7 +48,7 @@ vector<Attribute*> AggregationUnion::get_atts()
 }
 
 
-vector<Dimension*> AggregationUnion::get_dims()
+vector<Dimension*> AggregationUnion::get_dims() const
 {
     TIMING("AggregationUnion::get_dims()");
     return dims;
@@ -111,17 +111,6 @@ ostream& AggregationUnion::print(ostream &os) const
 {
     TIMING("AggregationUnion::print(ostream)");
     return os << "AggregationUnion()";
-}
-
-
-void AggregationUnion::populate_masks(const vector<Mask*> &masks)
-{
-    TIMING("AggregationUnion::populate_masks(vector<Mask*>)");
-    vector<Dataset*>::iterator dataset_it = datasets.begin();
-    vector<Dataset*>::iterator dataset_end = datasets.end();
-    for (; dataset_it!=dataset_end; ++dataset_it) {
-        (*dataset_it)->populate_masks(masks);
-    }
 }
 
 

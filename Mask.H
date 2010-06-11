@@ -1,44 +1,46 @@
 #ifndef MASK_H_
 #define MASK_H_
 
+#include <iostream>
 #include <string>
 
+//#include "Array.H"
 #include "LatLonBox.H"
 #include "Slice.H"
 
+using std::ostream;
 using std::string;
 
+class Array;
 class Dimension;
-class Variable;
 
 
 class Mask
 {
     public:
-        Mask(Dimension *dim);
+        static Mask* create(Dimension *dim);
+
         virtual ~Mask();
 
-        string get_name() const;
-        int64_t get_size() const;
-        int64_t get_count();
-
-        virtual void get_data(vector<int> &data) = 0;
-        virtual void get_data(vector<int> &data, int64_t lo, int64_t hi) = 0;
+        virtual int64_t get_size() const = 0;
+        virtual int64_t get_count() const = 0;
         virtual void clear() = 0;
-        virtual void adjust(const DimSlice &slice) = 0;
-        virtual void adjust(const LatLonBox &box,
-                Variable *lat, Variable *lon) = 0;
-        virtual void adjust(double low, double hi, Variable *var,
-                bool bitwise_or=true) = 0;
-        virtual void recount() = 0;
-        virtual void reindex() = 0;
+        virtual void fill() = 0;
+
+        virtual void modify(const DimSlice &slice) = 0;
+        virtual void modify(const LatLonBox &box,
+                            const Array *lat, const Array *lon) = 0;
+        virtual void modify(double low, double hi, const Array *var) = 0;
+
+        virtual Array* as_array() const = 0;
+        virtual Array* reindex() const = 0;
+        virtual Array* partial_sum() const = 0;
+
+        virtual ostream& print(ostream &os) const = 0;
+        friend ostream& operator << (ostream &os, const Mask *mask);
 
     protected:
-        string name;
-        int64_t size;
-        int64_t count;
-        bool need_recount;
-        bool cleared;
+        Mask();
 };
 
 #endif // MASK_H_

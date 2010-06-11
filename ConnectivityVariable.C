@@ -10,7 +10,7 @@
 #include "ConnectivityVariable.H"
 #include "Debug.H"
 #include "Dimension.H"
-#include "DistributedMask.H"
+#include "Mask.H"
 #include "Timing.H"
 
 using std::map;
@@ -55,7 +55,6 @@ Dimension* ConnectivityVariable::get_to_dim() const
  * nc_int is 4-bytes in netcdf 3.6.x, right? Which correspondes to MT_INT on
  * a 4-byte integer platform (i.e. linux). I doubt I got this interplay
  * correct...
- */
 void ConnectivityVariable::reindex()
 {
     TIMING("ConnectivityVariable::reindex()");
@@ -177,6 +176,7 @@ void ConnectivityVariable::reindex()
     }
     TRACER("ConnectivityVariable::reindex END\n");
 }
+*/
 
 
 ostream& ConnectivityVariable::print(ostream &os) const

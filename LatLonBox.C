@@ -44,12 +44,12 @@ LatLonBox::LatLonBox(double north, double south, double east, double west)
 
 
 LatLonBox::LatLonBox(const LatLonBox &range)
-    :   n(range.n),
-        s(range.s),
-        e(range.e),
-        w(range.w),
-        x(range.x),
-        y(range.y)
+    :   n(range.n)
+    ,   s(range.s)
+    ,   e(range.e)
+    ,   w(range.w)
+    ,   x(range.x)
+    ,   y(range.y)
 {
     TIMING("LatLonBox::LatLonBox(LatLonBox)");
 }
@@ -196,6 +196,13 @@ bool LatLonBox::contains(float lat, float lon) const
 
 
 bool LatLonBox::contains(double lat, double lon) const
+{
+    TIMING("LatLonBox::contains(double,double)");
+    return s<lat && lat<n && w<lon && lon<e;
+}
+
+
+bool LatLonBox::contains(long double lat, long double lon) const
 {
     TIMING("LatLonBox::contains(double,double)");
     return s<lat && lat<n && w<lon && lon<e;

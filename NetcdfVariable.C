@@ -81,6 +81,7 @@ DataType NetcdfVariable::get_type() const
 }
 
 
+/*
 void NetcdfVariable::read()
 {
     TRACER("NetcdfVariable::read() %s\n", get_name().c_str());
@@ -229,6 +230,31 @@ void NetcdfVariable::read()
 #undef read_var_all
         NGA_Release_update64(get_handle(), lo, hi);
     }
+}
+*/
+
+
+Array* NetcdfVariable::read()
+{
+    return NULL;
+}
+
+
+Array* NetcdfVariable::read(Array *dst)
+{
+    return dst;
+}
+
+
+Array* NetcdfVariable::read(int64_t record)
+{
+    return NULL;
+}
+
+
+Array* NetcdfVariable::read(int64_t record, Array *dst)
+{
+    return dst;
 }
 
 

@@ -68,11 +68,11 @@ vector<Attribute*> NetcdfDataset::get_atts()
 }
 
 
-vector<Dimension*> NetcdfDataset::get_dims()
+vector<Dimension*> NetcdfDataset::get_dims() const
 {
     TIMING("NetcdfDataset::get_dims()");
     vector<Dimension*> ret;
-    vector<NetcdfDimension*>::iterator it;
+    vector<NetcdfDimension*>::const_iterator it;
     for (it=dims.begin(); it!=dims.end(); ++it) {
         ret.push_back(*it);
     }

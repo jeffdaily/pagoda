@@ -102,6 +102,26 @@ bool DataType::operator == (const DataType &type) const
     return value == type.value;
 }
 
+bool DataType::operator != (nc_type type) const
+{
+    TIMING("DataType::operator!=(nc_type)");
+    return !(this->operator==(type));
+}
+
+
+bool DataType::operator != (int type) const
+{
+    TIMING("DataType::operator!=(int)");
+    return !(this->operator==(type));
+}
+
+
+bool DataType::operator != (const DataType &type) const
+{
+    TIMING("DataType::operator!=(type)");
+    return !(this->operator==(type));
+}
+
 
 ostream& operator << (ostream &os, const DataType &type)
 {

@@ -54,9 +54,13 @@ class DataType
         nc_type as_nc() const;
         int as_ma() const;
 
-        bool operator == (nc_type) const;
-        bool operator == (int) const;
+        bool operator == (nc_type type) const;
+        bool operator == (int type) const;
         bool operator == (const DataType &type) const;
+
+        bool operator != (nc_type type) const;
+        bool operator != (int type) const;
+        bool operator != (const DataType &type) const;
 
         friend ostream& operator << (ostream &os, const DataType &other);
 

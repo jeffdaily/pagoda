@@ -2,12 +2,10 @@
 #define DIMENSION_H_
 
 #include <iostream>
-    using std::ostream;
 #include <string>
-    using std::string;
 
-
-class Mask;
+using std::ostream;
+using std::string;
 
 
 class Dimension
@@ -15,9 +13,6 @@ class Dimension
     public:
         Dimension();
         virtual ~Dimension();
-
-        virtual void set_mask(Mask *mask);
-        virtual Mask* get_mask() const;
 
         virtual string get_name() const = 0;
         virtual int64_t get_size() const = 0;
@@ -30,8 +25,6 @@ class Dimension
     protected:
         Dimension(const Dimension &copy);
         Dimension& operator = (const Dimension &copy);
-
-        Mask *mask;
 };
 
 #endif // DIMENSION_H_

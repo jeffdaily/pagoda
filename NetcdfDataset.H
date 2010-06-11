@@ -23,7 +23,7 @@ class NetcdfDataset : public Dataset
         virtual ~NetcdfDataset();
 
         virtual vector<Attribute*> get_atts();
-        virtual vector<Dimension*> get_dims();
+        virtual vector<Dimension*> get_dims() const;
         virtual vector<Variable*> get_vars();
 
         virtual ostream& print(ostream &os) const;
