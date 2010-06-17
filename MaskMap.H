@@ -45,6 +45,8 @@ class MaskMap
         friend ostream& operator << (ostream &os, const MaskMap *maskmap);
 
     protected:
+        Mask* get_mask(const string &name, const Dimension *dim);
+
         masks_t masks;
 };
 

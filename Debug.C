@@ -49,7 +49,15 @@ static inline string to_string(const char *fmt, va_list ap)
 }
 
 
-void print_zero_dummy(const char *fmt, ...) {}
+void print_zero_dummy(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    va_end(ap);
+}
+
+
 void print_zero(const char *fmt, ...)
 {
     va_list ap;
@@ -60,7 +68,11 @@ void print_zero(const char *fmt, ...)
 }
 
 
-void print_zero_dummy(const string &str) {}
+void print_zero_dummy(const string &str)
+{
+}
+
+
 void print_zero(const string &str)
 {
     if (0 == GA_Nodeid()) {
@@ -71,7 +83,16 @@ void print_zero(const string &str)
 }
 
 
-void print_sync_dummy(const char *fmt, ...) {}
+void print_sync_dummy(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    va_end(ap);
+}
+
+
+
 void print_sync(const char *fmt, ...)
 {
     va_list ap;
@@ -82,7 +103,11 @@ void print_sync(const char *fmt, ...)
 }
 
 
-void print_sync_dummy(const string &str) {}
+void print_sync_dummy(const string &str)
+{
+}
+
+
 void print_sync(const string &str)
 {
     if (0 == GA_Nodeid()) {

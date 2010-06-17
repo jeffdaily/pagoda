@@ -80,6 +80,7 @@ NetcdfFileWriter.C        \
 NetcdfFileWriter.H        \
 NetcdfVariable.C          \
 NetcdfVariable.H          \
+NotImplementedException.H \
 Pack.C                    \
 Pack.H                    \
 Pnetcdf.C                 \

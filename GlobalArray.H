@@ -23,12 +23,7 @@ class GlobalArray : public Array
         virtual vector<int64_t> get_local_shape() const;
         virtual int64_t get_ndim() const;
 
-        virtual void fill(int value);
-        virtual void fill(long value);
-        virtual void fill(long long value);
-        virtual void fill(float value);
-        virtual void fill(double value);
-        virtual void fill(long double value);
+        virtual void fill(void *value);
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
@@ -37,12 +32,6 @@ class GlobalArray : public Array
                 const vector<int64_t> &dst_lo,
                 const vector<int64_t> &dst_hi);
 
-        GlobalArray& operator=(int value);
-        GlobalArray& operator=(long value);
-        GlobalArray& operator=(long long value);
-        GlobalArray& operator=(float value);
-        GlobalArray& operator=(double value);
-        GlobalArray& operator=(long double value);
         GlobalArray& operator=(const GlobalArray &that);
 
         GlobalArray& operator+=(const GlobalArray &that);
@@ -60,6 +49,11 @@ class GlobalArray : public Array
 
         virtual void* get(const vector<int64_t> &lo,
                           const vector<int64_t> &hi) const;
+        virtual void put(void *buffer,
+                         const vector<int64_t> &lo,
+                         const vector<int64_t> &hi);
+        virtual void scatter(void *buffer, const vector<int64_t> &subscripts);
+        virtual void* gather(const vector<int64_t> &subscripts) const;
 
         virtual ostream& print(ostream &os) const;
 

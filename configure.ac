@@ -111,8 +111,12 @@ AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 GCRM_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
     [AC_MSG_FAILURE([Could not locate pnetcdf])])
 GCRM_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
-    [GCRM_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize], [$FLIBS], [],
-        [AC_MSG_FAILURE([Could not locate ga5x nor ga4x])])])
+    [AS_UNSET([ac_cv_search_GA_Initialize])
+     GCRM_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize], [$FLIBS],
+        [-lpario -lma -larmci -llinalg],
+        [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])])
+GCRM_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
+    [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 
 AC_LANG_POP([C++])
 

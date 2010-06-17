@@ -9,6 +9,7 @@ using std::string;
 using std::vector;
 
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "LatLonBox.H"
 #include "Mask.H"
@@ -51,13 +52,50 @@ void MaskMap::modify_masks(
         const vector<DimSlice> &slices,
         const vector<Dimension*> &dims)
 {
+    TIMING("Dataset::modify_masks(vector<DimSlice>,vector<Dimension*>)");
+    vector<Dimension*>::const_iterator dim_it;
+    vector<DimSlice>::const_iterator slice_it;
+
+    // we're iterating over the command-line specified slices to create masks
+    for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
+        DimSlice slice = *slice_it;
+        string slice_name = slice.get_name();
+
+        // find the Dimension
+        for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
+            Dimension *dim = *dim_it;
+            string dim_name = dim->get_name();
+            if (dim_name == slice_name) {
+                // modify the Mask based on the current Slice
+                Mask *mask = get_mask(dim);
+                mask->modify(slice);
+                break;
+            }
+        }
+        if (dim_it == dims.end()) {
+            const string name = slice.get_name();
+            PRINT_ZERO("Sliced dimension '%s' does not exist\n", name.c_str());
+        }
+    }
 }
 
 
-void MaskMap::modify_masks(
-        const LatLonBox &box, const Array *lat,
-        const Array *lon, Dimension *dim)
+/**
+ * Modify the shared mask of the given lat/lon variables.
+ *
+ * For instance the lat/lon variables for corners, edges, and cells would have
+ * their masks modified based on each pair of variables.
+ *
+ * @param box the lat/lon specification
+ * @param lat the latitude coordinate data
+ * @param lon the longitude coordinate data
+ * @param dim the dimension we are masking
+ */
+void MaskMap::modify_masks( const LatLonBox &box,
+        const Array *lat, const Array *lon, Dimension *dim)
 {
+    Mask *mask = get_mask(dim);
+    mask->modify(box, lat, lon);
 }
 
 
@@ -70,11 +108,15 @@ void MaskMap::modify_masks(
 
 Mask* MaskMap::get_mask(Dimension *dim)
 {
-    masks_t::iterator it = masks.find(dim->get_name());
+    return get_mask(dim->get_name(), dim);
+}
+
+
+Mask* MaskMap::get_mask(const string &name, const Dimension *dim)
+{
+    masks_t::iterator it = masks.find(name);
     if (it == masks.end()) {
-        return masks.insert(
-                make_pair(dim->get_name(),
-                          Mask::create(dim))).first->second;
+        return masks.insert(make_pair(name, Mask::create(dim))).first->second;
     } else {
         return it->second;
     }
@@ -90,55 +132,22 @@ Mask* MaskMap::operator [] (Dimension *dim)
 ostream& MaskMap::print(ostream &os) const
 {
     os << "MaskMap " << this;
+    return os;
 }
 
 
 ostream& operator << (ostream &os, const MaskMap &maskmap)
 {
     maskmap.print(os);
+    return os;
 }
 
 
 ostream& operator << (ostream &os, const MaskMap *maskmap)
 {
     maskmap->print(os);
+    return os;
 }
-
-
-/*
-void Dataset::adjust_masks(const vector<DimSlice> &slices)
-{
-    TIMING("Dataset::adjust_masks(vector<DimSlice)");
-    vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::iterator dim_it;
-    vector<DimSlice>::const_iterator slice_it;
-
-    // we're iterating over the command-line specified slices to create masks
-    for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
-        DimSlice slice = *slice_it;
-        //Mask *mask;
-
-        // find the Dimension
-        for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
-            Dimension *dim = *dim_it;
-            string dim_name = dim->get_name();
-            string slice_name = slice.get_name();
-            if (dim_name == slice_name) {
-                break;
-            }
-        }
-        if (dim_it == dims.end()) {
-            const string name = slice.get_name();
-            PRINT_ZERO("Sliced dimension '%s' does not exist\n", name.c_str());
-            continue;
-        } else {
-            Dimension *dim = *dim_it;
-            // adjust the Mask based on the current Slice
-            dim->get_mask()->adjust(slice);
-        }
-    }
-}
-*/
 
 
 //#define ADJUST_MASKS_WITHOUT_PRESERVATION 1

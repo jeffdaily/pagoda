@@ -30,7 +30,7 @@ using std::vector;
  *
  * @param dim Dimension to base size on
  */
-GlobalMask::GlobalMask(Dimension *dim)
+GlobalMask::GlobalMask(const Dimension *dim)
     :   Mask()
     ,   mask(NULL)
 {
@@ -70,19 +70,6 @@ GlobalMask::~GlobalMask()
 
 
 /**
- * Returns the number of bits in the mask, regardless of whether any are set.
- *
- * @return the number of bits
- */
-int64_t GlobalMask::get_size() const
-{
-    TIMING("GlobalMask::get_size()");
-
-    return mask->get_shape().at(0);
-}
-
-
-/**
  * Returns the number of set bits in the mask.
  *
  * A bit is set if it is any value except zero.
@@ -97,14 +84,14 @@ int64_t GlobalMask::get_count() const
     TIMING("GlobalMask::get_count()");
 
     std::fill(counts.begin(), counts.end(), ZERO);
-    if (mask->owns_data()) {
-        int *data = (int*)mask->access();
-        for (int64_t i=0,limit=mask->get_local_size(); i<limit; ++i) {
+    if (owns_data()) {
+        int *data = (int*)access();
+        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
             if (data[i] != 0) {
                 ++(counts[ME]);
             }
         }
-        mask->release();
+        release();
     }
 #if SIZEOF_INT64_T == SIZEOF_INT
     armci_msg_igop(&counts[0], NPROC, "+");
@@ -133,7 +120,7 @@ void GlobalMask::clear()
 /**
  * Sets all bits to 1.
  */
-void GlobalMask::fill()
+void GlobalMask::reset()
 {
     TIMING("GlobalMask::fill()");
 
@@ -158,11 +145,11 @@ void GlobalMask::modify(const DimSlice &slice)
     TIMING("GlobalMask::modify(DimSlice)");
 
     // bail if mask doesn't own any of the data
-    if (!mask->owns_data()) return;
+    if (!owns_data()) return;
 
     slice.indices(get_size(), slo, shi, step);
-    mask->get_distribution(lo,hi);
-    data = (int*)mask->access();
+    get_distribution(lo,hi);
+    data = (int*)access();
     if (lo[0] <= slo) {
         int64_t start = slo-lo[0];
         if (hi[0] >= shi) {
@@ -187,7 +174,7 @@ void GlobalMask::modify(const DimSlice &slice)
             }
         }
     }
-    mask->release_update();
+    release_update();
 }
 
 
@@ -196,24 +183,24 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     int *mask_data;
     void *lat_data;
     void *lon_data;
-    int64_t size = mask->get_local_size();
+    int64_t size = get_local_size();
 
     TIMING("GlobalMask::modify(LatLonBox,Array*,Array*)\n");
 
     // bail if we don't own any of the data
-    if (!mask->owns_data()) return;
+    if (!owns_data()) return;
 
     // lat, lon, and this must have the same shape
     // but it is assumed that they have the same distributions
     if (lat->get_shape() != lon->get_shape()) {
         GA_Error("GlobalMask::modify lat lon shape mismatch", 0);
-    } else if (mask->get_shape() != lat->get_shape()) {
+    } else if (get_shape() != lat->get_shape()) {
         GA_Error("GlobalMask::modify mask lat/lon shape mismatch", 0);
     } else if (lat->get_type() != lon->get_type()) {
         GA_Error("GlobalMask::modify lat lon types differ", 0);
     }
 
-    mask_data = (int*)mask->access();
+    mask_data = (int*)access();
     lat_data = lat->access();
     lon_data = lon->access();
 
@@ -238,7 +225,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
 #undef adjust_op
     }
 
-    mask->release_update();
+    release_update();
     lat->release();
     lon->release();
 }
@@ -252,22 +239,22 @@ void GlobalMask::modify(double min, double max, const Array *var)
     void *var_data;
 
     // bail if we don't own any of the data
-    if (!mask->owns_data()) return;
+    if (!owns_data()) return;
 
     // lat, lon, and this must have the same shape
     // but it is assumed that they have the same distributions
-    if (mask->get_shape() != var->get_shape()) {
+    if (get_shape() != var->get_shape()) {
         GA_Error("GlobalMask::modify mask var shape mismatch", 0);
     }
 
-    mask_data = (int*)mask->access();
+    mask_data = (int*)access();
     var_data = var->access();
 
     switch (var->get_type().as_ma()) {
 #define adjust_op(MTYPE,TYPE) \
         case MTYPE: { \
             TYPE *pdata = (TYPE*)var_data; \
-            for (int64_t i=0,limit=mask->get_local_size(); i<limit; ++i) { \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
                 if (pdata[i] >= min && pdata[i] <= max) { \
                     mask_data[i] = 1; \
                 } \
@@ -283,7 +270,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
 #undef adjust_op
     }
 
-    mask->release_update();
+    release_update();
     var->release();
 }
 
@@ -293,21 +280,18 @@ void GlobalMask::modify(double min, double max, const Array *var)
  */
 void GlobalMask::normalize()
 {
+    TIMING("GlobalMask::normalize()");
+    TRACER("GlobalMask::normalize()");
 
-}
-
-
-/**
- * Return this Mask as an Array.
- *
- * In this case, return the underlying GlobalArray used as storage for this
- * GlobalMask.
- *
- * @return the GlobalArray used as storage for this GlobalMask
- */
-Array* GlobalMask::as_array() const
-{
-    return mask;
+    if (owns_data()) {
+        int *mask_data = (int*)access();
+        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
+            if (mask_data[i] != 0) {
+                mask_data[i] = 1;
+            }
+        }
+        release_update();
+    }
 }
 
 
@@ -321,45 +305,159 @@ Array* GlobalMask::as_array() const
  *
  * For example:
  *
- * GlobalMask:  0  0  0  0  1  1  1  0  1  2 -1  0  1
- * Ret:  -1 -1 -1 -1  0  1  2 -1  3  4  5 -1  6
+ * Mask:   0  0  0  0  1  1  1  0  1  2 -1  0  1
+ * Rtrn:  -1 -1 -1 -1  0  1  2 -1  3  4  5 -1  6
  *
  * @return the enumerated, reindexed Array
  */
 Array* GlobalMask::reindex() const
 {
+    vector<int64_t> count(1, get_count());
+    vector<int64_t> size(1, get_size());
+    Array *ret;
+    Array *tmp;
+
     TIMING("GlobalMask::reindex()");
     TRACER("GlobalMask::reindex() BEGIN\n");
 
-    int64_t count = 0;
-    vector<int64_t> size(1);
-    Array *ret;
-    int handle_tmp;
-
-    count = get_count();
-    size.assign(1, get_size());
     ret = new GlobalArray(C_INT, size);
-    ret->fill(-1);
+    ret->fill(int(-1));
+    tmp = new GlobalArray(C_INT, count);
+    pagoda::enumerate(tmp, NULL, NULL);
+    pagoda::unpack1d(tmp, ret, mask);
+    delete tmp;
 
-    handle_tmp = NGA_Create64(C_INT, 1, &count, "tmp_enum", NULL);
-    enumerate(handle_tmp, NULL, NULL);
-    unpack1d(handle_tmp, ret->handle, handle);
-    GA_Destroy(handle_tmp);
-    /*
-    if (GA_Nnodes() == 1) {
-        int64_t ZERO = 0;
-        int64_t bighi = size-1;
-        int64_t smlhi = tmp_count-1;
-        int *src,*dst,*mask;
-        NGA_Access64(handle_index, &ZERO, &bighi, &dst, NULL);
-        NGA_Access64(handle, &ZERO, &bighi, &mask, NULL);
-        NGA_Access64(handle_tmp, &ZERO, &smlhi, &src, NULL);
-        for (int64_t i=0; i<=bighi; ++i) {
-            std::cout << "[" << i << "]" << dst[i] << " " << mask[i] << std::endl;
-        }
-    }
-    */
     TRACER("GlobalMask::reindex() END\n");
 
     return ret;
+}
+
+
+// ########################################
+// BEGIN FORWARDS FOR Array IMPLEMENTATION
+// ########################################
+
+DataType GlobalMask::get_type() const
+{
+    return mask->get_type();
+}
+
+
+vector<int64_t> GlobalMask::get_shape() const
+{
+    return mask->get_shape();
+}
+
+
+vector<int64_t> GlobalMask::get_local_shape() const
+{
+    return mask->get_local_shape();
+}
+
+
+int64_t GlobalMask::get_ndim() const
+{
+    return mask->get_ndim();
+}
+
+
+void GlobalMask::fill(int value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(long value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(long long value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(float value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(double value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(long double value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::copy(const Array *src)
+{
+    mask->copy(src);
+}
+
+
+void GlobalMask::copy(const Array *src, const vector<int64_t> &src_lo, const vector<int64_t> &src_hi, const vector<int64_t> &dst_lo, const vector<int64_t> &dst_hi)
+{
+    mask->copy(src,src_lo,src_hi,dst_lo,dst_hi);
+}
+
+
+bool GlobalMask::same_distribution(const Array *other)
+{
+    return mask->same_distribution(other);
+}
+
+
+bool GlobalMask::owns_data() const
+{
+    return mask->owns_data();
+}
+
+
+void GlobalMask::get_distribution(vector<int64_t> &lo, vector<int64_t> &hi) const
+{
+    mask->get_distribution(lo,hi);
+}
+
+
+void* GlobalMask::access()
+{
+    return mask->access();
+}
+
+
+void* GlobalMask::access() const
+{
+    return mask->access();
+}
+
+
+void GlobalMask::release() const
+{
+    mask->release();
+}
+
+
+void GlobalMask::release_update()
+{
+    mask->release_update();
+}
+
+
+void* GlobalMask::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
+{
+    return mask->get(lo,hi);
+}
+
+
+Array* GlobalMask::partial_sum(bool excl) const
+{
+    return mask->partial_sum(excl);
 }

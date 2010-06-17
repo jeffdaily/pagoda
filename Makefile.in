@@ -407,6 +407,9 @@ localstatedir = @localstatedir@
 lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+mpi_CPPFLAGS = @mpi_CPPFLAGS@
+mpi_LDFLAGS = @mpi_LDFLAGS@
+mpi_LIBS = @mpi_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 pnetcdf_CPPFLAGS = @pnetcdf_CPPFLAGS@
@@ -492,6 +495,7 @@ NetcdfFileWriter.C        \
 NetcdfFileWriter.H        \
 NetcdfVariable.C          \
 NetcdfVariable.H          \
+NotImplementedException.H \
 Pack.C                    \
 Pack.H                    \
 Pnetcdf.C                 \

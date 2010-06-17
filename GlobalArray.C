@@ -2,9 +2,12 @@
 #   include <config.h>
 #endif
 
+#include <typeinfo>
+
 #include <ga.h>
 
 #include "GlobalArray.H"
+#include "NotImplementedException.H"
 #include "Timing.H"
 
 
@@ -106,48 +109,17 @@ int64_t GlobalArray::get_ndim() const
 }
 
 
-template <class T>
-static inline void array_fill(DataType type, int handle, T value)
+void GlobalArray::fill(void *value)
 {
-#define array_fill_helper(mt,t) \
-    if (type == mt) { \
-        t avalue = value; \
-        GA_Fill(handle, &avalue); \
-    } else
-    array_fill_helper(MT_C_INT,     int)
-    array_fill_helper(MT_C_LONGINT, long)
-    array_fill_helper(MT_C_LONGLONG,long long)
-    array_fill_helper(MT_C_FLOAT,   float)
-    array_fill_helper(MT_C_DBL,     double)
-    array_fill_helper(MT_C_LDBL,    long double)
-    ; // for last else above
-#undef array_fill_helper
+    GA_Fill(handle, value);
 }
-
-
-#define operator_helper(t) \
-void GlobalArray::fill(t value) \
-{ \
-    array_fill(type, handle, value); \
-} \
-GlobalArray& GlobalArray::operator=(t value) \
-{ \
-    array_fill(type, handle, value); \
-    return *this; \
-}
-operator_helper(int)
-operator_helper(long)
-operator_helper(long long)
-operator_helper(float)
-operator_helper(double)
-operator_helper(long double)
-#undef operator_helper
 
 
 void GlobalArray::copy(const Array *src)
 {
     if (typeid(*src) == typeid(*this)) {
     }
+    throw NotImplementedException("GlobalArray::copy(Array*)");
 }
 
 
@@ -500,4 +472,24 @@ void* GlobalArray::get(
     NGA_Get64(handle, &alo_copy[0], &ahi_copy[0], buffer, &ld[1]);
     
     return buffer;
+}
+
+
+void GlobalArray::put(void *buffer,
+        const vector<int64_t> &lo,
+        const vector<int64_t> & hi)
+{
+    throw NotImplementedException("GlobalArray::put(void*,vector<int64_t>,vector<int64_t>)");
+}
+
+
+void GlobalArray::scatter(void *buffer, const vector<int64_t> &subscripts)
+{
+    throw NotImplementedException("GlobalArray::scatter(void*,vector<int64_t>)");
+}
+
+
+void* GlobalArray::gather(const vector<int64_t> &subscripts) const
+{
+    throw NotImplementedException("GlobalArray::gather(vector<int64_t>)");
 }

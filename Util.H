@@ -1,22 +1,22 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-//#include <algorithm>
-//#include <cmath>
-//#include <functional>
-//#include <numeric>
+#include <algorithm>
+#include <cmath>
+#include <functional>
+#include <numeric>
 #include <string>
 #include <vector>
 
-//using std::divides;
-//using std::modulus;
-//using std::multiplies;
-//using std::partial_sum;
-//using std::ptr_fun;
-//using std::reverse;
-//using std::rotate;
+using std::divides;
+using std::modulus;
+using std::multiplies;
+using std::partial_sum;
+using std::ptr_fun;
+using std::reverse;
+using std::rotate;
 using std::string;
-//using std::transform;
+using std::transform;
 using std::vector;
 
 class Variable;
@@ -24,20 +24,25 @@ class Variable;
 namespace Util
 {
 
-
+int64_t num_nodes();
+int64_t nodeid();
+void gop_min(vector<long> &values);
 int64_t shape_to_size(const vector<int64_t> &shape);
 bool ends_with(const string &str, const string &end);
 void calculate_required_memory(const vector<Variable*> &vars);
 template <class T> T ptr_deleter(T object);
 template <class T> bool same_name(const T *first, const T *second);
-//template <class T> vector<T> unravel_index(T x, const vector<T> &dims);
-//template <class T> T ravel_index(vector<T> indices, const vector<T> &dims);
+template <class T> vector<T> unravel_index(T x, const vector<T> &dims);
+template <class T> T ravel_index(vector<T> indices, const vector<T> &dims);
 
 
 /**
  * Generic unary function for calling "delete" on the given object.
  *
  * The class T is assumed to be a pointer.
+ *
+ * @tparam[in] object the pointer to delete
+ * @return NULL
  */
 template <class T>
 T ptr_deleter(T object)
@@ -49,6 +54,10 @@ T ptr_deleter(T object)
 
 /**
  * Generic binary test for equality of the "get_name()" accessor.
+ * The class T is assumed to be an interface defining "get_name()".
+ *
+ * @tparam[in] first the lhs of equality
+ * @tparam[in] second theh rhs of equality
  */
 template <class T>
 bool same_name(const T *first, const T *second)
@@ -58,11 +67,14 @@ bool same_name(const T *first, const T *second)
 
 
 /**
- * Given a 1-D index, determine its equivalent n-D index based on dims.
+ * Given a 1-D index, determine its equivalent N-D index based on dims.
  *
  * Adapted from Python's NumPy.
+ *
+ * @tparam[in] x the 1-D index
+ * @tparam[in] dims the shape of the N-D array
+ * @return the N-D index
  */
-/*
 template <class T>
 vector<T> unravel_index(T x, const vector<T> &dims)
 {
@@ -84,15 +96,17 @@ vector<T> unravel_index(T x, const vector<T> &dims)
     // [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
     return result;
 }
-*/
 
 
 /**
- * Given an n-D index, determine its equivalent 1-D index based on dims.
+ * Given an N-D index, determine its equivalent 1-D index based on dims.
  *
  * Adapted from Python's NumPy.
+ *
+ * @tparam[in] indices the N-D index
+ * @tparam[in] dims the shape of the N-D array
+ * @return the 1-D index
  */
-/*
 template <class T>
 T ravel_index(vector<T> indices, const vector<T> &dims)
 {
@@ -111,7 +125,6 @@ T ravel_index(vector<T> indices, const vector<T> &dims)
     // [wd,xcd,ybcd,z]
     return accumulate(indices.begin(), indices.end()-1, 0) + indices.back();
 }
-*/
 
 } // namespace Util
 

@@ -7,8 +7,12 @@
 #include <string>
 #include <vector>
 
-#include <ga.h>
-#include <macdecls.h>
+#if HAVE_GA
+#   include <ga.h>
+#   include <macdecls.h>
+#elif HAVE_MPI
+#   include <mpi.h>
+#endif
 
 #include "Debug.H"
 #include "Timing.H"
@@ -23,7 +27,70 @@ using std::vector;
 
 
 /**
+ * Returns the number of nodes in this calculation.
+ *
+ * This abstracts away the chosen messaging library.
+ *
+ * @return the number of nodes in this calculation
+ */
+int64_t Util::num_nodes()
+{
+#if HAVE_GA
+    return GA_Nnodes();
+#elif HAVE_MPI
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return rank;
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the ID of this node in this calculation.
+ *
+ * This abstracts away the chosen messaging library.
+ *
+ * @return the ID of this node in this calculation.
+ */
+int64_t Util::nodeid()
+{
+#if HAVE_GA
+    return GA_Nodeid();
+#elif HAVE_MPI
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    return size;
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the minimum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the minimums of
+ */ 
+void Util::gop_min(vector<long> &values)
+{
+#if HAVE_GA
+    GA_Lgop(&values[0], values.size(), "min");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_LONG, MPI_MIN, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
  * Returns the total number of elements in the given array shape.
+ *
+ * @param[in] shape the shape of an Array
+ * @return the total number of elements in the given array shape.
  */
 int64_t Util::shape_to_size(const vector<int64_t> &shape)
 {
@@ -33,8 +100,12 @@ int64_t Util::shape_to_size(const vector<int64_t> &shape)
 
 /**
  * Returns true if string str ends with the string end.
+ *
+ * @param[in] fullString the string being queried
+ * @param[in] ending the ending to test with
+ * @return true if the given string ends with the given ending
  */
-bool Util::ends_with(string const &fullString, string const &ending)
+bool Util::ends_with(const string &fullString, const string &ending)
 {
     TIMING("Util::ends_with(string,string)");
     size_t len_string = fullString.length();
@@ -54,9 +125,12 @@ bool Util::ends_with(string const &fullString, string const &ending)
  * This has to do with our use of GA_Pack.  Each process needs roughly
  * at least as much memory as the largest variable in our input netcdf
  * files times 4%.
+ *
+ * @param[in] vars the Variables used in this calculation
  */
 void Util::calculate_required_memory(const vector<Variable*> &vars)
 {
+#if HAVE_GA
     TIMING("Util::calculate_required_memory(vector<Variable*>)");
     TRACER("Util::calculate_required_memory BEGIN\n");
     int64_t max_size = 0;
@@ -86,4 +160,5 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
         GA_Error(msg, 0);
     }
     TRACER("Util::calculate_required_memory END\n");
+#endif
 }

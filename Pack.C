@@ -389,6 +389,55 @@ void pagoda::enumerate(int g_src, void *start_val, void *inc_val)
 
 
 /**
+ * A global enumeration operation.
+ *
+ * Assumes g_src is a 1D array.
+ */
+void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
+{
+    vector<int64_t> lo;
+    vector<int64_t> hi;
+
+    TIMING("enumerate(Array*,void*,void*)");
+    TRACER("enumerate BEGIN\n");
+
+    src->get_distribution(lo,hi);
+
+    if (lo.size() > 1) {
+        GA_Error("enumerate: expected 1D array", lo.size());
+    }
+
+    if (src->owns_data()) {
+#define enumerate_op(MTYPE,TYPE) \
+        if (MTYPE == src->get_type()) { \
+            TYPE *src_data = (TYPE*)src->access(); \
+            TYPE start = 0; \
+            TYPE inc = 1; \
+            if (start_val) { \
+                start = *((TYPE*)start_val); \
+            } \
+            if (inc_val) { \
+                inc = *((TYPE*)inc_val); \
+            } \
+            for (int64_t i=0,limit=src->get_local_size(); i<limit; ++i) { \
+                src_data[i] = (lo[0]+i)*inc + start; \
+            } \
+            src->release_update(); \
+        } else
+        enumerate_op(C_INT,     int)
+        enumerate_op(C_LONG,    long)
+        enumerate_op(C_LONGLONG,long long)
+        enumerate_op(C_FLOAT,   float)
+        enumerate_op(C_DBL,     double)
+        enumerate_op(C_LDBL,    long double)
+        ; // for last else above
+#undef enumerate_op
+    }
+    TRACER("enumerate END\n");
+}
+
+
+/**
  * Unpack g_src into g_dst based on the mask g_msk.
  *
  * Assumes g_dst and g_msk have the same distributions.

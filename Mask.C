@@ -16,7 +16,7 @@
  *
  * @param dim Dimension to base size on
  */
-Mask* Mask::create(Dimension *dim)
+Mask* Mask::create(const Dimension *dim)
 {
     Mask *mask;
 
@@ -24,7 +24,7 @@ Mask* Mask::create(Dimension *dim)
     TRACER("Mask::create(Dimension*) size=%ld\n", dim->get_size());
 
     mask = new GlobalMask(dim);
-    mask->fill();
+    mask->reset();
     return mask;
 }
 
@@ -33,6 +33,7 @@ Mask* Mask::create(Dimension *dim)
  * Constructor.
  */
 Mask::Mask()
+    :   Array()
 {
     TIMING("Mask::Mask()");
 }
