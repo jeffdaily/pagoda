@@ -7634,7 +7634,7 @@ for ac_lib in '' global; do
     ac_res="none required"
   else
     ac_res=-l$ac_lib
-    LIBS="-l$ac_lib $FLIBS $ac_func_search_save_LIBS"
+    LIBS="-l$ac_lib -lpario -lma -larmci -llinalg $FLIBS $ac_func_search_save_LIBS"
   fi
   if ac_fn_cxx_try_link "$LINENO"; then :
   ac_cv_search_GA_Initialize=$ac_res
@@ -7665,7 +7665,7 @@ fi
 
 
 if test "x$ac_cv_search_GA_Initialize" != xno; then :
-  -lpario -lma -larmci -llinalg
+
 
 
 $as_echo "#define HAVE_GA 1" >>confdefs.h
@@ -7872,7 +7872,7 @@ for ac_lib in '' global; do
     ac_res="none required"
   else
     ac_res=-l$ac_lib
-    LIBS="-l$ac_lib $FLIBS $ac_func_search_save_LIBS"
+    LIBS="-l$ac_lib -lpario -lma -larmci -llinalg $FLIBS $ac_func_search_save_LIBS"
   fi
   if ac_fn_cxx_try_link "$LINENO"; then :
   ac_cv_search_GA_Initialize=$ac_res
@@ -7903,7 +7903,7 @@ fi
 
 
 if test "x$ac_cv_search_GA_Initialize" != xno; then :
-  -lpario -lma -larmci -llinalg
+
 
 
 $as_echo "#define HAVE_GA 1" >>confdefs.h
