@@ -15,6 +15,9 @@ class Dimension;
 class Variable;
 
 
+/**
+ * A Dimension Mask implemented using a GlobalArray.
+ */
 class GlobalMask :  public Mask
 {
     public:

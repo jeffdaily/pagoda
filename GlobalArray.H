@@ -32,13 +32,6 @@ class GlobalArray : public Array
                 const vector<int64_t> &dst_lo,
                 const vector<int64_t> &dst_hi);
 
-        GlobalArray& operator=(const GlobalArray &that);
-
-        GlobalArray& operator+=(const GlobalArray &that);
-        GlobalArray& operator-=(const GlobalArray &that);
-        GlobalArray& operator*=(const GlobalArray &that);
-        GlobalArray& operator/=(const GlobalArray &that);
-
         virtual bool owns_data() const;
         virtual void get_distribution(
                 vector<int64_t> &lo, vector<int64_t> &hi) const;
@@ -56,6 +49,13 @@ class GlobalArray : public Array
         virtual void* gather(const vector<int64_t> &subscripts) const;
 
         virtual ostream& print(ostream &os) const;
+
+        GlobalArray& operator=(const GlobalArray &that);
+
+        GlobalArray& operator+=(const GlobalArray &that);
+        GlobalArray& operator-=(const GlobalArray &that);
+        GlobalArray& operator*=(const GlobalArray &that);
+        GlobalArray& operator/=(const GlobalArray &that);
 
     protected:
         void set_distribution();

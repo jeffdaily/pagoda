@@ -132,6 +132,19 @@ void GlobalArray::copy(const Array *src,
 }
 
 
+ostream& operator << (ostream &os, const GlobalArray &array)
+{
+    os << "GlobalArray(" << array.get_type() << ",";
+    vector<int64_t> shape = array.get_shape();
+    os << "shape(" << shape[0];
+    for (size_t i=1,limit=shape.size(); i<limit; ++i) {
+        os << "," << shape[i];
+    }
+    os << "))";
+    return os;
+}
+
+
 GlobalArray& GlobalArray::operator=(const GlobalArray &that)
 {
     if (this == &that) {
@@ -362,19 +375,6 @@ GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
         GA_Error("shape mismatch",0);
     }
     return *this;
-}
-
-
-ostream& operator << (ostream &os, const GlobalArray &array)
-{
-    os << "GlobalArray(" << array.get_type() << ",";
-    vector<int64_t> shape = array.get_shape();
-    os << "shape(" << shape[0];
-    for (size_t i=1,limit=shape.size(); i<limit; ++i) {
-        os << "," << shape[i];
-    }
-    os << "))";
-    return os;
 }
 
 

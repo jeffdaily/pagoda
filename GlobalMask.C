@@ -16,6 +16,7 @@
 #include "Dimension.H"
 #include "GlobalArray.H"
 #include "GlobalMask.H"
+#include "NotImplementedException.H"
 #include "Pack.H"
 #include "Slice.H"
 #include "Timing.H"
@@ -333,6 +334,12 @@ Array* GlobalMask::reindex() const
 }
 
 
+Array* GlobalMask::partial_sum(bool excl) const
+{
+    throw NotImplementedException("GlobalMask::partial_sum(bool)");
+}
+
+
 // ########################################
 // BEGIN FORWARDS FOR Array IMPLEMENTATION
 // ########################################
@@ -454,10 +461,4 @@ void GlobalMask::release_update()
 void* GlobalMask::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
     return mask->get(lo,hi);
-}
-
-
-Array* GlobalMask::partial_sum(bool excl) const
-{
-    return mask->partial_sum(excl);
 }
