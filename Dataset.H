@@ -18,6 +18,9 @@ class Mask;
 class Variable;
 
 
+/**
+ * Open a file and access the Attributes, Variables, and Dimensions within.
+ */
 class Dataset
 {
     public:
@@ -47,7 +50,6 @@ class Dataset
 
     protected:
         Dataset();
-        virtual void decorate_set(const vector<Variable*> &vars) = 0;
 };
 
 #endif // DATASET_H_

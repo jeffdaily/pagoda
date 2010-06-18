@@ -14,6 +14,9 @@ class Dimension;
 class Variable;
 
 
+/**
+ * Interface for an aggregated Dataset.
+ */
 class Aggregation : public Dataset
 {
     public:

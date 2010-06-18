@@ -26,6 +26,7 @@ namespace Util
 
 int64_t num_nodes();
 int64_t nodeid();
+void barrier();
 void gop_min(vector<long> &values);
 int64_t shape_to_size(const vector<int64_t> &shape);
 bool ends_with(const string &str, const string &end);

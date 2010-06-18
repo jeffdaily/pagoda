@@ -3,13 +3,16 @@
 
 #include <vector>
 
-using std::vector;
-
 #include "Array.H"
 #include "DataType.H"
 #include "Dimension.H"
 
+using std::vector;
 
+
+/**
+ * An N-dimensional distributed Array based on the Global Arrays toolkit.
+ */
 class GlobalArray : public Array
 {
     public:

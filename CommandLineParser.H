@@ -2,12 +2,17 @@
 #define COMMANDLINEPARSER_H_
 
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
+
+using std::string;
+using std::vector;
 
 #include "LatLonBox.H"
 
+
+/**
+ * Common command-line parsing capabilities are found here.
+ */
 class CommandLineParser
 {
     public:

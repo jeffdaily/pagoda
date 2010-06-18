@@ -22,6 +22,9 @@ class Dimension;
 class Variable;
 
 
+/**
+ * An aggregated Dataset which joins on existing Dimensions.
+ */
 class AggregationJoinExisting : public Aggregation
 {
     public:
@@ -40,9 +43,6 @@ class AggregationJoinExisting : public Aggregation
         virtual Array* read(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;
-
-    protected:
-        virtual void decorate_set(const vector<Variable*> &vars);
 
     private:
         string agg_dim_name;

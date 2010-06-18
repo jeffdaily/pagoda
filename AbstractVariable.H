@@ -15,6 +15,10 @@ using std::vector;
 class Attribute;
 
 
+/**
+ * Variable operations which can be implemented using Variable's own methods
+ * are done here.
+ */
 class AbstractVariable : public Variable
 {
     public:

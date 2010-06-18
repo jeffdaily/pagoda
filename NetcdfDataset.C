@@ -143,10 +143,3 @@ NetcdfDimension* NetcdfDataset::get_udim() const
     TIMING("NetcdfDataset::get_udim()");
     return dims.at(udim);
 }
-
-
-void NetcdfDataset::decorate_set(const vector<Variable*> &vars)
-{
-    TIMING("NetcdfDataset::decorate_set(vector<Variable*>)");
-    decorated = vars;
-}

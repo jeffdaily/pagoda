@@ -112,11 +112,3 @@ ostream& AggregationUnion::print(ostream &os) const
     TIMING("AggregationUnion::print(ostream)");
     return os << "AggregationUnion()";
 }
-
-
-void AggregationUnion::decorate_set(const vector<Variable*> &vars)
-{
-    TIMING("AggregationUnion::decorate_set(vector<Variable*>)");
-    this->vars = vars;
-}
-

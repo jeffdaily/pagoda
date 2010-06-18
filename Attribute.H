@@ -13,6 +13,16 @@ class Attribute;
 class Values;
 
 
+/**
+ * Attributes may be associated with Variables or Datasets.
+ *
+ * An Attribute is a typed local array of Values.
+ *
+ * An attribute is meant to describe Variables or Datasets with additional
+ * properties such as units, special values, max and min valid ranges, scaling
+ * factors, offsets, etc.
+ *
+ */
 class Attribute
 {
     public:

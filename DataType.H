@@ -22,6 +22,12 @@ class DataTypeException : public runtime_error
 };
 
 
+/**
+ * A common DataType object for translating from various library-specific
+ * types.
+ *
+ * For example, between Global Arrays and netcdf.
+ */
 class DataType
 {
     enum dt_type {

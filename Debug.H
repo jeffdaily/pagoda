@@ -1,8 +1,6 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
-#include <ga.h>
-
 #include <string>
 
 using std::string;

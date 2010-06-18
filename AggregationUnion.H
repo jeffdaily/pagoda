@@ -14,6 +14,10 @@ class Dimension;
 class Variable;
 
 
+/**
+ * An aggregated Dataset which combines unique Dimensions and Variables by
+ * name (first found, first aggregated).
+ */
 class AggregationUnion : public Aggregation
 {
     public:
@@ -27,9 +31,6 @@ class AggregationUnion : public Aggregation
         virtual void add(Dataset *dataset);
 
         virtual ostream& print(ostream &os) const;
-
-    protected:
-        virtual void decorate_set(const vector<Variable*> &vars);
 
     private:
         vector<Dataset*> datasets;

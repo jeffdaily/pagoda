@@ -290,6 +290,4 @@ void Dataset::decorate()
     }
     GA_Sync();
 #endif // DEBUG
-
-    decorate_set(vars);
 }

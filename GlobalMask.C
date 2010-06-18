@@ -89,17 +89,17 @@ int64_t GlobalMask::get_count() const
         int *data = (int*)access();
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
             if (data[i] != 0) {
-                ++(counts[ME]);
+                ++(counts[GA_Nodeid()]);
             }
         }
         release();
     }
 #if SIZEOF_INT64_T == SIZEOF_INT
-    armci_msg_igop(&counts[0], NPROC, "+");
+    armci_msg_igop(&counts[0], GA_Nnodes(), "+");
 #elif SIZEOF_INT64_T == SIZEOF_LONG
-    armci_msg_lgop(&counts[0], NPROC, "+");
+    armci_msg_lgop(&counts[0], GA_Nnodes(), "+");
 #elif SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    armci_msg_llgop(&counts[0], NPROC, "+");
+    armci_msg_llgop(&counts[0], GA_Nnodes(), "+");
 #else
 #   error SIZEOF_INT64_T == ???
 #endif

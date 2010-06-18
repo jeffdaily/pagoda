@@ -16,6 +16,11 @@ class Attribute;
 class AggregationDimension;
 
 
+/**
+ * An aggregated Variable whose Dimension has been joined.
+ *
+ * This assumes the Variable has an unlimited Dimension.
+ */
 class AggregationVariable : public AbstractVariable
 {
     public:

@@ -69,6 +69,21 @@ int64_t Util::nodeid()
 
 
 /**
+ * Parallel barrier.
+ */
+void Util::barrier()
+{
+#if HAVE_GA
+    GA_Sync();
+#elif HAVE_MPI
+    MPI_Barrier();
+#else
+#   error
+#endif
+}
+
+
+/**
  * Returns the minimum of all values from all processes.
  *
  * @param[in,out] values the values to take the minimums of

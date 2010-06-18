@@ -140,10 +140,3 @@ ostream& AggregationJoinExisting::print(ostream &os) const
     TIMING("AggregationJoinExisting::print(ostream)");
     return os << "AggregationJoinExisting()";
 }
-
-
-void AggregationJoinExisting::decorate_set(const vector<Variable*> &vars)
-{
-    TIMING("AggregationJoinExisting::decorate_set(vector<Variable*>)");
-    this->vars = vars;
-}

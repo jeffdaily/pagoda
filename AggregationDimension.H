@@ -12,6 +12,9 @@ using std::string;
 using std::vector;
 
 
+/**
+ * A Dimension which concatenates multiple Dimensions together.
+ */
 class AggregationDimension : public Dimension
 {
     public:
