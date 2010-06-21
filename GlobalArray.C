@@ -118,6 +118,7 @@ void GlobalArray::fill(void *value)
 void GlobalArray::copy(const Array *src)
 {
     if (typeid(*src) == typeid(*this)) {
+        GA_Copy(((GlobalArray*)src)->handle, handle);
     }
     throw NotImplementedException("GlobalArray::copy(Array*)");
 }

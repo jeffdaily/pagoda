@@ -14,6 +14,17 @@ using std::string;
 using std::vector;
 
 
+/**
+ * Interface for writing a Dataset to a file.
+ *
+ * Following the constraints of the netcdf format, the file must be completely
+ * defined (all Dimensions, Variables, Variable Attributes, and global
+ * Attributes) before writing of data can take place.
+ *
+ * As an optimization, it is recommended that for record Variables, the data
+ * is written one complete record at a time (versus one entire Variable at a
+ * time) in order to write large, contiguous chunks of data.
+ */
 class FileWriter
 {
     public:

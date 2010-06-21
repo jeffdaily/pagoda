@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#if HAVE_GA
+#   include <ga.h>
+#endif
 #include <pnetcdf.h>
 
 #include "Attribute.H"

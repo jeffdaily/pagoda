@@ -10,6 +10,11 @@ using std::string;
 using std::vector;
 
 
+/**
+ * A local array interface.
+ *
+ * Often used in conjunction with Attributes.
+ */
 class Values
 {
     public:

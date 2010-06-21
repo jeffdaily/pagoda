@@ -21,6 +21,9 @@ using std::vector;
 
 class Variable;
 
+/**
+ * Holds miscellanous functionality.
+ */
 namespace Util
 {
 

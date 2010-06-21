@@ -8,6 +8,9 @@ using std::string;
 using std::vector;
 
 
+/**
+ * Functor implementation of string comparison.
+ */
 class StringComparator
 {
     public:

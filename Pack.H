@@ -3,6 +3,9 @@
 
 class Array;
 
+/**
+ * Holder of various miscellanous functionality.
+ */
 namespace pagoda
 {
     void partial_sum(int g_src, int g_dst, int excl);

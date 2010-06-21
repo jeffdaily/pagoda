@@ -8,6 +8,9 @@ using std::string;
 using std::ostream;
 
 
+/**
+ * Represents a rectangular latitude/longitude region.
+ */
 class LatLonBox
 {
     public:

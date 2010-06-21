@@ -17,7 +17,7 @@ using std::vector;
 
 
 /**
- * Writes a Dataset to a netcdf-3 file.
+ * Writes a Dataset to a netcdf-3 file using pnetcdf.
  */
 class NetcdfFileWriter : public FileWriter
 {

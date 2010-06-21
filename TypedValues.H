@@ -14,6 +14,11 @@ using std::string;
 using std::vector;
 
 
+/**
+ * A typed, local array.
+ *
+ * Often used to hold Attribute values.
+ */
 template <class T>
 class TypedValues : public Values
 {

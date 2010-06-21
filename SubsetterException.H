@@ -8,6 +8,9 @@ using std::runtime_error;
 using std::string;
 
 
+/**
+ * A subsetter-specific error.
+ */
 class SubsetterException : public runtime_error
 {
   public:

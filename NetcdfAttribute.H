@@ -2,9 +2,10 @@
 #define NETCDFATTRIBUTE_H_
 
 #include <iostream>
-    using std::ostream;
 #include <string>
-    using std::string;
+
+using std::ostream;
+using std::string;
 
 #include "Attribute.H"
 #include "DataType.H"
@@ -14,6 +15,9 @@ class NetcdfVariable;
 class Values;
 
 
+/**
+ * The pnetcdf implementation of an Attribute.
+ */
 class NetcdfAttribute : public Attribute
 {
     public:

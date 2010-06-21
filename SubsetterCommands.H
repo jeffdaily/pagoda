@@ -11,6 +11,9 @@ using std::string;
 using std::vector;
 
 
+/**
+ * All command-line parsing for the subsetter.
+ */
 class SubsetterCommands
 {
     public:

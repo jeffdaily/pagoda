@@ -6,6 +6,9 @@
 using std::runtime_error;
 
 
+/**
+ * Indicates an invalid index.
+ */
 class IndexOutOfBoundsException : public runtime_error
 {
   public:

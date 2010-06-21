@@ -3,6 +3,11 @@
 
 #include <pnetcdf.h>
 
+/**
+ * The pnetcdf namespace, providing a C++ layer to pnetcdf.
+ *
+ * Also uses the custom timing gathering functions for pnetcdf calls.
+ */
 namespace ncmpi
 {
     void create(MPI_Comm comm, const char *path, int cmode, MPI_Info info, int *ncidp);

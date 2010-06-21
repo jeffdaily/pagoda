@@ -6,6 +6,9 @@
 using std::runtime_error;
 
 
+/**
+ * Indicate invalid range.
+ */
 class RangeException : public runtime_error
 {
   public:

@@ -6,6 +6,9 @@
 using std::runtime_error;
 
 
+/**
+ * A run-time placeholder for unimplemented functionality.
+ */
 class NotImplementedException : public runtime_error
 {
   public:

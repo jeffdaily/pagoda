@@ -21,6 +21,13 @@ class Mask;
 typedef map<string,Mask*> masks_t;
 
 
+/**
+ * A Mask container.
+ *
+ * All Mask information is kept here and can be passed around as a container.
+ * The intent is to support multiple containers for Masks which can be set or
+ * unset from a Dataset.
+ */
 class MaskMap
 {
     public:

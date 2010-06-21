@@ -32,6 +32,9 @@ typedef map<string,uint64_t> PnetcdfIOMap;
 typedef multimap<uint64_t,string> PnetcdfIOMapR;
 
 
+/**
+ * Gather timing data for pnetcdf calls.
+ */
 class PnetcdfTiming
 {
     public:

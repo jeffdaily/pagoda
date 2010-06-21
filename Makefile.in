@@ -100,11 +100,11 @@ am_libsubsetter_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
 	Attribute.lo BoundaryVariable.lo CommandLineParser.lo \
 	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
 	DataType.lo Debug.lo Dimension.lo FileWriter.lo GlobalArray.lo \
-	LatLonBox.lo Mask.lo MaskMap.lo NetcdfAttribute.lo \
-	NetcdfDataset.lo NetcdfDimension.lo NetcdfFileWriter.lo \
-	NetcdfVariable.lo Pack.lo Pnetcdf.lo PnetcdfTiming.lo \
-	StringComparator.lo SubsetterCommands.lo Timing.lo Util.lo \
-	Values.lo Variable.lo VariableDecorator.lo
+	GlobalMask.lo LatLonBox.lo Mask.lo MaskMap.lo \
+	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
+	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo Pnetcdf.lo \
+	PnetcdfTiming.lo StringComparator.lo SubsetterCommands.lo \
+	Timing.lo Util.lo Values.lo Variable.lo VariableDecorator.lo
 libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -478,6 +478,8 @@ FileWriter.C              \
 FileWriter.H              \
 GlobalArray.C             \
 GlobalArray.H             \
+GlobalMask.C              \
+GlobalMask.H              \
 LatLonBox.C               \
 LatLonBox.H               \
 Mask.C                    \
@@ -768,6 +770,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GlobalArray.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GlobalMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@

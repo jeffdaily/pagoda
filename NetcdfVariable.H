@@ -18,6 +18,9 @@ class NetcdfAttribute;
 class NetcdfDimension;
 
 
+/**
+ * The pnetcdf implementation of the Variable.
+ */
 class NetcdfVariable : public AbstractVariable
 {
     public:

@@ -28,6 +28,9 @@ typedef pair<string,unsigned long> CountsPair;
 typedef pair<unsigned long,string> CountsPairReverse;
 
 
+/**
+ * Custom profiling and timing data collector.
+ */
 class Timing
 {
     public:

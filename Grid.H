@@ -5,7 +5,10 @@ class Dataset;
 
 
 /**
- * 
+ * Unstructured grid abstraction.
+ *
+ * Most grids can be represented in an unstructured way with explicit topology
+ * and related geometry.
  */
 class Grid
 {

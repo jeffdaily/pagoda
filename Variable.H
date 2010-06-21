@@ -17,6 +17,12 @@ class Dataset;
 class Dimension;
 
 
+/**
+ * A Variable has a name, a type, a shape, and data.
+ *
+ * A Variable can be thought of as a named Array.  Variables are the read-only
+ * interface to a Dataset's data.
+ */
 class Variable
 {
     public:

@@ -35,11 +35,13 @@ GlobalMask::GlobalMask(const Dimension *dim)
     :   Mask()
     ,   mask(NULL)
 {
+    int ONE = 1;
+
     TIMING("GlobalMask::GlobalMask(Dimension*)");
     TRACER("GlobalMask ctor size=%ld\n", dim->get_size());
 
     mask = new GlobalArray(C_INT, vector<int64_t>(1,dim->get_size()));
-    mask->fill(int(1));
+    mask->fill(&ONE);
 }
 
 
@@ -112,9 +114,11 @@ int64_t GlobalMask::get_count() const
  */
 void GlobalMask::clear()
 {
+    int ZERO = 0;
+
     TIMING("GlobalMask::clear()");
 
-    mask->fill(int(0));
+    mask->fill(&ZERO);
 }
 
 
@@ -123,9 +127,11 @@ void GlobalMask::clear()
  */
 void GlobalMask::reset()
 {
+    int ONE = 1;
+
     TIMING("GlobalMask::fill()");
 
-    mask->fill(int(1));
+    mask->fill(&ONE);
 }
 
 
@@ -317,12 +323,13 @@ Array* GlobalMask::reindex() const
     vector<int64_t> size(1, get_size());
     Array *ret;
     Array *tmp;
+    int NEG_ONE = -1;
 
     TIMING("GlobalMask::reindex()");
     TRACER("GlobalMask::reindex() BEGIN\n");
 
     ret = new GlobalArray(C_INT, size);
-    ret->fill(int(-1));
+    ret->fill(&NEG_ONE);
     tmp = new GlobalArray(C_INT, count);
     pagoda::enumerate(tmp, NULL, NULL);
     pagoda::unpack1d(tmp, ret, mask);
@@ -368,37 +375,7 @@ int64_t GlobalMask::get_ndim() const
 }
 
 
-void GlobalMask::fill(int value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(long value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(long long value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(float value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(double value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(long double value)
+void GlobalMask::fill(void *value)
 {
     mask->fill(value);
 }

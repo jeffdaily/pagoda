@@ -2,9 +2,10 @@
 #define NETCDFDATASET_H_
 
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
+
+using std::string;
+using std::vector;
 
 #include "Dataset.H"
 
@@ -16,6 +17,9 @@ class NetcdfVariable;
 class Variable;
 
 
+/**
+ * The pnetcdf implementation of the Dataset.
+ */
 class NetcdfDataset : public Dataset
 {
     public:

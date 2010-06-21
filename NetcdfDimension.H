@@ -2,15 +2,19 @@
 #define NETCDFDIMENSION_H_
 
 #include <iostream>
-    using std::ostream;
 #include <string>
-    using std::string;
+
+using std::ostream;
+using std::string;
 
 #include "Dimension.H"
 
 class NetcdfDataset;
 
 
+/**
+ * The pnetcdf implementation of the Dimension.
+ */
 class NetcdfDimension : public Dimension
 {
     public:

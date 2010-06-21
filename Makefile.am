@@ -63,6 +63,8 @@ FileWriter.C              \
 FileWriter.H              \
 GlobalArray.C             \
 GlobalArray.H             \
+GlobalMask.C              \
+GlobalMask.H              \
 LatLonBox.C               \
 LatLonBox.H               \
 Mask.C                    \
