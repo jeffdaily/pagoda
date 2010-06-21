@@ -84,6 +84,43 @@ void Util::barrier()
 
 
 /**
+ * Abort the parallel application.
+ *
+ * @param message message to print before aborting
+ */
+void Util::abort(const char *message)
+{
+#if HAVE_GA
+    GA_Error(const_cast<char*>(message), 0);
+#elif HAVE_MPI
+    cerr << "[" << nodeid() << "] " << message << endl;
+    MPI_Abort(MPI_COMM_WORLD, 0);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Abort the parallel application.
+ *
+ * @param message message to print before aborting
+ * @param errorcode
+ */
+void Util::abort(const char *message, int errorcode)
+{
+#if HAVE_GA
+    GA_Error(const_cast<char*>(message), errorcode);
+#elif HAVE_MPI
+    cerr << "[" << nodeid() << "] " << message << " :: " << errorcode << endl;
+    MPI_Abort(MPI_COMM_WORLD, errorcode);
+#else
+#   error
+#endif
+}
+
+
+/**
  * Returns the minimum of all values from all processes.
  *
  * @param[in,out] values the values to take the minimums of
@@ -98,6 +135,135 @@ void Util::gop_min(vector<long> &values)
 #else
 #   error
 #endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void Util::gop_sum(vector<int> &values)
+{
+#if HAVE_GA
+    GA_Igop(&values[0], values.size(), "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void Util::gop_sum(vector<long> &values)
+{
+#if HAVE_GA
+    GA_Lgop(&values[0], values.size(), "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void Util::gop_sum(vector<long long> &values)
+{
+#if HAVE_GA && HAVE_GA_LLGOP
+    GA_Llgop(&values[0], values.size(), "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void Util::gop_sum(vector<float> &values)
+{
+#if HAVE_GA
+    GA_Fgop(&values[0], values.size(), "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void Util::gop_sum(vector<double> &values)
+{
+#if HAVE_GA
+    GA_Dgop(&values[0], values.size(), "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void Util::gop_sum(vector<long double> &values)
+{
+#if HAVE_GA && HAVE_GA_LDGOP
+    GA_Ldgop(&values[0], values.size(), "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&values[0], &values[0], values.size(),
+            MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the shape of the given region.
+ *
+ * @param[in] lo
+ * @param[in] hi
+ * @return the shape
+ */
+vector<int64_t> Util::get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi)
+{
+    vector<int64_t> ret(lo.size());
+
+    TIMING("Util::get_shape(vector<int64_t>,vector<int64_t>)");
+
+    for (size_t i=0,limit=lo.size(); i<limit; ++i) {
+        ret.push_back(hi[i]-lo[i]+1);
+    }
+
+    return ret;
 }
 
 

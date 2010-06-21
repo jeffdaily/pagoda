@@ -43,15 +43,20 @@ class GlobalArray : public Array
         virtual void release() const;
         virtual void release_update();
 
-        virtual void* get(const vector<int64_t> &lo,
-                          const vector<int64_t> &hi) const;
+        virtual void* get(void *buffer,
+                          const vector<int64_t> &lo,
+                          const vector<int64_t> &hi,
+                          const vector<int64_t> &ld) const;
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
-                         const vector<int64_t> &hi);
+                         const vector<int64_t> &hi,
+                         const vector<int64_t> &ld);
         virtual void scatter(void *buffer, const vector<int64_t> &subscripts);
         virtual void* gather(const vector<int64_t> &subscripts) const;
 
         virtual ostream& print(ostream &os) const;
+
+        virtual void dump() const;
 
         GlobalArray& operator=(const GlobalArray &that);
 

@@ -341,9 +341,17 @@ Array* GlobalMask::reindex() const
 }
 
 
+/**
+ * TODO
+ */
 Array* GlobalMask::partial_sum(bool excl) const
 {
-    throw NotImplementedException("GlobalMask::partial_sum(bool)");
+    Array *ret = Array::create(get_type(), get_shape());
+
+    TIMING("GlobalMask::partial_sum(bool)");
+    pagoda::partial_sum(this, ret, excl);
+
+    return ret;
 }
 
 
@@ -405,7 +413,8 @@ bool GlobalMask::owns_data() const
 }
 
 
-void GlobalMask::get_distribution(vector<int64_t> &lo, vector<int64_t> &hi) const
+void GlobalMask::get_distribution(
+        vector<int64_t> &lo, vector<int64_t> &hi) const
 {
     mask->get_distribution(lo,hi);
 }
@@ -435,7 +444,46 @@ void GlobalMask::release_update()
 }
 
 
-void* GlobalMask::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
+void* GlobalMask::get(
+        void *buffer,
+        const vector<int64_t> &lo,
+        const vector<int64_t> &hi,
+        const vector<int64_t> &ld) const
 {
-    return mask->get(lo,hi);
+    return mask->get(buffer,lo,hi,ld);
+}
+
+
+void GlobalMask::put(
+        void *buffer,
+        const vector<int64_t> &lo,
+        const vector<int64_t> &hi,
+        const vector<int64_t> &ld)
+{
+    mask->put(buffer,lo,hi,ld);
+}
+
+
+void GlobalMask::scatter(void *buffer, const vector<int64_t> &subscripts)
+{
+    mask->scatter(buffer,subscripts);
+}
+
+
+void* GlobalMask::gather(const vector<int64_t> &subscripts) const
+{
+    return mask->gather(subscripts);
+}
+
+
+ostream& GlobalMask::print(ostream &os) const
+{
+    os << "GlobalMask";
+    return os;
+}
+
+
+void GlobalMask::dump() const
+{
+    mask->dump();
 }

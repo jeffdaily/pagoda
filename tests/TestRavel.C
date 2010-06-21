@@ -9,14 +9,15 @@
 
 // C++ includes, std and otherwise
 #include <iomanip>
-using std::setw;
 #include <iostream>
+#include <string>
+#include <vector>
+
 using std::cout;
 using std::endl;
 using std::ostream;
-#include <string>
+using std::setw;
 using std::string;
-#include <vector>
 using std::vector;
 
 // C++ includes
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
     //cout << "dims=" << dims2 << endl;
     //printf("dims=[%lld,%lld,%lld]\n", dims1[0], dims1[1], dims1[2]);
     for (size_t i=0; i<26; ++i) {
-        unravel64(i, 3, dims1, result1);
+        pagoda::unravel64(i, 3, dims1, result1);
         printf("unravel64(%zd, %d, [%ld,%ld,%ld], [%ld,%ld,%ld])\n",
                 i, ndim,
                 (long)dims1[0], (long)dims1[1], (long)dims1[2],

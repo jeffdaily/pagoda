@@ -1,20 +1,27 @@
 #ifndef PACK_H_
 #define PACK_H_
 
+#include <vector>
+
+using std::vector;
+
 class Array;
+
 
 /**
  * Holder of various miscellanous functionality.
  */
 namespace pagoda
 {
-    void partial_sum(int g_src, int g_dst, int excl);
-    void pack(int g_src, int g_dst, int *g_masks, int *g_masksums);
+    void partial_sum(const Array *g_src, Array *g_dst, bool excl);
+    void pack(const Array *g_src, Array *g_dst,
+              vector<Array*> g_masks, vector<Array*> g_masksums);
     void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result);
-    void enumerate(int g_src, void *start, void *inc);
+    void unravel64(int64_t x,
+                   const vector<int64_t> &dims,
+                   vector<int64_t> &result);
     void enumerate(Array *src, void *start, void *inc);
-    void unpack1d(int g_src, int g_dst, int g_msk);
-    void unpack1d(Array *g_src, Array *g_dst, Array *g_msk);
+    void unpack1d(const Array *g_src, Array *g_dst, Array *g_msk);
 };
 
 #endif // PACK_H_

@@ -44,8 +44,8 @@ check_PROGRAMS = subsetter_old$(EXEEXT) tests/Test$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScanAdd$(EXEEXT) \
 	tests/TestSort$(EXEEXT) tests/TestUnion$(EXEEXT) \
-	tests/TestUnpack$(EXEEXT)
-bin_PROGRAMS = subsetter$(EXEEXT)
+	tests/TestUnpack$(EXEEXT) tests/ga/TestPartialSum$(EXEEXT)
+bin_PROGRAMS =
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/config/config.h.in \
@@ -93,132 +93,113 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libsubsetter_la_LIBADD =
-am_libsubsetter_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
+libpagoda_la_LIBADD =
+am_libpagoda_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
 	AggregationDimension.lo AggregationJoinExisting.lo \
 	AggregationUnion.lo AggregationVariable.lo Array.lo \
 	Attribute.lo BoundaryVariable.lo CommandLineParser.lo \
 	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
-	DataType.lo Debug.lo Dimension.lo FileWriter.lo GlobalArray.lo \
-	GlobalMask.lo LatLonBox.lo Mask.lo MaskMap.lo \
+	DataType.lo Debug.lo Dimension.lo FileWriter.lo gax.lo \
+	GlobalArray.lo GlobalMask.lo LatLonBox.lo Mask.lo MaskMap.lo \
 	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
-	NetcdfFileWriter.lo NetcdfVariable.lo Pack.lo Pnetcdf.lo \
-	PnetcdfTiming.lo StringComparator.lo SubsetterCommands.lo \
-	Timing.lo Util.lo Values.lo Variable.lo VariableDecorator.lo
-libsubsetter_la_OBJECTS = $(am_libsubsetter_la_OBJECTS)
+	NetcdfFileWriter.lo NetcdfVariable.lo pagoda.lo Pack.lo \
+	Pnetcdf.lo PnetcdfTiming.lo StringComparator.lo \
+	SubsetterCommands.lo Timing.lo Util.lo Values.lo Variable.lo \
+	VariableDecorator.lo
+libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 PROGRAMS = $(bin_PROGRAMS)
-am_subsetter_OBJECTS = SubsetterMain.$(OBJEXT)
-subsetter_OBJECTS = $(am_subsetter_OBJECTS)
-subsetter_LDADD = $(LDADD)
-am__DEPENDENCIES_1 =
-subsetter_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_subsetter_old_OBJECTS = Mainp.$(OBJEXT)
 subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
 subsetter_old_LDADD = $(LDADD)
-subsetter_old_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_Test_OBJECTS = Test.$(OBJEXT)
+am__DEPENDENCIES_1 =
+subsetter_old_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_tests_Test_OBJECTS = tests/Test.$(OBJEXT)
 tests_Test_OBJECTS = $(am_tests_Test_OBJECTS)
 tests_Test_LDADD = $(LDADD)
-tests_Test_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am__dirstamp = $(am__leading_dot)dirstamp
-am_tests_TestAttribute_OBJECTS = TestAttribute.$(OBJEXT)
+tests_Test_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestAttribute_OBJECTS = tests/TestAttribute.$(OBJEXT)
 tests_TestAttribute_OBJECTS = $(am_tests_TestAttribute_OBJECTS)
 tests_TestAttribute_LDADD = $(LDADD)
-tests_TestAttribute_DEPENDENCIES = libsubsetter.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_tests_TestBin_OBJECTS = TestBin.$(OBJEXT)
+tests_TestAttribute_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestBin_OBJECTS = tests/TestBin.$(OBJEXT)
 tests_TestBin_OBJECTS = $(am_tests_TestBin_OBJECTS)
 tests_TestBin_LDADD = $(LDADD)
-tests_TestBin_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestDimension_OBJECTS = TestDimension.$(OBJEXT)
+tests_TestBin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestDimension_OBJECTS = tests/TestDimension.$(OBJEXT)
 tests_TestDimension_OBJECTS = $(am_tests_TestDimension_OBJECTS)
 tests_TestDimension_LDADD = $(LDADD)
-tests_TestDimension_DEPENDENCIES = libsubsetter.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_tests_TestDistance_OBJECTS = TestDistance.$(OBJEXT)
+tests_TestDimension_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestDistance_OBJECTS = tests/TestDistance.$(OBJEXT)
 tests_TestDistance_OBJECTS = $(am_tests_TestDistance_OBJECTS)
 tests_TestDistance_LDADD = $(LDADD)
-tests_TestDistance_DEPENDENCIES = libsubsetter.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_tests_TestEnum_OBJECTS = TestEnum.$(OBJEXT)
+tests_TestDistance_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestEnum_OBJECTS = tests/TestEnum.$(OBJEXT)
 tests_TestEnum_OBJECTS = $(am_tests_TestEnum_OBJECTS)
 tests_TestEnum_LDADD = $(LDADD)
-tests_TestEnum_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestGet_OBJECTS = TestGet.$(OBJEXT)
+tests_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestGet_OBJECTS = tests/TestGet.$(OBJEXT)
 tests_TestGet_OBJECTS = $(am_tests_TestGet_OBJECTS)
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 tests_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_tests_TestJoin_OBJECTS = TestJoin.$(OBJEXT)
+am_tests_TestJoin_OBJECTS = tests/TestJoin.$(OBJEXT)
 tests_TestJoin_OBJECTS = $(am_tests_TestJoin_OBJECTS)
 tests_TestJoin_LDADD = $(LDADD)
-tests_TestJoin_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestLocateRegion_OBJECTS = TestLocateRegion.$(OBJEXT)
+tests_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestLocateRegion_OBJECTS = tests/TestLocateRegion.$(OBJEXT)
 tests_TestLocateRegion_OBJECTS = $(am_tests_TestLocateRegion_OBJECTS)
 tests_TestLocateRegion_LDADD = $(LDADD)
-tests_TestLocateRegion_DEPENDENCIES = libsubsetter.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+tests_TestLocateRegion_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1)
-am_tests_TestNetcdfDataset_OBJECTS = TestNetcdfDataset.$(OBJEXT)
+am_tests_TestNetcdfDataset_OBJECTS =  \
+	tests/TestNetcdfDataset.$(OBJEXT)
 tests_TestNetcdfDataset_OBJECTS =  \
 	$(am_tests_TestNetcdfDataset_OBJECTS)
 tests_TestNetcdfDataset_LDADD = $(LDADD)
-tests_TestNetcdfDataset_DEPENDENCIES = libsubsetter.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+tests_TestNetcdfDataset_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1)
-am_tests_TestOpen_OBJECTS = TestOpen.$(OBJEXT)
+am_tests_TestOpen_OBJECTS = tests/TestOpen.$(OBJEXT)
 tests_TestOpen_OBJECTS = $(am_tests_TestOpen_OBJECTS)
 tests_TestOpen_LDADD = $(LDADD)
-tests_TestOpen_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestPartialSum_OBJECTS = TestPartialSum.$(OBJEXT)
+tests_TestOpen_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestPartialSum_OBJECTS = tests/TestPartialSum.$(OBJEXT)
 tests_TestPartialSum_OBJECTS = $(am_tests_TestPartialSum_OBJECTS)
 tests_TestPartialSum_LDADD = $(LDADD)
-tests_TestPartialSum_DEPENDENCIES = libsubsetter.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-am_tests_TestRavel_OBJECTS = TestRavel.$(OBJEXT)
+tests_TestPartialSum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestRavel_OBJECTS = tests/TestRavel.$(OBJEXT)
 tests_TestRavel_OBJECTS = $(am_tests_TestRavel_OBJECTS)
 tests_TestRavel_LDADD = $(LDADD)
-tests_TestRavel_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestRead_OBJECTS = TestRead.$(OBJEXT)
+tests_TestRavel_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestRead_OBJECTS = tests/TestRead.$(OBJEXT)
 tests_TestRead_OBJECTS = $(am_tests_TestRead_OBJECTS)
 tests_TestRead_LDADD = $(LDADD)
-tests_TestRead_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestScanAdd_OBJECTS = TestScanAdd.$(OBJEXT)
+tests_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestScanAdd_OBJECTS = tests/TestScanAdd.$(OBJEXT)
 tests_TestScanAdd_OBJECTS = $(am_tests_TestScanAdd_OBJECTS)
 tests_TestScanAdd_LDADD = $(LDADD)
-tests_TestScanAdd_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestSort_OBJECTS = TestSort.$(OBJEXT)
+tests_TestScanAdd_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestSort_OBJECTS = tests/TestSort.$(OBJEXT)
 tests_TestSort_OBJECTS = $(am_tests_TestSort_OBJECTS)
 tests_TestSort_LDADD = $(LDADD)
-tests_TestSort_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestUnion_OBJECTS = TestUnion.$(OBJEXT)
+tests_TestSort_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestUnion_OBJECTS = tests/TestUnion.$(OBJEXT)
 tests_TestUnion_OBJECTS = $(am_tests_TestUnion_OBJECTS)
 tests_TestUnion_LDADD = $(LDADD)
-tests_TestUnion_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_tests_TestUnpack_OBJECTS = TestUnpack.$(OBJEXT)
+tests_TestUnion_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestUnpack_OBJECTS = tests/TestUnpack.$(OBJEXT)
 tests_TestUnpack_OBJECTS = $(am_tests_TestUnpack_OBJECTS)
 tests_TestUnpack_LDADD = $(LDADD)
-tests_TestUnpack_DEPENDENCIES = libsubsetter.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+tests_TestUnpack_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_ga_TestPartialSum_OBJECTS =  \
+	tests/ga/TestPartialSum.$(OBJEXT)
+tests_ga_TestPartialSum_OBJECTS =  \
+	$(am_tests_ga_TestPartialSum_OBJECTS)
+tests_ga_TestPartialSum_LDADD = $(LDADD)
+tests_ga_TestPartialSum_DEPENDENCIES = libpagoda.la \
+	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/config
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -261,28 +242,28 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
-	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
-	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
-	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
+SOURCES = $(libpagoda_la_SOURCES) $(subsetter_old_SOURCES) \
+	$(tests_Test_SOURCES) $(tests_TestAttribute_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
+	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
+	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
+	$(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
 	$(tests_TestSort_SOURCES) $(tests_TestUnion_SOURCES) \
-	$(tests_TestUnpack_SOURCES)
-DIST_SOURCES = $(libsubsetter_la_SOURCES) $(subsetter_SOURCES) \
-	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
-	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
-	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
+	$(tests_TestUnpack_SOURCES) $(tests_ga_TestPartialSum_SOURCES)
+DIST_SOURCES = $(libpagoda_la_SOURCES) $(subsetter_old_SOURCES) \
+	$(tests_Test_SOURCES) $(tests_TestAttribute_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
+	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
+	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
+	$(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
 	$(tests_TestSort_SOURCES) $(tests_TestUnion_SOURCES) \
-	$(tests_TestUnpack_SOURCES)
+	$(tests_TestUnpack_SOURCES) $(tests_ga_TestPartialSum_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -357,6 +338,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CPPFLAGS = @PKG_CPPFLAGS@
+PKG_LDFLAGS = @PKG_LDFLAGS@
+PKG_LIBS = @PKG_LIBS@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -388,9 +372,6 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-ga_CPPFLAGS = @ga_CPPFLAGS@
-ga_LDFLAGS = @ga_LDFLAGS@
-ga_LIBS = @ga_LIBS@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -407,14 +388,8 @@ localstatedir = @localstatedir@
 lt_ECHO = @lt_ECHO@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
-mpi_CPPFLAGS = @mpi_CPPFLAGS@
-mpi_LDFLAGS = @mpi_LDFLAGS@
-mpi_LIBS = @mpi_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
-pnetcdf_CPPFLAGS = @pnetcdf_CPPFLAGS@
-pnetcdf_LDFLAGS = @pnetcdf_LDFLAGS@
-pnetcdf_LIBS = @pnetcdf_LIBS@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
@@ -429,17 +404,16 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I config
 @WARNINGS_TRUE@WALL = -Wall
 @PROFILE_TRUE@PROFILE = -pg
-AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(ga_CPPFLAGS)
+AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
 AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
-AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(ga_LDFLAGS)
-LDADD = libsubsetter.la $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
-LDADD_STANDALONE = $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
-lib_LTLIBRARIES = libsubsetter.la
+AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(GA_LDFLAGS)
+LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
+LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
+lib_LTLIBRARIES = libpagoda.la
 subsetter_old_SOURCES = Mainp.C
-subsetter_SOURCES = SubsetterMain.C
-libsubsetter_la_SOURCES = \
+libpagoda_la_SOURCES = \
 AbstractVariable.C        \
 AbstractVariable.H        \
 Aggregation.C             \
@@ -476,6 +450,8 @@ Dimension.H               \
 Error.H                   \
 FileWriter.C              \
 FileWriter.H              \
+gax.H                     \
+gax.C                     \
 GlobalArray.C             \
 GlobalArray.H             \
 GlobalMask.C              \
@@ -498,6 +474,8 @@ NetcdfFileWriter.H        \
 NetcdfVariable.C          \
 NetcdfVariable.H          \
 NotImplementedException.H \
+pagoda.C                  \
+pagoda.H                  \
 Pack.C                    \
 Pack.H                    \
 Pnetcdf.C                 \
@@ -541,6 +519,7 @@ tests_TestScanAdd_SOURCES = tests/TestScanAdd.C
 tests_TestSort_SOURCES = tests/TestSort.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
 tests_TestUnpack_SOURCES = tests/TestUnpack.c
+tests_ga_TestPartialSum_SOURCES = tests/ga/TestPartialSum.C
 tests_TestGet_LDADD = $(LDADD_STANDALONE)
 all: all-am
 
@@ -628,8 +607,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libsubsetter.la: $(libsubsetter_la_OBJECTS) $(libsubsetter_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libsubsetter_la_OBJECTS) $(libsubsetter_la_LIBADD) $(LIBS)
+libpagoda.la: $(libpagoda_la_OBJECTS) $(libpagoda_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libpagoda_la_OBJECTS) $(libpagoda_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -682,72 +661,138 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-subsetter$(EXEEXT): $(subsetter_OBJECTS) $(subsetter_DEPENDENCIES) 
-	@rm -f subsetter$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(subsetter_OBJECTS) $(subsetter_LDADD) $(LIBS)
 subsetter_old$(EXEEXT): $(subsetter_old_OBJECTS) $(subsetter_old_DEPENDENCIES) 
 	@rm -f subsetter_old$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(subsetter_old_OBJECTS) $(subsetter_old_LDADD) $(LIBS)
 tests/$(am__dirstamp):
 	@$(MKDIR_P) tests
 	@: > tests/$(am__dirstamp)
+tests/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) tests/$(DEPDIR)
+	@: > tests/$(DEPDIR)/$(am__dirstamp)
+tests/Test.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/Test$(EXEEXT): $(tests_Test_OBJECTS) $(tests_Test_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/Test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_Test_OBJECTS) $(tests_Test_LDADD) $(LIBS)
+tests/TestAttribute.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestAttribute$(EXEEXT): $(tests_TestAttribute_OBJECTS) $(tests_TestAttribute_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestAttribute$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestAttribute_OBJECTS) $(tests_TestAttribute_LDADD) $(LIBS)
+tests/TestBin.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestBin$(EXEEXT): $(tests_TestBin_OBJECTS) $(tests_TestBin_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestBin$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestBin_OBJECTS) $(tests_TestBin_LDADD) $(LIBS)
+tests/TestDimension.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestDimension$(EXEEXT): $(tests_TestDimension_OBJECTS) $(tests_TestDimension_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestDimension$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestDimension_OBJECTS) $(tests_TestDimension_LDADD) $(LIBS)
+tests/TestDistance.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestDistance$(EXEEXT): $(tests_TestDistance_OBJECTS) $(tests_TestDistance_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestDistance$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestDistance_OBJECTS) $(tests_TestDistance_LDADD) $(LIBS)
+tests/TestEnum.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestEnum$(EXEEXT): $(tests_TestEnum_OBJECTS) $(tests_TestEnum_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestEnum$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestEnum_OBJECTS) $(tests_TestEnum_LDADD) $(LIBS)
+tests/TestGet.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestGet$(EXEEXT): $(tests_TestGet_OBJECTS) $(tests_TestGet_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestGet$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestGet_OBJECTS) $(tests_TestGet_LDADD) $(LIBS)
+tests/TestJoin.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestJoin$(EXEEXT): $(tests_TestJoin_OBJECTS) $(tests_TestJoin_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestJoin$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestJoin_OBJECTS) $(tests_TestJoin_LDADD) $(LIBS)
+tests/TestLocateRegion.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestLocateRegion$(EXEEXT): $(tests_TestLocateRegion_OBJECTS) $(tests_TestLocateRegion_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestLocateRegion$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestLocateRegion_OBJECTS) $(tests_TestLocateRegion_LDADD) $(LIBS)
+tests/TestNetcdfDataset.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestNetcdfDataset$(EXEEXT): $(tests_TestNetcdfDataset_OBJECTS) $(tests_TestNetcdfDataset_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestNetcdfDataset$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestNetcdfDataset_OBJECTS) $(tests_TestNetcdfDataset_LDADD) $(LIBS)
+tests/TestOpen.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestOpen$(EXEEXT): $(tests_TestOpen_OBJECTS) $(tests_TestOpen_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestOpen$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestOpen_OBJECTS) $(tests_TestOpen_LDADD) $(LIBS)
+tests/TestPartialSum.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestPartialSum$(EXEEXT): $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestPartialSum$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_LDADD) $(LIBS)
+tests/TestRavel.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestRavel$(EXEEXT): $(tests_TestRavel_OBJECTS) $(tests_TestRavel_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestRavel$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestRavel_OBJECTS) $(tests_TestRavel_LDADD) $(LIBS)
+tests/TestRead.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestRead$(EXEEXT): $(tests_TestRead_OBJECTS) $(tests_TestRead_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestRead$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestRead_OBJECTS) $(tests_TestRead_LDADD) $(LIBS)
+tests/TestScanAdd.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestScanAdd$(EXEEXT): $(tests_TestScanAdd_OBJECTS) $(tests_TestScanAdd_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestScanAdd$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestScanAdd_OBJECTS) $(tests_TestScanAdd_LDADD) $(LIBS)
+tests/TestSort.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestSort$(EXEEXT): $(tests_TestSort_OBJECTS) $(tests_TestSort_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestSort$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestSort_OBJECTS) $(tests_TestSort_LDADD) $(LIBS)
+tests/TestUnion.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestUnion$(EXEEXT): $(tests_TestUnion_OBJECTS) $(tests_TestUnion_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestUnion$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestUnion_OBJECTS) $(tests_TestUnion_LDADD) $(LIBS)
+tests/TestUnpack.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestUnpack$(EXEEXT): $(tests_TestUnpack_OBJECTS) $(tests_TestUnpack_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestUnpack$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(tests_TestUnpack_OBJECTS) $(tests_TestUnpack_LDADD) $(LIBS)
+tests/ga/$(am__dirstamp):
+	@$(MKDIR_P) tests/ga
+	@: > tests/ga/$(am__dirstamp)
+tests/ga/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) tests/ga/$(DEPDIR)
+	@: > tests/ga/$(DEPDIR)/$(am__dirstamp)
+tests/ga/TestPartialSum.$(OBJEXT): tests/ga/$(am__dirstamp) \
+	tests/ga/$(DEPDIR)/$(am__dirstamp)
+tests/ga/TestPartialSum$(EXEEXT): $(tests_ga_TestPartialSum_OBJECTS) $(tests_ga_TestPartialSum_DEPENDENCIES) tests/ga/$(am__dirstamp)
+	@rm -f tests/ga/TestPartialSum$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_ga_TestPartialSum_OBJECTS) $(tests_ga_TestPartialSum_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f tests/Test.$(OBJEXT)
+	-rm -f tests/TestAttribute.$(OBJEXT)
+	-rm -f tests/TestBin.$(OBJEXT)
+	-rm -f tests/TestDimension.$(OBJEXT)
+	-rm -f tests/TestDistance.$(OBJEXT)
+	-rm -f tests/TestEnum.$(OBJEXT)
+	-rm -f tests/TestGet.$(OBJEXT)
+	-rm -f tests/TestJoin.$(OBJEXT)
+	-rm -f tests/TestLocateRegion.$(OBJEXT)
+	-rm -f tests/TestNetcdfDataset.$(OBJEXT)
+	-rm -f tests/TestOpen.$(OBJEXT)
+	-rm -f tests/TestPartialSum.$(OBJEXT)
+	-rm -f tests/TestRavel.$(OBJEXT)
+	-rm -f tests/TestRead.$(OBJEXT)
+	-rm -f tests/TestScanAdd.$(OBJEXT)
+	-rm -f tests/TestSort.$(OBJEXT)
+	-rm -f tests/TestUnion.$(OBJEXT)
+	-rm -f tests/TestUnpack.$(OBJEXT)
+	-rm -f tests/ga/TestPartialSum.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -785,366 +830,86 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterMain.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestAttribute.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestBin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDimension.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestDistance.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestEnum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestGet.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestJoin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestLocateRegion.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestNetcdfDataset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestOpen.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestPartialSum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestRavel.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestRead.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestScanAdd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestSort.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnion.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TestUnpack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Values.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VariableDecorator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gax.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pagoda.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/Test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestAttribute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestBin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDimension.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDistance.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestEnum.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestGet.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestJoin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestLocateRegion.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestNetcdfDataset.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestOpen.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRavel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRead.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestScanAdd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestSort.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestUnion.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestUnpack.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestPartialSum.Po@am__quote@
 
 .C.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
 
 .C.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .C.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-Test.o: tests/Test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Test.o -MD -MP -MF $(DEPDIR)/Test.Tpo -c -o Test.o `test -f 'tests/Test.C' || echo '$(srcdir)/'`tests/Test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/Test.Tpo $(DEPDIR)/Test.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/Test.C' object='Test.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Test.o `test -f 'tests/Test.C' || echo '$(srcdir)/'`tests/Test.C
-
-Test.obj: tests/Test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Test.obj -MD -MP -MF $(DEPDIR)/Test.Tpo -c -o Test.obj `if test -f 'tests/Test.C'; then $(CYGPATH_W) 'tests/Test.C'; else $(CYGPATH_W) '$(srcdir)/tests/Test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/Test.Tpo $(DEPDIR)/Test.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/Test.C' object='Test.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Test.obj `if test -f 'tests/Test.C'; then $(CYGPATH_W) 'tests/Test.C'; else $(CYGPATH_W) '$(srcdir)/tests/Test.C'; fi`
-
-TestAttribute.o: tests/TestAttribute.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestAttribute.o -MD -MP -MF $(DEPDIR)/TestAttribute.Tpo -c -o TestAttribute.o `test -f 'tests/TestAttribute.C' || echo '$(srcdir)/'`tests/TestAttribute.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestAttribute.Tpo $(DEPDIR)/TestAttribute.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestAttribute.C' object='TestAttribute.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute.o `test -f 'tests/TestAttribute.C' || echo '$(srcdir)/'`tests/TestAttribute.C
-
-TestAttribute.obj: tests/TestAttribute.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestAttribute.obj -MD -MP -MF $(DEPDIR)/TestAttribute.Tpo -c -o TestAttribute.obj `if test -f 'tests/TestAttribute.C'; then $(CYGPATH_W) 'tests/TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestAttribute.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestAttribute.Tpo $(DEPDIR)/TestAttribute.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestAttribute.C' object='TestAttribute.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestAttribute.obj `if test -f 'tests/TestAttribute.C'; then $(CYGPATH_W) 'tests/TestAttribute.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestAttribute.C'; fi`
-
-TestBin.o: tests/TestBin.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestBin.o -MD -MP -MF $(DEPDIR)/TestBin.Tpo -c -o TestBin.o `test -f 'tests/TestBin.C' || echo '$(srcdir)/'`tests/TestBin.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestBin.Tpo $(DEPDIR)/TestBin.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestBin.C' object='TestBin.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestBin.o `test -f 'tests/TestBin.C' || echo '$(srcdir)/'`tests/TestBin.C
-
-TestBin.obj: tests/TestBin.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestBin.obj -MD -MP -MF $(DEPDIR)/TestBin.Tpo -c -o TestBin.obj `if test -f 'tests/TestBin.C'; then $(CYGPATH_W) 'tests/TestBin.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestBin.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestBin.Tpo $(DEPDIR)/TestBin.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestBin.C' object='TestBin.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestBin.obj `if test -f 'tests/TestBin.C'; then $(CYGPATH_W) 'tests/TestBin.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestBin.C'; fi`
-
-TestDimension.o: tests/TestDimension.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestDimension.o -MD -MP -MF $(DEPDIR)/TestDimension.Tpo -c -o TestDimension.o `test -f 'tests/TestDimension.C' || echo '$(srcdir)/'`tests/TestDimension.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestDimension.Tpo $(DEPDIR)/TestDimension.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestDimension.C' object='TestDimension.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension.o `test -f 'tests/TestDimension.C' || echo '$(srcdir)/'`tests/TestDimension.C
-
-TestDimension.obj: tests/TestDimension.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestDimension.obj -MD -MP -MF $(DEPDIR)/TestDimension.Tpo -c -o TestDimension.obj `if test -f 'tests/TestDimension.C'; then $(CYGPATH_W) 'tests/TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestDimension.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestDimension.Tpo $(DEPDIR)/TestDimension.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestDimension.C' object='TestDimension.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestDimension.obj `if test -f 'tests/TestDimension.C'; then $(CYGPATH_W) 'tests/TestDimension.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestDimension.C'; fi`
-
-TestDistance.o: tests/TestDistance.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestDistance.o -MD -MP -MF $(DEPDIR)/TestDistance.Tpo -c -o TestDistance.o `test -f 'tests/TestDistance.C' || echo '$(srcdir)/'`tests/TestDistance.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestDistance.Tpo $(DEPDIR)/TestDistance.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestDistance.C' object='TestDistance.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestDistance.o `test -f 'tests/TestDistance.C' || echo '$(srcdir)/'`tests/TestDistance.C
-
-TestDistance.obj: tests/TestDistance.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestDistance.obj -MD -MP -MF $(DEPDIR)/TestDistance.Tpo -c -o TestDistance.obj `if test -f 'tests/TestDistance.C'; then $(CYGPATH_W) 'tests/TestDistance.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestDistance.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestDistance.Tpo $(DEPDIR)/TestDistance.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestDistance.C' object='TestDistance.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestDistance.obj `if test -f 'tests/TestDistance.C'; then $(CYGPATH_W) 'tests/TestDistance.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestDistance.C'; fi`
-
-TestEnum.o: tests/TestEnum.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestEnum.o -MD -MP -MF $(DEPDIR)/TestEnum.Tpo -c -o TestEnum.o `test -f 'tests/TestEnum.C' || echo '$(srcdir)/'`tests/TestEnum.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestEnum.Tpo $(DEPDIR)/TestEnum.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestEnum.C' object='TestEnum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestEnum.o `test -f 'tests/TestEnum.C' || echo '$(srcdir)/'`tests/TestEnum.C
-
-TestEnum.obj: tests/TestEnum.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestEnum.obj -MD -MP -MF $(DEPDIR)/TestEnum.Tpo -c -o TestEnum.obj `if test -f 'tests/TestEnum.C'; then $(CYGPATH_W) 'tests/TestEnum.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestEnum.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestEnum.Tpo $(DEPDIR)/TestEnum.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestEnum.C' object='TestEnum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestEnum.obj `if test -f 'tests/TestEnum.C'; then $(CYGPATH_W) 'tests/TestEnum.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestEnum.C'; fi`
-
-TestGet.o: tests/TestGet.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestGet.o -MD -MP -MF $(DEPDIR)/TestGet.Tpo -c -o TestGet.o `test -f 'tests/TestGet.C' || echo '$(srcdir)/'`tests/TestGet.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestGet.Tpo $(DEPDIR)/TestGet.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestGet.C' object='TestGet.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestGet.o `test -f 'tests/TestGet.C' || echo '$(srcdir)/'`tests/TestGet.C
-
-TestGet.obj: tests/TestGet.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestGet.obj -MD -MP -MF $(DEPDIR)/TestGet.Tpo -c -o TestGet.obj `if test -f 'tests/TestGet.C'; then $(CYGPATH_W) 'tests/TestGet.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestGet.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestGet.Tpo $(DEPDIR)/TestGet.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestGet.C' object='TestGet.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestGet.obj `if test -f 'tests/TestGet.C'; then $(CYGPATH_W) 'tests/TestGet.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestGet.C'; fi`
-
-TestJoin.o: tests/TestJoin.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestJoin.o -MD -MP -MF $(DEPDIR)/TestJoin.Tpo -c -o TestJoin.o `test -f 'tests/TestJoin.C' || echo '$(srcdir)/'`tests/TestJoin.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestJoin.Tpo $(DEPDIR)/TestJoin.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestJoin.C' object='TestJoin.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestJoin.o `test -f 'tests/TestJoin.C' || echo '$(srcdir)/'`tests/TestJoin.C
-
-TestJoin.obj: tests/TestJoin.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestJoin.obj -MD -MP -MF $(DEPDIR)/TestJoin.Tpo -c -o TestJoin.obj `if test -f 'tests/TestJoin.C'; then $(CYGPATH_W) 'tests/TestJoin.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestJoin.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestJoin.Tpo $(DEPDIR)/TestJoin.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestJoin.C' object='TestJoin.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestJoin.obj `if test -f 'tests/TestJoin.C'; then $(CYGPATH_W) 'tests/TestJoin.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestJoin.C'; fi`
-
-TestLocateRegion.o: tests/TestLocateRegion.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestLocateRegion.o -MD -MP -MF $(DEPDIR)/TestLocateRegion.Tpo -c -o TestLocateRegion.o `test -f 'tests/TestLocateRegion.C' || echo '$(srcdir)/'`tests/TestLocateRegion.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestLocateRegion.Tpo $(DEPDIR)/TestLocateRegion.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestLocateRegion.C' object='TestLocateRegion.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestLocateRegion.o `test -f 'tests/TestLocateRegion.C' || echo '$(srcdir)/'`tests/TestLocateRegion.C
-
-TestLocateRegion.obj: tests/TestLocateRegion.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestLocateRegion.obj -MD -MP -MF $(DEPDIR)/TestLocateRegion.Tpo -c -o TestLocateRegion.obj `if test -f 'tests/TestLocateRegion.C'; then $(CYGPATH_W) 'tests/TestLocateRegion.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestLocateRegion.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestLocateRegion.Tpo $(DEPDIR)/TestLocateRegion.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestLocateRegion.C' object='TestLocateRegion.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestLocateRegion.obj `if test -f 'tests/TestLocateRegion.C'; then $(CYGPATH_W) 'tests/TestLocateRegion.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestLocateRegion.C'; fi`
-
-TestNetcdfDataset.o: tests/TestNetcdfDataset.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestNetcdfDataset.o -MD -MP -MF $(DEPDIR)/TestNetcdfDataset.Tpo -c -o TestNetcdfDataset.o `test -f 'tests/TestNetcdfDataset.C' || echo '$(srcdir)/'`tests/TestNetcdfDataset.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestNetcdfDataset.Tpo $(DEPDIR)/TestNetcdfDataset.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestNetcdfDataset.C' object='TestNetcdfDataset.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestNetcdfDataset.o `test -f 'tests/TestNetcdfDataset.C' || echo '$(srcdir)/'`tests/TestNetcdfDataset.C
-
-TestNetcdfDataset.obj: tests/TestNetcdfDataset.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestNetcdfDataset.obj -MD -MP -MF $(DEPDIR)/TestNetcdfDataset.Tpo -c -o TestNetcdfDataset.obj `if test -f 'tests/TestNetcdfDataset.C'; then $(CYGPATH_W) 'tests/TestNetcdfDataset.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestNetcdfDataset.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestNetcdfDataset.Tpo $(DEPDIR)/TestNetcdfDataset.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestNetcdfDataset.C' object='TestNetcdfDataset.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestNetcdfDataset.obj `if test -f 'tests/TestNetcdfDataset.C'; then $(CYGPATH_W) 'tests/TestNetcdfDataset.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestNetcdfDataset.C'; fi`
-
-TestOpen.o: tests/TestOpen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestOpen.o -MD -MP -MF $(DEPDIR)/TestOpen.Tpo -c -o TestOpen.o `test -f 'tests/TestOpen.C' || echo '$(srcdir)/'`tests/TestOpen.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestOpen.Tpo $(DEPDIR)/TestOpen.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestOpen.C' object='TestOpen.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestOpen.o `test -f 'tests/TestOpen.C' || echo '$(srcdir)/'`tests/TestOpen.C
-
-TestOpen.obj: tests/TestOpen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestOpen.obj -MD -MP -MF $(DEPDIR)/TestOpen.Tpo -c -o TestOpen.obj `if test -f 'tests/TestOpen.C'; then $(CYGPATH_W) 'tests/TestOpen.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestOpen.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestOpen.Tpo $(DEPDIR)/TestOpen.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestOpen.C' object='TestOpen.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestOpen.obj `if test -f 'tests/TestOpen.C'; then $(CYGPATH_W) 'tests/TestOpen.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestOpen.C'; fi`
-
-TestPartialSum.o: tests/TestPartialSum.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestPartialSum.o -MD -MP -MF $(DEPDIR)/TestPartialSum.Tpo -c -o TestPartialSum.o `test -f 'tests/TestPartialSum.C' || echo '$(srcdir)/'`tests/TestPartialSum.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestPartialSum.Tpo $(DEPDIR)/TestPartialSum.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestPartialSum.C' object='TestPartialSum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestPartialSum.o `test -f 'tests/TestPartialSum.C' || echo '$(srcdir)/'`tests/TestPartialSum.C
-
-TestPartialSum.obj: tests/TestPartialSum.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestPartialSum.obj -MD -MP -MF $(DEPDIR)/TestPartialSum.Tpo -c -o TestPartialSum.obj `if test -f 'tests/TestPartialSum.C'; then $(CYGPATH_W) 'tests/TestPartialSum.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestPartialSum.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestPartialSum.Tpo $(DEPDIR)/TestPartialSum.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestPartialSum.C' object='TestPartialSum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestPartialSum.obj `if test -f 'tests/TestPartialSum.C'; then $(CYGPATH_W) 'tests/TestPartialSum.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestPartialSum.C'; fi`
-
-TestRavel.o: tests/TestRavel.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestRavel.o -MD -MP -MF $(DEPDIR)/TestRavel.Tpo -c -o TestRavel.o `test -f 'tests/TestRavel.C' || echo '$(srcdir)/'`tests/TestRavel.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestRavel.Tpo $(DEPDIR)/TestRavel.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestRavel.C' object='TestRavel.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestRavel.o `test -f 'tests/TestRavel.C' || echo '$(srcdir)/'`tests/TestRavel.C
-
-TestRavel.obj: tests/TestRavel.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestRavel.obj -MD -MP -MF $(DEPDIR)/TestRavel.Tpo -c -o TestRavel.obj `if test -f 'tests/TestRavel.C'; then $(CYGPATH_W) 'tests/TestRavel.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestRavel.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestRavel.Tpo $(DEPDIR)/TestRavel.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestRavel.C' object='TestRavel.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestRavel.obj `if test -f 'tests/TestRavel.C'; then $(CYGPATH_W) 'tests/TestRavel.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestRavel.C'; fi`
-
-TestRead.o: tests/TestRead.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestRead.o -MD -MP -MF $(DEPDIR)/TestRead.Tpo -c -o TestRead.o `test -f 'tests/TestRead.C' || echo '$(srcdir)/'`tests/TestRead.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestRead.Tpo $(DEPDIR)/TestRead.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestRead.C' object='TestRead.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestRead.o `test -f 'tests/TestRead.C' || echo '$(srcdir)/'`tests/TestRead.C
-
-TestRead.obj: tests/TestRead.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestRead.obj -MD -MP -MF $(DEPDIR)/TestRead.Tpo -c -o TestRead.obj `if test -f 'tests/TestRead.C'; then $(CYGPATH_W) 'tests/TestRead.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestRead.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestRead.Tpo $(DEPDIR)/TestRead.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestRead.C' object='TestRead.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestRead.obj `if test -f 'tests/TestRead.C'; then $(CYGPATH_W) 'tests/TestRead.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestRead.C'; fi`
-
-TestScanAdd.o: tests/TestScanAdd.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestScanAdd.o -MD -MP -MF $(DEPDIR)/TestScanAdd.Tpo -c -o TestScanAdd.o `test -f 'tests/TestScanAdd.C' || echo '$(srcdir)/'`tests/TestScanAdd.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestScanAdd.Tpo $(DEPDIR)/TestScanAdd.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestScanAdd.C' object='TestScanAdd.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestScanAdd.o `test -f 'tests/TestScanAdd.C' || echo '$(srcdir)/'`tests/TestScanAdd.C
-
-TestScanAdd.obj: tests/TestScanAdd.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestScanAdd.obj -MD -MP -MF $(DEPDIR)/TestScanAdd.Tpo -c -o TestScanAdd.obj `if test -f 'tests/TestScanAdd.C'; then $(CYGPATH_W) 'tests/TestScanAdd.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestScanAdd.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestScanAdd.Tpo $(DEPDIR)/TestScanAdd.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestScanAdd.C' object='TestScanAdd.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestScanAdd.obj `if test -f 'tests/TestScanAdd.C'; then $(CYGPATH_W) 'tests/TestScanAdd.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestScanAdd.C'; fi`
-
-TestSort.o: tests/TestSort.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestSort.o -MD -MP -MF $(DEPDIR)/TestSort.Tpo -c -o TestSort.o `test -f 'tests/TestSort.C' || echo '$(srcdir)/'`tests/TestSort.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestSort.Tpo $(DEPDIR)/TestSort.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestSort.C' object='TestSort.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestSort.o `test -f 'tests/TestSort.C' || echo '$(srcdir)/'`tests/TestSort.C
-
-TestSort.obj: tests/TestSort.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestSort.obj -MD -MP -MF $(DEPDIR)/TestSort.Tpo -c -o TestSort.obj `if test -f 'tests/TestSort.C'; then $(CYGPATH_W) 'tests/TestSort.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestSort.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestSort.Tpo $(DEPDIR)/TestSort.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestSort.C' object='TestSort.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestSort.obj `if test -f 'tests/TestSort.C'; then $(CYGPATH_W) 'tests/TestSort.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestSort.C'; fi`
-
-TestUnion.o: tests/TestUnion.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestUnion.o -MD -MP -MF $(DEPDIR)/TestUnion.Tpo -c -o TestUnion.o `test -f 'tests/TestUnion.C' || echo '$(srcdir)/'`tests/TestUnion.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestUnion.Tpo $(DEPDIR)/TestUnion.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestUnion.C' object='TestUnion.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestUnion.o `test -f 'tests/TestUnion.C' || echo '$(srcdir)/'`tests/TestUnion.C
-
-TestUnion.obj: tests/TestUnion.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TestUnion.obj -MD -MP -MF $(DEPDIR)/TestUnion.Tpo -c -o TestUnion.obj `if test -f 'tests/TestUnion.C'; then $(CYGPATH_W) 'tests/TestUnion.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestUnion.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestUnion.Tpo $(DEPDIR)/TestUnion.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tests/TestUnion.C' object='TestUnion.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TestUnion.obj `if test -f 'tests/TestUnion.C'; then $(CYGPATH_W) 'tests/TestUnion.C'; else $(CYGPATH_W) '$(srcdir)/tests/TestUnion.C'; fi`
-
 .c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-TestUnpack.o: tests/TestUnpack.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT TestUnpack.o -MD -MP -MF $(DEPDIR)/TestUnpack.Tpo -c -o TestUnpack.o `test -f 'tests/TestUnpack.c' || echo '$(srcdir)/'`tests/TestUnpack.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestUnpack.Tpo $(DEPDIR)/TestUnpack.Po
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/TestUnpack.c' object='TestUnpack.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o TestUnpack.o `test -f 'tests/TestUnpack.c' || echo '$(srcdir)/'`tests/TestUnpack.c
-
-TestUnpack.obj: tests/TestUnpack.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT TestUnpack.obj -MD -MP -MF $(DEPDIR)/TestUnpack.Tpo -c -o TestUnpack.obj `if test -f 'tests/TestUnpack.c'; then $(CYGPATH_W) 'tests/TestUnpack.c'; else $(CYGPATH_W) '$(srcdir)/tests/TestUnpack.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TestUnpack.Tpo $(DEPDIR)/TestUnpack.Po
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tests/TestUnpack.c' object='TestUnpack.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o TestUnpack.obj `if test -f 'tests/TestUnpack.c'; then $(CYGPATH_W) 'tests/TestUnpack.c'; else $(CYGPATH_W) '$(srcdir)/tests/TestUnpack.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1152,6 +917,7 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf tests/.libs tests/_libs
+	-rm -rf tests/ga/.libs tests/ga/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -1386,7 +1152,10 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f tests/$(DEPDIR)/$(am__dirstamp)
 	-rm -f tests/$(am__dirstamp)
+	-rm -f tests/ga/$(DEPDIR)/$(am__dirstamp)
+	-rm -f tests/ga/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1398,7 +1167,7 @@ clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) tests/$(DEPDIR) tests/ga/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -1446,7 +1215,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ./$(DEPDIR) tests/$(DEPDIR) tests/ga/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

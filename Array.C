@@ -52,7 +52,7 @@ int64_t Array::get_local_size() const
 }
 
 
-bool Array::same_distribution(const Array *other)
+bool Array::same_distribution(const Array *other) const
 {
     vector<long> values(1,
             (get_local_shape() == other->get_local_shape()) ? 1 : 0);
@@ -61,6 +61,51 @@ bool Array::same_distribution(const Array *other)
 
     Util::gop_min(values);
     return (values.at(0) == 1) ? true : false;
+}
+
+
+void* Array::get(int64_t lo, int64_t hi) const
+{
+    return get(vector<int64_t>(1,lo),vector<int64_t>(1,hi));
+}
+
+
+void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
+{
+    void *buffer;
+    vector<int64_t> ld = Util::get_shape(lo,hi);
+    int64_t buffer_size = Util::shape_to_size(ld);
+    DataType type = get_type();
+
+    TIMING("Array::get(vector<int64_t>,vector<int64_t>)");
+
+    ld.erase(ld.begin());
+
+#define get_helper(mt,t) \
+    if (type == mt) { \
+        buffer = new t[buffer_size]; \
+    } else
+    get_helper(C_INT,     int)
+    get_helper(C_LONG,    long)
+    get_helper(C_LONGLONG,long long)
+    get_helper(C_FLOAT,   float)
+    get_helper(C_DBL,     double)
+    get_helper(C_LDBL,    long double)
+    ; // for last else above
+#undef get_helper
+
+    return get(buffer, lo, hi, ld);
+}
+
+
+void Array::put(void *buffer,
+        const vector<int64_t> &lo, const vector<int64_t> &hi)
+{
+    vector<int64_t> ld = Util::get_shape(lo,hi);
+
+    ld.erase(ld.begin());
+
+    put(buffer, lo, hi, ld);
 }
 
 

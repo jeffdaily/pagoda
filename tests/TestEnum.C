@@ -7,6 +7,7 @@ using namespace std;
 #include <macdecls.h>
 #include <mpi.h>
 
+#include "gax.H"
 #include "Pack.H"
 
 
@@ -42,8 +43,8 @@ int main(int argc, char **argv)
     }
 
     //GA_Fill(g_dst, &NEG_ONE);
-    enumerate(g_src, &TWO, &THREE);
-    enumerate(g_enum, &START, &STEP);
+    gax::enumerate(g_src, &TWO, &THREE);
+    gax::enumerate(g_enum, &START, &STEP);
     //unpack1d(g_src, g_dst, g_msk);
 
     GA_Print(g_src);

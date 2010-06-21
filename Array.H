@@ -20,6 +20,7 @@ using std::vector;
 class Array
 {
     public:
+
         /**
          * Factory Array creation.
          *
@@ -27,6 +28,7 @@ class Array
          * @param[in] shape the shape of the Array to create
          */
         static Array* create(DataType type, vector<int64_t> shape);
+
         /**
          * Factory Array creation.
          *
@@ -127,7 +129,7 @@ class Array
          * @param[in] other the other Array
          * @return true if the distribution of this Array matches the other.
          */
-        virtual bool same_distribution(const Array *other);
+        virtual bool same_distribution(const Array *other) const;
 
         /**
          * Returns true if this process owns a local portion of the Array.
@@ -185,6 +187,18 @@ class Array
         /**
          * Copies data from Array into local buffer and returns the buffer.
          * Caller must cast the returned buffer to the appropriate type and
+         * must also free the returned buffer when finished.  Shortcut for a
+         * 1-Dimensional get.
+         * 
+         * @param[in] lo
+         * @param[in] hi
+         * @return the buffer
+         */
+        virtual void* get(int64_t lo, int64_t hi) const;
+
+        /**
+         * Copies data from Array into local buffer and returns the buffer.
+         * Caller must cast the returned buffer to the appropriate type and
          * must also free the returned buffer when finished.
          * 
          * @param[in] lo
@@ -192,7 +206,23 @@ class Array
          * @return the buffer
          */
         virtual void* get(const vector<int64_t> &lo,
-                          const vector<int64_t> &hi) const = 0;
+                          const vector<int64_t> &hi) const;
+
+        /**
+         * Copies data from Array into given buffer and returns the buffer.
+         * Caller must cast the returned buffer to the appropriate type.
+         * 
+         * @param[in,out] buffer the local array
+         * @param[in] lo
+         * @param[in] hi
+         * @param[in] ld array specifying the leading
+         *               dimensions/strides/extents of the buffer array
+         * @return the buffer
+         */
+        virtual void* get(void *buffer,
+                          const vector<int64_t> &lo,
+                          const vector<int64_t> &hi,
+                          const vector<int64_t> &ld) const = 0;
 
         /**
          * Copies data from the source buffer into into the Array.
@@ -203,10 +233,29 @@ class Array
          * @param[in] buffer the buffer
          * @param[in] lo
          * @param[in] hi
+         * @param[in] ld array specifying the leading
+         *               dimensions/strides/extents of the buffer array
          */
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
-                         const vector<int64_t> &hi) = 0;
+                         const vector<int64_t> &hi);
+
+        /**
+         * Copies data from the source buffer into into the Array.
+         *
+         * The buffer is assumed to have the same number of elements as the
+         * indicated patch.
+         *
+         * @param[in] buffer the buffer
+         * @param[in] lo
+         * @param[in] hi
+         * @param[in] ld the leading dimensions of the buffer array
+         */
+        virtual void put(void *buffer,
+                         const vector<int64_t> &lo,
+                         const vector<int64_t> &hi,
+                         const vector<int64_t> &ld) = 0;
+
         /**
          * Scatters values into this Array.
          *
@@ -232,6 +281,11 @@ class Array
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Array *array);
+
+        /**
+         * Dump the contents of this Array to the screen.
+         */
+        virtual void dump() const = 0;
 
     protected:
         Array();

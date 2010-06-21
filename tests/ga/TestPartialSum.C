@@ -11,7 +11,6 @@ using std::endl;
 #include <mpi.h>
 
 #include "gax.H"
-#include "Pack.H"
 
 int main(int argc, char **argv)
 {

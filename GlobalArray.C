@@ -9,6 +9,7 @@
 #include "GlobalArray.H"
 #include "NotImplementedException.H"
 #include "Timing.H"
+#include "Util.H"
 
 
 template <class InputIterator1, class Value>
@@ -120,7 +121,7 @@ void GlobalArray::copy(const Array *src)
     if (typeid(*src) == typeid(*this)) {
         GA_Copy(((GlobalArray*)src)->handle, handle);
     }
-    throw NotImplementedException("GlobalArray::copy(Array*)");
+    throw NotImplementedException("GlobalArray::copy(Array*) of differing Array implementations");
 }
 
 
@@ -130,6 +131,18 @@ void GlobalArray::copy(const Array *src,
         const vector<int64_t> &dst_lo,
         const vector<int64_t> &dst_hi)
 {
+    if (typeid(*src) == typeid(*this)) {
+        vector<int64_t> src_lo_copy(src_lo.begin(), src_lo.end());
+        vector<int64_t> src_hi_copy(src_hi.begin(), src_hi.end());
+        vector<int64_t> dst_lo_copy(dst_lo.begin(), dst_lo.end());
+        vector<int64_t> dst_hi_copy(dst_hi.begin(), dst_hi.end());
+        NGA_Copy_patch64('n',
+                ((GlobalArray*)src)->handle,
+                &src_lo_copy[0], &src_hi_copy[0],
+                handle,
+                &dst_lo_copy[0], &dst_hi_copy[0]);
+    }
+    throw NotImplementedException("GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
 }
 
 
@@ -441,56 +454,97 @@ void GlobalArray::release_update()
 
 
 void* GlobalArray::get(
-        const vector<int64_t> &alo,
-        const vector<int64_t> &ahi) const
+        void *buffer,
+        const vector<int64_t> &lo,
+        const vector<int64_t> &hi,
+        const vector<int64_t> &ld) const
 {
-    void *buffer;
-    int64_t buffer_size = 1;
-    vector<int64_t> alo_copy(alo.begin(),alo.end());
-    vector<int64_t> ahi_copy(ahi.begin(),ahi.end());
-    vector<int64_t> ld;
+    vector<int64_t> lo_copy(lo.begin(),lo.end());
+    vector<int64_t> hi_copy(hi.begin(),hi.end());
+    vector<int64_t> ld_copy(ld.begin(),ld.end());
 
-    TIMING("GlobalArray::get(vector<int64_t>,vector<int64_t>)");
+    TIMING("GlobalArray::get(void*,vector<int64_t>,vector<int64_t>,vector<int64_t>)");
 
-    for (size_t i=0,limit=get_ndim(); i<limit; ++i) {
-        ld.push_back(ahi[i]-alo[i]+1);
-        buffer_size *= ld.back();
-    }
+    NGA_Get64(handle, &lo_copy[0], &hi_copy[0], buffer, &ld_copy[0]);
 
-#define get_helper(mt,t) \
-    if (type == mt) { \
-        buffer = new t[buffer_size]; \
-    } else
-    get_helper(MT_C_INT,     int)
-    get_helper(MT_C_LONGINT, long)
-    get_helper(MT_C_LONGLONG,long long)
-    get_helper(MT_C_FLOAT,   float)
-    get_helper(MT_C_DBL,     double)
-    get_helper(MT_C_LDBL,    long double)
-    ; // for last else above
-#undef get_helper
-    
-    NGA_Get64(handle, &alo_copy[0], &ahi_copy[0], buffer, &ld[1]);
-    
     return buffer;
 }
 
 
 void GlobalArray::put(void *buffer,
         const vector<int64_t> &lo,
-        const vector<int64_t> & hi)
+        const vector<int64_t> &hi,
+        const vector<int64_t> &ld)
 {
-    throw NotImplementedException("GlobalArray::put(void*,vector<int64_t>,vector<int64_t>)");
+    vector<int64_t> lo_copy(lo.begin(), lo.end());
+    vector<int64_t> hi_copy(hi.begin(), hi.end());
+    vector<int64_t> ld_copy(ld.begin(), ld.end());
+    NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &ld_copy[0]);
 }
 
 
 void GlobalArray::scatter(void *buffer, const vector<int64_t> &subscripts)
 {
-    throw NotImplementedException("GlobalArray::scatter(void*,vector<int64_t>)");
+    // GA has a funky C signature for this one...
+    vector<int64_t> subscripts_copy(subscripts.begin(),subscripts.end());
+    int64_t ndim = get_ndim();
+    int64_t n = subscripts_copy.size() / ndim;
+    int64_t **subs = new int64_t*[n];
+
+    TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
+
+    for (size_t i=0; i<n; ++i) {
+        subs[i] = &subscripts_copy[i*ndim];
+    }
+
+    NGA_Scatter64(handle, buffer, subs, n);
+
+    delete subs;
 }
 
 
 void* GlobalArray::gather(const vector<int64_t> &subscripts) const
 {
-    throw NotImplementedException("GlobalArray::gather(vector<int64_t>)");
+    // GA has a funky C signature for this one...
+    vector<int64_t> subscripts_copy(subscripts.begin(),subscripts.end());
+    int64_t ndim = get_ndim();
+    int64_t n = subscripts_copy.size() / ndim;
+    int64_t **subs = new int64_t*[n];
+    void *buffer;
+
+    TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
+
+    for (size_t i=0; i<n; ++i) {
+        subs[i] = &subscripts_copy[i*ndim];
+    }
+
+#define gather_helper(mt,t) \
+    if (type == mt) { \
+        buffer = new t[n]; \
+    } else
+    gather_helper(C_INT,     int)
+    gather_helper(C_LONG,    long)
+    gather_helper(C_LONGLONG,long long)
+    gather_helper(C_FLOAT,   float)
+    gather_helper(C_DBL,     double)
+    gather_helper(C_LDBL,    long double)
+    ; // for last else above
+#undef gather_helper
+    
+    NGA_Gather64(handle, buffer, subs, n);
+
+    delete subs;
+}
+
+
+ostream& GlobalArray::print(ostream &os) const
+{
+    os << "GlobalArray";
+    return os;
+}
+
+
+void GlobalArray::dump() const
+{
+    GA_Print(handle);
 }

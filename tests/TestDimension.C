@@ -1,5 +1,5 @@
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#   include <config.h>
 #endif // HAVE_CONFIG_H
 
 // C includes, std and otherwise
@@ -11,18 +11,19 @@
 
 // C++ includes, std and otherwise
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
 using std::cout;
 using std::endl;
-#include <sstream>
 using std::ostringstream;
-#include <string>
 using std::string;
-#include <vector>
 using std::vector;
 
 // C++ includes
 #include "Dimension.H"
-#include "DistributedMask.H"
+#include "Mask.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "SubsetterException.H"
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
     }
 
     NetcdfDataset *dataset = new NetcdfDataset(argv[1]);
-    DistributedMask *mask = NULL;
+    Mask *mask = NULL;
 
     Util::calculate_required_memory(dataset->get_vars());
 
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
         Dimension *dim = dims[dimid];
         cout << dim << endl;
         if (dim->get_name() == "cells") {
-            mask = new DistributedMask(dim, 1);
+            mask = Mask::create(dim);
         }
     }
 

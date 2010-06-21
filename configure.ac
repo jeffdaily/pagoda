@@ -11,7 +11,7 @@ AC_CONFIG_MACRO_DIR([config])
 #####################################################3
 # automake
 #####################################################3
-AM_INIT_AUTOMAKE([foreign silent-rules])
+AM_INIT_AUTOMAKE([foreign silent-rules subdir-objects])
 AM_DISABLE_SHARED
 
 #####################################################3
@@ -112,12 +112,17 @@ GCRM_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
     [AC_MSG_FAILURE([Could not locate pnetcdf])])
 GCRM_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
     [AS_UNSET([ac_cv_search_GA_Initialize])
+     save_LIBS="$LIBS"
      GCRM_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize],
-        [-lpario -lma -larmci -llinalg $FLIBS],
-        [],
-        [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])])
+        [-lpario -lglobal -lma -larmci -llinalg $FLIBS],
+        [GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"],
+        [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
+     LIBS="$save_LIBS"])
 GCRM_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
+
+# Checks for GA functionality.
+AC_CHECK_FUNCS([GA_Llgop GA_Ldgop])
 
 AC_LANG_POP([C++])
 

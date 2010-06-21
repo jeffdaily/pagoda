@@ -30,7 +30,16 @@ namespace Util
 int64_t num_nodes();
 int64_t nodeid();
 void barrier();
+void abort(const char *message);
+void abort(const char *message, int errorcode);
 void gop_min(vector<long> &values);
+void gop_sum(vector<int> &values);
+void gop_sum(vector<long> &values);
+void gop_sum(vector<long long> &values);
+void gop_sum(vector<float> &values);
+void gop_sum(vector<double> &values);
+void gop_sum(vector<long double> &values);
+vector<int64_t> get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi);
 int64_t shape_to_size(const vector<int64_t> &shape);
 bool ends_with(const string &str, const string &end);
 void calculate_required_memory(const vector<Variable*> &vars);

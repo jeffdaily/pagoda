@@ -8,23 +8,21 @@ if PROFILE
 PROFILE = -pg
 endif
 
-AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(ga_CPPFLAGS)
+AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
 AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
-AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(ga_LDFLAGS)
-LDADD = libsubsetter.la $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
-LDADD_STANDALONE = $(pnetcdf_LIBS) $(ga_LIBS) $(FLIBS)
+AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(GA_LDFLAGS)
+LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
+LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 
 check_PROGRAMS = subsetter_old
-bin_PROGRAMS = subsetter
-lib_LTLIBRARIES = libsubsetter.la
+bin_PROGRAMS = 
+lib_LTLIBRARIES = libpagoda.la
 
 subsetter_old_SOURCES = Mainp.C
 
-subsetter_SOURCES = SubsetterMain.C
-
-libsubsetter_la_SOURCES = \
+libpagoda_la_SOURCES =    \
 AbstractVariable.C        \
 AbstractVariable.H        \
 Aggregation.C             \
@@ -61,6 +59,8 @@ Dimension.H               \
 Error.H                   \
 FileWriter.C              \
 FileWriter.H              \
+gax.H                     \
+gax.C                     \
 GlobalArray.C             \
 GlobalArray.H             \
 GlobalMask.C              \
@@ -83,6 +83,8 @@ NetcdfFileWriter.H        \
 NetcdfVariable.C          \
 NetcdfVariable.H          \
 NotImplementedException.H \
+pagoda.C                  \
+pagoda.H                  \
 Pack.C                    \
 Pack.H                    \
 Pnetcdf.C                 \
@@ -129,7 +131,8 @@ tests/TestRead          \
 tests/TestScanAdd       \
 tests/TestSort          \
 tests/TestUnion         \
-tests/TestUnpack
+tests/TestUnpack        \
+tests/ga/TestPartialSum
 
 tests_Test_SOURCES              = tests/Test.C
 tests_TestAttribute_SOURCES     = tests/TestAttribute.C
@@ -149,5 +152,6 @@ tests_TestScanAdd_SOURCES       = tests/TestScanAdd.C
 tests_TestSort_SOURCES          = tests/TestSort.C
 tests_TestUnion_SOURCES         = tests/TestUnion.C
 tests_TestUnpack_SOURCES        = tests/TestUnpack.c
+tests_ga_TestPartialSum_SOURCES = tests/ga/TestPartialSum.C
 
 tests_TestGet_LDADD = $(LDADD_STANDALONE)
