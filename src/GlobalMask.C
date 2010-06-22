@@ -325,11 +325,16 @@ Array* GlobalMask::reindex() const
     TRACER("GlobalMask::reindex() BEGIN\n");
 
     ret = new GlobalArray(C_INT, size);
-    ret->fill(&NEG_ONE);
-    tmp = new GlobalArray(C_INT, count);
-    pagoda::enumerate(tmp, NULL, NULL);
-    pagoda::unpack1d(tmp, ret, mask);
-    delete tmp;
+
+    if (count[0] > 0) {
+        ret->fill(&NEG_ONE);
+        tmp = new GlobalArray(C_INT, count);
+        pagoda::enumerate(tmp, NULL, NULL);
+        pagoda::unpack1d(tmp, ret, mask);
+        delete tmp;
+    } else {
+        pagoda::enumerate(ret, NULL, NULL);
+    }
 
     TRACER("GlobalMask::reindex() END\n");
 

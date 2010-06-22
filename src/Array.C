@@ -2,10 +2,6 @@
 #   include <config.h>
 #endif
 
-#if HAVE_GA
-#   include <ga.h>
-#endif
-
 #include "Array.H"
 #include "GlobalArray.H"
 #include "Timing.H"
@@ -85,13 +81,15 @@ void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
     if (type == mt) { \
         buffer = new t[buffer_size]; \
     } else
-    get_helper(C_INT,     int)
-    get_helper(C_LONG,    long)
-    get_helper(C_LONGLONG,long long)
-    get_helper(C_FLOAT,   float)
-    get_helper(C_DBL,     double)
-    get_helper(C_LDBL,    long double)
-    ; // for last else above
+    get_helper(DataType::INT,       int)
+    get_helper(DataType::LONG,      long)
+    get_helper(DataType::LONGLONG,  long long)
+    get_helper(DataType::FLOAT,     float)
+    get_helper(DataType::DOUBLE,    double)
+    get_helper(DataType::LONGDOUBLE,long double)
+    {
+        Util::abort("Array::get DataType not handled");
+    }
 #undef get_helper
 
     return get(buffer, lo, hi, ld);

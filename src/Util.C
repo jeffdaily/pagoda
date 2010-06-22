@@ -260,7 +260,7 @@ vector<int64_t> Util::get_shape(const vector<int64_t> &lo, const vector<int64_t>
     TIMING("Util::get_shape(vector<int64_t>,vector<int64_t>)");
 
     for (size_t i=0,limit=lo.size(); i<limit; ++i) {
-        ret.push_back(hi[i]-lo[i]+1);
+        ret[i] = hi[i]-lo[i]+1;
     }
 
     return ret;
@@ -302,6 +302,18 @@ bool Util::ends_with(const string &fullString, const string &ending)
 
 
 /**
+ * Set a reasonable default amount of memory to use.
+ *
+ * This is a hack because we want to hide the need for GA's MA library, but
+ * it's hard to do.
+ */
+void Util::calculate_required_memory()
+{
+    calculate_required_memory(vector<Variable*>());
+}
+
+
+/**
  * Attempt to calculate the largest amount of memory needed per-process.
  * This has to do with our use of GA_Pack.  Each process needs roughly
  * at least as much memory as the largest variable in our input netcdf
@@ -312,11 +324,13 @@ bool Util::ends_with(const string &fullString, const string &ending)
 void Util::calculate_required_memory(const vector<Variable*> &vars)
 {
 #if HAVE_GA
-    TIMING("Util::calculate_required_memory(vector<Variable*>)");
-    TRACER("Util::calculate_required_memory BEGIN\n");
     int64_t max_size = 0;
+    double gigabytes = 0;
     string max_name;
     vector<Variable*>::const_iterator var;
+
+    TIMING("Util::calculate_required_memory(vector<Variable*>)");
+    TRACER("Util::calculate_required_memory BEGIN\n");
 
     for (var=vars.begin(); var!=vars.end(); ++var) {
         int64_t var_size = shape_to_size((*var)->get_shape());
@@ -325,16 +339,18 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
             max_name = (*var)->get_name();
         }
     }
+    if (0 == max_size) {
+        max_size = 1000;
+        max_name = "NO VARIALBES";
+    }
 
-    int64_t max_size8 = max_size*8;
-    double gigabytes = 1.0 / 1073741824.0 * max_size8;
+    gigabytes = 1.0 / 1073741824.0 * max_size * 8;
 
     TRACER("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
-            max_name.c_str(), max_size8, gigabytes);
+            max_name.c_str(), max_size*8, gigabytes);
     max_size = int64_t(max_size * 0.04);
-    max_size8 = max_size*8;
-    gigabytes = 1.0 / 1073741824.0 * max_size8;
-    TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size8, gigabytes);
+    gigabytes = 1.0 / 1073741824.0 * max_size * 8;
+    TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size*8, gigabytes);
 
     if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
         char msg[] = "MA_init failed";

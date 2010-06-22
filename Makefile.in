@@ -46,10 +46,10 @@ check_PROGRAMS = subsetter_old$(EXEEXT) tests/ga/Test$(EXEEXT) \
 	tests/ga/TestRead$(EXEEXT) tests/ga/TestScanAdd$(EXEEXT) \
 	tests/ga/TestSort$(EXEEXT) tests/ga/TestUnion$(EXEEXT) \
 	tests/ga/TestUnpack$(EXEEXT) tests/Test$(EXEEXT) \
-	tests/TestAttribute$(EXEEXT) tests/TestBin$(EXEEXT) \
-	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
-	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
-	tests/TestJoin$(EXEEXT) tests/TestLocateRegion$(EXEEXT) \
+	tests/TestBin$(EXEEXT) tests/TestDimension$(EXEEXT) \
+	tests/TestDistance$(EXEEXT) tests/TestEnum$(EXEEXT) \
+	tests/TestGet$(EXEEXT) tests/TestJoin$(EXEEXT) \
+	tests/TestLocateRegion$(EXEEXT) \
 	tests/TestNetcdfDataset$(EXEEXT) tests/TestOpen$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScanAdd$(EXEEXT) \
@@ -139,10 +139,6 @@ am_tests_Test_OBJECTS = tests/Test.$(OBJEXT)
 tests_Test_OBJECTS = $(am_tests_Test_OBJECTS)
 tests_Test_LDADD = $(LDADD)
 tests_Test_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_TestAttribute_OBJECTS = tests/TestAttribute.$(OBJEXT)
-tests_TestAttribute_OBJECTS = $(am_tests_TestAttribute_OBJECTS)
-tests_TestAttribute_LDADD = $(LDADD)
-tests_TestAttribute_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestBin_OBJECTS = tests/TestBin.$(OBJEXT)
 tests_TestBin_OBJECTS = $(am_tests_TestBin_OBJECTS)
 tests_TestBin_LDADD = $(LDADD)
@@ -338,10 +334,10 @@ am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
-	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
-	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
+	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
+	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
+	$(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
@@ -360,10 +356,10 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(tests_ga_TestUnion_SOURCES) $(tests_ga_TestUnpack_SOURCES)
 DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
-	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
-	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
+	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
+	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
+	$(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
@@ -580,7 +576,6 @@ tests_ga_TestSort_SOURCES = tests/ga/TestSort.C
 tests_ga_Test_SOURCES = tests/ga/Test.C
 tests_ga_TestUnion_SOURCES = tests/ga/TestUnion.C
 tests_ga_TestUnpack_SOURCES = tests/ga/TestUnpack.c
-tests_TestAttribute_SOURCES = tests/TestAttribute.C
 tests_TestBin_SOURCES = tests/TestBin.C
 tests_TestDimension_SOURCES = tests/TestDimension.C
 tests_TestDistance_SOURCES = tests/TestDistance.C
@@ -823,11 +818,6 @@ tests/Test.$(OBJEXT): tests/$(am__dirstamp) \
 tests/Test$(EXEEXT): $(tests_Test_OBJECTS) $(tests_Test_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/Test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_Test_OBJECTS) $(tests_Test_LDADD) $(LIBS)
-tests/TestAttribute.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/TestAttribute$(EXEEXT): $(tests_TestAttribute_OBJECTS) $(tests_TestAttribute_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/TestAttribute$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestAttribute_OBJECTS) $(tests_TestAttribute_LDADD) $(LIBS)
 tests/TestBin.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestBin$(EXEEXT): $(tests_TestBin_OBJECTS) $(tests_TestBin_DEPENDENCIES) tests/$(am__dirstamp)
@@ -1088,7 +1078,6 @@ mostlyclean-compile:
 	-rm -f src/gax.lo
 	-rm -f src/pgdump.$(OBJEXT)
 	-rm -f tests/Test.$(OBJEXT)
-	-rm -f tests/TestAttribute.$(OBJEXT)
 	-rm -f tests/TestBin.$(OBJEXT)
 	-rm -f tests/TestDimension.$(OBJEXT)
 	-rm -f tests/TestDistance.$(OBJEXT)
@@ -1169,7 +1158,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgdump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/Test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestBin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDimension.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDistance.Po@am__quote@

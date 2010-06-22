@@ -1,58 +1,72 @@
+/**
+ * @file TestEnum.C
+ *
+ * Whether we got the pagoda::enumeration right.
+ */
+#if HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
+#include <cstdlib>
 #include <iostream>
-using namespace std;
 
-#include <stdlib.h>
-
-#include <ga.h>
-#include <macdecls.h>
-#include <mpi.h>
-
+#include "Array.H"
+#include "Bootstrap.H"
 #include "gax.H"
 #include "Pack.H"
+#include "Util.H"
+
+using std::cout;
+using std::endl;
 
 
 int main(int argc, char **argv)
 {
-    MPI_Init(&argc, &argv);
-    GA_Initialize();
-    if (MA_init(MT_DBL, 1000, 1000) == MA_FALSE) {
-        GA_Error("MA_init failed", 0);
-    }
-
-    int me = GA_Nodeid();
-    int nproc = GA_Nnodes();
-    int size_src = 10;
-    int size_dst = 30;
-    int g_src = NGA_Create(MT_INT, 1, &size_src, "src", NULL);
-    int g_enum = NGA_Create(MT_DBL, 1, &size_dst, "enum", NULL);
-    int g_dst = NGA_Create(MT_INT, 1, &size_dst, "dst", NULL);
-    int g_msk = NGA_Create(MT_INT, 1, &size_dst, "msk", NULL);
+    int me = Util::nodeid();
+    int nproc = Util::num_nodes();
+    vector<int64_t> shape_src(1,10);
+    vector<int64_t> shape_dst(1,30);
+    Array *a_src = NULL;
+    Array *a_enm = NULL;
+    Array *a_dst = NULL;
+    Array *a_msk = NULL;
     int NEG_ONE = -1;
     int TWO = 2;
     int THREE = 3;
     double START = 3.15;
     double STEP = 0.05;
+    vector<int64_t> lo;
+    vector<int64_t> hi;
+
+    pagoda::initialize(&argc, &argv);
+    Util::calculate_required_memory();
+
+    a_src = Array::create(DataType::INT,    shape_src);
+    a_enm = Array::create(DataType::DOUBLE, shape_dst);
+    a_dst = Array::create(DataType::INT,    shape_dst);
+    a_msk = Array::create(DataType::INT,    shape_dst);
 
     if (0 == me) {
         int msk[] = {0,1,1,0,0,0,0,1,1,0,
                      1,0,0,1,0,1,0,1,0,0,
                      0,0,1,0,1,0,0,0,0,0};
-        int ZERO = 0;
-        int hi = size_dst-1;
-        NGA_Put(g_msk, &ZERO, &hi, msk, NULL);
+        vector<int64_t> ZERO(1,0);
+        vector<int64_t> hi(1,shape_dst[0]-1);
+
+        a_msk->put(msk, ZERO, hi);
     }
 
-    //GA_Fill(g_dst, &NEG_ONE);
-    gax::enumerate(g_src, &TWO, &THREE);
-    gax::enumerate(g_enum, &START, &STEP);
-    //unpack1d(g_src, g_dst, g_msk);
+    a_dst->fill(&NEG_ONE);
+    pagoda::enumerate(a_src, &TWO, &THREE);
+    pagoda::enumerate(a_enm, &START, &STEP);
+    pagoda::unpack1d(a_src, a_dst, a_msk);
 
-    GA_Print(g_src);
-    GA_Print(g_enum);
-    //GA_Print(g_dst);
-    //GA_Print(g_msk);
+    a_enm->dump();
+    a_src->dump();
+    a_msk->dump();
+    a_dst->dump();
 
-    GA_Terminate();
-    MPI_Finalize();
-    exit(EXIT_SUCCESS);
+    pagoda::finalize();
+
+    return EXIT_SUCCESS;
 };

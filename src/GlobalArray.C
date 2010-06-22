@@ -97,9 +97,11 @@ vector<int64_t> GlobalArray::get_shape() const
 vector<int64_t> GlobalArray::get_local_shape() const
 {
     vector<int64_t> local_shape(shape.size());
+
     for (size_t i=0,limit=shape.size(); i<limit; ++i) {
-        local_shape.push_back(hi[i]-lo[i]+1);
+        local_shape[i] = hi[i]-lo[i]+1;
     }
+
     return local_shape;
 }
 

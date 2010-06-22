@@ -1,15 +1,25 @@
+/**
+ * @file Test.C
+ *
+ * Remind myself how inheritance and virtualization work...
+ */
+#if HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <functional>
-    using std::multiplies;
-#include <numeric>
-    using std::partial_sum;
 #include <iostream>
-    using std::cout;
-    using std::endl;
-    using std::ostream;
+#include <numeric>
 #include <string>
-    using std::string;
 #include <vector>
-    using std::vector;
+
+using std::cout;
+using std::endl;
+using std::multiplies;
+using std::ostream;
+using std::partial_sum;
+using std::string;
+using std::vector;
 
 
 ostream& operator << (ostream &os, const vector<string> &v)
@@ -95,5 +105,3 @@ int main(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
-
-

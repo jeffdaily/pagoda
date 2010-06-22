@@ -75,6 +75,8 @@ class DataType
 
         int to_ga() const;
         nc_type to_nc() const;
+        int get_id() const { return id; }
+        string get_name() const { return name; }
 
     protected:
         static DataType to_dt(int type);

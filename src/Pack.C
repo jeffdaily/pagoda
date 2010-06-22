@@ -4,10 +4,6 @@
 
 #include <vector>
 
-#include <ga.h>
-#include <macdecls.h>
-#include <message.h>
-
 #include "Array.H"
 #include "Debug.H"
 #include "Pack.H"
@@ -331,6 +327,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
 {
     vector<int64_t> lo;
     vector<int64_t> hi;
+    DataType type = src->get_type();
 
     TIMING("enumerate(Array*,void*,void*)");
     TRACER("enumerate BEGIN\n");
@@ -343,7 +340,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
 
     if (src->owns_data()) {
 #define enumerate_op(DTYPE,TYPE) \
-        if (DTYPE == src->get_type()) { \
+        if (DTYPE == type) { \
             TYPE *src_data = (TYPE*)src->access(); \
             TYPE start = 0; \
             TYPE inc = 1; \
@@ -364,7 +361,9 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
         enumerate_op(DataType::FLOAT,     float)
         enumerate_op(DataType::DOUBLE,    double)
         enumerate_op(DataType::LONGDOUBLE,long double)
-        ; // for last else above
+        {
+            Util::abort("enumerate: unrecogized DataType", type.get_id());
+        }
 #undef enumerate_op
     }
     TRACER("enumerate END\n");
@@ -395,22 +394,28 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     if (type_src != dst->get_type()) {
         Util::abort("unpack1d: src and dst DataTypes differ");
     }
+    if (DataType::INT != msk->get_type()) {
+        Util::abort("unpack1d: msk must be of type INT",
+                msk->get_type().get_id());
+    }
 
     // count mask bits on each proc
     if (!msk->owns_data()) {
         Util::gop_sum(counts);
-        TRACER("unpack1d lo,hi N/A 1\n");
+        TRACER("unpack1d lo,hi N/A 1 counts[me]=%ld\n", counts[me]);
         TRACER("unpack1d END\n");
         return; // this process doesn't participate
     } else {
         mask = (int*)msk->access();
         for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) {
-            if (0 != mask[i]) ++(counts[me]);
+            if (0 != mask[i]) {
+                ++(counts[me]);
+            }
         }
         msk->release();
         Util::gop_sum(counts);
         if (0 == counts[me]) {
-            TRACER("unpack1d lo,hi N/A 2\n");
+            TRACER("unpack1d lo,hi N/A 2 counts[me]=%ld\n", counts[me]);
             TRACER("unpack1d END\n");
             return; // this process doesn't participate
         }
@@ -421,7 +426,8 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         lo_src[0] += counts[i];
     }
     hi_src[0] = lo_src[0] + counts[me] - 1;
-    TRACER("unpack1d lo,hi = %ld,%ld\n", lo_src[0], hi_src[0]);
+    TRACER("unpack1d lo,hi,counts[me] = %ld,%ld,%ld\n",
+            lo_src[0], hi_src[0], counts[me]);
     // do the unpacking
     // assumption is that dst array has same distribution as msk array
 #define unpack1d_op(DTYPE,TYPE) \
@@ -433,11 +439,10 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) \
         { \
             if (msk_data[i] != 0) { \
-                dst_data[i] = *src_data; \
-                ++src_data; \
+                dst_data[i] = *(src_data++); \
             } \
         } \
-        delete src_origin; \
+        delete [] src_origin; \
         dst->release_update(); \
         msk->release(); \
     } else
@@ -447,7 +452,10 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     unpack1d_op(DataType::FLOAT,float)
     unpack1d_op(DataType::DOUBLE,double)
     unpack1d_op(DataType::LONGDOUBLE,long double)
-    ; // for last else above
+    {
+        Util::abort("pagoda::unpack1d: DataType not handled",
+                type_src.get_id());
+    }
 #undef unpack1d_op
     TRACER("unpack1d END\n");
 }
