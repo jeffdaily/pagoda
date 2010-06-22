@@ -55,7 +55,7 @@ check_PROGRAMS = subsetter_old$(EXEEXT) tests/ga/Test$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScanAdd$(EXEEXT) \
 	tests/TestSort$(EXEEXT) tests/TestUnion$(EXEEXT) \
 	tests/TestUnpack$(EXEEXT)
-bin_PROGRAMS =
+bin_PROGRAMS = pgdump$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -126,10 +126,14 @@ AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 PROGRAMS = $(bin_PROGRAMS)
+am_pgdump_OBJECTS = src/pgdump.$(OBJEXT)
+pgdump_OBJECTS = $(am_pgdump_OBJECTS)
+pgdump_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
+pgdump_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_subsetter_old_OBJECTS = src/Mainp.$(OBJEXT)
 subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
 subsetter_old_LDADD = $(LDADD)
-am__DEPENDENCIES_1 =
 subsetter_old_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_Test_OBJECTS = tests/Test.$(OBJEXT)
 tests_Test_OBJECTS = $(am_tests_Test_OBJECTS)
@@ -332,12 +336,12 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libpagoda_la_SOURCES) $(subsetter_old_SOURCES) \
-	$(tests_Test_SOURCES) $(tests_TestAttribute_SOURCES) \
-	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
-	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
-	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
-	$(tests_TestLocateRegion_SOURCES) \
+SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
+	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
+	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
+	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
@@ -354,12 +358,12 @@ SOURCES = $(libpagoda_la_SOURCES) $(subsetter_old_SOURCES) \
 	$(tests_ga_TestRavel_SOURCES) $(tests_ga_TestRead_SOURCES) \
 	$(tests_ga_TestScanAdd_SOURCES) $(tests_ga_TestSort_SOURCES) \
 	$(tests_ga_TestUnion_SOURCES) $(tests_ga_TestUnpack_SOURCES)
-DIST_SOURCES = $(libpagoda_la_SOURCES) $(subsetter_old_SOURCES) \
-	$(tests_Test_SOURCES) $(tests_TestAttribute_SOURCES) \
-	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
-	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
-	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
-	$(tests_TestLocateRegion_SOURCES) \
+DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
+	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
+	$(tests_TestAttribute_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
+	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestLocateRegion_SOURCES) \
 	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
@@ -526,6 +530,7 @@ LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libpagoda.la
 subsetter_old_SOURCES = src/Mainp.C
+pgdump_SOURCES = src/pgdump.C
 pkginclude_HEADERS = src/AbstractVariable.H src/AggregationDimension.H \
 	src/Aggregation.H src/AggregationJoinExisting.H \
 	src/AggregationUnion.H src/AggregationVariable.H src/Array.H \
@@ -798,6 +803,11 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+src/pgdump.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+pgdump$(EXEEXT): $(pgdump_OBJECTS) $(pgdump_DEPENDENCIES) 
+	@rm -f pgdump$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(pgdump_OBJECTS) $(pgdump_LDADD) $(LIBS)
 src/Mainp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 subsetter_old$(EXEEXT): $(subsetter_old_OBJECTS) $(subsetter_old_DEPENDENCIES) 
 	@rm -f subsetter_old$(EXEEXT)
@@ -1076,6 +1086,7 @@ mostlyclean-compile:
 	-rm -f src/VariableDecorator.lo
 	-rm -f src/gax.$(OBJEXT)
 	-rm -f src/gax.lo
+	-rm -f src/pgdump.$(OBJEXT)
 	-rm -f tests/Test.$(OBJEXT)
 	-rm -f tests/TestAttribute.$(OBJEXT)
 	-rm -f tests/TestBin.$(OBJEXT)
@@ -1156,6 +1167,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/VariableDecorator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgdump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestBin.Po@am__quote@

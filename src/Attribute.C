@@ -35,19 +35,24 @@ size_t Attribute::get_count() const
 
 string Attribute::get_string() const
 {
+    string ret;
+
     TIMING("Attribute::get_string()");
-    ostringstream os;
-    os << get_values();
-    return os.str();
+
+    get_values()->as(ret);
+
+    return ret;
 }
 
 
 ostream& Attribute::print(ostream &os) const
 {
-    TIMING("Attribute::print(ostream)");
     const string name = get_name();
     const DataType type = get_type();
     const string str = get_string();
+
+    TIMING("Attribute::print(ostream)");
+
     return os << name << "(" << type << ") = " << str;
 }
 
@@ -57,4 +62,3 @@ ostream& operator << (ostream &os, const Attribute *other)
     TIMING("Attribute::operator<<(ostream,Attribute*)");
     return other->print(os);
 }
-

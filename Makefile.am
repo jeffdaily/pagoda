@@ -17,10 +17,12 @@ LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 
 check_PROGRAMS = subsetter_old
-bin_PROGRAMS = 
+bin_PROGRAMS = pgdump
 lib_LTLIBRARIES = libpagoda.la
 
 subsetter_old_SOURCES = src/Mainp.C
+
+pgdump_SOURCES = src/pgdump.C
 
 pkginclude_HEADERS =
 pkginclude_HEADERS += src/AbstractVariable.H
