@@ -20,6 +20,10 @@ using std::vector;
 
 int main(int argc, char **argv)
 {
+    Dataset *dataset;
+    vector<Attribute*> atts;
+    vector<Variable*> vars;
+
     pagoda::initialize(&argc,&argv);
 
     if (argc != 2) {
@@ -31,10 +35,12 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    Dataset *dataset = Dataset::open(argv[1]);
+    dataset = Dataset::open(argv[1]);
+
+    cout << endl << "Test as(string)" << endl << endl;
 
     cout << "@@@@@@@@@@@@@@@@@@@ GLOBAL ATTRIBUTES" << endl;
-    vector<Attribute*> atts = dataset->get_atts();
+    atts = dataset->get_atts();
     for (size_t attid=0,natt=atts.size(); attid<natt; ++attid) {
         Attribute *att = atts[attid];
         cout << att << endl;
@@ -47,7 +53,31 @@ int main(int argc, char **argv)
     }
 
     cout << "@@@@@@@@@@@@@@@@@@@ VARIABLE ATTRIBUTES" << endl;
-    vector<Variable*> vars = dataset->get_vars();
+    vars = dataset->get_vars();
+    for (size_t varid=0,nvar=vars.size(); varid<nvar; ++varid) {
+        Variable *var = vars[varid];
+        cout << var->get_name() << endl;
+        atts = var->get_atts();
+        for (int attid=0,natt=atts.size(); attid<natt; ++attid) {
+            cout << "\t" << atts.at(attid) << endl;
+        }
+    }
+
+    cout << "@@@@@@@@@@@@@@@@@@@ GLOBAL ATTRIBUTES" << endl;
+    atts = dataset->get_atts();
+    for (size_t attid=0,natt=atts.size(); attid<natt; ++attid) {
+        Attribute *att = atts[attid];
+        string test;
+
+        cout << att << endl;
+        cout << "TEST OF as(), size=" << att->get_count() << endl;
+        att->get_values()->as(test);
+        cout << test << endl;
+        cout << endl;
+    }
+
+    cout << "@@@@@@@@@@@@@@@@@@@ VARIABLE ATTRIBUTES" << endl;
+    vars = dataset->get_vars();
     for (size_t varid=0,nvar=vars.size(); varid<nvar; ++varid) {
         Variable *var = vars[varid];
         cout << var->get_name() << endl;

@@ -15,6 +15,7 @@
 #include "AggregationUnion.H"
 #include "Array.H"
 #include "Attribute.H"
+#include "Bootstrap.H"
 #include "CommandLineParser.H"
 #include "Common.H"
 #include "Dataset.H"
@@ -40,10 +41,3 @@
 #include "Util.H"
 #include "Values.H"
 #include "Variable.H"
-
-namespace pagoda {
-
-void initialize(int *argc, char ***argv);
-void finalize();
-
-};
