@@ -54,7 +54,7 @@ template <class T> T ravel_index(vector<T> indices, const vector<T> &dims);
  *
  * The class T is assumed to be a pointer.
  *
- * @tparam[in] object the pointer to delete
+ * @param[in] object the pointer to delete
  * @return NULL
  */
 template <class T>
@@ -69,8 +69,8 @@ T ptr_deleter(T object)
  * Generic binary test for equality of the "get_name()" accessor.
  * The class T is assumed to be an interface defining "get_name()".
  *
- * @tparam[in] first the lhs of equality
- * @tparam[in] second theh rhs of equality
+ * @param[in] first the lhs of equality
+ * @param[in] second theh rhs of equality
  */
 template <class T>
 bool same_name(const T *first, const T *second)
@@ -84,8 +84,8 @@ bool same_name(const T *first, const T *second)
  *
  * Adapted from Python's NumPy.
  *
- * @tparam[in] x the 1-D index
- * @tparam[in] dims the shape of the N-D array
+ * @param[in] x the 1-D index
+ * @param[in] dims the shape of the N-D array
  * @return the N-D index
  */
 template <class T>
@@ -116,8 +116,8 @@ vector<T> unravel_index(T x, const vector<T> &dims)
  *
  * Adapted from Python's NumPy.
  *
- * @tparam[in] indices the N-D index
- * @tparam[in] dims the shape of the N-D array
+ * @param[in] indices the N-D index
+ * @param[in] dims the shape of the N-D array
  * @return the 1-D index
  */
 template <class T>

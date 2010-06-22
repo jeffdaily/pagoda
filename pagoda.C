@@ -1,4 +1,6 @@
-#include "pagoda.H"
+#if HAVE_CONFIG_H
+#   include <config.h>
+#endif
 
 #if HAVE_MPI
 #   include <mpi.h>
@@ -6,6 +8,8 @@
 #if HAVE_GA
 #   include <ga.h>
 #endif
+
+#include "pagoda.H"
 
 
 void pagoda::initialize(int *argc, char ***argv)

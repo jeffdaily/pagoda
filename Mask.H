@@ -117,7 +117,7 @@ class Mask : public Array
         /**
          * Write this Mask to the given stream.
          *
-         * @param[in,out] the stream
+         * @param[in,out] os the stream
          * @return the stream
          */
         virtual ostream& print(ostream &os) const = 0;

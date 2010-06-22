@@ -1,3 +1,15 @@
+/**
+ * @mainpage
+ *
+ * @section Introduction Introdcution
+ *
+ * TODO
+ *
+ * @section Installation Installation
+ *
+ * TODO
+ *
+ */
 #include "AbstractVariable.H"
 #include "AggregationDimension.H"
 #include "Aggregation.H"

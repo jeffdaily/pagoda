@@ -42,7 +42,7 @@ GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
     ,   lo()
     ,   hi()
 {
-    handle = NGA_Create64(type, shape.size(), &shape[0], "noname", NULL);
+    handle = NGA_Create64(type.to_ga(), shape.size(), &shape[0], "name", NULL);
     set_distribution();
 }
 
@@ -59,7 +59,7 @@ GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
             it!=end; ++it) {
         shape.push_back((*it)->get_size());
     }
-    handle = NGA_Create64(type, shape.size(), &shape[0], "noname", NULL);
+    handle = NGA_Create64(type.to_ga(), shape.size(), &shape[0], "name", NULL);
     set_distribution();
 }
 

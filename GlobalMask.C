@@ -211,26 +211,24 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     lat_data = lat->access();
     lon_data = lon->access();
 
-    switch (lat->get_type().as_ma()) {
-#define adjust_op(MTYPE,TYPE) \
-        case MTYPE: { \
-            TYPE *plat = (TYPE*)lat_data; \
-            TYPE *plon = (TYPE*)lon_data; \
-            for (int64_t i=0; i<size; ++i) { \
-                if (box.contains(plat[i], plon[i])) { \
-                    mask_data[i] = 1; \
-                } \
+#define adjust_op(DTYPE,TYPE) \
+    if (lat->get_type() == DTYPE) { \
+        TYPE *plat = (TYPE*)lat_data; \
+        TYPE *plon = (TYPE*)lon_data; \
+        for (int64_t i=0; i<size; ++i) { \
+            if (box.contains(plat[i], plon[i])) { \
+                mask_data[i] = 1; \
             } \
-            break; \
-        }
-        adjust_op(C_INT,int)
-        adjust_op(C_LONG,long)
-        adjust_op(C_LONGLONG,long long)
-        adjust_op(C_FLOAT,float)
-        adjust_op(C_DBL,double)
-        adjust_op(C_LDBL,long double)
+        } \
+    } else
+    adjust_op(DataType::INT,int)
+    adjust_op(DataType::LONG,long)
+    adjust_op(DataType::LONGLONG,long long)
+    adjust_op(DataType::FLOAT,float)
+    adjust_op(DataType::DOUBLE,double)
+    adjust_op(DataType::LONGDOUBLE,long double)
+    ; // for last else above
 #undef adjust_op
-    }
 
     release_update();
     lat->release();
@@ -257,25 +255,23 @@ void GlobalMask::modify(double min, double max, const Array *var)
     mask_data = (int*)access();
     var_data = var->access();
 
-    switch (var->get_type().as_ma()) {
-#define adjust_op(MTYPE,TYPE) \
-        case MTYPE: { \
-            TYPE *pdata = (TYPE*)var_data; \
-            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
-                if (pdata[i] >= min && pdata[i] <= max) { \
-                    mask_data[i] = 1; \
-                } \
+#define adjust_op(DTYPE,TYPE) \
+    if (var->get_type() == DTYPE) { \
+        TYPE *pdata = (TYPE*)var_data; \
+        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+            if (pdata[i] >= min && pdata[i] <= max) { \
+                mask_data[i] = 1; \
             } \
-            break; \
-        }
-        adjust_op(C_INT,int)
-        adjust_op(C_LONG,long)
-        adjust_op(C_LONGLONG,long long)
-        adjust_op(C_FLOAT,float)
-        adjust_op(C_DBL,double)
-        adjust_op(C_LDBL,long double)
+        } \
+    } else
+    adjust_op(DataType::INT,int)
+    adjust_op(DataType::LONG,long)
+    adjust_op(DataType::LONGLONG,long long)
+    adjust_op(DataType::FLOAT,float)
+    adjust_op(DataType::DOUBLE,double)
+    adjust_op(DataType::LONGDOUBLE,long double)
+    ; // for last else above
 #undef adjust_op
-    }
 
     release_update();
     var->release();

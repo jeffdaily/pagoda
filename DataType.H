@@ -2,12 +2,17 @@
 #define DATATYPE_H_
 
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
-#include <macdecls.h>
-#include <pnetcdf.h>
+#if HAVE_PNETCDF
+#   include <pnetcdf.h>
+#elif HAVE_NETCDF
+#   include <netcdf.h>
+#endif
 
+using std::ostringstream;
 using std::ostream;
 using std::runtime_error;
 using std::string;
@@ -16,8 +21,17 @@ using std::string;
 class DataTypeException : public runtime_error
 {
     public:
+        static string to_string(int value) {
+            ostringstream os;
+            os << value;
+            return os.str();
+        }
+
         explicit DataTypeException(const string &what)
             :   runtime_error(what)
+        {}
+        explicit DataTypeException(const string &what, int value)
+            :   runtime_error(what+string(" :: ")+to_string(value))
         {}
 };
 
@@ -27,56 +41,49 @@ class DataTypeException : public runtime_error
  * types.
  *
  * For example, between Global Arrays and netcdf.
+ * Implemented as a type-safe enumeration.  There can be multiple instances of
+ * a given DataType but there are a fixed set of values that the instances may
+ * represent.
  */
 class DataType
 {
-    enum dt_type {
-        dt_char=-1000, /* something unique between netcdf and GA */
-        dt_short,
-        dt_int,
-        dt_long,
-        dt_longlong,
-        dt_float,
-        dt_double,
-        dt_longdouble,
-        dt_uchar,
-        dt_ushort,
-        dt_uint,
-        dt_ulong,
-        dt_ulonglong,
-        dt_string
-    };
-
     public:
-        DataType(nc_type type);
+        static const DataType CHAR;
+        static const DataType SHORT;
+        static const DataType INT;
+        static const DataType LONG;
+        static const DataType LONGLONG;
+        static const DataType FLOAT;
+        static const DataType DOUBLE;
+        static const DataType LONGDOUBLE;
+        static const DataType UCHAR;
+        static const DataType USHORT;
+        static const DataType UINT;
+        static const DataType ULONG;
+        static const DataType ULONGLONG;
+        static const DataType STRING;
+
         DataType(int type);
         DataType(const DataType &type);
-
-        DataType& operator = (nc_type type);
         DataType& operator = (int type);
         DataType& operator = (const DataType &type);
-        operator nc_type () const;
-        operator int () const;
-        nc_type as_nc() const;
-        int as_ma() const;
 
-        bool operator == (nc_type type) const;
-        bool operator == (int type) const;
         bool operator == (const DataType &type) const;
-
-        bool operator != (nc_type type) const;
-        bool operator != (int type) const;
         bool operator != (const DataType &type) const;
 
-        friend ostream& operator << (ostream &os, const DataType &other);
+        friend ostream& operator << (ostream &os, const DataType &type);
 
-        static dt_type to_dt(nc_type type);
-        static dt_type to_dt(int type);
-        static nc_type to_nc(dt_type type);
-        static int to_ma(dt_type type);
+        int to_ga() const;
+        nc_type to_nc() const;
 
     protected:
-        dt_type value;
+        static DataType to_dt(int type);
+        DataType();
+        DataType(const string &name);
+
+        static int next_id;
+        int id;
+        string name;
 };
 
 #endif // DATATYPE_H_

@@ -104,7 +104,7 @@ void NetcdfFileWriter::def_var(Variable *var)
         TRACER("NetcdfFileWriter::def_var %s(%d,%d,%d)\n", name.c_str(), dim_ids[0], dim_ids[1], dim_ids[2]);
     }
 #endif
-    type = var->get_type();
+    type = var->get_type().to_nc();
     ncmpi::def_var(ncid, name.c_str(), type, ndim, dim_ids, &id);
     var_id[name] = id;
 

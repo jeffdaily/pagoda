@@ -89,8 +89,8 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
 {
     int nproc = Util::num_nodes();
     int me = Util::nodeid();
-    int type_src = g_src->get_type();
-    int type_dst = g_dst->get_type();
+    DataType type_src = g_src->get_type();
+    DataType type_dst = g_dst->get_type();
     int64_t dims;
     void *ptr_src;
     void *ptr_dst;
@@ -100,10 +100,10 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     TRACER("partial_sum(Array*,Array*,bool)");
 
     if (! g_src->same_distribution(g_dst)) {
-        GA_Error("partial_sum: Arrays must have same distribution", 0);
+        Util::abort("partial_sum: Arrays must have same distribution", 0);
     }
     if (g_src->get_ndim() != 1 || g_dst->get_ndim() != 1) {
-        GA_Error("partial_sum: supports 1-dim Arrays only", 0);
+        Util::abort("partial_sum: supports 1-dim Arrays only", 0);
     }
 
     //Util::barrier(); // TODO do we need this?
@@ -113,8 +113,8 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     if (g_src->owns_data()) {
         ptr_src = g_src->access();
         ptr_dst = g_dst->access();
-#define partial_sum_op(MTYPE_SRC,TYPE_SRC,MTYPE_DST,TYPE_DST,FMT) \
-        if (MTYPE_SRC == type_src && MTYPE_DST == type_dst) { \
+#define partial_sum_op(DTYPE_SRC,TYPE_SRC,DTYPE_DST,TYPE_DST,FMT) \
+        if (DTYPE_SRC == type_src && DTYPE_DST == type_dst) { \
             TYPE_DST value = 0; \
             vector<TYPE_DST> values(nproc,0); \
             TYPE_DST *dst = (TYPE_DST*)ptr_dst; \
@@ -143,15 +143,15 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
             } \
             TRACER("partial_sum_op "#FMT"\n", value); \
         } else
-        partial_sum_op(C_INT,int,C_INT,int,%d)
-        partial_sum_op(C_INT,int,C_LONG,long,%ld)
-        partial_sum_op(C_INT,int,C_LONGLONG,long long,%lld)
-        partial_sum_op(C_LONG,long,C_LONG,long,%ld)
-        partial_sum_op(C_LONG,long,C_LONGLONG,long long,%lld)
-        partial_sum_op(C_LONGLONG,long long,C_LONGLONG,long long,%lld)
-        partial_sum_op(C_FLOAT,float,C_FLOAT,float,%f)
-        partial_sum_op(C_FLOAT,float,C_DBL,double,%f)
-        partial_sum_op(C_DBL,double,C_DBL,double,%f)
+        partial_sum_op(DataType::INT,int,DataType::INT,int,%d)
+        partial_sum_op(DataType::INT,int,DataType::LONG,long,%ld)
+        partial_sum_op(DataType::INT,int,DataType::LONGLONG,long long,%lld)
+        partial_sum_op(DataType::LONG,long,DataType::LONG,long,%ld)
+        partial_sum_op(DataType::LONG,long,DataType::LONGLONG,long long,%lld)
+        partial_sum_op(DataType::LONGLONG,long long,DataType::LONGLONG,long long,%lld)
+        partial_sum_op(DataType::FLOAT,float,DataType::FLOAT,float,%f)
+        partial_sum_op(DataType::FLOAT,float,DataType::DOUBLE,double,%f)
+        partial_sum_op(DataType::DOUBLE,double,DataType::DOUBLE,double,%f)
         ; // for last else above
 #undef partial_sum_op
         g_dst->release_update();
@@ -159,18 +159,18 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     } else {
         /* no elements stored on this process */
         /* broadcast dummy value to all processes */
-#define partial_sum_op(MTYPE,TYPE) \
-        if (MTYPE == type_dst) { \
+#define partial_sum_op(DTYPE,TYPE) \
+        if (DTYPE == type_dst) { \
             vector<TYPE> values(nproc, 0); \
             Util::gop_sum(values); \
             TRACER("partial_sum_op N/A\n"); \
         } else
-        partial_sum_op(C_INT,     int)
-        partial_sum_op(C_LONG,    long)
-        partial_sum_op(C_LONGLONG,long long)
-        partial_sum_op(C_FLOAT,   float)
-        partial_sum_op(C_DBL,     double)
-        partial_sum_op(C_LDBL,    long double)
+        partial_sum_op(DataType::INT,       int)
+        partial_sum_op(DataType::LONG,      long)
+        partial_sum_op(DataType::LONGLONG,  long long)
+        partial_sum_op(DataType::FLOAT,     float)
+        partial_sum_op(DataType::DOUBLE,    double)
+        partial_sum_op(DataType::LONGDOUBLE,long double)
         ; // for last else above
 #undef partial_sum_op
     }
@@ -185,13 +185,13 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
 {
     int me = Util::nodeid();
 
-    int type_src = g_src->get_type();
+    DataType type_src = g_src->get_type();
     int ndim_src = g_src->get_ndim();
     vector<int64_t> lo_src(ndim_src,0);
     vector<int64_t> hi_src(ndim_src,0);
     vector<int64_t> ld_src(ndim_src-1,0);
 
-    int type_dst = g_dst->get_type();
+    DataType type_dst = g_dst->get_type();
     int ndim_dst = g_dst->get_ndim();
     vector<int64_t> dims_dst(ndim_dst,0);
     vector<int64_t> lo_dst(ndim_dst,0);
@@ -256,41 +256,39 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
             //printf("\n");
             
             /* Create the destination buffer */
-            switch (type_src) {
-#define pack_bit_copy(MTYPE,TYPE,FMT) \
-                case MTYPE: \
-                    { \
-                        int64_t buf_dst_index = 0; \
-                        TYPE *buf_src = (TYPE*)g_src->access(); \
-                        TYPE *buf_dst = new TYPE[local_counts_product]; \
-                        TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
-                        for (int64_t i=0; i<elems_product_src; ++i) { \
-                            unravel64i(i, ndim_src, &elems_src[0], &index[0]); \
-                            int okay = 1; \
-                            for (int j=0; j<ndim_src; ++j) { \
-                                okay *= local_masks[j][index[j]]; \
-                            } \
-                            if (0 != okay) { \
-                                buf_dst[buf_dst_index++] = buf_src[i]; \
-                            } \
-                        } \
-                        if (buf_dst_index != local_counts_product) { \
-                            printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
-                            Util::abort("pack: mismatch", buf_dst_index); \
-                        } \
-                        TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
-                        g_dst->put(buf_dst, lo_dst, hi_dst, ld_dst); \
-                        g_src->release(); \
-                        delete [] buf_dst; \
-                        break; \
-                    }
-                pack_bit_copy(C_INT,int,%d)
-                pack_bit_copy(C_LONG,long,%ld)
-                pack_bit_copy(C_LONGLONG,long long,%ld)
-                pack_bit_copy(C_FLOAT,float,%f)
-                pack_bit_copy(C_DBL,double,%f)
+#define pack_bit_copy(DTYPE,TYPE,FMT) \
+            if (type_src == DTYPE) { \
+                int64_t buf_dst_index = 0; \
+                TYPE *buf_src = (TYPE*)g_src->access(); \
+                TYPE *buf_dst = new TYPE[local_counts_product]; \
+                TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
+                for (int64_t i=0; i<elems_product_src; ++i) { \
+                    unravel64i(i, ndim_src, &elems_src[0], &index[0]); \
+                    int okay = 1; \
+                    for (int j=0; j<ndim_src; ++j) { \
+                        okay *= local_masks[j][index[j]]; \
+                    } \
+                    if (0 != okay) { \
+                        buf_dst[buf_dst_index++] = buf_src[i]; \
+                    } \
+                } \
+                if (buf_dst_index != local_counts_product) { \
+                    printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
+                    Util::abort("pack: mismatch", buf_dst_index); \
+                } \
+                TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
+                g_dst->put(buf_dst, lo_dst, hi_dst, ld_dst); \
+                g_src->release(); \
+                delete [] buf_dst; \
+            } else
+            pack_bit_copy(DataType::INT,int,%d)
+            pack_bit_copy(DataType::LONG,long,%ld)
+            pack_bit_copy(DataType::LONGLONG,long long,%ld)
+            pack_bit_copy(DataType::FLOAT,float,%f)
+            pack_bit_copy(DataType::DOUBLE,double,%f)
+            pack_bit_copy(DataType::LONGDOUBLE,long double,%f)
+            ; // for last else above
 #undef pack_bit_copy
-            }
         }
         //print_local_masks(local_masks, elems, ndim);
         // Clean up
@@ -340,12 +338,12 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
     src->get_distribution(lo,hi);
 
     if (lo.size() > 1) {
-        GA_Error("enumerate: expected 1D array", lo.size());
+        Util::abort("enumerate: expected 1D array", lo.size());
     }
 
     if (src->owns_data()) {
-#define enumerate_op(MTYPE,TYPE) \
-        if (MTYPE == src->get_type()) { \
+#define enumerate_op(DTYPE,TYPE) \
+        if (DTYPE == src->get_type()) { \
             TYPE *src_data = (TYPE*)src->access(); \
             TYPE start = 0; \
             TYPE inc = 1; \
@@ -360,12 +358,12 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
             } \
             src->release_update(); \
         } else
-        enumerate_op(C_INT,     int)
-        enumerate_op(C_LONG,    long)
-        enumerate_op(C_LONGLONG,long long)
-        enumerate_op(C_FLOAT,   float)
-        enumerate_op(C_DBL,     double)
-        enumerate_op(C_LDBL,    long double)
+        enumerate_op(DataType::INT,       int)
+        enumerate_op(DataType::LONG,      long)
+        enumerate_op(DataType::LONGLONG,  long long)
+        enumerate_op(DataType::FLOAT,     float)
+        enumerate_op(DataType::DOUBLE,    double)
+        enumerate_op(DataType::LONGDOUBLE,long double)
         ; // for last else above
 #undef enumerate_op
     }
@@ -376,7 +374,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
 /**
  * Unpack g_src into g_dst based on the mask g_msk.
  *
- * Assumes g_dst and g_msk have the same distributions.
+ * Assumes g_dst and g_msk have the same distributions and DataTypes.
  */
 void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
 {
@@ -386,12 +384,16 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     vector<long> counts(nproc,0);
     vector<int64_t> lo_src(1,0);
     vector<int64_t> hi_src(1,0);
+    DataType type_src = src->get_type();
 
     TIMING("unpack1d(Array*,Array*,Array*)");
     TRACER("unpack1d BEGIN\n");
 
     if (!dst->same_distribution(msk)) {
-        GA_Error("unpack1d: dst and msk distributions differ", 0);
+        Util::abort("unpack1d: dst and msk distributions differ");
+    }
+    if (type_src != dst->get_type()) {
+        Util::abort("unpack1d: src and dst DataTypes differ");
     }
 
     // count mask bits on each proc
@@ -422,32 +424,30 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     TRACER("unpack1d lo,hi = %ld,%ld\n", lo_src[0], hi_src[0]);
     // do the unpacking
     // assumption is that dst array has same distribution as msk array
-    switch (src->get_type().as_ma()) {
-#define unpack1d_op(MTYPE,TYPE) \
-        case MTYPE: { \
-            TYPE *src_data = (TYPE*)src->get(lo_src, hi_src); \
-            TYPE *dst_data = (TYPE*)dst->access(); \
-            TYPE *src_origin = src_data; \
-            int  *msk_data = (int*)msk->access(); \
-            for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) \
-            { \
-                if (msk_data[i] != 0) { \
-                    dst_data[i] = *src_data; \
-                    ++src_data; \
-                } \
+#define unpack1d_op(DTYPE,TYPE) \
+    if (type_src == DTYPE) { \
+        TYPE *src_data = (TYPE*)src->get(lo_src, hi_src); \
+        TYPE *dst_data = (TYPE*)dst->access(); \
+        TYPE *src_origin = src_data; \
+        int  *msk_data = (int*)msk->access(); \
+        for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) \
+        { \
+            if (msk_data[i] != 0) { \
+                dst_data[i] = *src_data; \
+                ++src_data; \
             } \
-            delete src_origin; \
-            dst->release_update(); \
-            msk->release(); \
-            break; \
-        }
-        unpack1d_op(C_INT,int)
-        unpack1d_op(C_LONG,long)
-        unpack1d_op(C_LONGLONG,long long)
-        unpack1d_op(C_FLOAT,float)
-        unpack1d_op(C_DBL,double)
-        unpack1d_op(C_LDBL,long double)
+        } \
+        delete src_origin; \
+        dst->release_update(); \
+        msk->release(); \
+    } else
+    unpack1d_op(DataType::INT,int)
+    unpack1d_op(DataType::LONG,long)
+    unpack1d_op(DataType::LONGLONG,long long)
+    unpack1d_op(DataType::FLOAT,float)
+    unpack1d_op(DataType::DOUBLE,double)
+    unpack1d_op(DataType::LONGDOUBLE,long double)
+    ; // for last else above
 #undef unpack1d_op
-    }
     TRACER("unpack1d END\n");
 }

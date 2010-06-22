@@ -233,8 +233,6 @@ class Array
          * @param[in] buffer the buffer
          * @param[in] lo
          * @param[in] hi
-         * @param[in] ld array specifying the leading
-         *               dimensions/strides/extents of the buffer array
          */
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,

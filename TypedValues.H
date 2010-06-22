@@ -23,7 +23,7 @@ template <class T>
 class TypedValues : public Values
 {
     public:
-        TypedValues(T values[], const size_t &size);
+        TypedValues(T *values, const size_t &size);
         TypedValues(const vector<T> &values);
         virtual ~TypedValues();
 
