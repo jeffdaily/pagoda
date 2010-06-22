@@ -8,7 +8,7 @@ if PROFILE
 PROFILE = -pg
 endif
 
-AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
 AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
@@ -20,95 +20,95 @@ check_PROGRAMS = subsetter_old
 bin_PROGRAMS = 
 lib_LTLIBRARIES = libpagoda.la
 
-subsetter_old_SOURCES = Mainp.C
+subsetter_old_SOURCES = src/Mainp.C
 
-libpagoda_la_SOURCES =    \
-AbstractVariable.C        \
-AbstractVariable.H        \
-Aggregation.C             \
-AggregationDimension.C    \
-AggregationDimension.H    \
-Aggregation.H             \
-AggregationJoinExisting.C \
-AggregationJoinExisting.H \
-AggregationUnion.C        \
-AggregationUnion.H        \
-AggregationVariable.C     \
-AggregationVariable.H     \
-Array.C                   \
-Array.H                   \
-Attribute.C               \
-Attribute.H               \
-BoundaryVariable.C        \
-BoundaryVariable.H        \
-CommandLineParser.C       \
-CommandLineParser.H       \
-Common.H                  \
-ConnectivityVariable.C    \
-ConnectivityVariable.H    \
-CoordinateVariable.C      \
-CoordinateVariable.H      \
-Dataset.C                 \
-Dataset.H                 \
-DataType.C                \
-DataType.H                \
-Debug.C                   \
-Debug.H                   \
-Dimension.C               \
-Dimension.H               \
-Error.H                   \
-FileWriter.C              \
-FileWriter.H              \
-gax.H                     \
-gax.C                     \
-GlobalArray.C             \
-GlobalArray.H             \
-GlobalMask.C              \
-GlobalMask.H              \
-LatLonBox.C               \
-LatLonBox.H               \
-Mask.C                    \
-Mask.H                    \
-MaskMap.C                 \
-MaskMap.H                 \
-NetcdfAttribute.C         \
-NetcdfAttribute.H         \
-NetcdfDataset.C           \
-NetcdfDataset.H           \
-NetcdfDimension.C         \
-NetcdfDimension.H         \
-NetcdfError.H             \
-NetcdfFileWriter.C        \
-NetcdfFileWriter.H        \
-NetcdfVariable.C          \
-NetcdfVariable.H          \
-NotImplementedException.H \
-pagoda.C                  \
-pagoda.H                  \
-Pack.C                    \
-Pack.H                    \
-Pnetcdf.C                 \
-Pnetcdf.H                 \
-PnetcdfTiming.C           \
-PnetcdfTiming.H           \
-RangeException.H          \
-Slice.H                   \
-StringComparator.C        \
-StringComparator.H        \
-SubsetterCommands.C       \
-SubsetterCommands.H       \
-SubsetterException.H      \
-Timing.C                  \
-Timing.H                  \
-TypedValues.H             \
-Util.C                    \
-Util.H                    \
-Values.C                  \
-Values.H                  \
-Variable.C                \
-VariableDecorator.C       \
-VariableDecorator.H       \
-Variable.H
+libpagoda_la_SOURCES =        \
+src/AbstractVariable.C        \
+src/AbstractVariable.H        \
+src/Aggregation.C             \
+src/AggregationDimension.C    \
+src/AggregationDimension.H    \
+src/Aggregation.H             \
+src/AggregationJoinExisting.C \
+src/AggregationJoinExisting.H \
+src/AggregationUnion.C        \
+src/AggregationUnion.H        \
+src/AggregationVariable.C     \
+src/AggregationVariable.H     \
+src/Array.C                   \
+src/Array.H                   \
+src/Attribute.C               \
+src/Attribute.H               \
+src/BoundaryVariable.C        \
+src/BoundaryVariable.H        \
+src/CommandLineParser.C       \
+src/CommandLineParser.H       \
+src/Common.H                  \
+src/ConnectivityVariable.C    \
+src/ConnectivityVariable.H    \
+src/CoordinateVariable.C      \
+src/CoordinateVariable.H      \
+src/Dataset.C                 \
+src/Dataset.H                 \
+src/DataType.C                \
+src/DataType.H                \
+src/Debug.C                   \
+src/Debug.H                   \
+src/Dimension.C               \
+src/Dimension.H               \
+src/Error.H                   \
+src/FileWriter.C              \
+src/FileWriter.H              \
+src/gax.H                     \
+src/gax.C                     \
+src/GlobalArray.C             \
+src/GlobalArray.H             \
+src/GlobalMask.C              \
+src/GlobalMask.H              \
+src/LatLonBox.C               \
+src/LatLonBox.H               \
+src/Mask.C                    \
+src/Mask.H                    \
+src/MaskMap.C                 \
+src/MaskMap.H                 \
+src/NetcdfAttribute.C         \
+src/NetcdfAttribute.H         \
+src/NetcdfDataset.C           \
+src/NetcdfDataset.H           \
+src/NetcdfDimension.C         \
+src/NetcdfDimension.H         \
+src/NetcdfError.H             \
+src/NetcdfFileWriter.C        \
+src/NetcdfFileWriter.H        \
+src/NetcdfVariable.C          \
+src/NetcdfVariable.H          \
+src/NotImplementedException.H \
+src/pagoda.C                  \
+src/pagoda.H                  \
+src/Pack.C                    \
+src/Pack.H                    \
+src/Pnetcdf.C                 \
+src/Pnetcdf.H                 \
+src/PnetcdfTiming.C           \
+src/PnetcdfTiming.H           \
+src/RangeException.H          \
+src/Slice.H                   \
+src/StringComparator.C        \
+src/StringComparator.H        \
+src/SubsetterCommands.C       \
+src/SubsetterCommands.H       \
+src/SubsetterException.H      \
+src/Timing.C                  \
+src/Timing.H                  \
+src/TypedValues.H             \
+src/Util.C                    \
+src/Util.H                    \
+src/Values.C                  \
+src/Values.H                  \
+src/Variable.C                \
+src/VariableDecorator.C       \
+src/VariableDecorator.H       \
+src/Variable.H
 
 #############################################################################
 # tests

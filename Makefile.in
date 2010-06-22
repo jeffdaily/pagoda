@@ -103,29 +103,32 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libpagoda_la_LIBADD =
-am_libpagoda_la_OBJECTS = AbstractVariable.lo Aggregation.lo \
-	AggregationDimension.lo AggregationJoinExisting.lo \
-	AggregationUnion.lo AggregationVariable.lo Array.lo \
-	Attribute.lo BoundaryVariable.lo CommandLineParser.lo \
-	ConnectivityVariable.lo CoordinateVariable.lo Dataset.lo \
-	DataType.lo Debug.lo Dimension.lo FileWriter.lo gax.lo \
-	GlobalArray.lo GlobalMask.lo LatLonBox.lo Mask.lo MaskMap.lo \
-	NetcdfAttribute.lo NetcdfDataset.lo NetcdfDimension.lo \
-	NetcdfFileWriter.lo NetcdfVariable.lo pagoda.lo Pack.lo \
-	Pnetcdf.lo PnetcdfTiming.lo StringComparator.lo \
-	SubsetterCommands.lo Timing.lo Util.lo Values.lo Variable.lo \
-	VariableDecorator.lo
+am__dirstamp = $(am__leading_dot)dirstamp
+am_libpagoda_la_OBJECTS = src/AbstractVariable.lo src/Aggregation.lo \
+	src/AggregationDimension.lo src/AggregationJoinExisting.lo \
+	src/AggregationUnion.lo src/AggregationVariable.lo \
+	src/Array.lo src/Attribute.lo src/BoundaryVariable.lo \
+	src/CommandLineParser.lo src/ConnectivityVariable.lo \
+	src/CoordinateVariable.lo src/Dataset.lo src/DataType.lo \
+	src/Debug.lo src/Dimension.lo src/FileWriter.lo src/gax.lo \
+	src/GlobalArray.lo src/GlobalMask.lo src/LatLonBox.lo \
+	src/Mask.lo src/MaskMap.lo src/NetcdfAttribute.lo \
+	src/NetcdfDataset.lo src/NetcdfDimension.lo \
+	src/NetcdfFileWriter.lo src/NetcdfVariable.lo src/pagoda.lo \
+	src/Pack.lo src/Pnetcdf.lo src/PnetcdfTiming.lo \
+	src/StringComparator.lo src/SubsetterCommands.lo src/Timing.lo \
+	src/Util.lo src/Values.lo src/Variable.lo \
+	src/VariableDecorator.lo
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 PROGRAMS = $(bin_PROGRAMS)
-am_subsetter_old_OBJECTS = Mainp.$(OBJEXT)
+am_subsetter_old_OBJECTS = src/Mainp.$(OBJEXT)
 subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
 subsetter_old_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
 subsetter_old_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am__dirstamp = $(am__leading_dot)dirstamp
 am_tests_Test_OBJECTS = tests/Test.$(OBJEXT)
 tests_Test_OBJECTS = $(am_tests_Test_OBJECTS)
 tests_Test_LDADD = $(LDADD)
@@ -511,7 +514,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I config
 @WARNINGS_TRUE@WALL = -Wall
 @PROFILE_TRUE@PROFILE = -pg
-AM_CPPFLAGS = $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
 AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
@@ -519,94 +522,94 @@ AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(GA_LDFLAGS)
 LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libpagoda.la
-subsetter_old_SOURCES = Mainp.C
+subsetter_old_SOURCES = src/Mainp.C
 libpagoda_la_SOURCES = \
-AbstractVariable.C        \
-AbstractVariable.H        \
-Aggregation.C             \
-AggregationDimension.C    \
-AggregationDimension.H    \
-Aggregation.H             \
-AggregationJoinExisting.C \
-AggregationJoinExisting.H \
-AggregationUnion.C        \
-AggregationUnion.H        \
-AggregationVariable.C     \
-AggregationVariable.H     \
-Array.C                   \
-Array.H                   \
-Attribute.C               \
-Attribute.H               \
-BoundaryVariable.C        \
-BoundaryVariable.H        \
-CommandLineParser.C       \
-CommandLineParser.H       \
-Common.H                  \
-ConnectivityVariable.C    \
-ConnectivityVariable.H    \
-CoordinateVariable.C      \
-CoordinateVariable.H      \
-Dataset.C                 \
-Dataset.H                 \
-DataType.C                \
-DataType.H                \
-Debug.C                   \
-Debug.H                   \
-Dimension.C               \
-Dimension.H               \
-Error.H                   \
-FileWriter.C              \
-FileWriter.H              \
-gax.H                     \
-gax.C                     \
-GlobalArray.C             \
-GlobalArray.H             \
-GlobalMask.C              \
-GlobalMask.H              \
-LatLonBox.C               \
-LatLonBox.H               \
-Mask.C                    \
-Mask.H                    \
-MaskMap.C                 \
-MaskMap.H                 \
-NetcdfAttribute.C         \
-NetcdfAttribute.H         \
-NetcdfDataset.C           \
-NetcdfDataset.H           \
-NetcdfDimension.C         \
-NetcdfDimension.H         \
-NetcdfError.H             \
-NetcdfFileWriter.C        \
-NetcdfFileWriter.H        \
-NetcdfVariable.C          \
-NetcdfVariable.H          \
-NotImplementedException.H \
-pagoda.C                  \
-pagoda.H                  \
-Pack.C                    \
-Pack.H                    \
-Pnetcdf.C                 \
-Pnetcdf.H                 \
-PnetcdfTiming.C           \
-PnetcdfTiming.H           \
-RangeException.H          \
-Slice.H                   \
-StringComparator.C        \
-StringComparator.H        \
-SubsetterCommands.C       \
-SubsetterCommands.H       \
-SubsetterException.H      \
-Timing.C                  \
-Timing.H                  \
-TypedValues.H             \
-Util.C                    \
-Util.H                    \
-Values.C                  \
-Values.H                  \
-Variable.C                \
-VariableDecorator.C       \
-VariableDecorator.H       \
-Variable.H
+src/AbstractVariable.C        \
+src/AbstractVariable.H        \
+src/Aggregation.C             \
+src/AggregationDimension.C    \
+src/AggregationDimension.H    \
+src/Aggregation.H             \
+src/AggregationJoinExisting.C \
+src/AggregationJoinExisting.H \
+src/AggregationUnion.C        \
+src/AggregationUnion.H        \
+src/AggregationVariable.C     \
+src/AggregationVariable.H     \
+src/Array.C                   \
+src/Array.H                   \
+src/Attribute.C               \
+src/Attribute.H               \
+src/BoundaryVariable.C        \
+src/BoundaryVariable.H        \
+src/CommandLineParser.C       \
+src/CommandLineParser.H       \
+src/Common.H                  \
+src/ConnectivityVariable.C    \
+src/ConnectivityVariable.H    \
+src/CoordinateVariable.C      \
+src/CoordinateVariable.H      \
+src/Dataset.C                 \
+src/Dataset.H                 \
+src/DataType.C                \
+src/DataType.H                \
+src/Debug.C                   \
+src/Debug.H                   \
+src/Dimension.C               \
+src/Dimension.H               \
+src/Error.H                   \
+src/FileWriter.C              \
+src/FileWriter.H              \
+src/gax.H                     \
+src/gax.C                     \
+src/GlobalArray.C             \
+src/GlobalArray.H             \
+src/GlobalMask.C              \
+src/GlobalMask.H              \
+src/LatLonBox.C               \
+src/LatLonBox.H               \
+src/Mask.C                    \
+src/Mask.H                    \
+src/MaskMap.C                 \
+src/MaskMap.H                 \
+src/NetcdfAttribute.C         \
+src/NetcdfAttribute.H         \
+src/NetcdfDataset.C           \
+src/NetcdfDataset.H           \
+src/NetcdfDimension.C         \
+src/NetcdfDimension.H         \
+src/NetcdfError.H             \
+src/NetcdfFileWriter.C        \
+src/NetcdfFileWriter.H        \
+src/NetcdfVariable.C          \
+src/NetcdfVariable.H          \
+src/NotImplementedException.H \
+src/pagoda.C                  \
+src/pagoda.H                  \
+src/Pack.C                    \
+src/Pack.H                    \
+src/Pnetcdf.C                 \
+src/Pnetcdf.H                 \
+src/PnetcdfTiming.C           \
+src/PnetcdfTiming.H           \
+src/RangeException.H          \
+src/Slice.H                   \
+src/StringComparator.C        \
+src/StringComparator.H        \
+src/SubsetterCommands.C       \
+src/SubsetterCommands.H       \
+src/SubsetterException.H      \
+src/Timing.C                  \
+src/Timing.H                  \
+src/TypedValues.H             \
+src/Util.C                    \
+src/Util.H                    \
+src/Values.C                  \
+src/Values.H                  \
+src/Variable.C                \
+src/VariableDecorator.C       \
+src/VariableDecorator.H       \
+src/Variable.H
 
 tests_Test_SOURCES = tests/Test.C
 tests_TestAttribute_SOURCES = tests/TestAttribute.C
@@ -732,6 +735,69 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
+src/$(am__dirstamp):
+	@$(MKDIR_P) src
+	@: > src/$(am__dirstamp)
+src/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) src/$(DEPDIR)
+	@: > src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractVariable.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Aggregation.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/AggregationDimension.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AggregationJoinExisting.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AggregationUnion.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AggregationVariable.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Array.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Attribute.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/BoundaryVariable.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/CommandLineParser.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/ConnectivityVariable.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/CoordinateVariable.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Dataset.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/DataType.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Debug.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Dimension.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/FileWriter.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/gax.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/GlobalArray.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/GlobalMask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/LatLonBox.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Mask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/MaskMap.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/NetcdfAttribute.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/NetcdfDataset.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/NetcdfDimension.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/NetcdfFileWriter.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/NetcdfVariable.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/pagoda.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Pack.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Pnetcdf.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/PnetcdfTiming.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/StringComparator.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/SubsetterCommands.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/Timing.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Util.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Values.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Variable.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/VariableDecorator.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 libpagoda.la: $(libpagoda_la_OBJECTS) $(libpagoda_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libpagoda_la_OBJECTS) $(libpagoda_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
@@ -786,6 +852,7 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+src/Mainp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 subsetter_old$(EXEEXT): $(subsetter_old_OBJECTS) $(subsetter_old_DEPENDENCIES) 
 	@rm -f subsetter_old$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(subsetter_old_OBJECTS) $(subsetter_old_LDADD) $(LIBS)
@@ -984,6 +1051,85 @@ tests/ga/TestUnpack$(EXEEXT): $(tests_ga_TestUnpack_OBJECTS) $(tests_ga_TestUnpa
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f src/AbstractVariable.$(OBJEXT)
+	-rm -f src/AbstractVariable.lo
+	-rm -f src/Aggregation.$(OBJEXT)
+	-rm -f src/Aggregation.lo
+	-rm -f src/AggregationDimension.$(OBJEXT)
+	-rm -f src/AggregationDimension.lo
+	-rm -f src/AggregationJoinExisting.$(OBJEXT)
+	-rm -f src/AggregationJoinExisting.lo
+	-rm -f src/AggregationUnion.$(OBJEXT)
+	-rm -f src/AggregationUnion.lo
+	-rm -f src/AggregationVariable.$(OBJEXT)
+	-rm -f src/AggregationVariable.lo
+	-rm -f src/Array.$(OBJEXT)
+	-rm -f src/Array.lo
+	-rm -f src/Attribute.$(OBJEXT)
+	-rm -f src/Attribute.lo
+	-rm -f src/BoundaryVariable.$(OBJEXT)
+	-rm -f src/BoundaryVariable.lo
+	-rm -f src/CommandLineParser.$(OBJEXT)
+	-rm -f src/CommandLineParser.lo
+	-rm -f src/ConnectivityVariable.$(OBJEXT)
+	-rm -f src/ConnectivityVariable.lo
+	-rm -f src/CoordinateVariable.$(OBJEXT)
+	-rm -f src/CoordinateVariable.lo
+	-rm -f src/DataType.$(OBJEXT)
+	-rm -f src/DataType.lo
+	-rm -f src/Dataset.$(OBJEXT)
+	-rm -f src/Dataset.lo
+	-rm -f src/Debug.$(OBJEXT)
+	-rm -f src/Debug.lo
+	-rm -f src/Dimension.$(OBJEXT)
+	-rm -f src/Dimension.lo
+	-rm -f src/FileWriter.$(OBJEXT)
+	-rm -f src/FileWriter.lo
+	-rm -f src/GlobalArray.$(OBJEXT)
+	-rm -f src/GlobalArray.lo
+	-rm -f src/GlobalMask.$(OBJEXT)
+	-rm -f src/GlobalMask.lo
+	-rm -f src/LatLonBox.$(OBJEXT)
+	-rm -f src/LatLonBox.lo
+	-rm -f src/Mainp.$(OBJEXT)
+	-rm -f src/Mask.$(OBJEXT)
+	-rm -f src/Mask.lo
+	-rm -f src/MaskMap.$(OBJEXT)
+	-rm -f src/MaskMap.lo
+	-rm -f src/NetcdfAttribute.$(OBJEXT)
+	-rm -f src/NetcdfAttribute.lo
+	-rm -f src/NetcdfDataset.$(OBJEXT)
+	-rm -f src/NetcdfDataset.lo
+	-rm -f src/NetcdfDimension.$(OBJEXT)
+	-rm -f src/NetcdfDimension.lo
+	-rm -f src/NetcdfFileWriter.$(OBJEXT)
+	-rm -f src/NetcdfFileWriter.lo
+	-rm -f src/NetcdfVariable.$(OBJEXT)
+	-rm -f src/NetcdfVariable.lo
+	-rm -f src/Pack.$(OBJEXT)
+	-rm -f src/Pack.lo
+	-rm -f src/Pnetcdf.$(OBJEXT)
+	-rm -f src/Pnetcdf.lo
+	-rm -f src/PnetcdfTiming.$(OBJEXT)
+	-rm -f src/PnetcdfTiming.lo
+	-rm -f src/StringComparator.$(OBJEXT)
+	-rm -f src/StringComparator.lo
+	-rm -f src/SubsetterCommands.$(OBJEXT)
+	-rm -f src/SubsetterCommands.lo
+	-rm -f src/Timing.$(OBJEXT)
+	-rm -f src/Timing.lo
+	-rm -f src/Util.$(OBJEXT)
+	-rm -f src/Util.lo
+	-rm -f src/Values.$(OBJEXT)
+	-rm -f src/Values.lo
+	-rm -f src/Variable.$(OBJEXT)
+	-rm -f src/Variable.lo
+	-rm -f src/VariableDecorator.$(OBJEXT)
+	-rm -f src/VariableDecorator.lo
+	-rm -f src/gax.$(OBJEXT)
+	-rm -f src/gax.lo
+	-rm -f src/pagoda.$(OBJEXT)
+	-rm -f src/pagoda.lo
 	-rm -f tests/Test.$(OBJEXT)
 	-rm -f tests/TestAttribute.$(OBJEXT)
 	-rm -f tests/TestBin.$(OBJEXT)
@@ -1024,46 +1170,46 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Aggregation.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationDimension.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationJoinExisting.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationUnion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AggregationVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Array.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Attribute.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BoundaryVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CommandLineParser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectivityVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CoordinateVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DataType.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dataset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Debug.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Dimension.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileWriter.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GlobalArray.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GlobalMask.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LatLonBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mainp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Mask.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MaskMap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfAttribute.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDataset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfDimension.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfFileWriter.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetcdfVariable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pack.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pnetcdf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StringComparator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SubsetterCommands.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timing.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Values.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Variable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/VariableDecorator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gax.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pagoda.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Aggregation.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AggregationDimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AggregationJoinExisting.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AggregationUnion.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AggregationVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Array.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Attribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/BoundaryVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CommandLineParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ConnectivityVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CoordinateVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/DataType.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Debug.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/FileWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalArray.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalMask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/LatLonBox.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mainp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/MaskMap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/NetcdfAttribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/NetcdfDataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/NetcdfDimension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/NetcdfFileWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/NetcdfVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pnetcdf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/StringComparator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/SubsetterCommands.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Timing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Values.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Variable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/VariableDecorator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pagoda.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestBin.Po@am__quote@
@@ -1160,6 +1306,7 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf src/.libs src/_libs
 	-rm -rf tests/.libs tests/_libs
 	-rm -rf tests/ga/.libs tests/ga/_libs
 
@@ -1396,6 +1543,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f src/$(DEPDIR)/$(am__dirstamp)
+	-rm -f src/$(am__dirstamp)
 	-rm -f tests/$(DEPDIR)/$(am__dirstamp)
 	-rm -f tests/$(am__dirstamp)
 	-rm -f tests/ga/$(DEPDIR)/$(am__dirstamp)
@@ -1411,7 +1560,7 @@ clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ./$(DEPDIR) tests/$(DEPDIR) tests/ga/$(DEPDIR)
+	-rm -rf src/$(DEPDIR) tests/$(DEPDIR) tests/ga/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -1459,7 +1608,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ./$(DEPDIR) tests/$(DEPDIR) tests/ga/$(DEPDIR)
+	-rm -rf src/$(DEPDIR) tests/$(DEPDIR) tests/ga/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
