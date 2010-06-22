@@ -31,7 +31,7 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    NetcdfDataset *dataset = new NetcdfDataset(argv[1]);
+    Dataset *dataset = Dataset::open(argv[1]);
 
     cout << "@@@@@@@@@@@@@@@@@@@ GLOBAL ATTRIBUTES" << endl;
     vector<Attribute*> atts = dataset->get_atts();

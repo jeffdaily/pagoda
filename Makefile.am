@@ -22,154 +22,136 @@ lib_LTLIBRARIES = libpagoda.la
 
 subsetter_old_SOURCES = src/Mainp.C
 
-libpagoda_la_SOURCES =        \
-src/AbstractVariable.C        \
-src/AbstractVariable.H        \
-src/Aggregation.C             \
-src/AggregationDimension.C    \
-src/AggregationDimension.H    \
-src/Aggregation.H             \
-src/AggregationJoinExisting.C \
-src/AggregationJoinExisting.H \
-src/AggregationUnion.C        \
-src/AggregationUnion.H        \
-src/AggregationVariable.C     \
-src/AggregationVariable.H     \
-src/Array.C                   \
-src/Array.H                   \
-src/Attribute.C               \
-src/Attribute.H               \
-src/BoundaryVariable.C        \
-src/BoundaryVariable.H        \
-src/CommandLineParser.C       \
-src/CommandLineParser.H       \
-src/Common.H                  \
-src/ConnectivityVariable.C    \
-src/ConnectivityVariable.H    \
-src/CoordinateVariable.C      \
-src/CoordinateVariable.H      \
-src/Dataset.C                 \
-src/Dataset.H                 \
-src/DataType.C                \
-src/DataType.H                \
-src/Debug.C                   \
-src/Debug.H                   \
-src/Dimension.C               \
-src/Dimension.H               \
-src/Error.H                   \
-src/FileWriter.C              \
-src/FileWriter.H              \
-src/gax.H                     \
-src/gax.C                     \
-src/GlobalArray.C             \
-src/GlobalArray.H             \
-src/GlobalMask.C              \
-src/GlobalMask.H              \
-src/LatLonBox.C               \
-src/LatLonBox.H               \
-src/Mask.C                    \
-src/Mask.H                    \
-src/MaskMap.C                 \
-src/MaskMap.H                 \
-src/NetcdfAttribute.C         \
-src/NetcdfAttribute.H         \
-src/NetcdfDataset.C           \
-src/NetcdfDataset.H           \
-src/NetcdfDimension.C         \
-src/NetcdfDimension.H         \
-src/NetcdfError.H             \
-src/NetcdfFileWriter.C        \
-src/NetcdfFileWriter.H        \
-src/NetcdfVariable.C          \
-src/NetcdfVariable.H          \
-src/NotImplementedException.H \
-src/pagoda.C                  \
-src/pagoda.H                  \
-src/Pack.C                    \
-src/Pack.H                    \
-src/Pnetcdf.C                 \
-src/Pnetcdf.H                 \
-src/PnetcdfTiming.C           \
-src/PnetcdfTiming.H           \
-src/RangeException.H          \
-src/Slice.H                   \
-src/StringComparator.C        \
-src/StringComparator.H        \
-src/SubsetterCommands.C       \
-src/SubsetterCommands.H       \
-src/SubsetterException.H      \
-src/Timing.C                  \
-src/Timing.H                  \
-src/TypedValues.H             \
-src/Util.C                    \
-src/Util.H                    \
-src/Values.C                  \
-src/Values.H                  \
-src/Variable.C                \
-src/VariableDecorator.C       \
-src/VariableDecorator.H       \
-src/Variable.H
+pkginclude_HEADERS =
+pkginclude_HEADERS += src/AbstractVariable.H
+pkginclude_HEADERS += src/AggregationDimension.H
+pkginclude_HEADERS += src/Aggregation.H
+pkginclude_HEADERS += src/AggregationJoinExisting.H
+pkginclude_HEADERS += src/AggregationUnion.H
+pkginclude_HEADERS += src/AggregationVariable.H
+pkginclude_HEADERS += src/Array.H
+pkginclude_HEADERS += src/Attribute.H
+pkginclude_HEADERS += src/BoundaryVariable.H
+pkginclude_HEADERS += src/CommandLineParser.H
+pkginclude_HEADERS += src/Common.H
+pkginclude_HEADERS += src/ConnectivityVariable.H
+pkginclude_HEADERS += src/CoordinateVariable.H
+pkginclude_HEADERS += src/Dataset.H
+pkginclude_HEADERS += src/DataType.H
+pkginclude_HEADERS += src/Debug.H
+pkginclude_HEADERS += src/Dimension.H
+pkginclude_HEADERS += src/Error.H
+pkginclude_HEADERS += src/FileWriter.H
+pkginclude_HEADERS += src/gax.H
+pkginclude_HEADERS += src/GlobalArray.H
+pkginclude_HEADERS += src/GlobalMask.H
+pkginclude_HEADERS += src/LatLonBox.H
+pkginclude_HEADERS += src/Mask.H
+pkginclude_HEADERS += src/MaskMap.H
+pkginclude_HEADERS += src/NetcdfAttribute.H
+pkginclude_HEADERS += src/NetcdfDataset.H
+pkginclude_HEADERS += src/NetcdfDimension.H
+pkginclude_HEADERS += src/NetcdfError.H
+pkginclude_HEADERS += src/NetcdfFileWriter.H
+pkginclude_HEADERS += src/NetcdfVariable.H
+pkginclude_HEADERS += src/NotImplementedException.H
+pkginclude_HEADERS += src/pagoda.H
+pkginclude_HEADERS += src/Pack.H
+pkginclude_HEADERS += src/Pnetcdf.H
+pkginclude_HEADERS += src/PnetcdfTiming.H
+pkginclude_HEADERS += src/RangeException.H
+pkginclude_HEADERS += src/Slice.H
+pkginclude_HEADERS += src/StringComparator.H
+pkginclude_HEADERS += src/SubsetterCommands.H
+pkginclude_HEADERS += src/SubsetterException.H
+pkginclude_HEADERS += src/Timing.H
+pkginclude_HEADERS += src/TypedValues.H
+pkginclude_HEADERS += src/Util.H
+pkginclude_HEADERS += src/Values.H
+pkginclude_HEADERS += src/VariableDecorator.H
+pkginclude_HEADERS += src/Variable.H
+
+libpagoda_la_SOURCES =
+libpagoda_la_SOURCES += src/AbstractVariable.C
+libpagoda_la_SOURCES += src/Aggregation.C
+libpagoda_la_SOURCES += src/AggregationDimension.C
+libpagoda_la_SOURCES += src/AggregationJoinExisting.C
+libpagoda_la_SOURCES += src/AggregationUnion.C
+libpagoda_la_SOURCES += src/AggregationVariable.C
+libpagoda_la_SOURCES += src/Array.C
+libpagoda_la_SOURCES += src/Attribute.C
+libpagoda_la_SOURCES += src/BoundaryVariable.C
+libpagoda_la_SOURCES += src/CommandLineParser.C
+libpagoda_la_SOURCES += src/ConnectivityVariable.C
+libpagoda_la_SOURCES += src/CoordinateVariable.C
+libpagoda_la_SOURCES += src/Dataset.C
+libpagoda_la_SOURCES += src/DataType.C
+libpagoda_la_SOURCES += src/Debug.C
+libpagoda_la_SOURCES += src/Dimension.C
+libpagoda_la_SOURCES += src/FileWriter.C
+libpagoda_la_SOURCES += src/gax.C
+libpagoda_la_SOURCES += src/GlobalArray.C
+libpagoda_la_SOURCES += src/GlobalMask.C
+libpagoda_la_SOURCES += src/LatLonBox.C
+libpagoda_la_SOURCES += src/Mask.C
+libpagoda_la_SOURCES += src/MaskMap.C
+libpagoda_la_SOURCES += src/NetcdfAttribute.C
+libpagoda_la_SOURCES += src/NetcdfDataset.C
+libpagoda_la_SOURCES += src/NetcdfDimension.C
+libpagoda_la_SOURCES += src/NetcdfFileWriter.C
+libpagoda_la_SOURCES += src/NetcdfVariable.C
+libpagoda_la_SOURCES += src/pagoda.C
+libpagoda_la_SOURCES += src/Pack.C
+libpagoda_la_SOURCES += src/Pnetcdf.C
+libpagoda_la_SOURCES += src/PnetcdfTiming.C
+libpagoda_la_SOURCES += src/StringComparator.C
+libpagoda_la_SOURCES += src/SubsetterCommands.C
+libpagoda_la_SOURCES += src/Timing.C
+libpagoda_la_SOURCES += src/Util.C
+libpagoda_la_SOURCES += src/Values.C
+libpagoda_la_SOURCES += src/Variable.C
+libpagoda_la_SOURCES += src/VariableDecorator.C
 
 #############################################################################
 # tests
 #
-check_PROGRAMS +=          \
-tests/Test                 \
-tests/TestAttribute        \
-tests/TestBin              \
-tests/TestDimension        \
-tests/TestDistance         \
-tests/TestEnum             \
-tests/TestGet              \
-tests/TestLocateRegion     \
-tests/TestJoin             \
-tests/TestNetcdfDataset    \
-tests/TestOpen             \
-tests/TestPartialSum       \
-tests/TestRavel            \
-tests/TestRead             \
-tests/TestScanAdd          \
-tests/TestSort             \
-tests/TestUnion            \
-tests/TestUnpack           \
-tests/ga/Test              \
-tests/ga/TestAttribute     \
-tests/ga/TestBin           \
-tests/ga/TestDimension     \
-tests/ga/TestDistance      \
-tests/ga/TestEnum          \
-tests/ga/TestGet           \
-tests/ga/TestLocateRegion  \
-tests/ga/TestJoin          \
-tests/ga/TestNetcdfDataset \
-tests/ga/TestOpen          \
-tests/ga/TestPartialSum    \
-tests/ga/TestRavel         \
-tests/ga/TestRead          \
-tests/ga/TestScanAdd       \
-tests/ga/TestSort          \
-tests/ga/TestUnion         \
-tests/ga/TestUnpack
+check_PROGRAMS += tests/ga/Test
+check_PROGRAMS += tests/ga/TestAttribute
+check_PROGRAMS += tests/ga/TestBin
+check_PROGRAMS += tests/ga/TestDimension
+check_PROGRAMS += tests/ga/TestDistance
+check_PROGRAMS += tests/ga/TestEnum
+check_PROGRAMS += tests/ga/TestGet
+check_PROGRAMS += tests/ga/TestJoin
+check_PROGRAMS += tests/ga/TestLocateRegion
+check_PROGRAMS += tests/ga/TestNetcdfDataset
+check_PROGRAMS += tests/ga/TestOpen
+check_PROGRAMS += tests/ga/TestPartialSum
+check_PROGRAMS += tests/ga/TestRavel
+check_PROGRAMS += tests/ga/TestRead
+check_PROGRAMS += tests/ga/TestScanAdd
+check_PROGRAMS += tests/ga/TestSort
+check_PROGRAMS += tests/ga/TestUnion
+check_PROGRAMS += tests/ga/TestUnpack
+check_PROGRAMS += tests/Test
+check_PROGRAMS += tests/TestAttribute
+check_PROGRAMS += tests/TestBin
+check_PROGRAMS += tests/TestDimension
+check_PROGRAMS += tests/TestDistance
+check_PROGRAMS += tests/TestEnum
+check_PROGRAMS += tests/TestGet
+check_PROGRAMS += tests/TestJoin
+check_PROGRAMS += tests/TestLocateRegion
+check_PROGRAMS += tests/TestNetcdfDataset
+check_PROGRAMS += tests/TestOpen
+check_PROGRAMS += tests/TestPartialSum
+check_PROGRAMS += tests/TestRavel
+check_PROGRAMS += tests/TestRead
+check_PROGRAMS += tests/TestScanAdd
+check_PROGRAMS += tests/TestSort
+check_PROGRAMS += tests/TestUnion
+check_PROGRAMS += tests/TestUnpack
 
-tests_Test_SOURCES                 = tests/Test.C
-tests_TestAttribute_SOURCES        = tests/TestAttribute.C
-tests_TestBin_SOURCES              = tests/TestBin.C
-tests_TestDimension_SOURCES        = tests/TestDimension.C
-tests_TestDistance_SOURCES         = tests/TestDistance.C
-tests_TestEnum_SOURCES             = tests/TestEnum.C
-tests_TestGet_SOURCES              = tests/TestGet.C
-tests_TestJoin_SOURCES             = tests/TestJoin.C
-tests_TestLocateRegion_SOURCES     = tests/TestLocateRegion.C
-tests_TestNetcdfDataset_SOURCES    = tests/TestNetcdfDataset.C
-tests_TestOpen_SOURCES             = tests/TestOpen.C
-tests_TestPartialSum_SOURCES       = tests/TestPartialSum.C
-tests_TestRavel_SOURCES            = tests/TestRavel.C
-tests_TestRead_SOURCES             = tests/TestRead.C
-tests_TestScanAdd_SOURCES          = tests/TestScanAdd.C
-tests_TestSort_SOURCES             = tests/TestSort.C
-tests_TestUnion_SOURCES            = tests/TestUnion.C
-tests_TestUnpack_SOURCES           = tests/TestUnpack.c
-tests_ga_Test_SOURCES              = tests/ga/Test.C
 tests_ga_TestAttribute_SOURCES     = tests/ga/TestAttribute.C
 tests_ga_TestBin_SOURCES           = tests/ga/TestBin.C
 tests_ga_TestDimension_SOURCES     = tests/ga/TestDimension.C
@@ -185,8 +167,27 @@ tests_ga_TestRavel_SOURCES         = tests/ga/TestRavel.C
 tests_ga_TestRead_SOURCES          = tests/ga/TestRead.C
 tests_ga_TestScanAdd_SOURCES       = tests/ga/TestScanAdd.C
 tests_ga_TestSort_SOURCES          = tests/ga/TestSort.C
+tests_ga_Test_SOURCES              = tests/ga/Test.C
 tests_ga_TestUnion_SOURCES         = tests/ga/TestUnion.C
 tests_ga_TestUnpack_SOURCES        = tests/ga/TestUnpack.c
+tests_TestAttribute_SOURCES        = tests/TestAttribute.C
+tests_TestBin_SOURCES              = tests/TestBin.C
+tests_TestDimension_SOURCES        = tests/TestDimension.C
+tests_TestDistance_SOURCES         = tests/TestDistance.C
+tests_TestEnum_SOURCES             = tests/TestEnum.C
+tests_TestGet_SOURCES              = tests/TestGet.C
+tests_TestJoin_SOURCES             = tests/TestJoin.C
+tests_TestLocateRegion_SOURCES     = tests/TestLocateRegion.C
+tests_TestNetcdfDataset_SOURCES    = tests/TestNetcdfDataset.C
+tests_TestOpen_SOURCES             = tests/TestOpen.C
+tests_TestPartialSum_SOURCES       = tests/TestPartialSum.C
+tests_TestRavel_SOURCES            = tests/TestRavel.C
+tests_TestRead_SOURCES             = tests/TestRead.C
+tests_TestScanAdd_SOURCES          = tests/TestScanAdd.C
+tests_TestSort_SOURCES             = tests/TestSort.C
+tests_Test_SOURCES                 = tests/Test.C
+tests_TestUnion_SOURCES            = tests/TestUnion.C
+tests_TestUnpack_SOURCES           = tests/TestUnpack.c
 
-tests_TestGet_LDADD    = $(LDADD_STANDALONE)
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)
+tests_TestGet_LDADD    = $(LDADD_STANDALONE)

@@ -706,7 +706,7 @@ PACKAGE_STRING='pagoda 0.2'
 PACKAGE_BUGREPORT='jeff.daily@pnl.gov'
 PACKAGE_URL=''
 
-ac_unique_file="Mainp.C"
+ac_unique_file="src/Mainp.C"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

@@ -3,7 +3,7 @@
 #####################################################3
 AC_PREREQ([2.64])
 AC_INIT([pagoda], [0.2], [jeff.daily@pnl.gov])
-AC_CONFIG_SRCDIR([Mainp.C])
+AC_CONFIG_SRCDIR([src/Mainp.C])
 AC_CONFIG_HEADERS([config/config.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
