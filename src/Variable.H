@@ -13,7 +13,6 @@ using std::vector;
 
 class Array;
 class Attribute;
-class Dataset;
 class Dimension;
 
 

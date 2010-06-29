@@ -4,14 +4,14 @@
 
 #include <sstream>
 
-#include <ga.h>
-
 #include "AbstractVariable.H"
+#include "Array.H"
 #include "Attribute.H"
 #include "Dimension.H"
 #include "Mask.H"
 #include "StringComparator.H"
 #include "Timing.H"
+#include "Variable.H"
 
 using std::ostringstream;
 
@@ -122,6 +122,26 @@ Attribute* AbstractVariable::find_att(
     }
 
     return NULL;
+}
+
+
+Array* AbstractVariable::read()
+{
+    Array *dst = Array::create(get_type(), get_shape());
+    return read(dst);
+}
+
+
+Array* AbstractVariable::read(int64_t record)
+{
+    vector<int64_t> shape;
+    Array *dst;
+
+    shape = get_shape();
+    shape.erase(shape.begin());
+    dst = Array::create(get_type(), shape);
+
+    return read(record, dst);
 }
 
 

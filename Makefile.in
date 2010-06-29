@@ -36,25 +36,21 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = subsetter_old$(EXEEXT) tests/ga/Test$(EXEEXT) \
+check_PROGRAMS = subsetter_old$(EXEEXT) \
 	tests/ga/TestAttribute$(EXEEXT) tests/ga/TestBin$(EXEEXT) \
 	tests/ga/TestDimension$(EXEEXT) tests/ga/TestDistance$(EXEEXT) \
 	tests/ga/TestEnum$(EXEEXT) tests/ga/TestGet$(EXEEXT) \
 	tests/ga/TestJoin$(EXEEXT) tests/ga/TestLocateRegion$(EXEEXT) \
-	tests/ga/TestNetcdfDataset$(EXEEXT) tests/ga/TestOpen$(EXEEXT) \
+	tests/ga/TestNetcdfDataset$(EXEEXT) \
 	tests/ga/TestPartialSum$(EXEEXT) tests/ga/TestRavel$(EXEEXT) \
 	tests/ga/TestRead$(EXEEXT) tests/ga/TestScanAdd$(EXEEXT) \
 	tests/ga/TestSort$(EXEEXT) tests/ga/TestUnion$(EXEEXT) \
-	tests/ga/TestUnpack$(EXEEXT) tests/Test$(EXEEXT) \
-	tests/TestBin$(EXEEXT) tests/TestDimension$(EXEEXT) \
-	tests/TestDistance$(EXEEXT) tests/TestEnum$(EXEEXT) \
-	tests/TestGet$(EXEEXT) tests/TestJoin$(EXEEXT) \
-	tests/TestLocateRegion$(EXEEXT) \
-	tests/TestNetcdfDataset$(EXEEXT) tests/TestOpen$(EXEEXT) \
+	tests/ga/TestUnpack$(EXEEXT) tests/TestBin$(EXEEXT) \
+	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
+	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
+	tests/TestJoin$(EXEEXT) tests/TestNetcdfDataset$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
-	tests/TestRead$(EXEEXT) tests/TestScanAdd$(EXEEXT) \
-	tests/TestSort$(EXEEXT) tests/TestUnion$(EXEEXT) \
-	tests/TestUnpack$(EXEEXT)
+	tests/TestRead$(EXEEXT) tests/TestUnion$(EXEEXT)
 bin_PROGRAMS = pgdump$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
@@ -135,10 +131,6 @@ am_subsetter_old_OBJECTS = src/Mainp.$(OBJEXT)
 subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
 subsetter_old_LDADD = $(LDADD)
 subsetter_old_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_Test_OBJECTS = tests/Test.$(OBJEXT)
-tests_Test_OBJECTS = $(am_tests_Test_OBJECTS)
-tests_Test_LDADD = $(LDADD)
-tests_Test_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestBin_OBJECTS = tests/TestBin.$(OBJEXT)
 tests_TestBin_OBJECTS = $(am_tests_TestBin_OBJECTS)
 tests_TestBin_LDADD = $(LDADD)
@@ -157,17 +149,12 @@ tests_TestEnum_LDADD = $(LDADD)
 tests_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestGet_OBJECTS = tests/TestGet.$(OBJEXT)
 tests_TestGet_OBJECTS = $(am_tests_TestGet_OBJECTS)
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
-tests_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_2)
+tests_TestGet_LDADD = $(LDADD)
+tests_TestGet_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestJoin_OBJECTS = tests/TestJoin.$(OBJEXT)
 tests_TestJoin_OBJECTS = $(am_tests_TestJoin_OBJECTS)
 tests_TestJoin_LDADD = $(LDADD)
 tests_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_TestLocateRegion_OBJECTS = tests/TestLocateRegion.$(OBJEXT)
-tests_TestLocateRegion_OBJECTS = $(am_tests_TestLocateRegion_OBJECTS)
-tests_TestLocateRegion_LDADD = $(LDADD)
-tests_TestLocateRegion_DEPENDENCIES = libpagoda.la \
-	$(am__DEPENDENCIES_1)
 am_tests_TestNetcdfDataset_OBJECTS =  \
 	tests/TestNetcdfDataset.$(OBJEXT)
 tests_TestNetcdfDataset_OBJECTS =  \
@@ -175,10 +162,6 @@ tests_TestNetcdfDataset_OBJECTS =  \
 tests_TestNetcdfDataset_LDADD = $(LDADD)
 tests_TestNetcdfDataset_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1)
-am_tests_TestOpen_OBJECTS = tests/TestOpen.$(OBJEXT)
-tests_TestOpen_OBJECTS = $(am_tests_TestOpen_OBJECTS)
-tests_TestOpen_LDADD = $(LDADD)
-tests_TestOpen_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestPartialSum_OBJECTS = tests/TestPartialSum.$(OBJEXT)
 tests_TestPartialSum_OBJECTS = $(am_tests_TestPartialSum_OBJECTS)
 tests_TestPartialSum_LDADD = $(LDADD)
@@ -191,26 +174,10 @@ am_tests_TestRead_OBJECTS = tests/TestRead.$(OBJEXT)
 tests_TestRead_OBJECTS = $(am_tests_TestRead_OBJECTS)
 tests_TestRead_LDADD = $(LDADD)
 tests_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_TestScanAdd_OBJECTS = tests/TestScanAdd.$(OBJEXT)
-tests_TestScanAdd_OBJECTS = $(am_tests_TestScanAdd_OBJECTS)
-tests_TestScanAdd_LDADD = $(LDADD)
-tests_TestScanAdd_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_TestSort_OBJECTS = tests/TestSort.$(OBJEXT)
-tests_TestSort_OBJECTS = $(am_tests_TestSort_OBJECTS)
-tests_TestSort_LDADD = $(LDADD)
-tests_TestSort_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestUnion_OBJECTS = tests/TestUnion.$(OBJEXT)
 tests_TestUnion_OBJECTS = $(am_tests_TestUnion_OBJECTS)
 tests_TestUnion_LDADD = $(LDADD)
 tests_TestUnion_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_TestUnpack_OBJECTS = tests/TestUnpack.$(OBJEXT)
-tests_TestUnpack_OBJECTS = $(am_tests_TestUnpack_OBJECTS)
-tests_TestUnpack_LDADD = $(LDADD)
-tests_TestUnpack_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_tests_ga_Test_OBJECTS = tests/ga/Test.$(OBJEXT)
-tests_ga_Test_OBJECTS = $(am_tests_ga_Test_OBJECTS)
-tests_ga_Test_LDADD = $(LDADD)
-tests_ga_Test_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_ga_TestAttribute_OBJECTS = tests/ga/TestAttribute.$(OBJEXT)
 tests_ga_TestAttribute_OBJECTS = $(am_tests_ga_TestAttribute_OBJECTS)
 tests_ga_TestAttribute_LDADD = $(LDADD)
@@ -236,6 +203,7 @@ tests_ga_TestEnum_LDADD = $(LDADD)
 tests_ga_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_ga_TestGet_OBJECTS = tests/ga/TestGet.$(OBJEXT)
 tests_ga_TestGet_OBJECTS = $(am_tests_ga_TestGet_OBJECTS)
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 tests_ga_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_tests_ga_TestJoin_OBJECTS = tests/ga/TestJoin.$(OBJEXT)
 tests_ga_TestJoin_OBJECTS = $(am_tests_ga_TestJoin_OBJECTS)
@@ -255,10 +223,6 @@ tests_ga_TestNetcdfDataset_OBJECTS =  \
 tests_ga_TestNetcdfDataset_LDADD = $(LDADD)
 tests_ga_TestNetcdfDataset_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1)
-am_tests_ga_TestOpen_OBJECTS = tests/ga/TestOpen.$(OBJEXT)
-tests_ga_TestOpen_OBJECTS = $(am_tests_ga_TestOpen_OBJECTS)
-tests_ga_TestOpen_LDADD = $(LDADD)
-tests_ga_TestOpen_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_ga_TestPartialSum_OBJECTS =  \
 	tests/ga/TestPartialSum.$(OBJEXT)
 tests_ga_TestPartialSum_OBJECTS =  \
@@ -333,45 +297,35 @@ AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
-	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
-	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
-	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
-	$(tests_TestLocateRegion_SOURCES) \
-	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
+	$(subsetter_old_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
+	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestNetcdfDataset_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
-	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
-	$(tests_TestSort_SOURCES) $(tests_TestUnion_SOURCES) \
-	$(tests_TestUnpack_SOURCES) $(tests_ga_Test_SOURCES) \
+	$(tests_TestRead_SOURCES) $(tests_TestUnion_SOURCES) \
 	$(tests_ga_TestAttribute_SOURCES) $(tests_ga_TestBin_SOURCES) \
 	$(tests_ga_TestDimension_SOURCES) \
 	$(tests_ga_TestDistance_SOURCES) $(tests_ga_TestEnum_SOURCES) \
 	$(tests_ga_TestGet_SOURCES) $(tests_ga_TestJoin_SOURCES) \
 	$(tests_ga_TestLocateRegion_SOURCES) \
 	$(tests_ga_TestNetcdfDataset_SOURCES) \
-	$(tests_ga_TestOpen_SOURCES) \
 	$(tests_ga_TestPartialSum_SOURCES) \
 	$(tests_ga_TestRavel_SOURCES) $(tests_ga_TestRead_SOURCES) \
 	$(tests_ga_TestScanAdd_SOURCES) $(tests_ga_TestSort_SOURCES) \
 	$(tests_ga_TestUnion_SOURCES) $(tests_ga_TestUnpack_SOURCES)
 DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
-	$(subsetter_old_SOURCES) $(tests_Test_SOURCES) \
-	$(tests_TestBin_SOURCES) $(tests_TestDimension_SOURCES) \
-	$(tests_TestDistance_SOURCES) $(tests_TestEnum_SOURCES) \
-	$(tests_TestGet_SOURCES) $(tests_TestJoin_SOURCES) \
-	$(tests_TestLocateRegion_SOURCES) \
-	$(tests_TestNetcdfDataset_SOURCES) $(tests_TestOpen_SOURCES) \
+	$(subsetter_old_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
+	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestNetcdfDataset_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
-	$(tests_TestRead_SOURCES) $(tests_TestScanAdd_SOURCES) \
-	$(tests_TestSort_SOURCES) $(tests_TestUnion_SOURCES) \
-	$(tests_TestUnpack_SOURCES) $(tests_ga_Test_SOURCES) \
+	$(tests_TestRead_SOURCES) $(tests_TestUnion_SOURCES) \
 	$(tests_ga_TestAttribute_SOURCES) $(tests_ga_TestBin_SOURCES) \
 	$(tests_ga_TestDimension_SOURCES) \
 	$(tests_ga_TestDistance_SOURCES) $(tests_ga_TestEnum_SOURCES) \
 	$(tests_ga_TestGet_SOURCES) $(tests_ga_TestJoin_SOURCES) \
 	$(tests_ga_TestLocateRegion_SOURCES) \
 	$(tests_ga_TestNetcdfDataset_SOURCES) \
-	$(tests_ga_TestOpen_SOURCES) \
 	$(tests_ga_TestPartialSum_SOURCES) \
 	$(tests_ga_TestRavel_SOURCES) $(tests_ga_TestRead_SOURCES) \
 	$(tests_ga_TestScanAdd_SOURCES) $(tests_ga_TestSort_SOURCES) \
@@ -567,13 +521,11 @@ tests_ga_TestGet_SOURCES = tests/ga/TestGet.C
 tests_ga_TestJoin_SOURCES = tests/ga/TestJoin.C
 tests_ga_TestLocateRegion_SOURCES = tests/ga/TestLocateRegion.C
 tests_ga_TestNetcdfDataset_SOURCES = tests/ga/TestNetcdfDataset.C
-tests_ga_TestOpen_SOURCES = tests/ga/TestOpen.C
 tests_ga_TestPartialSum_SOURCES = tests/ga/TestPartialSum.C
 tests_ga_TestRavel_SOURCES = tests/ga/TestRavel.C
 tests_ga_TestRead_SOURCES = tests/ga/TestRead.C
 tests_ga_TestScanAdd_SOURCES = tests/ga/TestScanAdd.C
 tests_ga_TestSort_SOURCES = tests/ga/TestSort.C
-tests_ga_Test_SOURCES = tests/ga/Test.C
 tests_ga_TestUnion_SOURCES = tests/ga/TestUnion.C
 tests_ga_TestUnpack_SOURCES = tests/ga/TestUnpack.c
 tests_TestBin_SOURCES = tests/TestBin.C
@@ -582,19 +534,12 @@ tests_TestDistance_SOURCES = tests/TestDistance.C
 tests_TestEnum_SOURCES = tests/TestEnum.C
 tests_TestGet_SOURCES = tests/TestGet.C
 tests_TestJoin_SOURCES = tests/TestJoin.C
-tests_TestLocateRegion_SOURCES = tests/TestLocateRegion.C
 tests_TestNetcdfDataset_SOURCES = tests/TestNetcdfDataset.C
-tests_TestOpen_SOURCES = tests/TestOpen.C
 tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 tests_TestRavel_SOURCES = tests/TestRavel.C
 tests_TestRead_SOURCES = tests/TestRead.C
-tests_TestScanAdd_SOURCES = tests/TestScanAdd.C
-tests_TestSort_SOURCES = tests/TestSort.C
-tests_Test_SOURCES = tests/Test.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
-tests_TestUnpack_SOURCES = tests/TestUnpack.c
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)
-tests_TestGet_LDADD = $(LDADD_STANDALONE)
 all: all-am
 
 .SUFFIXES:
@@ -813,11 +758,6 @@ tests/$(am__dirstamp):
 tests/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) tests/$(DEPDIR)
 	@: > tests/$(DEPDIR)/$(am__dirstamp)
-tests/Test.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/Test$(EXEEXT): $(tests_Test_OBJECTS) $(tests_Test_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/Test$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_Test_OBJECTS) $(tests_Test_LDADD) $(LIBS)
 tests/TestBin.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestBin$(EXEEXT): $(tests_TestBin_OBJECTS) $(tests_TestBin_DEPENDENCIES) tests/$(am__dirstamp)
@@ -848,21 +788,11 @@ tests/TestJoin.$(OBJEXT): tests/$(am__dirstamp) \
 tests/TestJoin$(EXEEXT): $(tests_TestJoin_OBJECTS) $(tests_TestJoin_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestJoin$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestJoin_OBJECTS) $(tests_TestJoin_LDADD) $(LIBS)
-tests/TestLocateRegion.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/TestLocateRegion$(EXEEXT): $(tests_TestLocateRegion_OBJECTS) $(tests_TestLocateRegion_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/TestLocateRegion$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestLocateRegion_OBJECTS) $(tests_TestLocateRegion_LDADD) $(LIBS)
 tests/TestNetcdfDataset.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestNetcdfDataset$(EXEEXT): $(tests_TestNetcdfDataset_OBJECTS) $(tests_TestNetcdfDataset_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestNetcdfDataset$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestNetcdfDataset_OBJECTS) $(tests_TestNetcdfDataset_LDADD) $(LIBS)
-tests/TestOpen.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/TestOpen$(EXEEXT): $(tests_TestOpen_OBJECTS) $(tests_TestOpen_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/TestOpen$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestOpen_OBJECTS) $(tests_TestOpen_LDADD) $(LIBS)
 tests/TestPartialSum.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestPartialSum$(EXEEXT): $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_DEPENDENCIES) tests/$(am__dirstamp)
@@ -878,37 +808,17 @@ tests/TestRead.$(OBJEXT): tests/$(am__dirstamp) \
 tests/TestRead$(EXEEXT): $(tests_TestRead_OBJECTS) $(tests_TestRead_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestRead$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestRead_OBJECTS) $(tests_TestRead_LDADD) $(LIBS)
-tests/TestScanAdd.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/TestScanAdd$(EXEEXT): $(tests_TestScanAdd_OBJECTS) $(tests_TestScanAdd_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/TestScanAdd$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestScanAdd_OBJECTS) $(tests_TestScanAdd_LDADD) $(LIBS)
-tests/TestSort.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/TestSort$(EXEEXT): $(tests_TestSort_OBJECTS) $(tests_TestSort_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/TestSort$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestSort_OBJECTS) $(tests_TestSort_LDADD) $(LIBS)
 tests/TestUnion.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestUnion$(EXEEXT): $(tests_TestUnion_OBJECTS) $(tests_TestUnion_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestUnion$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestUnion_OBJECTS) $(tests_TestUnion_LDADD) $(LIBS)
-tests/TestUnpack.$(OBJEXT): tests/$(am__dirstamp) \
-	tests/$(DEPDIR)/$(am__dirstamp)
-tests/TestUnpack$(EXEEXT): $(tests_TestUnpack_OBJECTS) $(tests_TestUnpack_DEPENDENCIES) tests/$(am__dirstamp)
-	@rm -f tests/TestUnpack$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(tests_TestUnpack_OBJECTS) $(tests_TestUnpack_LDADD) $(LIBS)
 tests/ga/$(am__dirstamp):
 	@$(MKDIR_P) tests/ga
 	@: > tests/ga/$(am__dirstamp)
 tests/ga/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) tests/ga/$(DEPDIR)
 	@: > tests/ga/$(DEPDIR)/$(am__dirstamp)
-tests/ga/Test.$(OBJEXT): tests/ga/$(am__dirstamp) \
-	tests/ga/$(DEPDIR)/$(am__dirstamp)
-tests/ga/Test$(EXEEXT): $(tests_ga_Test_OBJECTS) $(tests_ga_Test_DEPENDENCIES) tests/ga/$(am__dirstamp)
-	@rm -f tests/ga/Test$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_ga_Test_OBJECTS) $(tests_ga_Test_LDADD) $(LIBS)
 tests/ga/TestAttribute.$(OBJEXT): tests/ga/$(am__dirstamp) \
 	tests/ga/$(DEPDIR)/$(am__dirstamp)
 tests/ga/TestAttribute$(EXEEXT): $(tests_ga_TestAttribute_OBJECTS) $(tests_ga_TestAttribute_DEPENDENCIES) tests/ga/$(am__dirstamp)
@@ -954,11 +864,6 @@ tests/ga/TestNetcdfDataset.$(OBJEXT): tests/ga/$(am__dirstamp) \
 tests/ga/TestNetcdfDataset$(EXEEXT): $(tests_ga_TestNetcdfDataset_OBJECTS) $(tests_ga_TestNetcdfDataset_DEPENDENCIES) tests/ga/$(am__dirstamp)
 	@rm -f tests/ga/TestNetcdfDataset$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_ga_TestNetcdfDataset_OBJECTS) $(tests_ga_TestNetcdfDataset_LDADD) $(LIBS)
-tests/ga/TestOpen.$(OBJEXT): tests/ga/$(am__dirstamp) \
-	tests/ga/$(DEPDIR)/$(am__dirstamp)
-tests/ga/TestOpen$(EXEEXT): $(tests_ga_TestOpen_OBJECTS) $(tests_ga_TestOpen_DEPENDENCIES) tests/ga/$(am__dirstamp)
-	@rm -f tests/ga/TestOpen$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(tests_ga_TestOpen_OBJECTS) $(tests_ga_TestOpen_LDADD) $(LIBS)
 tests/ga/TestPartialSum.$(OBJEXT): tests/ga/$(am__dirstamp) \
 	tests/ga/$(DEPDIR)/$(am__dirstamp)
 tests/ga/TestPartialSum$(EXEEXT): $(tests_ga_TestPartialSum_OBJECTS) $(tests_ga_TestPartialSum_DEPENDENCIES) tests/ga/$(am__dirstamp)
@@ -1077,24 +982,17 @@ mostlyclean-compile:
 	-rm -f src/gax.$(OBJEXT)
 	-rm -f src/gax.lo
 	-rm -f src/pgdump.$(OBJEXT)
-	-rm -f tests/Test.$(OBJEXT)
 	-rm -f tests/TestBin.$(OBJEXT)
 	-rm -f tests/TestDimension.$(OBJEXT)
 	-rm -f tests/TestDistance.$(OBJEXT)
 	-rm -f tests/TestEnum.$(OBJEXT)
 	-rm -f tests/TestGet.$(OBJEXT)
 	-rm -f tests/TestJoin.$(OBJEXT)
-	-rm -f tests/TestLocateRegion.$(OBJEXT)
 	-rm -f tests/TestNetcdfDataset.$(OBJEXT)
-	-rm -f tests/TestOpen.$(OBJEXT)
 	-rm -f tests/TestPartialSum.$(OBJEXT)
 	-rm -f tests/TestRavel.$(OBJEXT)
 	-rm -f tests/TestRead.$(OBJEXT)
-	-rm -f tests/TestScanAdd.$(OBJEXT)
-	-rm -f tests/TestSort.$(OBJEXT)
 	-rm -f tests/TestUnion.$(OBJEXT)
-	-rm -f tests/TestUnpack.$(OBJEXT)
-	-rm -f tests/ga/Test.$(OBJEXT)
 	-rm -f tests/ga/TestAttribute.$(OBJEXT)
 	-rm -f tests/ga/TestBin.$(OBJEXT)
 	-rm -f tests/ga/TestDimension.$(OBJEXT)
@@ -1104,7 +1002,6 @@ mostlyclean-compile:
 	-rm -f tests/ga/TestJoin.$(OBJEXT)
 	-rm -f tests/ga/TestLocateRegion.$(OBJEXT)
 	-rm -f tests/ga/TestNetcdfDataset.$(OBJEXT)
-	-rm -f tests/ga/TestOpen.$(OBJEXT)
 	-rm -f tests/ga/TestPartialSum.$(OBJEXT)
 	-rm -f tests/ga/TestRavel.$(OBJEXT)
 	-rm -f tests/ga/TestRead.$(OBJEXT)
@@ -1157,24 +1054,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/VariableDecorator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgdump.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestBin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDimension.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDistance.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestEnum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestGet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestJoin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestLocateRegion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestNetcdfDataset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestOpen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRead.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestScanAdd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestSort.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestUnion.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestUnpack.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestBin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestDimension.Po@am__quote@
@@ -1184,7 +1074,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestJoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestLocateRegion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestNetcdfDataset.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestOpen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestPartialSum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestRead.Po@am__quote@

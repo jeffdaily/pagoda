@@ -83,13 +83,6 @@ DataType AggregationVariable::get_type() const
 }
 
 
-Array* AggregationVariable::read()
-{
-    Array *dst = Array::create(get_type(), get_shape());
-    return read(dst);
-}
-
-
 Array* AggregationVariable::read(Array *dst)
 {
     Array *src;
@@ -125,19 +118,6 @@ Array* AggregationVariable::read(Array *dst)
     delete src;
 
     return dst;
-}
-
-
-Array* AggregationVariable::read(int64_t record)
-{
-    vector<int64_t> shape;
-    Array *dst;
-    
-    shape = get_shape();
-    shape.erase(shape.begin());
-    dst = Array::create(get_type(), shape);
-
-    return read(record, dst);
 }
 
 

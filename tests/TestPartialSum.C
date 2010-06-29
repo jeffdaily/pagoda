@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+#   include "config.h"
+#endif
+
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
@@ -6,78 +10,78 @@ using std::setw;
 using std::cout;
 using std::endl;
 
-#include <ga.h>
-#include <macdecls.h>
-#include <mpi.h>
-
-#include "gax.H"
+#include "Array.H"
+#include "Bootstrap.H"
+#include "DataType.H"
 #include "Pack.H"
+#include "Util.H"
 
 int main(int argc, char **argv)
 {
-    MPI_Init(&argc, &argv);
-    GA_Initialize();
-    if (MA_init(MT_DBL, 1000, 1000) == MA_FALSE) {
-        GA_Error("MA_init failed", 0);
+    Array *g_src;
+    Array *g_dst0;
+    Array *g_dst1;
+    vector<int64_t> size(1,10);
+    vector<int64_t> ZERO(1,0);
+    vector<int64_t> hi(1,size[0]-1);
+
+    pagoda::initialize(&argc, &argv);
+    Util::calculate_required_memory();
+
+    g_src = Array::create(DataType::INT, size);
+    g_dst0 = Array::create(DataType::INT, size);
+    g_dst1 = Array::create(DataType::INT, size);
+
+    for (int loop=0; loop<3; ++loop) {
+        if (0 == pagoda::me) {
+            if (0 == loop) {
+                int vals[] = {0,0,1,0,1,1,1,0,0,1}; // 10 == size
+                g_src->put(vals, ZERO, hi);
+            } else if (1 == loop) {
+                int vals[] = {1,0,1,0,1,1,1,0,0,0}; // 10 == size
+                g_src->put(vals, ZERO, hi);
+            } else if (2 == loop) {
+                int vals[] = {1,1,1,1,1,1,1,1,1,1}; // 10 == size
+                g_src->put(vals, ZERO, hi);
+            }
+        }
+        pagoda::partial_sum(g_src, g_dst0, false);
+        Util::barrier();
+        pagoda::partial_sum(g_src, g_dst1, true);
+        Util::barrier();
+
+        if (0 == pagoda::me) {
+            int *values = new int[size[0]];
+            int varw = 10;
+            int valw = 3;
+
+            cout << endl;
+
+            g_src->get(values, ZERO, hi, vector<int64_t>());
+            cout << setw(varw) << "src[i] =";
+            for (int i=0; i<size[0]; ++i) {
+                cout << setw(valw) << values[i];
+            }
+            cout << endl;
+
+            g_dst0->get(values, ZERO, hi, vector<int64_t>());
+            cout << setw(varw) << "dst0[i] =";
+            for (int i=0; i<size[0]; ++i) {
+                cout << setw(valw) << values[i];
+            }
+            cout << endl;
+
+            g_dst1->get(values, ZERO, hi, vector<int64_t>());
+            cout << setw(varw) << "dst1[i] =";
+            for (int i=0; i<size[0]; ++i) {
+                cout << setw(valw) << values[i];
+            }
+            cout << endl;
+
+            delete [] values;
+        }
     }
 
-    int me = GA_Nodeid();
-    int size = 10;
-    int g_src = NGA_Create(MT_INT, 1, &size, "src", NULL);
-    int g_dst0 = GA_Duplicate(g_src, "dst0");
-    int g_dst1 = GA_Duplicate(g_src, "dst1");
-    int ZERO = 0;
-    int hi = size - 1;
-
-    if (0 == me) {
-        //int vals[] = {0,0,1,0,1,1,1,0,0,1}; // 10 == size
-        //int vals[] = {1,0,1,0,1,1,1,0,0,1}; // 10 == size
-        int vals[] = {1,1,1,1,1,1,1,1,1,1}; // 10 == size
-        int lo = 0;
-        int hi = size-1;
-        NGA_Put(g_src, &lo, &hi, vals, NULL);
-    }
-    gax::partial_sum(g_src, g_dst0, 0);
-    GA_Sync();
-    gax::partial_sum(g_src, g_dst1, 1);
-    GA_Sync();
-
-    if (0 == me) {
-        int *values = new int[size];
-        int varw = 10;
-        int valw = 3;
-
-        cout << setw(varw) << "i = ";
-        for (int i=0; i<size; ++i) {
-            cout << setw(valw) << i;
-        }
-        cout << endl;
-
-        NGA_Get(g_src, &ZERO, &hi, values, NULL);
-        cout << setw(varw) << "src[i] =";
-        for (int i=0; i<size; ++i) {
-            cout << setw(valw) << values[i];
-        }
-        cout << endl;
-
-        NGA_Get(g_dst0, &ZERO, &hi, values, NULL);
-        cout << setw(varw) << "dst0[i] =";
-        for (int i=0; i<size; ++i) {
-            cout << setw(valw) << values[i];
-        }
-        cout << endl;
-
-        NGA_Get(g_dst1, &ZERO, &hi, values, NULL);
-        cout << setw(varw) << "dst1[i] =";
-        for (int i=0; i<size; ++i) {
-            cout << setw(valw) << values[i];
-        }
-        cout << endl;
-
-        delete [] values;
-    }
-
-    GA_Terminate();
-    MPI_Finalize();
-    exit(EXIT_SUCCESS);
+    pagoda::finalize();
+    return EXIT_SUCCESS;
 };

@@ -16,6 +16,7 @@
 #include "NetcdfVariable.H"
 #include "Pnetcdf.H"
 #include "Timing.H"
+#include "Util.H"
 
 
 NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
@@ -234,26 +235,132 @@ void NetcdfVariable::read()
 */
 
 
-Array* NetcdfVariable::read()
-{
-    return NULL;
-}
-
-
 Array* NetcdfVariable::read(Array *dst)
 {
+    int ncid = dataset->get_id();
+    DataType type = get_type();
+    int64_t ndim = num_dims();
+    vector<int64_t> lo(ndim);
+    vector<int64_t> hi(ndim);
+    vector<MPI_Offset> start(ndim);
+    vector<MPI_Offset> count(ndim);
+    bool found_bit = true;
+
+    TRACER("NetcdfVariable::read(Array*) %s\n", get_name().c_str());
+    TIMING("NetcdfVariable::read(Array*)");
+
+    dst->get_distribution(lo,hi);
+
+    if (dst->get_ndim() != ndim) {
+        Util::abort("NetcdfVariable::read(Array*) :: shape mismatch");
+    }
+
+#ifdef READ_OPT
+#   error TODO read optimization
+    // only attempt the optimization for record variables
+    // **Why did I decide to do it that way??**
+    // check all dimension masks for a non-zero bit
+#endif
+
+    if (dst->owns_data() && found_bit) {
+        for (int64_t dimidx=0; dimidx<ndim; ++dimidx) {
+            start[dimidx] = lo[dimidx];
+            count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
+        }
+#define read_var_all(TYPE, DT) \
+        if (type == DT) { \
+            TYPE *ptr = NULL; \
+            ptr = (TYPE*)dst->access(); \
+            ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
+        } else
+        read_var_all(int,    DataType::INT)
+        read_var_all(float,  DataType::FLOAT)
+        read_var_all(double, DataType::DOUBLE)
+        ; // for last else above
+        dst->release();
+#undef read_var_all
+    } else {
+        // make a non-participating process a no-op
+        fill(start.begin(), start.end(), 0);
+        fill(count.begin(), count.end(), 0);
+#define read_var_all(TYPE, DT) \
+        if (type == DT) { \
+            TYPE *ptr = NULL; \
+            ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
+        } else
+        read_var_all(int,    DataType::INT)
+        read_var_all(float,  DataType::FLOAT)
+        read_var_all(double, DataType::DOUBLE)
+        ; // for last else above
+#undef read_var_all
+    }
+
     return dst;
-}
-
-
-Array* NetcdfVariable::read(int64_t record)
-{
-    return NULL;
 }
 
 
 Array* NetcdfVariable::read(int64_t record, Array *dst)
 {
+    int ncid = dataset->get_id();
+    DataType type = get_type();
+    int64_t ndim = num_dims();
+    vector<int64_t> lo(ndim);
+    vector<int64_t> hi(ndim);
+    vector<MPI_Offset> start(ndim);
+    vector<MPI_Offset> count(ndim);
+    bool found_bit = true;
+
+    TRACER("NetcdfVariable::read(int64_t,Array*) %s\n", get_name().c_str());
+    TIMING("NetcdfVariable::read(int64_t,Array*)");
+
+    dst->get_distribution(lo,hi);
+
+    if (dst->get_ndim()+1 != ndim) {
+        Util::abort("NetcdfVariable::read(int64_t,Array*) :: shape mismatch");
+    }
+
+#ifdef READ_OPT
+#   error TODO read optimization
+    // only attempt the optimization for record variables
+    // **Why did I decide to do it that way??**
+    // check all dimension masks for a non-zero bit
+#endif
+
+    if (dst->owns_data() && found_bit) {
+        start[0] = record;
+        count[0] = 1;
+        for (int64_t dimidx=1; dimidx<ndim; ++dimidx) {
+            start[dimidx] = lo[dimidx-1];
+            count[dimidx] = hi[dimidx-1] - lo[dimidx-1] + 1;
+        }
+#define read_var_all(TYPE, DT) \
+        if (type == DT) { \
+            TYPE *ptr = NULL; \
+            ptr = (TYPE*)dst->access(); \
+            ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
+        } else
+        read_var_all(int,    DataType::INT)
+        read_var_all(float,  DataType::FLOAT)
+        read_var_all(double, DataType::DOUBLE)
+        ; // for last else above
+        dst->release();
+#undef read_var_all
+    } else {
+        // make a non-participating process a no-op
+        fill(start.begin(), start.end(), 0);
+        fill(count.begin(), count.end(), 0);
+#define read_var_all(TYPE, DT) \
+        if (type == DT) { \
+            TYPE *ptr = NULL; \
+            ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
+        } else
+        read_var_all(int,    DataType::INT)
+        read_var_all(float,  DataType::FLOAT)
+        read_var_all(double, DataType::DOUBLE)
+        ; // for last else above
+#undef read_var_all
+    }
+
     return dst;
 }
 

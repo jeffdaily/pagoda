@@ -27,17 +27,12 @@ class NetcdfVariable : public AbstractVariable
         NetcdfVariable(NetcdfDataset *dataset, int varid);
         virtual ~NetcdfVariable();
 
+        // virtuals from AbstractVariable
         virtual string get_name() const;
-
         virtual vector<Dimension*> get_dims() const;
-
         virtual vector<Attribute*> get_atts() const;
-
         virtual DataType get_type() const;
-
-        virtual Array* read();
         virtual Array* read(Array *dst);
-        virtual Array* read(int64_t record);
         virtual Array* read(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;

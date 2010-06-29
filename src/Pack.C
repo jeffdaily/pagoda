@@ -11,7 +11,6 @@
 #include "Util.H"
 
 using std::vector;
-using namespace pagoda;
 
 
 /**

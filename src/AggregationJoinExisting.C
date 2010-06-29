@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,10 +15,12 @@
 #include "Dimension.H"
 #include "Error.H"
 #include "Timing.H"
+#include "Util.H"
 #include "Variable.H"
 
 using std::ostream;
 using std::string;
+using std::transform;
 using std::vector;
 
 
@@ -38,14 +41,20 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
 
 AggregationJoinExisting::~AggregationJoinExisting()
 {
-    TIMING("AggregationJoinExisting::~AggregationJoinExisting()");
     map<string,AggregationVariable*>::iterator agg_var_it = agg_vars.begin();
     map<string,AggregationVariable*>::iterator agg_var_end = agg_vars.end();
+
+    TIMING("AggregationJoinExisting::~AggregationJoinExisting()");
+
     for (; agg_var_it!=agg_var_end; ++agg_var_it) {
         AggregationVariable *agg_var = agg_var_it->second;
         delete agg_var;
         agg_var = NULL;
     }
+
+    transform(datasets.begin(), datasets.end(), datasets.begin(),
+            Util::ptr_deleter<Dataset*>);
+
     delete agg_dim;
 }
 

@@ -12,13 +12,21 @@
 #include "pagoda.H"
 
 
+int pagoda::me = 0;
+int pagoda::npe = 0;
+
+
 void pagoda::initialize(int *argc, char ***argv)
 {
 #if HAVE_MPI
     MPI_Init(argc,argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &pagoda::me);
+    MPI_Comm_size(MPI_COMM_WORLD, &pagoda::npe);
 #endif
 #if HAVE_GA
     GA_Initialize();
+    pagoda::me = GA_Nodeid();
+    pagoda::npe = GA_Nnodes();
 #endif
 }
 
