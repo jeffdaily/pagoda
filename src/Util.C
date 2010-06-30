@@ -86,7 +86,7 @@ void Util::barrier()
 /**
  * Abort the parallel application.
  *
- * @param message message to print before aborting
+ * @param[in] message message to print before aborting
  */
 void Util::abort(const char *message)
 {
@@ -104,8 +104,8 @@ void Util::abort(const char *message)
 /**
  * Abort the parallel application.
  *
- * @param message message to print before aborting
- * @param errorcode
+ * @param[in] message message to print before aborting
+ * @param[in] errorcode
  */
 void Util::abort(const char *message, int errorcode)
 {

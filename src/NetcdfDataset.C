@@ -22,7 +22,6 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ,   atts()
     ,   dims()
     ,   vars()
-    ,   decorated()
 {
     TIMING("NetcdfDataset::NetcdfDataset(string)");
     int ndim;
@@ -56,43 +55,48 @@ NetcdfDataset::~NetcdfDataset()
 }
 
 
-vector<Attribute*> NetcdfDataset::get_atts()
+vector<Attribute*> NetcdfDataset::get_atts() const
 {
-    TIMING("NetcdfDataset::get_atts()");
     vector<Attribute*> ret;
-    vector<NetcdfAttribute*>::iterator it;
+    vector<NetcdfAttribute*>::const_iterator it;
+
+    TIMING("NetcdfDataset::get_atts()");
+
     for (it=atts.begin(); it!=atts.end(); ++it) {
         ret.push_back(*it);
     }
+
     return ret;
 }
 
 
 vector<Dimension*> NetcdfDataset::get_dims() const
 {
-    TIMING("NetcdfDataset::get_dims()");
     vector<Dimension*> ret;
     vector<NetcdfDimension*>::const_iterator it;
+
+    TIMING("NetcdfDataset::get_dims()");
+
     for (it=dims.begin(); it!=dims.end(); ++it) {
         ret.push_back(*it);
     }
+
     return ret;
 }
 
 
-vector<Variable*> NetcdfDataset::get_vars()
+vector<Variable*> NetcdfDataset::get_vars() const
 {
+    vector<Variable*> ret;
+    vector<NetcdfVariable*>::const_iterator it;
+
     TIMING("NetcdfDataset::get_vars()");
-    if (decorated.empty()) {
-        vector<Variable*> ret;
-        vector<NetcdfVariable*>::iterator it;
-        for (it=vars.begin(); it!=vars.end(); ++it) {
-            ret.push_back(*it);
-        }
-        return ret;
-    } else {
-        return decorated;
+
+    for (it=vars.begin(); it!=vars.end(); ++it) {
+        ret.push_back(*it);
     }
+
+    return ret;
 }
 
 
@@ -114,6 +118,18 @@ NetcdfVariable* NetcdfDataset::get_var(size_t i) const
 {
     TIMING("NetcdfDataset::get_var(size_t)");
     return vars.at(i);
+}
+
+
+void NetcdfDataset::set_masks(MaskMap *masks)
+{
+    this->masks = masks;
+}
+
+
+MaskMap* NetcdfDataset::get_masks() const
+{
+    return masks;
 }
 
 

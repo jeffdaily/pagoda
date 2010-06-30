@@ -11,6 +11,7 @@ using std::vector;
 
 class Attribute;
 class Dimension;
+class MaskMap;
 class NetcdfAttribute;
 class NetcdfDimension;
 class NetcdfVariable;
@@ -26,9 +27,12 @@ class NetcdfDataset : public Dataset
         NetcdfDataset(const string &filename);
         virtual ~NetcdfDataset();
 
-        virtual vector<Attribute*> get_atts();
+        virtual vector<Attribute*> get_atts() const;
         virtual vector<Dimension*> get_dims() const;
-        virtual vector<Variable*> get_vars();
+        virtual vector<Variable*> get_vars() const;
+
+        virtual void set_masks(MaskMap *masks);
+        virtual MaskMap* get_masks() const;
 
         virtual ostream& print(ostream &os) const;
 
@@ -47,7 +51,7 @@ class NetcdfDataset : public Dataset
         vector<NetcdfAttribute*> atts;
         vector<NetcdfDimension*> dims;
         vector<NetcdfVariable*> vars;
-        vector<Variable*> decorated;
+        MaskMap *masks;
 };
 
 #endif // NETCDFDATASET_H_

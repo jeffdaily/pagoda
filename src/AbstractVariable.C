@@ -70,7 +70,7 @@ string AbstractVariable::get_long_name() const
 {
     TIMING("AbstractVariable::get_long_name()");
     string att_name("long_name");
-    Attribute *att = find_att(att_name);
+    Attribute *att = get_att(att_name);
 
     if (att) {
         ostringstream val;
@@ -81,11 +81,11 @@ string AbstractVariable::get_long_name() const
 }
 
 
-Attribute* AbstractVariable::find_att(
+Attribute* AbstractVariable::get_att(
         const string &name,
         bool ignore_case) const
 {
-    TIMING("AbstractVariable::find_att(string,bool)");
+    TIMING("AbstractVariable::get_att(string,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -103,11 +103,11 @@ Attribute* AbstractVariable::find_att(
 }
 
 
-Attribute* AbstractVariable::find_att(
+Attribute* AbstractVariable::get_att(
         const vector<string> &names,
         bool ignore_case) const
 {
-    TIMING("AbstractVariable::find_att(vector<string>,bool)");
+    TIMING("AbstractVariable::get_att(vector<string>,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();

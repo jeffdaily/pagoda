@@ -14,7 +14,7 @@
  *
  * Construct Mask based on the size of the given Dimension.
  *
- * @param dim Dimension to base size on
+ * @param[in] dim Dimension to base size on
  */
 Mask* Mask::create(const Dimension *dim)
 {

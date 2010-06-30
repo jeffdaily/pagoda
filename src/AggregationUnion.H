@@ -11,6 +11,7 @@ using std::vector;
 
 class Attribute;
 class Dimension;
+class MaskMap;
 class Variable;
 
 
@@ -24,11 +25,14 @@ class AggregationUnion : public Aggregation
         AggregationUnion();
         virtual ~AggregationUnion();
 
-        virtual vector<Attribute*> get_atts();
+        virtual vector<Attribute*> get_atts() const;
         virtual vector<Dimension*> get_dims() const;
-        virtual vector<Variable*> get_vars();
+        virtual vector<Variable*> get_vars() const;
 
         virtual void add(Dataset *dataset);
+
+        virtual void set_masks(MaskMap *masks);
+        virtual MaskMap* get_masks() const;
 
         virtual ostream& print(ostream &os) const;
 
@@ -37,6 +41,7 @@ class AggregationUnion : public Aggregation
         vector<Attribute*> atts;
         vector<Dimension*> dims;
         vector<Variable*> vars;
+        MaskMap *masks;
 };
 
 #endif // AGGREGATIONUNION_H_

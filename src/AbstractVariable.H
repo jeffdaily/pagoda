@@ -35,9 +35,9 @@ class AbstractVariable : public Variable
         virtual vector<Attribute*> get_atts() const = 0;
         virtual int64_t num_atts() const;
         virtual string get_long_name() const;
-        virtual Attribute* find_att(const string &name,
+        virtual Attribute* get_att(const string &name,
                 bool ignore_case=false) const;
-        virtual Attribute* find_att(const vector<string> &names,
+        virtual Attribute* get_att(const vector<string> &names,
                 bool ignore_case=false) const;
 
         virtual DataType get_type() const = 0;

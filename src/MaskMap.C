@@ -90,12 +90,12 @@ void MaskMap::modify_masks(
  * For instance the lat/lon variables for corners, edges, and cells would have
  * their masks modified based on each pair of variables.
  *
- * @param box the lat/lon specification
- * @param lat the latitude coordinate data
- * @param lon the longitude coordinate data
- * @param dim the dimension we are masking
+ * @param[in] box the lat/lon specification
+ * @param[in] lat the latitude coordinate data
+ * @param[in] lon the longitude coordinate data
+ * @param[in] dim the dimension we are masking
  */
-void MaskMap::modify_masks( const LatLonBox &box,
+void MaskMap::modify_masks(const LatLonBox &box,
         const Array *lat, const Array *lon, Dimension *dim)
 {
     Mask *mask = get_mask(dim);
@@ -182,8 +182,8 @@ void Dataset::adjust_masks(const LatLonBox &box)
         Variable *lat;
         Variable *lon;
 
-        lat = find_var(string("grid_center_lat"), false, true);
-        lon = find_var(string("grid_center_lon"), false, true);
+        lat = get_var(string("grid_center_lat"), false, true);
+        lon = get_var(string("grid_center_lon"), false, true);
         if (!lat) {
             PRINT_ZERO("adjust_masks: missing grid_center_lat\n");
         } else if (!lon) {
@@ -191,8 +191,8 @@ void Dataset::adjust_masks(const LatLonBox &box)
         } else {
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
         }
-        lat = find_var(string("grid_corner_lat2"), false, true);
-        lon = find_var(string("grid_corner_lon2"), false, true);
+        lat = get_var(string("grid_corner_lat2"), false, true);
+        lon = get_var(string("grid_corner_lon2"), false, true);
         if (!lat) {
             PRINT_ZERO("adjust_masks: missing grid_corner_lat\n");
         } else if (!lon) {
@@ -200,8 +200,8 @@ void Dataset::adjust_masks(const LatLonBox &box)
         } else {
             lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
         }
-        lat = find_var(string("grid_edge_lat2"), false, true);
-        lon = find_var(string("grid_edge_lon2"), false, true);
+        lat = get_var(string("grid_edge_lat2"), false, true);
+        lon = get_var(string("grid_edge_lon2"), false, true);
         if (!lat) {
             PRINT_ZERO("adjust_masks: missing grid_corner_lat\n");
         } else if (!lon) {
@@ -230,8 +230,8 @@ static inline void adjust_corners_edges_mask(
     int ZERO = 0;
     int64_t cells_count = chi-clo+1;
     
-    var = dataset->find_var(var_name, false, true);
-    dim = dataset->find_dim(dim_name);
+    var = dataset->get_var(var_name, false, true);
+    dim = dataset->get_dim(dim_name);
 
     if (!var) {
         if (corners)
@@ -323,8 +323,8 @@ static inline bool adjust_centers_mask(Dataset *dataset, const LatLonBox &box)
     Variable *lon_var;
     Dimension *cells_dim;
 
-    lat_var = dataset->find_var(string("grid_center_lat"), false, true);
-    lon_var = dataset->find_var(string("grid_center_lon"), false, true);
+    lat_var = dataset->get_var(string("grid_center_lat"), false, true);
+    lon_var = dataset->get_var(string("grid_center_lon"), false, true);
     if (!lat_var) {
         ERR("adjust_masks: missing grid_center_lat");
     }

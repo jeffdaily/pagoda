@@ -82,21 +82,21 @@ string VariableDecorator::get_long_name() const
 }
 
 
-Attribute* VariableDecorator::find_att(
+Attribute* VariableDecorator::get_att(
         const string &name,
         bool ignore_case) const
 {
-    TIMING("VariableDecorator::find_att(string,bool)");
-    return var->find_att(name, ignore_case);
+    TIMING("VariableDecorator::get_att(string,bool)");
+    return var->get_att(name, ignore_case);
 }
 
 
-Attribute* VariableDecorator::find_att(
+Attribute* VariableDecorator::get_att(
         const vector<string> &names,
         bool ignore_case) const
 {
-    TIMING("VariableDecorator::find_att(vector<string>,bool)");
-    return var->find_att(names, ignore_case);
+    TIMING("VariableDecorator::get_att(vector<string>,bool)");
+    return var->get_att(names, ignore_case);
 }
 
 

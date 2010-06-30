@@ -20,11 +20,13 @@ class Variable;
 class Aggregation : public Dataset
 {
     public:
-        Aggregation();
         virtual ~Aggregation();
 
         virtual void add(Dataset *dataset) = 0;
-        void add(const vector<Dataset*> &datasets);
+        virtual void add(const vector<Dataset*> &datasets);
+
+    protected:
+        Aggregation();
 };
 
 #endif // AGGREGATION_H_

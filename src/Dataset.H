@@ -14,7 +14,7 @@ using std::vector;
 
 class Attribute;
 class Dimension;
-class Mask;
+class MaskMap;
 class Variable;
 
 
@@ -28,20 +28,23 @@ class Dataset
 
         virtual ~Dataset();
 
-        virtual vector<Attribute*> get_atts() = 0;
+        virtual vector<Attribute*> get_atts() const = 0;
         virtual vector<Dimension*> get_dims() const = 0;
-        virtual vector<Variable*> get_vars() = 0;
+        virtual vector<Variable*> get_vars() const = 0;
 
-        virtual Attribute* find_att(const string &name,
-                bool ignore_case=false, bool within=false);
-        virtual Attribute* find_att(const vector<string> &names,
-                bool ignore_case=false, bool within=false);
+        virtual Attribute* get_att(const string &name,
+                bool ignore_case=false, bool within=false) const;
+        virtual Attribute* get_att(const vector<string> &names,
+                bool ignore_case=false, bool within=false) const;
 
-        virtual Dimension* find_dim(const string &name,
-                bool ignore_case=false, bool within=false);
+        virtual Dimension* get_dim(const string &name,
+                bool ignore_case=false, bool within=false) const;
 
-        virtual Variable* find_var(const string &name,
-                bool ignore_case=false, bool within=false);
+        virtual Variable* get_var(const string &name,
+                bool ignore_case=false, bool within=false) const;
+
+        virtual void set_masks(MaskMap *masks) = 0;
+        virtual MaskMap* get_masks() const = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Dataset *dataset);

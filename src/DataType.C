@@ -53,7 +53,7 @@ DataType::DataType(const string &name)
  * Luckily the GA types are integers within 1000 and 1016 and the netcdf types
  * are from 0 to 6.
  *
- * @param type the integer to convert to a DataType
+ * @param[in] type the integer to convert to a DataType
  */
 DataType::DataType(int type)
     :   id(-1)
@@ -68,7 +68,7 @@ DataType::DataType(int type)
 /**
  * Copy constructor.
  *
- * @param type the DataType to copy
+ * @param[in] type the DataType to copy
  */
 DataType::DataType(const DataType &type)
     :   id(type.id)
@@ -80,7 +80,7 @@ DataType::DataType(const DataType &type)
 /**
  * Assignment to an intger.
  *
- * @param type the integer to convert to a DataType
+ * @param[in] type the integer to convert to a DataType
  * @return this DataType
  */
 DataType& DataType::operator = (int type)
@@ -93,7 +93,7 @@ DataType& DataType::operator = (int type)
 /**
  * Assignment to another DataType.
  *
- * @param type the other DataType
+ * @param[in] type the other DataType
  * @return this DataType
  */
 DataType& DataType::operator = (const DataType &type)
@@ -107,7 +107,7 @@ DataType& DataType::operator = (const DataType &type)
 /**
  * Equality comparison.
  *
- * @param type the DataType to compare
+ * @param[in] type the DataType to compare
  * @return true if the IDs are equal
  */
 bool DataType::operator == (const DataType &type) const
@@ -119,7 +119,7 @@ bool DataType::operator == (const DataType &type) const
 /**
  * Inequality comparison.
  *
- * @param type the DataType to compare
+ * @param[in] type the DataType to compare
  * @return true if the IDs are not equal
  */
 bool DataType::operator != (const DataType &type) const
@@ -131,8 +131,8 @@ bool DataType::operator != (const DataType &type) const
 /**
  * Inserts the name of the DataType into the given stream.
  *
- * @param os the stream
- * @param type the DataType to insert
+ * @param[in,out] os the stream
+ * @param[in] type the DataType to insert
  * @return the given stream
  */
 ostream& operator << (ostream &os, const DataType &type)
@@ -323,7 +323,7 @@ nc_type DataType::to_nc() const
 /**
  * Convert int to DataType.
  *
- * @param type the integer to convert
+ * @param[in] type the integer to convert
  * @return the corresponding DataType
  */
 DataType DataType::to_dt(int type)

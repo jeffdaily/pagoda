@@ -62,13 +62,15 @@ Dataset::~Dataset()
 }
 
 
-Attribute* Dataset::find_att(const string &name, bool ignore_case, bool within)
+Attribute* Dataset::get_att(const string &name, bool ignore_case,
+        bool within) const
 {
-    TIMING("Dataset::find_att(string,bool,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
     StringComparator cmp;
+
+    TIMING("Dataset::get_att(string,bool,bool)");
 
     cmp.set_ignore_case(ignore_case);
     cmp.set_within(within);
@@ -83,14 +85,15 @@ Attribute* Dataset::find_att(const string &name, bool ignore_case, bool within)
 }
 
 
-Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case,
-        bool within)
+Attribute* Dataset::get_att(const vector<string> &names, bool ignore_case,
+        bool within) const
 {
-    TIMING("Dataset::find_att(vector<string>,bool,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
     StringComparator cmp;
+
+    TIMING("Dataset::get_att(vector<string>,bool,bool)");
 
     cmp.set_ignore_case(ignore_case);
     cmp.set_within(within);
@@ -105,13 +108,15 @@ Attribute* Dataset::find_att(const vector<string> &names, bool ignore_case,
 }
 
 
-Dimension* Dataset::find_dim(const string &name, bool ignore_case, bool within)
+Dimension* Dataset::get_dim(const string &name, bool ignore_case,
+        bool within) const
 {
-    TIMING("Dataset::find_dim(string,bool,bool)");
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
     vector<Dimension*>::const_iterator end = dims.end();
     StringComparator cmp;
+
+    TIMING("Dataset::get_dim(string,bool,bool)");
 
     cmp.set_ignore_case(ignore_case);
     cmp.set_within(within);
@@ -126,9 +131,10 @@ Dimension* Dataset::find_dim(const string &name, bool ignore_case, bool within)
 }
 
 
-Variable* Dataset::find_var(const string &name, bool ignore_case, bool within)
+Variable* Dataset::get_var(const string &name, bool ignore_case,
+        bool within) const
 {
-    TIMING("Dataset::find_var(string,bool,bool)");
+    TIMING("Dataset::get_var(string,bool,bool)");
     vector<Variable*> vars = get_vars();
     vector<Variable*>::const_iterator it = vars.begin();
     vector<Variable*>::const_iterator end = vars.end();
@@ -204,16 +210,16 @@ void Dataset::decorate()
         Variable *var = *var_it;
         //cerr << "Attempting to decorate " << var->get_name() << endl;
         Attribute *att;
-        if ((att = var->find_att(string("bounds")))) {
+        if ((att = var->get_att(string("bounds")))) {
             string val = att->get_string();
             Variable *bound_var;
-            if ((bound_var = find_var(val))) {
+            if ((bound_var = get_var(val))) {
                 vector<Variable*>::iterator it;
                 it = find(vars.begin(), vars.end(), bound_var);
                 (*it) = new BoundaryVariable(bound_var, var);
             }
         }
-        if ((att = var->find_att(string("units")))) {
+        if ((att = var->get_att(string("units")))) {
             string val = att->get_string();
             if (find(lat_units.begin(),lat_units.end(),val) != lat_units.end())
             {
@@ -231,7 +237,7 @@ void Dataset::decorate()
                 continue;
             }
         }
-        if ((att = var->find_att(string("standard_name")))) {
+        if ((att = var->get_att(string("standard_name")))) {
             string val = att->get_string();
             if ("latitude" == val) {
                 (*var_it) = new CoordinateVariable(var);
@@ -241,7 +247,7 @@ void Dataset::decorate()
                 continue;
             }
         }
-        if ((att = var->find_att(string("axis")))) {
+        if ((att = var->get_att(string("axis")))) {
             string val = att->get_string();
             if ("Y" == val) {
                 (*var_it) = new CoordinateVariable(var);
@@ -254,7 +260,7 @@ void Dataset::decorate()
                 continue;
             }
         }
-        if ((att = var->find_att(string("positive")))) {
+        if ((att = var->get_att(string("positive")))) {
             string val = att->get_string();
             transform(val.begin(),val.end(),val.begin(),(int(*)(int))tolower);
             if ("up" == val || "down" == val) {
@@ -263,19 +269,19 @@ void Dataset::decorate()
             }
         }
         if (var->get_name() == "cell_neighbors") {
-            Dimension *dim = find_dim(string("cells"));
+            Dimension *dim = get_dim(string("cells"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }
         }
         if (var->get_name() == "cell_corners") {
-            Dimension *dim = find_dim(string("corners"));
+            Dimension *dim = get_dim(string("corners"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }
         }
         if (var->get_name() == "cell_edges") {
-            Dimension *dim = find_dim(string("edges"));
+            Dimension *dim = get_dim(string("edges"));
             if (dim) {
                 (*var_it) = new ConnectivityVariable(var, dim);
             }

@@ -41,7 +41,7 @@ AggregationUnion::~AggregationUnion()
 }
 
 
-vector<Attribute*> AggregationUnion::get_atts()
+vector<Attribute*> AggregationUnion::get_atts() const
 {
     TIMING("AggregationUnion::get_atts()");
     return atts;
@@ -55,7 +55,7 @@ vector<Dimension*> AggregationUnion::get_dims() const
 }
 
 
-vector<Variable*> AggregationUnion::get_vars()
+vector<Variable*> AggregationUnion::get_vars() const
 {
     TIMING("AggregationUnion::get_vars()");
     return vars;
@@ -72,7 +72,7 @@ void AggregationUnion::add(Dataset *dataset)
     vector<Attribute*>::const_iterator other_atts_end = other_atts.end();
     for (; other_atts_it!=other_atts_end; ++other_atts_it) {
         Attribute *other_att = *other_atts_it;
-        Attribute *orig_att = find_att(other_att->get_name());
+        Attribute *orig_att = get_att(other_att->get_name());
         if (! orig_att) {
             atts.push_back(other_att);
         }
@@ -83,7 +83,7 @@ void AggregationUnion::add(Dataset *dataset)
     vector<Dimension*>::const_iterator other_dims_end = other_dims.end();
     for (; other_dims_it!=other_dims_end; ++other_dims_it) {
         Dimension *other_dim = *other_dims_it;
-        Dimension *orig_dim = find_dim(other_dim->get_name());
+        Dimension *orig_dim = get_dim(other_dim->get_name());
         if (! orig_dim) {
             dims.push_back(other_dim);
         } else {
@@ -99,11 +99,27 @@ void AggregationUnion::add(Dataset *dataset)
     vector<Variable*>::const_iterator other_vars_end = other_vars.end();
     for (; other_vars_it!=other_vars_end; ++other_vars_it) {
         Variable *other_var = *other_vars_it;
-        Variable *orig_var = find_var(other_var->get_name());
+        Variable *orig_var = get_var(other_var->get_name());
         if (! orig_var) {
             vars.push_back(other_var);
         }
     }
+}
+
+
+void AggregationUnion::set_masks(MaskMap *masks)
+{
+    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
+            it!=end; ++it) {
+        (*it)->set_masks(masks);
+    }
+    this->masks = masks;
+}
+
+
+MaskMap* AggregationUnion::get_masks() const
+{
+    return masks;
 }
 
 

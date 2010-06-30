@@ -29,7 +29,7 @@ using std::vector;
 /**
  * Construct GlobalMask based on the size of the given Dimension.
  *
- * @param dim Dimension to base size on
+ * @param[in] dim Dimension to base size on
  */
 GlobalMask::GlobalMask(const Dimension *dim)
     :   Mask()
@@ -48,7 +48,7 @@ GlobalMask::GlobalMask(const Dimension *dim)
 /**
  * Copy constructor.
  *
- * @param that other GlobalMask
+ * @param[in] that other GlobalMask
  */
 GlobalMask::GlobalMask(const GlobalMask &that)
     :   Mask()
@@ -138,7 +138,7 @@ void GlobalMask::reset()
 /**
  * Set bits based on the given slice notation.
  *
- * @param slice the dimension slice
+ * @param[in] slice the dimension slice
  */
 void GlobalMask::modify(const DimSlice &slice)
 {

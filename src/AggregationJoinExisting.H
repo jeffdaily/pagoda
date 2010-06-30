@@ -19,6 +19,7 @@ class Array;
 class Attribute;
 class Dataset;
 class Dimension;
+class MaskMap;
 class Variable;
 
 
@@ -31,11 +32,14 @@ class AggregationJoinExisting : public Aggregation
         AggregationJoinExisting(const string& name);
         virtual ~AggregationJoinExisting();
 
-        virtual vector<Attribute*> get_atts();
+        virtual vector<Attribute*> get_atts() const;
         virtual vector<Dimension*> get_dims() const;
-        virtual vector<Variable*> get_vars();
+        virtual vector<Variable*> get_vars() const;
 
         virtual void add(Dataset *dataset);
+
+        virtual void set_masks(MaskMap *masks) = 0;
+        virtual MaskMap* get_masks() const = 0;
 
         virtual ostream& print(ostream &os) const;
 
@@ -47,7 +51,7 @@ class AggregationJoinExisting : public Aggregation
         vector<Attribute*> atts;
         vector<Dimension*> dims;
         vector<Variable*> vars;
-
+        MaskMap *masks;
 };
 
 #endif // AGGREGATIONJOINEXISTING_H_

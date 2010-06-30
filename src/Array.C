@@ -66,6 +66,23 @@ void* Array::get(int64_t lo, int64_t hi) const
 }
 
 
+void* Array::get(void *buffer, int64_t lo, int64_t hi) const
+{
+    return get(buffer, vector<int64_t>(1,lo),vector<int64_t>(1,hi));
+}
+
+
+void* Array::get(void *buffer,
+        const vector<int64_t> &lo, const vector<int64_t> &hi) const
+{
+    vector<int64_t> ld = Util::get_shape(lo,hi);
+
+    ld.erase(ld.begin());
+
+    return get(buffer, lo, hi, ld);
+}
+
+
 void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
     void *buffer;
@@ -93,6 +110,12 @@ void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
 #undef get_helper
 
     return get(buffer, lo, hi, ld);
+}
+
+
+void Array::put(void *buffer, int64_t lo, int64_t hi)
+{
+    put(buffer, vector<int64_t>(1,lo), vector<int64_t>(1,hi));
 }
 
 

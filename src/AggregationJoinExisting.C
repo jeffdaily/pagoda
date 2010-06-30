@@ -59,7 +59,7 @@ AggregationJoinExisting::~AggregationJoinExisting()
 }
 
 
-vector<Attribute*> AggregationJoinExisting::get_atts()
+vector<Attribute*> AggregationJoinExisting::get_atts() const
 {
     TIMING("AggregationJoinExisting::get_atts()");
     return atts;
@@ -73,7 +73,7 @@ vector<Dimension*> AggregationJoinExisting::get_dims() const
 }
 
 
-vector<Variable*> AggregationJoinExisting::get_vars()
+vector<Variable*> AggregationJoinExisting::get_vars() const
 {
     TIMING("AggregationJoinExisting::get_vars()");
     return vars;
@@ -91,7 +91,7 @@ void AggregationJoinExisting::add(Dataset *dataset)
     vector<Attribute*>::const_iterator other_atts_end = other_atts.end();
     for (; other_atts_it!=other_atts_end; ++other_atts_it) {
         Attribute *other_att = *other_atts_it;
-        Attribute *att = find_att(other_att->get_name());
+        Attribute *att = get_att(other_att->get_name());
         if (! att) {
             atts.push_back(other_att);
         }
@@ -102,7 +102,7 @@ void AggregationJoinExisting::add(Dataset *dataset)
     vector<Dimension*>::const_iterator other_dims_end = other_dims.end();
     for (; other_dims_it!=other_dims_end; ++other_dims_it) {
         Dimension *other_dim = *other_dims_it;
-        Dimension *dim = find_dim(other_dim->get_name());
+        Dimension *dim = get_dim(other_dim->get_name());
         if (! dim) {
             if (other_dim->get_name() == agg_dim_name) {
                 agg_dim = new AggregationDimension(other_dim);
@@ -120,7 +120,7 @@ void AggregationJoinExisting::add(Dataset *dataset)
     vector<Variable*>::const_iterator other_vars_end = other_vars.end();
     for (; other_vars_it!=other_vars_end; ++other_vars_it) {
         Variable *other_var = *other_vars_it;
-        Variable *var = find_var(other_var->get_name());
+        Variable *var = get_var(other_var->get_name());
         if (! var) {
             if (other_var->get_dims()[0]->get_name() == agg_dim_name) {
                 AggregationVariable *agg_var;
@@ -141,6 +141,22 @@ void AggregationJoinExisting::add(Dataset *dataset)
         }
     }
     TRACER("AggregationJoinExisting::add END\n");
+}
+
+
+void AggregationJoinExisting::set_masks(MaskMap *masks)
+{
+    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
+            it!=end; ++it) {
+        (*it)->set_masks(masks);
+    }
+    this->masks = masks;
+}
+
+
+MaskMap* AggregationJoinExisting::get_masks() const
+{
+    return masks;
 }
 
 

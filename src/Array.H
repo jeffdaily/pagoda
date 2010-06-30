@@ -192,9 +192,22 @@ class Array
          * 
          * @param[in] lo
          * @param[in] hi
-         * @return the buffer
+         * @return the new buffer
          */
         virtual void* get(int64_t lo, int64_t hi) const;
+
+        /**
+         * Copies data from Array into local buffer and returns the buffer.
+         * Caller must cast the returned buffer to the appropriate type and
+         * must also free the returned buffer when finished.  Shortcut for a
+         * 1-Dimensional get.
+         * 
+         * @param[in,out] buffer preallocated local array
+         * @param[in] lo
+         * @param[in] hi
+         * @return the given buffer, modified
+         */
+        virtual void* get(void *buffer, int64_t lo, int64_t hi) const;
 
         /**
          * Copies data from Array into local buffer and returns the buffer.
@@ -203,21 +216,35 @@ class Array
          * 
          * @param[in] lo
          * @param[in] hi
-         * @return the buffer
+         * @return the new buffer
          */
         virtual void* get(const vector<int64_t> &lo,
+                          const vector<int64_t> &hi) const;
+
+        /**
+         * Copies data from Array into local buffer and returns the buffer.
+         * Caller must cast the returned buffer to the appropriate type and
+         * must also free the returned buffer when finished.
+         * 
+         * @param[in,out] buffer preallocated local array
+         * @param[in] lo
+         * @param[in] hi
+         * @return the given buffer, modified
+         */
+        virtual void* get(void *buffer,
+                          const vector<int64_t> &lo,
                           const vector<int64_t> &hi) const;
 
         /**
          * Copies data from Array into given buffer and returns the buffer.
          * Caller must cast the returned buffer to the appropriate type.
          * 
-         * @param[in,out] buffer the local array
+         * @param[in,out] buffer preallocated local array
          * @param[in] lo
          * @param[in] hi
          * @param[in] ld array specifying the leading
          *               dimensions/strides/extents of the buffer array
-         * @return the buffer
+         * @return the given buffer, modified
          */
         virtual void* get(void *buffer,
                           const vector<int64_t> &lo,
@@ -226,6 +253,21 @@ class Array
 
         /**
          * Copies data from the source buffer into into the Array.
+         * 1-D shorthand.
+         *
+         * The buffer is assumed to have the same number of elements as the
+         * indicated patch.
+         *
+         * @param[in] buffer the buffer
+         * @param[in] lo
+         * @param[in] hi
+         */
+        virtual void put(void *buffer, int64_t lo, int64_t hi);
+
+        /**
+         * Copies data from the source buffer into into the Array.
+         * Assumes leading dimensions (ld) can be inferred from shape of the
+         * specified patch.
          *
          * The buffer is assumed to have the same number of elements as the
          * indicated patch.
