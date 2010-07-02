@@ -135,6 +135,34 @@ Array* VariableDecorator::read(int64_t record, Array *dst)
 }
 
 
+Array* VariableDecorator::iread()
+{
+    TIMING("VariableDecorator::iread()");
+    return var->iread();
+}
+
+
+Array* VariableDecorator::iread(Array *dst)
+{
+    TIMING("VariableDecorator::iread(Array*)");
+    return var->iread(dst);
+}
+
+
+Array* VariableDecorator::iread(int64_t record)
+{
+    TIMING("VariableDecorator::iread(int64_t)");
+    return var->iread(record);
+}
+
+
+Array* VariableDecorator::iread(int64_t record, Array *dst)
+{
+    TIMING("VariableDecorator::iread(int64_t,Array*)");
+    return var->iread(record, dst);
+}
+
+
 ostream& VariableDecorator::print(ostream &os) const
 {
     TIMING("VariableDecorator::print(ostream)");

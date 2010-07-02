@@ -14,6 +14,7 @@ using std::vector;
 
 class Attribute;
 class Dimension;
+class Request;
 
 
 class VariableDecorator : public Variable
@@ -43,6 +44,11 @@ class VariableDecorator : public Variable
         virtual Array* read(Array *dst);
         virtual Array* read(int64_t record);
         virtual Array* read(int64_t record, Array *dst);
+
+        virtual Array* iread();
+        virtual Array* iread(Array *dst);
+        virtual Array* iread(int64_t record);
+        virtual Array* iread(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;
 

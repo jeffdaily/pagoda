@@ -46,6 +46,8 @@ class Dataset
         virtual void set_masks(MaskMap *masks) = 0;
         virtual MaskMap* get_masks() const = 0;
 
+        virtual void wait() = 0;
+
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Dataset *dataset);
 

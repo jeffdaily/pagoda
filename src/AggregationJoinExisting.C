@@ -160,6 +160,15 @@ MaskMap* AggregationJoinExisting::get_masks() const
 }
 
 
+void AggregationJoinExisting::wait()
+{
+    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
+            it!=end; ++it) {
+        (*it)->wait();
+    }
+}
+
+
 ostream& AggregationJoinExisting::print(ostream &os) const
 {
     TIMING("AggregationJoinExisting::print(ostream)");

@@ -4,6 +4,7 @@
 
 #include <pnetcdf.h>
 
+#include "Array.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
@@ -22,6 +23,9 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ,   atts()
     ,   dims()
     ,   vars()
+    ,   masks(NULL)
+    ,   requests()
+    ,   arrays_to_release()
 {
     TIMING("NetcdfDataset::NetcdfDataset(string)");
     int ndim;
@@ -123,13 +127,31 @@ NetcdfVariable* NetcdfDataset::get_var(size_t i) const
 
 void NetcdfDataset::set_masks(MaskMap *masks)
 {
+    TIMING("NetcdfDataset::set_masks(MaskMap*)");
     this->masks = masks;
 }
 
 
 MaskMap* NetcdfDataset::get_masks() const
 {
+    TIMING("NetcdfDataset::get_masks()");
     return masks;
+}
+
+
+void NetcdfDataset::wait()
+{
+    TIMING("NetcdfDataset::wait()");
+
+    if (!requests.empty()) {
+        vector<int> statuses(requests.size());
+        ncmpi::wait_all(ncid, requests.size(), &requests[0], &statuses[0]);
+        for (size_t i=0; i<arrays_to_release.size(); ++i) {
+            arrays_to_release[i]->release();
+        }
+        arrays_to_release.clear();
+        requests.clear();
+    }
 }
 
 

@@ -38,8 +38,10 @@ class AggregationJoinExisting : public Aggregation
 
         virtual void add(Dataset *dataset);
 
-        virtual void set_masks(MaskMap *masks) = 0;
-        virtual MaskMap* get_masks() const = 0;
+        virtual void set_masks(MaskMap *masks);
+        virtual MaskMap* get_masks() const;
+
+        virtual void wait();
 
         virtual ostream& print(ostream &os) const;
 

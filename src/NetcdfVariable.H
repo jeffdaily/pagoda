@@ -34,6 +34,8 @@ class NetcdfVariable : public AbstractVariable
         virtual DataType get_type() const;
         virtual Array* read(Array *dst);
         virtual Array* read(int64_t record, Array *dst);
+        virtual Array* iread(Array *dst);
+        virtual Array* iread(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;
 
@@ -41,6 +43,14 @@ class NetcdfVariable : public AbstractVariable
         int get_id() const;
 
     protected:
+        Array* read(Array *dst, bool nonblocking);
+        Array* read(int64_t record, Array *dst, bool nonblocking);
+        bool find_bit(const vector<Dimension*> &adims,
+                const vector<int64_t> &lo, const vector<int64_t> &hi) const;
+        void do_read(Array *dst, const vector<MPI_Offset> &start,
+                const vector<MPI_Offset> &count, bool found_bit,
+                bool nonblocking);
+
         NetcdfDataset *dataset;
         int id;
         string name;

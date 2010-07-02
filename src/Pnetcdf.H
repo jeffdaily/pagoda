@@ -89,6 +89,13 @@ namespace ncmpi
     void get_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], float *ip);
     void get_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], double *ip);
 
+    int iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], short *ip);
+    int iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], int *ip);
+    int iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], float *ip);
+    int iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], double *ip);
+    
+    void wait_all(int ncid, int count, int array_of_requests[], int array_of_statuses[]);
+
     void put_vars_all(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], const MPI_Offset stride[], const short *op);
     void put_vars_all(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], const MPI_Offset stride[], const int *op);
     void put_vars_all(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], const MPI_Offset stride[], const float *op);

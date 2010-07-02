@@ -49,6 +49,11 @@ class Variable
         virtual Array* read(int64_t record) = 0;
         virtual Array* read(int64_t record, Array *dst) = 0;
 
+        virtual Array* iread() = 0;
+        virtual Array* iread(Array *dst) = 0;
+        virtual Array* iread(int64_t record) = 0;
+        virtual Array* iread(int64_t record, Array *dst) = 0;
+
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Variable *other);
 

@@ -38,13 +38,16 @@ class AggregationVariable : public AbstractVariable
         virtual Array* read(Array *dst);
         virtual Array* read(int64_t record, Array *dst);
 
+        virtual Array* iread(Array *dst);
+        virtual Array* iread(int64_t record, Array *dst);
+
         virtual ostream& print(ostream &os) const;
 
     protected:
-        int64_t index_var;
-        int64_t index_within_var;
         AggregationDimension *agg_dim;
-        vector<Variable*> vars; /* Variables we are concatenating */
+        vector<Variable*> vars; /**< Variables we are concatenating */
+        vector<Array*> arrays_to_copy; /**< when non-blocking completes */
+        Array *array_to_fill; /**< when non-blocking completes */
 };
 
 #endif // AGGREGATIONVARIABLE_H_

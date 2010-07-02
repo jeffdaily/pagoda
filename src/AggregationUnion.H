@@ -34,6 +34,8 @@ class AggregationUnion : public Aggregation
         virtual void set_masks(MaskMap *masks);
         virtual MaskMap* get_masks() const;
 
+        virtual void wait();
+
         virtual ostream& print(ostream &os) const;
 
     private:

@@ -602,3 +602,85 @@ void ncmpi::get_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Of
     PNETCDF_TIMING4("ncmpi_get_vara_double", ndim, count, NC_DOUBLE);
     ERRNO_CHECK(ncmpi_get_vara_double(ncid, varid, start, count, ip));
 }
+
+
+int ncmpi::iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], short *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+#   ifdef GATHER_PNETCDF_TIMING
+    int ndim;
+    ERRNO_CHECK(ncmpi_inq_varndims(ncid, varid, &ndim));
+#   endif
+    PNETCDF_TIMING4("ncmpi_iget_vara_short", ndim, count, NC_SHORT);
+    ERRNO_CHECK(ncmpi_iget_vara_short(ncid, varid, start, count, ip, &request));
+    return request;
+#else
+    get_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], int *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+#   ifdef GATHER_PNETCDF_TIMING
+    int ndim;
+    ERRNO_CHECK(ncmpi_inq_varndims(ncid, varid, &ndim));
+#   endif
+    PNETCDF_TIMING4("ncmpi_iget_vara_int", ndim, count, NC_SHORT);
+    ERRNO_CHECK(ncmpi_iget_vara_int(ncid, varid, start, count, ip, &request));
+    return request;
+#else
+    get_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], float *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+#   ifdef GATHER_PNETCDF_TIMING
+    int ndim;
+    ERRNO_CHECK(ncmpi_inq_varndims(ncid, varid, &ndim));
+#   endif
+    PNETCDF_TIMING4("ncmpi_iget_vara_float", ndim, count, NC_SHORT);
+    ERRNO_CHECK(ncmpi_iget_vara_float(ncid, varid, start, count, ip, &request));
+    return request;
+#else
+    get_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iget_vara(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], double *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+#   ifdef GATHER_PNETCDF_TIMING
+    int ndim;
+    ERRNO_CHECK(ncmpi_inq_varndims(ncid, varid, &ndim));
+#   endif
+    PNETCDF_TIMING4("ncmpi_iget_vara_double", ndim, count, NC_SHORT);
+    ERRNO_CHECK(ncmpi_iget_vara_double(ncid, varid, start, count, ip, &request));
+    return request;
+#else
+    get_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+void ncmpi::wait_all(int ncid, int count, int array_of_requests[],
+        int array_of_statuses[])
+{
+#if HAVE_PNETCDF_NEW_NB
+    PNETCDF_TIMING1("ncmpi_waitall");
+    ERRNO_CHECK(ncmpi_wait_all(ncid, count, array_of_requests, array_of_statuses));
+#endif
+}

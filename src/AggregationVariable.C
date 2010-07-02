@@ -27,8 +27,6 @@ using std::vector;
 AggregationVariable::AggregationVariable(
         AggregationDimension *agg_dim, Variable *var)
     :   AbstractVariable()
-    ,   index_var(0)
-    ,   index_within_var(0)
     ,   agg_dim(agg_dim)
     ,   vars()
 {
@@ -83,8 +81,10 @@ DataType AggregationVariable::get_type() const
 }
 
 
+#if AGGREGATION_VARIABLE_READ_LOMEM
 Array* AggregationVariable::read(Array *dst)
 {
+    /* Reads one timestep at a time and copies to dst Array */
     Array *src;
     int ndim;
     vector<int64_t> dst_lo;
@@ -120,6 +120,48 @@ Array* AggregationVariable::read(Array *dst)
     return dst;
 }
 
+#else /* AGGREGATION_VARIABLE_READ_LOMEM */
+
+Array* AggregationVariable::read(Array *dst)
+{    /* Reads one aggregated Variable at a time and copies to dst Array */
+    int count = 0;
+    int ndim = num_dims();
+    vector<int64_t> dst_lo(ndim, 0);
+    vector<int64_t> dst_hi = get_shape();
+    vector<int64_t>::iterator shape_it;
+    vector<int64_t>::iterator shape_end;
+    vector<Variable*>::const_iterator var_it;
+    vector<Variable*>::const_iterator var_end;
+
+    for (shape_it=dst_hi.begin(),shape_end=dst_hi.end();
+            shape_it!=shape_end; ++shape_it) {
+        --(*shape_it);
+    }
+    dst_hi[0] = 0;
+
+    // TODO could optimize by reusing Array *src if shape doesn't change
+    // between reads
+    for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
+        Variable *var = *var_it;
+        Array *src = var->read();
+        int64_t ndim = var->num_dims();
+        vector<int64_t> src_lo(ndim, 0);
+        vector<int64_t> src_hi = var->get_shape();
+
+        for (shape_it=src_hi.begin(),shape_end=src_hi.end();
+                shape_it!=shape_end; ++shape_it) {
+            --(*shape_it);
+        }
+        dst_hi[0] = dst_lo[0] + src_hi[0];
+        dst->copy(src, src_lo, src_hi, dst_lo, dst_hi);
+        dst_lo[0] = dst_hi[0]+1;
+        delete src;
+    }
+
+    return dst;
+}
+#endif  /* AGGREGATION_VARIABLE_READ_LOMEM */
+
 
 Array* AggregationVariable::read(int64_t record, Array *dst)
 {
@@ -133,6 +175,43 @@ Array* AggregationVariable::read(int64_t record, Array *dst)
         int64_t num_records = vars.at(index_var)->get_shape().at(0);
         if (index_within_var < num_records) {
             return vars.at(index_var)->read(index_within_var, dst);
+        } else {
+            index_within_var -= num_records;
+        }
+    }
+
+    return NULL;
+}
+
+
+Array* AggregationVariable::iread(Array *dst)
+{
+    vector<Variable*>::const_iterator var_it;
+    vector<Variable*>::const_iterator var_end;
+
+    array_to_fill = dst;
+    
+    for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
+        Variable *var = *var_it;
+        arrays_to_copy.push_back(var->iread());
+    }
+
+    return dst;
+}
+
+
+Array* AggregationVariable::iread(int64_t record, Array *dst)
+{
+    int64_t index_within_var = record;
+
+    if (record < 0 || record > get_shape().at(0)) {
+        throw IndexOutOfBoundsException("AggregationVariable::read");
+    }
+
+    for (int64_t index_var=0; index_var<vars.size(); ++index_var) {
+        int64_t num_records = vars.at(index_var)->get_shape().at(0);
+        if (index_within_var < num_records) {
+            return vars.at(index_var)->iread(index_within_var, dst);
         } else {
             index_within_var -= num_records;
         }

@@ -123,6 +123,15 @@ MaskMap* AggregationUnion::get_masks() const
 }
 
 
+void AggregationUnion::wait()
+{
+    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
+            it!=end; ++it) {
+        (*it)->wait();
+    }
+}
+
+
 ostream& AggregationUnion::print(ostream &os) const
 {
     TIMING("AggregationUnion::print(ostream)");

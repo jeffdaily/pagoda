@@ -145,6 +145,26 @@ Array* AbstractVariable::read(int64_t record)
 }
 
 
+Array* AbstractVariable::iread()
+{
+    Array *dst = Array::create(get_type(), get_shape());
+    return iread(dst);
+}
+
+
+Array* AbstractVariable::iread(int64_t record)
+{
+    vector<int64_t> shape;
+    Array *dst;
+
+    shape = get_shape();
+    shape.erase(shape.begin());
+    dst = Array::create(get_type(), shape);
+
+    return iread(record, dst);
+}
+
+
 ostream& AbstractVariable::print(ostream &os) const
 {
     TIMING("AbstractVariable::print(ostream)");

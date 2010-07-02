@@ -1,6 +1,8 @@
 #ifndef NETCDFDATASET_H_
 #define NETCDFDATASET_H_
 
+#include <pnetcdf.h>
+
 #include <string>
 #include <vector>
 
@@ -9,6 +11,7 @@ using std::vector;
 
 #include "Dataset.H"
 
+class Array;
 class Attribute;
 class Dimension;
 class MaskMap;
@@ -34,6 +37,8 @@ class NetcdfDataset : public Dataset
         virtual void set_masks(MaskMap *masks);
         virtual MaskMap* get_masks() const;
 
+        virtual void wait();
+
         virtual ostream& print(ostream &os) const;
 
         NetcdfAttribute* get_att(size_t i) const;
@@ -44,6 +49,8 @@ class NetcdfDataset : public Dataset
         int get_id() const;
         NetcdfDimension* get_udim() const;
 
+        friend class NetcdfVariable;
+
     protected:
         string filename;
         int ncid;
@@ -52,6 +59,9 @@ class NetcdfDataset : public Dataset
         vector<NetcdfDimension*> dims;
         vector<NetcdfVariable*> vars;
         MaskMap *masks;
+
+        vector<int> requests;
+        vector<Array*> arrays_to_release;
 };
 
 #endif // NETCDFDATASET_H_

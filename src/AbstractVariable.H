@@ -47,6 +47,11 @@ class AbstractVariable : public Variable
         virtual Array* read(int64_t record);
         virtual Array* read(int64_t record, Array *dst) = 0;
 
+        virtual Array* iread();
+        virtual Array* iread(Array *dst) = 0;
+        virtual Array* iread(int64_t record);
+        virtual Array* iread(int64_t record, Array *dst) = 0;
+
         virtual ostream& print(ostream &os) const;
 
     protected:
