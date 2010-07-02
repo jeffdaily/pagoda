@@ -41,45 +41,48 @@ MaskMap::~MaskMap()
  */
 void MaskMap::create_masks(const Dataset *dataset)
 {
-    vector<Dimension*> dims = dataset->get_dims();
-    vector<Dimension*>::iterator dim_it;
-
     TIMING("MaskMap::create_masks(Dataset*)");
+    create_masks(dataset->get_dims());
+}
 
-    for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
+
+/**
+ * Create a default Mask for each given Dimension.
+ *
+ * If a Mask does not yet exist for a Dimension, it is initialized to 1.
+ * Otherwise, if a Mask already exists, it is left alone.
+ */
+void MaskMap::create_masks(const vector<Dimension*> dims)
+{
+    vector<Dimension*>::const_iterator dim_it;
+    vector<Dimension*>::const_iterator dim_end;
+
+    TIMING("MaskMap::create_masks(vector<Dimension*>)");
+
+    for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
         Dimension *dim = *dim_it;
         Mask *mask = get_mask(dim);
     }
 }
 
 
-void MaskMap::modify_masks(
-        const vector<DimSlice> &slices,
-        const vector<Dimension*> &dims)
+void MaskMap::modify(const vector<DimSlice> &slices)
 {
-    TIMING("Dataset::modify_masks(vector<DimSlice>,vector<Dimension*>)");
-    vector<Dimension*>::const_iterator dim_it;
+    TIMING("Dataset::modify(vector<DimSlice>,vector<Dimension*>)");
     vector<DimSlice>::const_iterator slice_it;
 
     // we're iterating over the command-line specified slices to create masks
     for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
         DimSlice slice = *slice_it;
         string slice_name = slice.get_name();
+        masks_t::const_iterator mask_it = masks.find(slice_name);
 
-        // find the Dimension
-        for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
-            Dimension *dim = *dim_it;
-            string dim_name = dim->get_name();
-            if (dim_name == slice_name) {
-                // modify the Mask based on the current Slice
-                Mask *mask = get_mask(dim);
-                mask->modify(slice);
-                break;
-            }
-        }
-        if (dim_it == dims.end()) {
-            const string name = slice.get_name();
-            PRINT_ZERO("Sliced dimension '%s' does not exist\n", name.c_str());
+        if (mask_it == masks.end()) {
+            PRINT_ZERO("Sliced dimension '%s' does not exist\n",
+                    slice_name.c_str());
+        } else {
+            // modify the Mask based on the current Slice
+            mask_it->second->modify(slice);
         }
     }
 }
@@ -96,7 +99,7 @@ void MaskMap::modify_masks(
  * @param[in] lon the longitude coordinate data
  * @param[in] dim the dimension we are masking
  */
-void MaskMap::modify_masks(const LatLonBox &box,
+void MaskMap::modify(const LatLonBox &box,
         const Array *lat, const Array *lon, Dimension *dim)
 {
     Mask *mask = get_mask(dim);
@@ -116,11 +119,11 @@ void MaskMap::modify_masks(const LatLonBox &box,
  * @param[in] lat_dim the latitude dimension we are masking
  * @param[in] lon_dim the longitude dimension we are masking
  */
-void MaskMap::modify_masks(
+void MaskMap::modify(
         const LatLonBox &box, const Array *lat, const Array *lon,
         Dimension *lat_dim, Dimension *lon_dim)
 {
-    throw NotImplementedException("MaskMap::modify_masks(LatLonBox,Array*,Array*,Dimension*,Dimension*)");
+    throw NotImplementedException("MaskMap::modify(LatLonBox,Array*,Array*,Dimension*,Dimension*)");
 }
 
 
@@ -141,7 +144,7 @@ void MaskMap::modify_masks(
  * @param[in] to_mask the Dimension which should be masked based on masked
  * @param[in] topology relation between the two given Dimensions
  */
-void MaskMap::modify_masks(
+void MaskMap::modify(
         Dimension *dim_masked, Dimension *dim_to_mask, const Array *topology)
 {
     Mask *mask = get_mask(dim_masked);

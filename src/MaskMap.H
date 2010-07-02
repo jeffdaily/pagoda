@@ -35,15 +35,14 @@ class MaskMap
         virtual ~MaskMap();
 
         void create_masks(const Dataset *dataset);
+        void create_masks(const vector<Dimension*> dims);
 
-        void modify_masks(const vector<DimSlice> &slices,
-                const vector<Dimension*> &dims);
-        void modify_masks(const LatLonBox &box,
-                const Array *lat, const Array *lon, Dimension *dim);
-        void modify_masks(const LatLonBox &box,
-                const Array *lat, const Array *lon,
+        void modify(const vector<DimSlice> &slices);
+        void modify(const LatLonBox &box, const Array *lat,
+                const Array *lon, Dimension *dim);
+        void modify(const LatLonBox &box, const Array *lat, const Array *lon,
                 Dimension *lat_dim, Dimension *lon_dim);
-        void modify_masks(Dimension *masked, Dimension *to_mask,
+        void modify(Dimension *masked, Dimension *to_mask,
                 const Array *topology);
 
         Mask* get_mask(Dimension *dim);

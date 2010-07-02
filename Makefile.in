@@ -49,9 +49,9 @@ check_PROGRAMS = subsetter_old$(EXEEXT) \
 	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
 	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
 	tests/TestJoin$(EXEEXT) tests/TestNetcdfDataset$(EXEEXT) \
-	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
-	tests/TestRead$(EXEEXT) tests/TestScatter$(EXEEXT) \
-	tests/TestUnion$(EXEEXT)
+	tests/TestMaskMap$(EXEEXT) tests/TestPartialSum$(EXEEXT) \
+	tests/TestRavel$(EXEEXT) tests/TestRead$(EXEEXT) \
+	tests/TestScatter$(EXEEXT) tests/TestUnion$(EXEEXT)
 bin_PROGRAMS = pgdump$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
@@ -156,6 +156,10 @@ am_tests_TestJoin_OBJECTS = tests/TestJoin.$(OBJEXT)
 tests_TestJoin_OBJECTS = $(am_tests_TestJoin_OBJECTS)
 tests_TestJoin_LDADD = $(LDADD)
 tests_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestMaskMap_OBJECTS = tests/TestMaskMap.$(OBJEXT)
+tests_TestMaskMap_OBJECTS = $(am_tests_TestMaskMap_OBJECTS)
+tests_TestMaskMap_LDADD = $(LDADD)
+tests_TestMaskMap_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestNetcdfDataset_OBJECTS =  \
 	tests/TestNetcdfDataset.$(OBJEXT)
 tests_TestNetcdfDataset_OBJECTS =  \
@@ -305,7 +309,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_TestBin_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
-	$(tests_TestJoin_SOURCES) $(tests_TestNetcdfDataset_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestMaskMap_SOURCES) \
+	$(tests_TestNetcdfDataset_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
 	$(tests_TestUnion_SOURCES) $(tests_ga_TestAttribute_SOURCES) \
@@ -322,7 +327,8 @@ DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(subsetter_old_SOURCES) $(tests_TestBin_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
-	$(tests_TestJoin_SOURCES) $(tests_TestNetcdfDataset_SOURCES) \
+	$(tests_TestJoin_SOURCES) $(tests_TestMaskMap_SOURCES) \
+	$(tests_TestNetcdfDataset_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
 	$(tests_TestUnion_SOURCES) $(tests_ga_TestAttribute_SOURCES) \
@@ -539,6 +545,7 @@ tests_TestEnum_SOURCES = tests/TestEnum.C
 tests_TestGet_SOURCES = tests/TestGet.C
 tests_TestJoin_SOURCES = tests/TestJoin.C
 tests_TestNetcdfDataset_SOURCES = tests/TestNetcdfDataset.C
+tests_TestMaskMap_SOURCES = tests/TestMaskMap.C
 tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 tests_TestRavel_SOURCES = tests/TestRavel.C
 tests_TestRead_SOURCES = tests/TestRead.C
@@ -794,6 +801,11 @@ tests/TestJoin.$(OBJEXT): tests/$(am__dirstamp) \
 tests/TestJoin$(EXEEXT): $(tests_TestJoin_OBJECTS) $(tests_TestJoin_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestJoin$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestJoin_OBJECTS) $(tests_TestJoin_LDADD) $(LIBS)
+tests/TestMaskMap.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestMaskMap$(EXEEXT): $(tests_TestMaskMap_OBJECTS) $(tests_TestMaskMap_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestMaskMap$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestMaskMap_OBJECTS) $(tests_TestMaskMap_LDADD) $(LIBS)
 tests/TestNetcdfDataset.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestNetcdfDataset$(EXEEXT): $(tests_TestNetcdfDataset_OBJECTS) $(tests_TestNetcdfDataset_DEPENDENCIES) tests/$(am__dirstamp)
@@ -999,6 +1011,7 @@ mostlyclean-compile:
 	-rm -f tests/TestEnum.$(OBJEXT)
 	-rm -f tests/TestGet.$(OBJEXT)
 	-rm -f tests/TestJoin.$(OBJEXT)
+	-rm -f tests/TestMaskMap.$(OBJEXT)
 	-rm -f tests/TestNetcdfDataset.$(OBJEXT)
 	-rm -f tests/TestPartialSum.$(OBJEXT)
 	-rm -f tests/TestRavel.$(OBJEXT)
@@ -1072,6 +1085,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestEnum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestGet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestJoin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestMaskMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestNetcdfDataset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRavel.Po@am__quote@
