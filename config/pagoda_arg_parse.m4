@@ -1,9 +1,9 @@
-# GCRM_ARG_PARSE(ARG, VAR_LIBS, VAR_LDFLAGS, VAR_CPPFLAGS)
+# PAGODA_ARG_PARSE(ARG, VAR_LIBS, VAR_LDFLAGS, VAR_CPPFLAGS)
 # --------------------------------------------------------
 # Parse whitespace-separated ARG into appropriate LIBS, LDFLAGS, and
 # CPPFLAGS variables.
 # TODO ADD test -d tests for *lib* and *include* cases??
-AC_DEFUN([GCRM_ARG_PARSE],
+AC_DEFUN([PAGODA_ARG_PARSE],
 [for arg in $$1 ; do
     AS_CASE([$arg],
         [yes],          [],

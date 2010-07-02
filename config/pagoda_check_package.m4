@@ -1,8 +1,8 @@
-# GCRM_CHECK_PACKAGE(pkg, header, library, function, [extra-libs],
-#                    [action-if-found], [action-if-not-found])
+# PAGODA_CHECK_PACKAGE(pkg, header, library, function, [extra-libs],
+#                      [action-if-found], [action-if-not-found])
 # -----------------------------------------------------------------
 #
-AC_DEFUN([GCRM_CHECK_PACKAGE], [
+AC_DEFUN([PAGODA_CHECK_PACKAGE], [
 AS_VAR_PUSHDEF([HAVE_PKG],    m4_toupper(m4_translit([HAVE_$1], [-.], [__])))
 AS_VAR_PUSHDEF([PKG_LIBS],    m4_toupper(m4_translit([$1_LIBS], [-.], [__])))
 AS_VAR_PUSHDEF([PKG_LDFLAGS], m4_toupper(m4_translit([$1_LDFLAGS], [-.], [__])))
@@ -18,7 +18,7 @@ AC_ARG_WITH([$1],
 AS_CASE([$with_$1],
     [yes],  [],
     [no],   [],
-            [GCRM_ARG_PARSE(
+            [PAGODA_ARG_PARSE(
                 [with_$1],
                 [PKG_LIBS],
                 [PKG_LDFLAGS],

@@ -76,7 +76,7 @@ AC_TYPE_INT64_T
 AC_TYPE_UINT64_T
 AC_CHECK_TYPE([MPI_Offset], [], [], [[#include <mpi.h>]])
 AC_TYPE_LONG_DOUBLE
-GCRM_CXX_VARIADIC_MACROS([],
+PAGODA_CXX_VARIADIC_MACROS([],
     [AC_MSG_WARN([C99 variadic macros not supported, IO timing disabled])])
 
 # Checks for C++ type sizes.
@@ -108,18 +108,21 @@ AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
 AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 
 # Checks for C++ libraries.
-GCRM_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
+PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
     [AC_MSG_FAILURE([Could not locate pnetcdf])])
-GCRM_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
+PAGODA_PNETCDF_NB_INT
+PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
     [AS_UNSET([ac_cv_search_GA_Initialize])
      save_LIBS="$LIBS"
-     GCRM_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize],
+     PAGODA_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize],
         [-lpario -lglobal -lma -larmci -llinalg $FLIBS],
         [GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"],
         [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
      LIBS="$save_LIBS"])
-GCRM_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
+PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
+
+# Does pnetcdf have the new nonblocking interface?
 
 # Checks for GA functionality.
 AC_CHECK_FUNCS([GA_Llgop GA_Ldgop])

@@ -55,6 +55,9 @@
 /* set to 1 if we have the indicated package */
 #undef HAVE_PNETCDF
 
+/* pnetcdf version >=1.2 */
+#undef HAVE_PNETCDF_NEW_NB
+
 /* Define to 1 if stdbool.h conforms to C99. */
 #undef HAVE_STDBOOL_H
 
