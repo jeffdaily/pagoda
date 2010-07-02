@@ -55,27 +55,25 @@ bin_PROGRAMS = pgdump$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/config/config.h.in $(top_srcdir)/configure \
-	AUTHORS COPYING ChangeLog INSTALL NEWS config/compile \
-	config/config.guess config/config.sub config/depcomp \
-	config/install-sh config/ltmain.sh config/missing
+	$(srcdir)/config.h.in $(top_srcdir)/configure AUTHORS COPYING \
+	ChangeLog INSTALL NEWS build-aux/compile \
+	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
+	build-aux/install-sh build-aux/ltmain.sh build-aux/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/config/libtool.m4 \
-	$(top_srcdir)/config/lt_obsolete.m4 \
-	$(top_srcdir)/config/ltoptions.m4 \
-	$(top_srcdir)/config/ltsugar.m4 \
-	$(top_srcdir)/config/ltversion.m4 \
-	$(top_srcdir)/config/pagoda_arg_parse.m4 \
-	$(top_srcdir)/config/pagoda_check_package.m4 \
-	$(top_srcdir)/config/pagoda_cxx_variadic_macro.m4 \
-	$(top_srcdir)/config/pagoda_pnetcdf_nb.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/pagoda_arg_parse.m4 \
+	$(top_srcdir)/m4/pagoda_check_package.m4 \
+	$(top_srcdir)/m4/pagoda_cxx_variadic_macro.m4 \
+	$(top_srcdir)/m4/pagoda_pnetcdf_nb.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/config/config.h
+CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -256,8 +254,8 @@ am_tests_ga_TestUnpack_OBJECTS = tests/ga/TestUnpack.$(OBJEXT)
 tests_ga_TestUnpack_OBJECTS = $(am_tests_ga_TestUnpack_OBJECTS)
 tests_ga_TestUnpack_LDADD = $(LDADD)
 tests_ga_TestUnpack_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/config
-depcomp = $(SHELL) $(top_srcdir)/config/depcomp
+DEFAULT_INCLUDES = -I.@am__isrc@
+depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -470,7 +468,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ACLOCAL_AMFLAGS = -I config
+ACLOCAL_AMFLAGS = -I m4
 @WARNINGS_TRUE@WALL = -Wall
 @PROFILE_TRUE@PROFILE = -pg
 AM_CPPFLAGS = -I$(top_srcdir)/src $(pnetcdf_CPPFLAGS) $(GA_CPPFLAGS)
@@ -542,7 +540,8 @@ tests_TestRavel_SOURCES = tests/TestRavel.C
 tests_TestRead_SOURCES = tests/TestRead.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)
-all: all-am
+all: config.h
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .C .c .lo .o .obj
@@ -581,22 +580,22 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 
-config/config.h: config/stamp-h1
+config.h: stamp-h1
 	@if test ! -f $@; then \
-	  rm -f config/stamp-h1; \
-	  $(MAKE) $(AM_MAKEFLAGS) config/stamp-h1; \
+	  rm -f stamp-h1; \
+	  $(MAKE) $(AM_MAKEFLAGS) stamp-h1; \
 	else :; fi
 
-config/stamp-h1: $(top_srcdir)/config/config.h.in $(top_builddir)/config.status
-	@rm -f config/stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status config/config.h
-$(top_srcdir)/config/config.h.in:  $(am__configure_deps) 
+stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
+	@rm -f stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status config.h
+$(srcdir)/config.h.in:  $(am__configure_deps) 
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
-	rm -f config/stamp-h1
+	rm -f stamp-h1
 	touch $@
 
 distclean-hdr:
-	-rm -f config/config.h config/stamp-h1
+	-rm -f config.h stamp-h1
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
@@ -1184,11 +1183,11 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	set x; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -1206,9 +1205,9 @@ TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	  fi; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -1376,7 +1375,7 @@ distcleancheck: distclean
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
@@ -1489,7 +1488,7 @@ ps-am:
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-pkgincludeHEADERS
 
-.MAKE: check-am install-am install-strip
+.MAKE: all check-am install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
