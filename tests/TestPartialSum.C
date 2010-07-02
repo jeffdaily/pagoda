@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     vector<int64_t> hi(1,size[0]-1);
 
     pagoda::initialize(&argc, &argv);
-    Util::calculate_required_memory();
+    pagoda::calculate_required_memory();
 
     g_src = Array::create(DataType::INT, size);
     g_dst0 = Array::create(DataType::INT, size);
@@ -46,9 +46,9 @@ int main(int argc, char **argv)
             }
         }
         pagoda::partial_sum(g_src, g_dst0, false);
-        Util::barrier();
+        pagoda::barrier();
         pagoda::partial_sum(g_src, g_dst1, true);
-        Util::barrier();
+        pagoda::barrier();
 
         if (0 == pagoda::me) {
             int *values = new int[size[0]];

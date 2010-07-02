@@ -53,7 +53,7 @@ AggregationJoinExisting::~AggregationJoinExisting()
     }
 
     transform(datasets.begin(), datasets.end(), datasets.begin(),
-            Util::ptr_deleter<Dataset*>);
+            pagoda::ptr_deleter<Dataset*>);
 
     delete agg_dim;
 }

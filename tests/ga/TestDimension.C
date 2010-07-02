@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     NetcdfDataset *dataset = new NetcdfDataset(argv[1]);
     Mask *mask = NULL;
 
-    Util::calculate_required_memory(dataset->get_vars());
+    pagoda::calculate_required_memory(dataset->get_vars());
 
     vector<Dimension*> dims = dataset->get_dims();
     for (size_t dimid=0,ndim=dims.size(); dimid<ndim; ++dimid) {

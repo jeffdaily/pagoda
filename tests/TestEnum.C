@@ -22,8 +22,6 @@ using std::endl;
 
 int main(int argc, char **argv)
 {
-    int me = Util::nodeid();
-    int nproc = Util::num_nodes();
     vector<int64_t> shape_src(1,10);
     vector<int64_t> shape_dst(1,30);
     Array *a_src = NULL;
@@ -39,14 +37,14 @@ int main(int argc, char **argv)
     vector<int64_t> hi;
 
     pagoda::initialize(&argc, &argv);
-    Util::calculate_required_memory();
+    pagoda::calculate_required_memory();
 
     a_src = Array::create(DataType::INT,    shape_src);
     a_enm = Array::create(DataType::DOUBLE, shape_dst);
     a_dst = Array::create(DataType::INT,    shape_dst);
     a_msk = Array::create(DataType::INT,    shape_dst);
 
-    if (0 == me) {
+    if (0 == pagoda::me) {
         int msk[] = {0,1,1,0,0,0,0,1,1,0,
                      1,0,0,1,0,1,0,1,0,0,
                      0,0,1,0,1,0,0,0,0,0};

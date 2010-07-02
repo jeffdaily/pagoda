@@ -43,6 +43,8 @@ class MaskMap
         void modify_masks(const LatLonBox &box,
                 const Array *lat, const Array *lon,
                 Dimension *lat_dim, Dimension *lon_dim);
+        void modify_masks(Dimension *masked, Dimension *to_mask,
+                const Array *topology);
 
         Mask* get_mask(Dimension *dim);
         Mask* operator [] (Dimension *dim);

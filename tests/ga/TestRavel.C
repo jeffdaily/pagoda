@@ -65,10 +65,10 @@ int main(int argc, char **argv)
                 i, ndim,
                 (long)dims1[0], (long)dims1[1], (long)dims1[2],
                 (long)result1[0], (long)result1[1], (long)result1[2]);
-        //result2 = Util::unravel_index(i, dims2);
+        //result2 = pagoda::unravel_index(i, dims2);
         //cout << setw(2) << i << " --> " << result2 << " ";
         //printf("[%lld,%lld,%lld]", result1[0], result1[1], result1[2]);
-        //cout << " --> " << setw(2) << Util::ravel_index(result2, dims2) << endl;
+        //cout << " --> " << setw(2) << pagoda::ravel_index(result2, dims2) << endl;
     }
 
     delete [] dims1;

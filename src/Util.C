@@ -33,7 +33,7 @@ using std::vector;
  *
  * @return the number of nodes in this calculation
  */
-int64_t Util::num_nodes()
+int64_t pagoda::num_nodes()
 {
 #if HAVE_GA
     return GA_Nnodes();
@@ -54,7 +54,7 @@ int64_t Util::num_nodes()
  *
  * @return the ID of this node in this calculation.
  */
-int64_t Util::nodeid()
+int64_t pagoda::nodeid()
 {
 #if HAVE_GA
     return GA_Nodeid();
@@ -71,7 +71,7 @@ int64_t Util::nodeid()
 /**
  * Parallel barrier.
  */
-void Util::barrier()
+void pagoda::barrier()
 {
 #if HAVE_GA
     GA_Sync();
@@ -88,7 +88,7 @@ void Util::barrier()
  *
  * @param[in] message message to print before aborting
  */
-void Util::abort(const char *message)
+void pagoda::abort(const char *message)
 {
 #if HAVE_GA
     GA_Error(const_cast<char*>(message), 0);
@@ -107,7 +107,7 @@ void Util::abort(const char *message)
  * @param[in] message message to print before aborting
  * @param[in] errorcode
  */
-void Util::abort(const char *message, int errorcode)
+void pagoda::abort(const char *message, int errorcode)
 {
 #if HAVE_GA
     GA_Error(const_cast<char*>(message), errorcode);
@@ -125,7 +125,7 @@ void Util::abort(const char *message, int errorcode)
  *
  * @param[in,out] values the values to take the minimums of
  */ 
-void Util::gop_min(vector<long> &values)
+void pagoda::gop_min(vector<long> &values)
 {
 #if HAVE_GA
     GA_Lgop(&values[0], values.size(), "min");
@@ -143,7 +143,7 @@ void Util::gop_min(vector<long> &values)
  *
  * @param[in,out] values the values to take the sums of
  */ 
-void Util::gop_sum(vector<int> &values)
+void pagoda::gop_sum(vector<int> &values)
 {
 #if HAVE_GA
     GA_Igop(&values[0], values.size(), "+");
@@ -161,7 +161,7 @@ void Util::gop_sum(vector<int> &values)
  *
  * @param[in,out] values the values to take the sums of
  */ 
-void Util::gop_sum(vector<long> &values)
+void pagoda::gop_sum(vector<long> &values)
 {
 #if HAVE_GA
     GA_Lgop(&values[0], values.size(), "+");
@@ -179,7 +179,7 @@ void Util::gop_sum(vector<long> &values)
  *
  * @param[in,out] values the values to take the sums of
  */ 
-void Util::gop_sum(vector<long long> &values)
+void pagoda::gop_sum(vector<long long> &values)
 {
 #if HAVE_GA && HAVE_GA_LLGOP
     GA_Llgop(&values[0], values.size(), "+");
@@ -197,7 +197,7 @@ void Util::gop_sum(vector<long long> &values)
  *
  * @param[in,out] values the values to take the sums of
  */ 
-void Util::gop_sum(vector<float> &values)
+void pagoda::gop_sum(vector<float> &values)
 {
 #if HAVE_GA
     GA_Fgop(&values[0], values.size(), "+");
@@ -215,7 +215,7 @@ void Util::gop_sum(vector<float> &values)
  *
  * @param[in,out] values the values to take the sums of
  */ 
-void Util::gop_sum(vector<double> &values)
+void pagoda::gop_sum(vector<double> &values)
 {
 #if HAVE_GA
     GA_Dgop(&values[0], values.size(), "+");
@@ -233,7 +233,7 @@ void Util::gop_sum(vector<double> &values)
  *
  * @param[in,out] values the values to take the sums of
  */ 
-void Util::gop_sum(vector<long double> &values)
+void pagoda::gop_sum(vector<long double> &values)
 {
 #if HAVE_GA && HAVE_GA_LDGOP
     GA_Ldgop(&values[0], values.size(), "+");
@@ -253,11 +253,11 @@ void Util::gop_sum(vector<long double> &values)
  * @param[in] hi
  * @return the shape
  */
-vector<int64_t> Util::get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi)
+vector<int64_t> pagoda::get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi)
 {
     vector<int64_t> ret(lo.size());
 
-    TIMING("Util::get_shape(vector<int64_t>,vector<int64_t>)");
+    TIMING("pagoda::get_shape(vector<int64_t>,vector<int64_t>)");
 
     for (size_t i=0,limit=lo.size(); i<limit; ++i) {
         ret[i] = hi[i]-lo[i]+1;
@@ -273,7 +273,7 @@ vector<int64_t> Util::get_shape(const vector<int64_t> &lo, const vector<int64_t>
  * @param[in] shape the shape of an Array
  * @return the total number of elements in the given array shape.
  */
-int64_t Util::shape_to_size(const vector<int64_t> &shape)
+int64_t pagoda::shape_to_size(const vector<int64_t> &shape)
 {
     return accumulate(shape.begin(),shape.end(),1,multiplies<int64_t>());
 }
@@ -286,9 +286,9 @@ int64_t Util::shape_to_size(const vector<int64_t> &shape)
  * @param[in] ending the ending to test with
  * @return true if the given string ends with the given ending
  */
-bool Util::ends_with(const string &fullString, const string &ending)
+bool pagoda::ends_with(const string &fullString, const string &ending)
 {
-    TIMING("Util::ends_with(string,string)");
+    TIMING("pagoda::ends_with(string,string)");
     size_t len_string = fullString.length();
     size_t len_ending = ending.length();
     size_t arg1 = len_string - len_ending;
@@ -307,7 +307,7 @@ bool Util::ends_with(const string &fullString, const string &ending)
  * This is a hack because we want to hide the need for GA's MA library, but
  * it's hard to do.
  */
-void Util::calculate_required_memory()
+void pagoda::calculate_required_memory()
 {
     calculate_required_memory(vector<Variable*>());
 }
@@ -321,7 +321,7 @@ void Util::calculate_required_memory()
  *
  * @param[in] vars the Variables used in this calculation
  */
-void Util::calculate_required_memory(const vector<Variable*> &vars)
+void pagoda::calculate_required_memory(const vector<Variable*> &vars)
 {
 #if HAVE_GA
     int64_t max_size = 0;
@@ -329,8 +329,8 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
     string max_name;
     vector<Variable*>::const_iterator var;
 
-    TIMING("Util::calculate_required_memory(vector<Variable*>)");
-    TRACER("Util::calculate_required_memory BEGIN\n");
+    TIMING("pagoda::calculate_required_memory(vector<Variable*>)");
+    TRACER("pagoda::calculate_required_memory BEGIN\n");
 
     for (var=vars.begin(); var!=vars.end(); ++var) {
         int64_t var_size = shape_to_size((*var)->get_shape());
@@ -356,6 +356,6 @@ void Util::calculate_required_memory(const vector<Variable*> &vars)
         char msg[] = "MA_init failed";
         GA_Error(msg, 0);
     }
-    TRACER("Util::calculate_required_memory END\n");
+    TRACER("pagoda::calculate_required_memory END\n");
 #endif
 }

@@ -144,6 +144,7 @@ check_PROGRAMS += tests/TestNetcdfDataset
 check_PROGRAMS += tests/TestPartialSum
 check_PROGRAMS += tests/TestRavel
 check_PROGRAMS += tests/TestRead
+check_PROGRAMS += tests/TestScatter
 check_PROGRAMS += tests/TestUnion
 
 tests_ga_TestAttribute_SOURCES     = tests/ga/TestAttribute.C
@@ -172,6 +173,7 @@ tests_TestNetcdfDataset_SOURCES    = tests/TestNetcdfDataset.C
 tests_TestPartialSum_SOURCES       = tests/TestPartialSum.C
 tests_TestRavel_SOURCES            = tests/TestRavel.C
 tests_TestRead_SOURCES             = tests/TestRead.C
+tests_TestScatter_SOURCES          = tests/TestScatter.C
 tests_TestUnion_SOURCES            = tests/TestUnion.C
 
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)

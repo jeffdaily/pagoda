@@ -24,7 +24,7 @@ class Variable;
 /**
  * Holds miscellanous functionality.
  */
-namespace Util
+namespace pagoda
 {
 
 int64_t num_nodes();
@@ -140,6 +140,6 @@ T ravel_index(vector<T> indices, const vector<T> &dims)
     return accumulate(indices.begin(), indices.end()-1, 0) + indices.back();
 }
 
-} // namespace Util
+} // namespace pagoda
 
 #endif // UTIL_H_

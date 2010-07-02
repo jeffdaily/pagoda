@@ -44,8 +44,8 @@ static inline void unravel64i(int64_t x, int ndim, int64_t *dims, int64_t *resul
 
 void gax::partial_sum(int g_src, int g_dst, int excl)
 {
-    int nproc = Util::num_nodes();
-    int me = Util::nodeid();
+    int nproc = pagoda::num_nodes();
+    int me = pagoda::nodeid();
     int type_src;
     int type_dst;
     int ndim;
@@ -175,8 +175,8 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
 
 void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 {
-    //int nproc = Util::num_nodes();
-    int me = Util::nodeid();
+    //int nproc = pagoda::num_nodes();
+    int me = pagoda::nodeid();
 
     int type_src;
     int ndim_src = GA_Ndim(g_src);
@@ -320,8 +320,8 @@ void gax::unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
  */
 void gax::enumerate(int g_src, void *start_val, void *inc_val)
 {
-    int me = Util::nodeid();
-    int nproc = Util::num_nodes();
+    int me = pagoda::nodeid();
+    int nproc = pagoda::num_nodes();
     int64_t src_lo;
     int64_t src_hi;
     int src_type;
@@ -406,8 +406,8 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
 {
     TIMING("unpack1d(int,int,int)");
     TRACER("unpack1d BEGIN\n");
-    int me = Util::nodeid();
-    int nproc = Util::num_nodes();
+    int me = pagoda::nodeid();
+    int nproc = pagoda::num_nodes();
     int *mask;
     long counts[nproc];
     int64_t lo_msk = 0;

@@ -109,7 +109,7 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking)
     dst->get_distribution(lo,hi);
 
     if (dst->get_ndim() != ndim) {
-        Util::abort("NetcdfVariable::read(Array*) :: shape mismatch");
+        pagoda::abort("NetcdfVariable::read(Array*) :: shape mismatch");
     }
 
     found_bit = find_bit(get_dims(), lo, hi);
@@ -159,7 +159,7 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking)
     dst->get_distribution(lo,hi);
 
     if (dst->get_ndim()+1 != ndim) {
-        Util::abort("NetcdfVariable::read(int64_t,Array*) :: shape mismatch");
+        pagoda::abort("NetcdfVariable::read(int64_t,Array*) :: shape mismatch");
     }
 
     found_bit = find_bit(adims, lo, hi);
@@ -235,8 +235,8 @@ void NetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
         } else { \
             ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
         } \
-        if (!nonblocking && dst->owns_data() && found_bit) { \
-            dst->release(); \
+        if (dst->owns_data() && found_bit && !nonblocking) { \
+            dst->release_update(); \
         } \
     } else
     read_var_all(int,    DataType::INT)

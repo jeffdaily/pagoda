@@ -18,6 +18,7 @@ using std::vector;
 #include "LatLonBox.H"
 #include "Mask.H"
 #include "MaskMap.H"
+#include "NotImplementedException.H"
 #include "Slice.H"
 #include "Timing.H"
 
@@ -103,10 +104,91 @@ void MaskMap::modify_masks(const LatLonBox &box,
 }
 
 
+/**
+ * Modifiy the masks of the given lat/lon variables.
+ *
+ * This is usefulf when the lat/lon dimensions are unique.  In other words,
+ * assumes lat_dim and lon_dim are two different dimensions.
+ *
+ * @param[in] box the lat/lon specification
+ * @param[in] lat the latitude coordinate data
+ * @param[in] lon the longitude coordinate data
+ * @param[in] lat_dim the latitude dimension we are masking
+ * @param[in] lon_dim the longitude dimension we are masking
+ */
 void MaskMap::modify_masks(
         const LatLonBox &box, const Array *lat, const Array *lon,
         Dimension *lat_dim, Dimension *lon_dim)
 {
+    throw NotImplementedException("MaskMap::modify_masks(LatLonBox,Array*,Array*,Dimension*,Dimension*)");
+}
+
+
+/**
+ * Modify the mask of a connected Dimension.
+ *
+ * This is a very specific function designed to help preserve whole cells
+ * during a subset.  Let's assume we have cells/faces, edges, and
+ * vertices/corners within a dataset and we also have variables indicating
+ * how they are connected.  For a variable from cells to edges might look like
+ * cell_edges(cells, celledges) where celledges indicates how many edges the
+ * particular cell has.  We want to mask the related edges dimension (don't
+ * confuse with the small celledges Dimension).  That's where this function
+ * is useful.  Read it as: modify the mask for the "to_mask" Dimension based
+ * on the given "masked" Dimension and the given "topology" relation.
+ *
+ * @param[in] masked the Dimension which already has an associated Mask
+ * @param[in] to_mask the Dimension which should be masked based on masked
+ * @param[in] topology relation between the two given Dimensions
+ */
+void MaskMap::modify_masks(
+        Dimension *dim_masked, Dimension *dim_to_mask, const Array *topology)
+{
+    Mask *mask = get_mask(dim_masked);
+    Mask *to_mask = get_mask(dim_to_mask);
+    int64_t connections = topology->get_shape().at(1);
+    int64_t mask_local_size = mask->get_local_size();
+    vector<int64_t> masked_lo(1);
+    vector<int64_t> masked_hi(1);
+    vector<int64_t> topology_lo(2);
+    vector<int64_t> topology_hi(2);
+    int *mask_data;
+    int *topology_data;
+    vector<int> topology_buffer;
+    vector<int64_t> topology_subscripts;
+
+    if (!mask->owns_data()) {
+        // bail if this process doesn't own any of the mask
+        return;
+    }
+    
+    mask->get_distribution(masked_lo, masked_hi);
+    topology_lo.push_back(masked_lo.at(0));
+    topology_lo.push_back(0);
+    topology_hi.push_back(mask_local_size);
+    topology_hi.push_back(connections);
+    
+    // read portion of the topology local to the mask
+    topology_data = (int*)topology->get(topology_lo, topology_hi);
+    
+    // iterate over the topology indices and place into set
+    mask_data = (int*)mask->access();
+    for (int64_t idx=0; idx<mask_local_size; ++idx) {
+        if (mask_data[idx] != 0) {
+            int64_t local_offset = idx * connections;
+            for (int64_t connection=0; connection<connections; ++connection) {
+                topology_subscripts.push_back(
+                        topology_data[local_offset+connection]);
+            }
+        }
+    }
+    mask->release();
+
+    topology_buffer.assign(topology_subscripts.size(), 1);
+    to_mask->scatter(&topology_buffer[0], topology_subscripts);
+
+    // clean up
+    delete [] topology_data;
 }
 
 

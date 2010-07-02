@@ -37,14 +37,14 @@ Array::~Array()
 int64_t Array::get_size() const
 {
     TIMING("Array::get_size()");
-    return Util::shape_to_size(get_shape());
+    return pagoda::shape_to_size(get_shape());
 }
 
 
 int64_t Array::get_local_size() const
 {
     TIMING("Array::get_local_size()");
-    return Util::shape_to_size(get_local_shape());
+    return pagoda::shape_to_size(get_local_shape());
 }
 
 
@@ -55,7 +55,7 @@ bool Array::same_distribution(const Array *other) const
 
     TIMING("Array::same_distribution(Array*)");
 
-    Util::gop_min(values);
+    pagoda::gop_min(values);
     return (values.at(0) == 1) ? true : false;
 }
 
@@ -75,7 +75,7 @@ void* Array::get(void *buffer, int64_t lo, int64_t hi) const
 void* Array::get(void *buffer,
         const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
-    vector<int64_t> ld = Util::get_shape(lo,hi);
+    vector<int64_t> ld = pagoda::get_shape(lo,hi);
 
     ld.erase(ld.begin());
 
@@ -86,8 +86,8 @@ void* Array::get(void *buffer,
 void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
     void *buffer;
-    vector<int64_t> ld = Util::get_shape(lo,hi);
-    int64_t buffer_size = Util::shape_to_size(ld);
+    vector<int64_t> ld = pagoda::get_shape(lo,hi);
+    int64_t buffer_size = pagoda::shape_to_size(ld);
     DataType type = get_type();
 
     TIMING("Array::get(vector<int64_t>,vector<int64_t>)");
@@ -105,7 +105,7 @@ void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
     get_helper(DataType::DOUBLE,    double)
     get_helper(DataType::LONGDOUBLE,long double)
     {
-        Util::abort("Array::get DataType not handled");
+        pagoda::abort("Array::get DataType not handled");
     }
 #undef get_helper
 
@@ -122,7 +122,7 @@ void Array::put(void *buffer, int64_t lo, int64_t hi)
 void Array::put(void *buffer,
         const vector<int64_t> &lo, const vector<int64_t> &hi)
 {
-    vector<int64_t> ld = Util::get_shape(lo,hi);
+    vector<int64_t> ld = pagoda::get_shape(lo,hi);
 
     ld.erase(ld.begin());
 

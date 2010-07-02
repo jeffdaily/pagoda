@@ -32,7 +32,7 @@ static inline void unravel64i(
     }
     for (int i=0; i<ndim; ++i) {
         if (result[i] >= dims[i]) {
-            Util::abort("unravel64i: result[i] >= dims[i]");
+            pagoda::abort("unravel64i: result[i] >= dims[i]");
         }
     }
 }
@@ -58,7 +58,7 @@ static inline void unravel64i(
     }
     for (int i=0; i<ndim; ++i) {
         if (result[i] >= dims[i]) {
-            Util::abort("unravel64i: result[i] >= dims[i]");
+            pagoda::abort("unravel64i: result[i] >= dims[i]");
         }
     }
 }
@@ -82,8 +82,8 @@ static inline void unravel64i(
  */
 void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
 {
-    int nproc = Util::num_nodes();
-    int me = Util::nodeid();
+    int nproc = pagoda::num_nodes();
+    int me = pagoda::nodeid();
     DataType type_src = g_src->get_type();
     DataType type_dst = g_dst->get_type();
     int64_t dims;
@@ -95,13 +95,13 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     TRACER("partial_sum(Array*,Array*,bool)");
 
     if (! g_src->same_distribution(g_dst)) {
-        Util::abort("partial_sum: Arrays must have same distribution", 0);
+        pagoda::abort("partial_sum: Arrays must have same distribution", 0);
     }
     if (g_src->get_ndim() != 1 || g_dst->get_ndim() != 1) {
-        Util::abort("partial_sum: supports 1-dim Arrays only", 0);
+        pagoda::abort("partial_sum: supports 1-dim Arrays only", 0);
     }
 
-    //Util::barrier(); // TODO do we need this?
+    //pagoda::barrier(); // TODO do we need this?
 
     elems = g_src->get_local_size();
 
@@ -129,7 +129,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
             if (!excl) { \
                 values[me] += src[elems-1]; \
             } \
-            Util::gop_sum(values); \
+            pagoda::gop_sum(values); \
             for (int64_t i=0; i<me; ++i) { \
                 value += values[i]; \
             } \
@@ -157,7 +157,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
 #define partial_sum_op(DTYPE,TYPE) \
         if (DTYPE == type_dst) { \
             vector<TYPE> values(nproc, 0); \
-            Util::gop_sum(values); \
+            pagoda::gop_sum(values); \
             TRACER("partial_sum_op N/A\n"); \
         } else
         partial_sum_op(DataType::INT,       int)
@@ -178,7 +178,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
 void pagoda::pack(const Array *g_src, Array *g_dst,
         vector<Array*> g_masks, vector<Array*> g_masksums)
 {
-    int me = Util::nodeid();
+    int me = pagoda::nodeid();
 
     DataType type_src = g_src->get_type();
     int ndim_src = g_src->get_ndim();
@@ -197,10 +197,10 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
     TIMING("pack(Array*,Array*,vector<Array*>) BEGIN");
 
     if (ndim_src != ndim_dst) {
-        Util::abort("pack: src and dst ndims don't match", ndim_src-ndim_dst);
+        pagoda::abort("pack: src and dst ndims don't match", ndim_src-ndim_dst);
     }
 
-    //Util::barrier(); // TODO do we need this?
+    //pagoda::barrier(); // TODO do we need this?
 
     g_src->get_distribution(lo_src,hi_src);
 
@@ -269,7 +269,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                 } \
                 if (buf_dst_index != local_counts_product) { \
                     printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
-                    Util::abort("pack: mismatch", buf_dst_index); \
+                    pagoda::abort("pack: mismatch", buf_dst_index); \
                 } \
                 TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
                 g_dst->put(buf_dst, lo_dst, hi_dst, ld_dst); \
@@ -334,7 +334,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
     src->get_distribution(lo,hi);
 
     if (lo.size() > 1) {
-        Util::abort("enumerate: expected 1D array", lo.size());
+        pagoda::abort("enumerate: expected 1D array", lo.size());
     }
 
     if (src->owns_data()) {
@@ -361,7 +361,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
         enumerate_op(DataType::DOUBLE,    double)
         enumerate_op(DataType::LONGDOUBLE,long double)
         {
-            Util::abort("enumerate: unrecogized DataType", type.get_id());
+            pagoda::abort("enumerate: unrecogized DataType", type.get_id());
         }
 #undef enumerate_op
     }
@@ -376,8 +376,8 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
  */
 void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
 {
-    int me = Util::nodeid();
-    int nproc = Util::num_nodes();
+    int me = pagoda::nodeid();
+    int nproc = pagoda::num_nodes();
     int *mask;
     vector<long> counts(nproc,0);
     vector<int64_t> lo_src(1,0);
@@ -388,19 +388,19 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     TRACER("unpack1d BEGIN\n");
 
     if (!dst->same_distribution(msk)) {
-        Util::abort("unpack1d: dst and msk distributions differ");
+        pagoda::abort("unpack1d: dst and msk distributions differ");
     }
     if (type_src != dst->get_type()) {
-        Util::abort("unpack1d: src and dst DataTypes differ");
+        pagoda::abort("unpack1d: src and dst DataTypes differ");
     }
     if (DataType::INT != msk->get_type()) {
-        Util::abort("unpack1d: msk must be of type INT",
+        pagoda::abort("unpack1d: msk must be of type INT",
                 msk->get_type().get_id());
     }
 
     // count mask bits on each proc
     if (!msk->owns_data()) {
-        Util::gop_sum(counts);
+        pagoda::gop_sum(counts);
         TRACER("unpack1d lo,hi N/A 1 counts[me]=%ld\n", counts[me]);
         TRACER("unpack1d END\n");
         return; // this process doesn't participate
@@ -412,7 +412,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
             }
         }
         msk->release();
-        Util::gop_sum(counts);
+        pagoda::gop_sum(counts);
         if (0 == counts[me]) {
             TRACER("unpack1d lo,hi N/A 2 counts[me]=%ld\n", counts[me]);
             TRACER("unpack1d END\n");
@@ -452,7 +452,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     unpack1d_op(DataType::DOUBLE,double)
     unpack1d_op(DataType::LONGDOUBLE,long double)
     {
-        Util::abort("pagoda::unpack1d: DataType not handled",
+        pagoda::abort("pagoda::unpack1d: DataType not handled",
                 type_src.get_id());
     }
 #undef unpack1d_op

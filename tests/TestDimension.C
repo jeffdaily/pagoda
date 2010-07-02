@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
     dataset = Dataset::open(argv[1]);
 
-    Util::calculate_required_memory(dataset->get_vars());
+    pagoda::calculate_required_memory(dataset->get_vars());
 
     dims = dataset->get_dims();
     for (size_t dimid=0,limit=dims.size(); dimid<limit; ++dimid) {
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
     if (mask) {
         Array *array = mask->reindex();
-        Util::barrier();
+        pagoda::barrier();
         mask->dump();
         array->dump();
     }

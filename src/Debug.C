@@ -13,7 +13,7 @@ static inline int get_precision()
 {
     TIMING("get_precision()");
     int precision = 1;
-    int nproc = Util::num_nodes();
+    int nproc = pagoda::num_nodes();
     while (nproc > 10) {
         ++precision;
         nproc /= 10;
@@ -75,11 +75,11 @@ void print_zero_dummy(const string &str)
 
 void print_zero(const string &str)
 {
-    if (0 == Util::nodeid()) {
+    if (0 == pagoda::nodeid()) {
         fprintf(stderr, str.c_str());
         fflush(stderr);
     }
-    Util::barrier();
+    pagoda::barrier();
 }
 
 
@@ -110,10 +110,10 @@ void print_sync_dummy(const string &str)
 
 void print_sync(const string &str)
 {
-    if (0 == Util::nodeid()) {
+    if (0 == pagoda::nodeid()) {
         fprintf(stderr, "[%*d] ", get_precision(), 0);
         fprintf(stderr, str.c_str());
-        for (int proc=1,nproc=Util::num_nodes(); proc<nproc; ++proc) {
+        for (int proc=1,nproc=pagoda::num_nodes(); proc<nproc; ++proc) {
             MPI_Status stat;
             int count;
             char *msg;

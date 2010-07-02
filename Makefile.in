@@ -50,7 +50,8 @@ check_PROGRAMS = subsetter_old$(EXEEXT) \
 	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
 	tests/TestJoin$(EXEEXT) tests/TestNetcdfDataset$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
-	tests/TestRead$(EXEEXT) tests/TestUnion$(EXEEXT)
+	tests/TestRead$(EXEEXT) tests/TestScatter$(EXEEXT) \
+	tests/TestUnion$(EXEEXT)
 bin_PROGRAMS = pgdump$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
@@ -174,6 +175,10 @@ am_tests_TestRead_OBJECTS = tests/TestRead.$(OBJEXT)
 tests_TestRead_OBJECTS = $(am_tests_TestRead_OBJECTS)
 tests_TestRead_LDADD = $(LDADD)
 tests_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestScatter_OBJECTS = tests/TestScatter.$(OBJEXT)
+tests_TestScatter_OBJECTS = $(am_tests_TestScatter_OBJECTS)
+tests_TestScatter_LDADD = $(LDADD)
+tests_TestScatter_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestUnion_OBJECTS = tests/TestUnion.$(OBJEXT)
 tests_TestUnion_OBJECTS = $(am_tests_TestUnion_OBJECTS)
 tests_TestUnion_LDADD = $(LDADD)
@@ -302,9 +307,9 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestJoin_SOURCES) $(tests_TestNetcdfDataset_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
-	$(tests_TestRead_SOURCES) $(tests_TestUnion_SOURCES) \
-	$(tests_ga_TestAttribute_SOURCES) $(tests_ga_TestBin_SOURCES) \
-	$(tests_ga_TestDimension_SOURCES) \
+	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
+	$(tests_TestUnion_SOURCES) $(tests_ga_TestAttribute_SOURCES) \
+	$(tests_ga_TestBin_SOURCES) $(tests_ga_TestDimension_SOURCES) \
 	$(tests_ga_TestDistance_SOURCES) $(tests_ga_TestEnum_SOURCES) \
 	$(tests_ga_TestGet_SOURCES) $(tests_ga_TestJoin_SOURCES) \
 	$(tests_ga_TestLocateRegion_SOURCES) \
@@ -319,9 +324,9 @@ DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestJoin_SOURCES) $(tests_TestNetcdfDataset_SOURCES) \
 	$(tests_TestPartialSum_SOURCES) $(tests_TestRavel_SOURCES) \
-	$(tests_TestRead_SOURCES) $(tests_TestUnion_SOURCES) \
-	$(tests_ga_TestAttribute_SOURCES) $(tests_ga_TestBin_SOURCES) \
-	$(tests_ga_TestDimension_SOURCES) \
+	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
+	$(tests_TestUnion_SOURCES) $(tests_ga_TestAttribute_SOURCES) \
+	$(tests_ga_TestBin_SOURCES) $(tests_ga_TestDimension_SOURCES) \
 	$(tests_ga_TestDistance_SOURCES) $(tests_ga_TestEnum_SOURCES) \
 	$(tests_ga_TestGet_SOURCES) $(tests_ga_TestJoin_SOURCES) \
 	$(tests_ga_TestLocateRegion_SOURCES) \
@@ -537,6 +542,7 @@ tests_TestNetcdfDataset_SOURCES = tests/TestNetcdfDataset.C
 tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 tests_TestRavel_SOURCES = tests/TestRavel.C
 tests_TestRead_SOURCES = tests/TestRead.C
+tests_TestScatter_SOURCES = tests/TestScatter.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)
 all: config.h
@@ -808,6 +814,11 @@ tests/TestRead.$(OBJEXT): tests/$(am__dirstamp) \
 tests/TestRead$(EXEEXT): $(tests_TestRead_OBJECTS) $(tests_TestRead_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestRead$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestRead_OBJECTS) $(tests_TestRead_LDADD) $(LIBS)
+tests/TestScatter.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestScatter$(EXEEXT): $(tests_TestScatter_OBJECTS) $(tests_TestScatter_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestScatter$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestScatter_OBJECTS) $(tests_TestScatter_LDADD) $(LIBS)
 tests/TestUnion.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestUnion$(EXEEXT): $(tests_TestUnion_OBJECTS) $(tests_TestUnion_DEPENDENCIES) tests/$(am__dirstamp)
@@ -992,6 +1003,7 @@ mostlyclean-compile:
 	-rm -f tests/TestPartialSum.$(OBJEXT)
 	-rm -f tests/TestRavel.$(OBJEXT)
 	-rm -f tests/TestRead.$(OBJEXT)
+	-rm -f tests/TestScatter.$(OBJEXT)
 	-rm -f tests/TestUnion.$(OBJEXT)
 	-rm -f tests/ga/TestAttribute.$(OBJEXT)
 	-rm -f tests/ga/TestBin.$(OBJEXT)
@@ -1064,6 +1076,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRead.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestScatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestUnion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestBin.Po@am__quote@

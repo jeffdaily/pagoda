@@ -180,7 +180,7 @@ class Array
 
         /**
          * Indicate the pointer returned by access() is no longer in use.
-         * This implies the data was modified (or potentially modified.
+         * This implies the data was modified (or potentially modified.)
          */
         virtual void release_update() = 0;
 

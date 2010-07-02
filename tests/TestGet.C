@@ -39,18 +39,18 @@ int main(int argc, char **argv)
     vector<int64_t> ahi;
 
     pagoda::initialize(&argc, &argv);
-    Util::calculate_required_memory();
+    pagoda::calculate_required_memory();
 
     data_shape.push_back(15);
     data_shape.push_back(10);
-    data_size = Util::shape_to_size(data_shape);
+    data_size = pagoda::shape_to_size(data_shape);
     array = Array::create(DataType::INT, data_shape);
     data_local_shape = array->get_local_shape();
     array->get_distribution(alo,ahi);
 
     buf_shape.push_back(5);
     buf_shape.push_back(10);
-    buf_size = Util::shape_to_size(buf_shape);
+    buf_size = pagoda::shape_to_size(buf_shape);
     buf = new int[buf_size];
 
     lo.push_back(10);

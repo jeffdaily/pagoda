@@ -48,7 +48,7 @@ NetcdfDataset::NetcdfDataset(const string &filename)
 NetcdfDataset::~NetcdfDataset()
 {
     TIMING("NetcdfDataset::~NetcdfDataset()");
-    using Util::ptr_deleter;
+    using pagoda::ptr_deleter;
     transform(atts.begin(), atts.end(), atts.begin(),
             ptr_deleter<NetcdfAttribute*>);
     transform(dims.begin(), dims.end(), dims.begin(),
@@ -147,7 +147,7 @@ void NetcdfDataset::wait()
         vector<int> statuses(requests.size());
         ncmpi::wait_all(ncid, requests.size(), &requests[0], &statuses[0]);
         for (size_t i=0; i<arrays_to_release.size(); ++i) {
-            arrays_to_release[i]->release();
+            arrays_to_release[i]->release_update();
         }
         arrays_to_release.clear();
         requests.clear();
