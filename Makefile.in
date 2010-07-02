@@ -114,7 +114,7 @@ am_libpagoda_la_OBJECTS = src/AbstractVariable.lo src/Aggregation.lo \
 	src/NetcdfAttribute.lo src/NetcdfDataset.lo \
 	src/NetcdfDimension.lo src/NetcdfFileWriter.lo \
 	src/NetcdfVariable.lo src/Pack.lo src/Pnetcdf.lo \
-	src/PnetcdfTiming.lo src/Request.lo src/StringComparator.lo \
+	src/PnetcdfTiming.lo src/StringComparator.lo \
 	src/SubsetterCommands.lo src/Timing.lo src/Util.lo \
 	src/Values.lo src/Variable.lo src/VariableDecorator.lo
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
@@ -493,10 +493,10 @@ pkginclude_HEADERS = src/AbstractVariable.H src/AggregationDimension.H \
 	src/NetcdfDimension.H src/NetcdfError.H src/NetcdfFileWriter.H \
 	src/NetcdfVariable.H src/NotImplementedException.H \
 	src/pagoda.H src/Pack.H src/Pnetcdf.H src/PnetcdfTiming.H \
-	src/RangeException.H src/Request.H src/Slice.H \
-	src/StringComparator.H src/SubsetterCommands.H \
-	src/SubsetterException.H src/Timing.H src/TypedValues.H \
-	src/Util.H src/Values.H src/VariableDecorator.H src/Variable.H
+	src/RangeException.H src/Slice.H src/StringComparator.H \
+	src/SubsetterCommands.H src/SubsetterException.H src/Timing.H \
+	src/TypedValues.H src/Util.H src/Values.H \
+	src/VariableDecorator.H src/Variable.H
 libpagoda_la_SOURCES = src/AbstractVariable.C src/Aggregation.C \
 	src/AggregationDimension.C src/AggregationJoinExisting.C \
 	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
@@ -508,7 +508,7 @@ libpagoda_la_SOURCES = src/AbstractVariable.C src/Aggregation.C \
 	src/MaskMap.C src/NetcdfAttribute.C src/NetcdfDataset.C \
 	src/NetcdfDimension.C src/NetcdfFileWriter.C \
 	src/NetcdfVariable.C src/Pack.C src/Pnetcdf.C \
-	src/PnetcdfTiming.C src/Request.C src/StringComparator.C \
+	src/PnetcdfTiming.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
 	src/Variable.C src/VariableDecorator.C
 tests_ga_TestAttribute_SOURCES = tests/ga/TestAttribute.C
@@ -679,7 +679,6 @@ src/Pack.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Pnetcdf.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfTiming.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/Request.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/StringComparator.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/SubsetterCommands.lo: src/$(am__dirstamp) \
@@ -966,8 +965,6 @@ mostlyclean-compile:
 	-rm -f src/Pnetcdf.lo
 	-rm -f src/PnetcdfTiming.$(OBJEXT)
 	-rm -f src/PnetcdfTiming.lo
-	-rm -f src/Request.$(OBJEXT)
-	-rm -f src/Request.lo
 	-rm -f src/StringComparator.$(OBJEXT)
 	-rm -f src/StringComparator.lo
 	-rm -f src/SubsetterCommands.$(OBJEXT)
@@ -1048,7 +1045,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pnetcdf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Request.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/SubsetterCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Timing.Plo@am__quote@
