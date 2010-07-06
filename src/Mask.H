@@ -44,6 +44,13 @@ class Mask : public Array
         virtual ~Mask();
 
         /**
+         * Returns the name of the associated Dimension.
+         *
+         * @return the name of the associated Dimension
+         */
+        virtual string get_name() const = 0;
+
+        /**
          * Returns the number of set bits in this Mask.
          *
          * @return the number of set bits in this Mask

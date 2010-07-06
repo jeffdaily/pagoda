@@ -34,6 +34,7 @@ using std::vector;
 GlobalMask::GlobalMask(const Dimension *dim)
     :   Mask()
     ,   mask(NULL)
+    ,   name(dim->get_name())
 {
     int ONE = 1;
 
@@ -53,6 +54,7 @@ GlobalMask::GlobalMask(const Dimension *dim)
 GlobalMask::GlobalMask(const GlobalMask &that)
     :   Mask()
     ,   mask(NULL)
+    ,   name(that.name)
 {
     TIMING("GlobalMask::GlobalMask(GlobalMask)");
     TRACER("GlobalMask ctor copy\n");
@@ -69,6 +71,12 @@ GlobalMask::~GlobalMask()
     TIMING("GlobalMask::~GlobalMask()");
 
     delete mask;
+}
+
+
+string GlobalMask::get_name() const
+{
+    return name;
 }
 
 

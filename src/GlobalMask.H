@@ -26,6 +26,7 @@ class GlobalMask :  public Mask
         virtual ~GlobalMask();
 
         // Mask virtuals
+        virtual string get_name() const;
         virtual int64_t get_count() const;
         virtual void clear();
         virtual void reset();
@@ -84,6 +85,7 @@ class GlobalMask :  public Mask
 
     protected:
         GlobalArray *mask;
+        string name;
 };
 
 #endif /* GLOBALMASK_H_ */

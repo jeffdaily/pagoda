@@ -6,10 +6,13 @@
 #include <string>
 #include <vector>
 
+#include "Dimension.H"
 #include "FileWriter.H"
+#include "Mask.H"
 #include "NetcdfFileWriter.H"
 #include "Util.H"
 #include "Timing.H"
+#include "Variable.H"
 
 using std::ostream;
 using std::string;
@@ -40,6 +43,28 @@ FileWriter::~FileWriter()
 }
 
 
+void FileWriter::def_dim(Mask *mask)
+{
+    def_dim(mask->get_name(), mask->get_count());
+}
+
+
+void FileWriter::def_dim(Dimension *dim)
+{
+    def_dim(dim->get_name(), dim->get_size());
+}
+
+
+void FileWriter::def_dims(const vector<Mask*> &masks)
+{
+    TIMING("FileWriter::def_dims(vector<Mask*>)");
+    vector<Mask*>::const_iterator msk_it;
+    for (msk_it=masks.begin(); msk_it!=masks.end(); ++msk_it) {
+        def_dim(*msk_it);
+    }
+}
+
+
 void FileWriter::def_dims(const vector<Dimension*> &dims)
 {
     TIMING("FileWriter::def_dims(vector<Dimension*>)");
@@ -47,6 +72,42 @@ void FileWriter::def_dims(const vector<Dimension*> &dims)
     for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
         def_dim(*dim_it);
     }
+}
+
+
+void FileWriter::def_var(const string &name, const vector<Dimension*> &dims,
+        const DataType &type, const vector<Attribute*> &atts)
+{
+    vector<Dimension*>::const_iterator dim_it;
+    vector<Dimension*>::const_iterator dim_end;
+    vector<string> dim_names;
+
+    for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
+        dim_names.push_back((*dim_it)->get_name());
+    }
+
+    def_var(name, dim_names, type, atts);
+}
+
+
+void FileWriter::def_var(const string &name, const vector<Mask*> &masks,
+        const DataType &type, const vector<Attribute*> &atts)
+{
+    vector<Mask*>::const_iterator msk_it;
+    vector<Mask*>::const_iterator msk_end;
+    vector<string> dim_names;
+
+    for (msk_it=masks.begin(),msk_end=masks.end(); msk_it!=msk_end; ++msk_it) {
+        dim_names.push_back((*msk_it)->get_name());
+    }
+
+    def_var(name, dim_names, type, atts);
+}
+
+
+void FileWriter::def_var(Variable *var)
+{
+    def_var(var->get_name(), var->get_dims(), var->get_type(), var->get_atts());
 }
 
 

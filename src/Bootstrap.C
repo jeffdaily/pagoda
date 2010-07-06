@@ -9,7 +9,7 @@
 #   include <ga.h>
 #endif
 
-#include "pagoda.H"
+#include "Bootstrap.H"
 
 
 int pagoda::me = 0;
