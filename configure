@@ -636,6 +636,8 @@ build_vendor
 build_cpu
 build
 LIBTOOL
+ENABLE_GA_TESTS_FALSE
+ENABLE_GA_TESTS_TRUE
 PKG_CPPFLAGS
 PKG_LDFLAGS
 PKG_LIBS
@@ -741,6 +743,7 @@ enable_dependency_tracking
 with_pnetcdf
 with_ga
 with_mpi
+enable_ga_tests
 enable_static
 with_pic
 enable_fast_install
@@ -1390,6 +1393,7 @@ Optional Features:
   --enable-shared[=PKGS]  build shared libraries [default=no]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-ga-tests       build Global Arrays based tests
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
@@ -7320,66 +7324,6 @@ fi
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pnetcdf uses the int non-blocking interface" >&5
-$as_echo_n "checking whether pnetcdf uses the int non-blocking interface... " >&6; }
-if test "${pagoda_cv_pnetcdf_nb_int+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char ncmpi_wait_all ();
-#ifdef F77_DUMMY_MAIN
-
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-
-#endif
-int
-main ()
-{
-return ncmpi_wait_all ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  pagoda_cv_pnetcdf_nb_int=yes
-else
-  pagoda_cv_pnetcdf_nb_int=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-     ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pagoda_cv_pnetcdf_nb_int" >&5
-$as_echo "$pagoda_cv_pnetcdf_nb_int" >&6; }
-if test $pagoda_cv_pnetcdf_nb_int = yes; then :
-
-
-$as_echo "#define HAVE_PNETCDF_NEW_NB 1" >>confdefs.h
-
-fi
-
 
 
 
@@ -8023,7 +7967,82 @@ fi
 
 
 
+# Whether to build Global Arrays test programs
+# Check whether --enable-ga-tests was given.
+if test "${enable_ga_tests+set}" = set; then :
+  enableval=$enable_ga_tests;
+fi
+
+ if test "x$enable_ga_tests" = xyes; then
+  ENABLE_GA_TESTS_TRUE=
+  ENABLE_GA_TESTS_FALSE='#'
+else
+  ENABLE_GA_TESTS_TRUE='#'
+  ENABLE_GA_TESTS_FALSE=
+fi
+
+
 # Does pnetcdf have the new nonblocking interface?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pnetcdf uses the int non-blocking interface" >&5
+$as_echo_n "checking whether pnetcdf uses the int non-blocking interface... " >&6; }
+if test "${pagoda_cv_pnetcdf_nb_int+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ncmpi_wait_all ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return ncmpi_wait_all ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  pagoda_cv_pnetcdf_nb_int=yes
+else
+  pagoda_cv_pnetcdf_nb_int=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+     ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pagoda_cv_pnetcdf_nb_int" >&5
+$as_echo "$pagoda_cv_pnetcdf_nb_int" >&6; }
+if test $pagoda_cv_pnetcdf_nb_int = yes; then :
+
+
+$as_echo "#define HAVE_PNETCDF_NEW_NB 1" >>confdefs.h
+
+fi
+
 
 # Checks for GA functionality.
 for ac_func in GA_Llgop GA_Ldgop
@@ -20356,6 +20375,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error "conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_GA_TESTS_TRUE}" && test -z "${ENABLE_GA_TESTS_FALSE}"; then
+  as_fn_error "conditional \"ENABLE_GA_TESTS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PROFILE_TRUE}" && test -z "${PROFILE_FALSE}"; then

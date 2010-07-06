@@ -118,6 +118,7 @@ libpagoda_la_SOURCES += src/VariableDecorator.C
 #############################################################################
 # tests
 #
+if ENABLE_GA_TESTS
 check_PROGRAMS += tests/ga/TestAttribute
 check_PROGRAMS += tests/ga/TestBin
 check_PROGRAMS += tests/ga/TestDimension
@@ -134,6 +135,7 @@ check_PROGRAMS += tests/ga/TestScanAdd
 check_PROGRAMS += tests/ga/TestSort
 check_PROGRAMS += tests/ga/TestUnion
 check_PROGRAMS += tests/ga/TestUnpack
+endif
 check_PROGRAMS += tests/TestBin
 check_PROGRAMS += tests/TestDimension
 check_PROGRAMS += tests/TestDistance
@@ -147,6 +149,7 @@ check_PROGRAMS += tests/TestRavel
 check_PROGRAMS += tests/TestRead
 check_PROGRAMS += tests/TestScatter
 check_PROGRAMS += tests/TestUnion
+check_PROGRAMS += tests/TestWrite
 
 tests_ga_TestAttribute_SOURCES     = tests/ga/TestAttribute.C
 tests_ga_TestBin_SOURCES           = tests/ga/TestBin.C
@@ -177,5 +180,6 @@ tests_TestRavel_SOURCES            = tests/TestRavel.C
 tests_TestRead_SOURCES             = tests/TestRead.C
 tests_TestScatter_SOURCES          = tests/TestScatter.C
 tests_TestUnion_SOURCES            = tests/TestUnion.C
+tests_TestWrite_SOURCES            = tests/TestWrite.C
 
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)

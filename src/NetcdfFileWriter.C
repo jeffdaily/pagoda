@@ -253,84 +253,6 @@ void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
     }
 }
 
-/*
-void NetcdfFileWriter::write(int handle, const string &name, int record)
-{
-    //TIMING("NetcdfFileWriter::write(int,string,int)");
-    maybe_enddef();
-    write(handle, get_var_id(name), record);
-}
-*/
-
-
-/*
-void NetcdfFileWriter::write(int handle, int varid, int record)
-{
-    DataType type = NC_CHAR;
-    int mt_type;
-    int ndim;
-    int64_t dim_sizes_[GA_MAX_DIM];
-    int64_t lo[GA_MAX_DIM];
-    int64_t hi[GA_MAX_DIM];
-    int64_t ld[GA_MAX_DIM-1];
-    MPI_Offset start[GA_MAX_DIM];
-    MPI_Offset count[GA_MAX_DIM];
-    int dimidx=0;
-
-    TIMING("NetcdfFileWriter::write(int,int,int)");
-    TRACER("NetcdfFileWriter::write %d %d %d\n", handle, varid, record);
-
-    maybe_enddef();
-
-    NGA_Inquire64(handle, &mt_type, &ndim, dim_sizes_);
-    type = mt_type;
-    NGA_Distribution64(handle, GA_Nodeid(), lo, hi);
-
-    if (0 > lo[0] && 0 > hi[0]) {
-        // make a non-participating process a no-op
-        for (dimidx=0; dimidx<ndim; ++dimidx) {
-            start[dimidx] = 0;
-            count[dimidx] = 0;
-        }
-#define write_var_all(TYPE, NC_TYPE) \
-        if (type == NC_TYPE) { \
-            ncmpi::put_vara_all(ncid, varid, start, count, (const TYPE*)NULL);\
-        } else
-        write_var_all(int,    NC_INT)
-        write_var_all(float,  NC_FLOAT)
-        write_var_all(double, NC_DOUBLE)
-#undef write_var_all
-        ; // for last else above
-    } else {
-        if (record >= 0) {
-            start[0] = record;
-            count[0] = 1;
-            for (dimidx=0; dimidx<ndim; ++dimidx) {
-                start[dimidx+1] = lo[dimidx];
-                count[dimidx+1] = hi[dimidx] - lo[dimidx] + 1;
-            }
-        } else {
-            for (dimidx=0; dimidx<ndim; ++dimidx) {
-                start[dimidx] = lo[dimidx];
-                count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
-            }
-        }
-#define write_var_all(TYPE, NC_TYPE) \
-        if (type == NC_TYPE) { \
-            TYPE *ptr; \
-            NGA_Access64(handle, lo, hi, &ptr, ld); \
-            ncmpi::put_vara_all(ncid, varid, start, count, ptr); \
-        } else
-        write_var_all(int, NC_INT)
-        write_var_all(float, NC_FLOAT)
-        write_var_all(double, NC_DOUBLE)
-#undef write_var_all
-        ; // for last else above
-        NGA_Release64(handle, lo, hi);
-    }
-}
-*/
-
 
 void NetcdfFileWriter::write(Array *array, const string &name)
 {
@@ -348,19 +270,58 @@ void NetcdfFileWriter::write(Array *array, const string &name)
 
 void NetcdfFileWriter::write(Array *array, const string &name, int64_t record)
 {
-    vector<int64_t> shape_to_compare = get_var_shape(name);
-    vector<int64_t> start(shape_to_compare.size(), 0);
+    DataType type = array->get_type();
+    vector<int64_t> array_shape = array->get_shape();
+    vector<int64_t> array_local_shape = array->get_local_shape();
+    vector<int64_t> shape = get_var_shape(name);
+    vector<MPI_Offset> start(shape.size(), 0);
+    vector<MPI_Offset> count(shape.size(), 0);
+    int var_id = get_var_id(name);
 
-    // remove record part of shape
-    shape_to_compare.erase(shape_to_compare.begin());
-    // verify that the given array has the same shape as the defined variable
-    if (shape_to_compare != array->get_shape()) {
-        throw invalid_argument("shape mismatch");
+    TIMING("NetcdfFileWriter::write(Array*,string,int64_t)");
+    TRACER("NetcdfFileWriter::write record %ld %s\n",
+            (long)record, name.c_str());
+
+    if (array_shape.size()+1 != shape.size()) {
+        throw invalid_argument("array rank mismatch");
+    }
+    shape.erase(shape.begin()); // remove record dimension
+    if (array_shape != shape) {
+        throw invalid_argument("array shape mismatch");
     }
 
-    start[0] = record;
+    maybe_enddef();
 
-    write(array, name, start);
+    if (array->owns_data()) {
+        vector<int64_t> lo;
+        vector<int64_t> hi;
+
+        count[0] = 1;
+        std::copy(array_local_shape.begin(), array_local_shape.end(),
+                count.begin()+1);
+        start[0] = record;
+        array->get_distribution(lo, hi);
+        std::copy(lo.begin(), lo.end(), start.begin()+1);
+    }
+
+#define write_var_all(TYPE, DT) \
+    if (type == DT) { \
+        TYPE *ptr = NULL; \
+        if (array->owns_data()) { \
+            ptr = (TYPE*)array->access(); \
+        } \
+        ncmpi::put_vara_all(ncid, var_id, &start[0], &count[0], ptr); \
+        if (array->owns_data()) { \
+            array->release(); \
+        } \
+    } else
+    write_var_all(int,    DataType::INT)
+    write_var_all(float,  DataType::FLOAT)
+    write_var_all(double, DataType::DOUBLE)
+    {
+        throw invalid_argument("unrecognized DataType");
+    }
+#undef write_var_all
 }
 
 
@@ -371,18 +332,20 @@ void NetcdfFileWriter::write(Array *array, const string &name,
     DataType type = array->get_type();
     vector<int64_t> array_shape = array->get_shape();
     vector<int64_t> array_local_shape = array->get_local_shape();
-    vector<int64_t> var_shape = get_var_shape(name);
+    vector<int64_t> array_lo;
+    vector<int64_t> array_hi;
+    vector<int64_t> shape = get_var_shape(name);
     vector<MPI_Offset> start_copy(start.begin(), start.end());
-    vector<MPI_Offset> count(var_shape.size(), 0);
+    vector<MPI_Offset> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
     TIMING("NetcdfFileWriter::write(Array*,string,vector<int64_t>)");
     TRACER("NetcdfFileWriter::write %s\n", name.c_str());
 
-    if (start_copy.size() != var_shape.size()) {
+    if (start.size() != shape.size()) {
         throw invalid_argument("start rank mismatch");
     }
-    if (array_shape.size() != var_shape.size()) {
+    if (array_shape.size() != shape.size()) {
         throw invalid_argument("array rank mismatch");
     }
 
@@ -390,9 +353,10 @@ void NetcdfFileWriter::write(Array *array, const string &name,
 
     if (array->owns_data()) {
         count.assign(array_local_shape.begin(), array_local_shape.end());
-    } else {
-        // make a non-participating process a no-op
-        count.assign(var_shape.size(), 0);
+        array->get_distribution(array_lo, array_hi);
+        for (size_t i=0; i<start_copy.size(); ++i) {
+            start_copy[i] = start[i] + array_lo[i];
+        }
     }
 
 #define write_var_all(TYPE, DT) \

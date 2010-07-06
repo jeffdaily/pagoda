@@ -1,0 +1,77 @@
+/** Perform various block-sized pnetcdf reads. */
+#ifdef HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
+#include <iostream>
+
+#include "Array.H"
+#include "Bootstrap.H"
+#include "Dataset.H"
+#include "Debug.H"
+#include "FileWriter.H"
+#include "Util.H"
+#include "Variable.H"
+
+using std::cerr;
+using std::cout;
+using std::endl;
+
+
+/**
+ * 1) Open a dataset for writing.
+ * 2) Write dummy values.
+ */
+int main(int argc, char **argv)
+{
+    Array *array1;
+    Array *array2;
+    Array *array3;
+    vector<int64_t> shape1;
+    vector<int64_t> shape2;
+    vector<int64_t> shape3;
+    float ONE = 1;
+    float TWO = 2;
+    float THREE = 3;
+    vector<string> dims;
+    FileWriter *writer;
+    vector<int64_t> start;
+
+    pagoda::initialize(&argc, &argv);
+
+    shape1.push_back(10);
+    shape1.push_back(20);
+    shape2.push_back(20);
+    shape3.push_back(5);
+    shape3.push_back(10);
+
+    array1 = Array::create(DataType::FLOAT, shape1);
+    array2 = Array::create(DataType::FLOAT, shape2);
+    array3 = Array::create(DataType::FLOAT, shape3);
+    start.push_back(3);
+    start.push_back(3);
+
+    array1->fill(&ONE);
+    array2->fill(&TWO);
+    array3->fill(&THREE);
+    pagoda::barrier();
+
+    writer = FileWriter::create("test.nc");
+    writer->def_dim("dim1", 10);
+    writer->def_dim("dim2", 20);
+    dims.push_back("dim1");
+    dims.push_back("dim2");
+    writer->def_var("var1", dims, DataType::FLOAT);
+    writer->write(array1, "var1");
+    writer->write(array2, "var1", 2);
+    writer->write(array3, "var1", start);
+
+    delete array1;
+    delete array2;
+    delete array3;
+    delete writer;
+
+    pagoda::finalize();
+
+    return EXIT_SUCCESS;
+}

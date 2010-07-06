@@ -46,15 +46,15 @@ class FileWriter
         virtual void def_var(const string &name,
                 const vector<string> &dims,
                 const DataType &type,
-                const vector<Attribute*> &atts) = 0;
+                const vector<Attribute*> &atts=vector<Attribute*>()) = 0;
         virtual void def_var(const string &name,
                 const vector<Dimension*> &dims,
                 const DataType &type,
-                const vector<Attribute*> &atts);
+                const vector<Attribute*> &atts=vector<Attribute*>());
         virtual void def_var(const string &name,
                 const vector<Mask*> &dims,
                 const DataType &type,
-                const vector<Attribute*> &atts);
+                const vector<Attribute*> &atts=vector<Attribute*>());
         virtual void def_var(Variable *var);
         virtual void def_vars(const vector<Variable*> &vars);
 

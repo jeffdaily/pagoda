@@ -1,8 +1,15 @@
+#if HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
 #include <mpi.h>
 
 #include <cstdarg>
 #include <cstdio>
 #include <string>
+
+using std::fprintf;
+using std::string;
 
 #include "Debug.H"
 #include "Timing.H"
@@ -11,9 +18,11 @@
 
 static inline int get_precision()
 {
-    TIMING("get_precision()");
     int precision = 1;
     int nproc = pagoda::num_nodes();
+
+    TIMING("get_precision()");
+
     while (nproc > 10) {
         ++precision;
         nproc /= 10;

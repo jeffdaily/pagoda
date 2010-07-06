@@ -111,7 +111,6 @@ AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
 # Checks for C++ libraries.
 PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
     [AC_MSG_FAILURE([Could not locate pnetcdf])])
-PAGODA_PNETCDF_NB_INT
 PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
     [AS_UNSET([ac_cv_search_GA_Initialize])
      save_LIBS="$LIBS"
@@ -123,7 +122,13 @@ PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
 PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 
+# Whether to build Global Arrays test programs
+AC_ARG_ENABLE([ga-tests],
+    [AS_HELP_STRING([--enable-ga-tests], [build Global Arrays based tests])])
+AM_CONDITIONAL([ENABLE_GA_TESTS], [test "x$enable_ga_tests" = xyes])
+
 # Does pnetcdf have the new nonblocking interface?
+PAGODA_PNETCDF_NB_INT
 
 # Checks for GA functionality.
 AC_CHECK_FUNCS([GA_Llgop GA_Ldgop])
