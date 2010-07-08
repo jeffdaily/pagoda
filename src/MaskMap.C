@@ -12,15 +12,18 @@ using std::map;
 using std::string;
 using std::vector;
 
+#include "Array.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
+#include "Grid.H"
 #include "LatLonBox.H"
 #include "Mask.H"
 #include "MaskMap.H"
 #include "NotImplementedException.H"
 #include "Slice.H"
 #include "Timing.H"
+#include "Variable.H"
 
 MaskMap::MaskMap()
     :   masks()
@@ -28,8 +31,19 @@ MaskMap::MaskMap()
 }
 
 
+MaskMap::MaskMap(Dataset *dataset)
+    :   masks()
+{
+    create_masks(dataset->get_dims());
+    dataset->set_masks(this);
+}
+
+
 MaskMap::~MaskMap()
 {
+    for (masks_t::iterator it=masks.begin(); it!= masks.end(); ++it) {
+        delete it->second;
+    }
 }
 
 
@@ -68,8 +82,9 @@ void MaskMap::create_masks(const vector<Dimension*> dims)
 
 void MaskMap::modify(const vector<DimSlice> &slices)
 {
-    TIMING("Dataset::modify(vector<DimSlice>,vector<Dimension*>)");
     vector<DimSlice>::const_iterator slice_it;
+
+    TIMING("Dataset::modify(vector<DimSlice>,vector<Dimension*>)");
 
     // we're iterating over the command-line specified slices to create masks
     for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
@@ -78,12 +93,23 @@ void MaskMap::modify(const vector<DimSlice> &slices)
         masks_t::const_iterator mask_it = masks.find(slice_name);
 
         if (mask_it == masks.end()) {
-            PRINT_ZERO("Sliced dimension '%s' does not exist\n",
+            pagoda::print_zero("Sliced dimension '%s' does not exist\n",
                     slice_name.c_str());
         } else {
             // modify the Mask based on the current Slice
             mask_it->second->modify(slice);
         }
+    }
+}
+
+
+void MaskMap::modify(const LatLonBox &box, Grid *grid)
+{
+    if (grid->get_type() == GridType::GEODESIC) {
+        Variable *lat = grid->get_cell_lat();
+        Variable *lon = grid->get_cell_lon();
+        Dimension *dim = lat->get_dims().at(0);
+        modify(box, lat, lon, dim);
     }
 }
 
@@ -100,10 +126,14 @@ void MaskMap::modify(const vector<DimSlice> &slices)
  * @param[in] dim the dimension we are masking
  */
 void MaskMap::modify(const LatLonBox &box,
-        const Array *lat, const Array *lon, Dimension *dim)
+        const Variable *lat, const Variable *lon, Dimension *dim)
 {
     Mask *mask = get_mask(dim);
-    mask->modify(box, lat, lon);
+    Array *lat_array = lat->read();
+    Array *lon_array = lon->read();
+    mask->modify(box, lat_array, lon_array);
+    delete lat_array;
+    delete lon_array;
 }
 
 
@@ -120,10 +150,10 @@ void MaskMap::modify(const LatLonBox &box,
  * @param[in] lon_dim the longitude dimension we are masking
  */
 void MaskMap::modify(
-        const LatLonBox &box, const Array *lat, const Array *lon,
+        const LatLonBox &box, const Variable *lat, const Variable *lon,
         Dimension *lat_dim, Dimension *lon_dim)
 {
-    throw NotImplementedException("MaskMap::modify(LatLonBox,Array*,Array*,Dimension*,Dimension*)");
+    throw NotImplementedException("MaskMap::modify(LatLonBox,Variable*,Variable*,Dimension*,Dimension*)");
 }
 
 
@@ -145,7 +175,7 @@ void MaskMap::modify(
  * @param[in] topology relation between the two given Dimensions
  */
 void MaskMap::modify(
-        Dimension *dim_masked, Dimension *dim_to_mask, const Array *topology)
+        Dimension *dim_masked, Dimension *dim_to_mask, const Variable *topology)
 {
     Mask *mask = get_mask(dim_masked);
     Mask *to_mask = get_mask(dim_to_mask);
@@ -156,6 +186,7 @@ void MaskMap::modify(
     vector<int64_t> topology_lo(2);
     vector<int64_t> topology_hi(2);
     int *mask_data;
+    Array *topology_array;
     int *topology_data;
     vector<int> topology_buffer;
     vector<int64_t> topology_subscripts;
@@ -172,7 +203,8 @@ void MaskMap::modify(
     topology_hi.push_back(connections);
     
     // read portion of the topology local to the mask
-    topology_data = (int*)topology->get(topology_lo, topology_hi);
+    topology_array = topology->read();
+    topology_data = (int*)topology_array->get(topology_lo, topology_hi);
     
     // iterate over the topology indices and place into set
     mask_data = (int*)mask->access();
@@ -191,11 +223,12 @@ void MaskMap::modify(
     to_mask->scatter(&topology_buffer[0], topology_subscripts);
 
     // clean up
+    delete topology_array;
     delete [] topology_data;
 }
 
 
-Mask* MaskMap::get_mask(Dimension *dim)
+Mask* MaskMap::get_mask(const Dimension *dim)
 {
     return get_mask(dim->get_name(), dim);
 }
@@ -212,7 +245,7 @@ Mask* MaskMap::get_mask(const string &name, const Dimension *dim)
 }
 
 
-Mask* MaskMap::operator [] (Dimension *dim)
+Mask* MaskMap::operator [] (const Dimension *dim)
 {
     return get_mask(dim);
 }
@@ -237,264 +270,3 @@ ostream& operator << (ostream &os, const MaskMap *maskmap)
     maskmap->print(os);
     return os;
 }
-
-
-//#define ADJUST_MASKS_WITHOUT_PRESERVATION 1
-#if ADJUST_MASKS_WITHOUT_PRESERVATION
-/**
- * Special-case mask creation using a Lat/Lon combination.
- *
- * Different than creating masks solely based on a single Slice at a time,
- * this special case allows the lat and lon dimensions to be subset
- * simultaenously. This is most important when dealing with a cell-based
- * grid where the lat and lon coordinate variables share the same dimension.
- * In that case, if we were to generate masks one at a time, we'd get, in
- * logic terms, an OR over the shared dimension mask. What we really want,
- * whether the grid is cell- or rectangular-based, is an AND result -- a
- * lat lon box instead of a lat lon cross.
- *
- * This algorithm does not preserve whole cells, rather the unique cells,
- * corners, and edges are all subset individually.
-void Dataset::adjust_masks(const LatLonBox &box)
-{
-    TIMING("Dataset::adjust_masks(LatLonBox)");
-    if (box != LatLonBox::GLOBAL) {
-        // TODO how to locate the lat/lon dims?
-        // TODO subset anything with lat or lon dimensions such as
-        // corner/edge variables
-        // Likely solution is to iterate over all Variables and examine them
-        // for special attributes
-        Variable *lat;
-        Variable *lon;
-
-        lat = get_var(string("grid_center_lat"), false, true);
-        lon = get_var(string("grid_center_lon"), false, true);
-        if (!lat) {
-            PRINT_ZERO("adjust_masks: missing grid_center_lat\n");
-        } else if (!lon) {
-            PRINT_ZERO("adjust_masks: missing grid_center_lon\n");
-        } else {
-            lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
-        }
-        lat = get_var(string("grid_corner_lat2"), false, true);
-        lon = get_var(string("grid_corner_lon2"), false, true);
-        if (!lat) {
-            PRINT_ZERO("adjust_masks: missing grid_corner_lat\n");
-        } else if (!lon) {
-            PRINT_ZERO("adjust_masks: missing grid_corner_lon\n");
-        } else {
-            lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
-        }
-        lat = get_var(string("grid_edge_lat2"), false, true);
-        lon = get_var(string("grid_edge_lon2"), false, true);
-        if (!lat) {
-            PRINT_ZERO("adjust_masks: missing grid_corner_lat\n");
-        } else if (!lon) {
-            PRINT_ZERO("adjust_masks: missing grid_corner_lon\n");
-        } else {
-            lon->get_dims()[0]->get_mask()->adjust(box, lat, lon);
-        }
-    }
-}
- */
-
-#else /* ADJUST_MASKS_WITHOUT_PRESERVATION */
-
-/*
-static inline void adjust_corners_edges_mask(
-        Dataset *dataset, int *cmask, int64_t clo, int64_t chi, bool corners)
-{
-    Variable *var;
-    ConnectivityVariable *cv;
-    NetcdfVariable *ncv;
-    Dimension *dim;
-    Dimension *dimbound;
-    DistributedMask *mask;
-    string var_name = corners ? "cell_corners" : "cell_edges";
-    string dim_name = corners ? "corners" : "edges";
-    int ZERO = 0;
-    int64_t cells_count = chi-clo+1;
-    
-    var = dataset->get_var(var_name, false, true);
-    dim = dataset->get_dim(dim_name);
-
-    if (!var) {
-        if (corners)
-            PRINT_ZERO("no cell_corners found to subset\n");
-        else
-            PRINT_ZERO("no cell_edges found to subset\n");
-        return;
-    }
-    if (!dim) {
-        if (corners) {
-            PRINT_ZERO("missing associated dimension 'corners' for cell_corner\n");
-            PRINT_ZERO("cannot subset cell_corner\n");
-        } else {
-            PRINT_ZERO("missing associated dimension 'edges' for cell_edges\n");
-            PRINT_ZERO("cannot subset cell_edge\n");
-        }
-        return;
-    }
-    mask = dynamic_cast<DistributedMask*>(dim->get_mask());
-    cv = dynamic_cast<ConnectivityVariable*>(var);
-    ncv = dynamic_cast<NetcdfVariable*>(var);
-    if (!ncv) {
-        if (!cv) {
-            ERR("did not cast to ConnectivityVariable");
-        } else {
-            ncv = dynamic_cast<NetcdfVariable*>(cv->get_var());
-            if (!ncv) {
-                ERR("did not cast to NetcdfVariable");
-            }
-        }
-    }
-    dimbound = var->get_dims().at(1);
-
-    GA_Fill(mask->get_handle(), &ZERO);
-    
-    // read portion of the corners or edges local to the cells mask
-    int64_t per_cell = dimbound->get_size();
-    int64_t local_size = cells_count * per_cell;
-    MPI_Offset var_lo[] = {clo, 0};
-    MPI_Offset var_count[] = {cells_count, per_cell};
-    int var_data[local_size];
-    ncmpi::get_vara_all(ncv->get_dataset()->get_id(), ncv->get_id(),
-                var_lo, var_count, &var_data[0]);
-
-    // iterate over the corners or edges indices and place into set
-    set<int> var_data_set;
-    for (int64_t cellidx=0; cellidx<cells_count; ++cellidx) {
-        if (cmask[cellidx] != 0) {
-            int64_t local_offset = cellidx * per_cell;
-            for (int64_t boundidx=0; boundidx<per_cell; ++boundidx) {
-                var_data_set.insert(var_data[local_offset+boundidx]);
-            }
-        }
-    }
-
-    // NGA_Scatter_acc expects int** (yuck)
-    size_t size = var_data_set.size();
-    int ones[size];
-    fill(ones, ones+size, 1);
-    int64_t *subs[size];
-    set<int>::const_iterator it,end;
-    size_t idx=0;
-    for (it=var_data_set.begin(),end=var_data_set.end(); it!=end; ++it,++idx) {
-        subs[idx] = new int64_t(*it);
-    }
-
-    NGA_Scatter64(mask->get_handle(), ones, subs, size);
-    
-    // Clean up!
-    for (int64_t idx=0,limit=size; idx<limit; ++idx) {
-        delete subs[idx];
-    }
-}
-*/
-
-
-/*
-static inline bool adjust_centers_mask(Dataset *dataset, const LatLonBox &box)
-{
-    TRACER("adjust_centers_mask\n");
-    int type;
-    int ndim;
-    int64_t dims[1];
-    int64_t lo;
-    int64_t hi;
-    DistributedMask *cells_mask;
-    int *cells_mask_data;
-    Variable *lat_var;
-    Variable *lon_var;
-    Dimension *cells_dim;
-
-    lat_var = dataset->get_var(string("grid_center_lat"), false, true);
-    lon_var = dataset->get_var(string("grid_center_lon"), false, true);
-    if (!lat_var) {
-        ERR("adjust_masks: missing grid_center_lat");
-    }
-    if (!lon_var) {
-        ERR("adjust_masks: missing grid_center_lon");
-    }
-
-    cells_dim = lat_var->get_dims()[0];
-    cells_mask = dynamic_cast<DistributedMask*>(cells_dim->get_mask());
-    if (!cells_mask) {
-        ERR("cells mask was not distributed");
-    }
-
-    lat_var->read();
-    lon_var->read();
-    if (!cells_mask->access(lo, hi, cells_mask_data)) {
-        DEBUG_SYNC("this process doesn't own any of the cells_mask, return\n");
-        return false;
-    } else {
-        DEBUG_SYNC("this process owns some of the cells_mask, continue\n");
-    }
-    // just need the type of the lat/lon vars
-    NGA_Inquire64(lat_var->get_handle(), &type, &ndim, dims);
-    switch (type) {
-#define adjust_op(MTYPE,TYPE) \
-        case MTYPE: { \
-            TYPE *lat; \
-            TYPE *lon; \
-            NGA_Access64(lat_var->get_handle(), &lo, &hi, &lat, NULL); \
-            NGA_Access64(lon_var->get_handle(), &lo, &hi, &lon, NULL); \
-            for (int64_t i=0, limit=hi-lo+1; i<limit; ++i) { \
-                cells_mask_data[i] = box.contains(lat[i], lon[i]) ? 1 : 0; \
-            } \
-            break; \
-        }
-        adjust_op(C_INT,int)
-        adjust_op(C_LONG,long)
-        adjust_op(C_LONGLONG,long long)
-        adjust_op(C_FLOAT,float)
-        adjust_op(C_DBL,double)
-#undef adjust_op
-    }
-    adjust_corners_edges_mask(dataset, cells_mask_data, lo, hi, true);
-    adjust_corners_edges_mask(dataset, cells_mask_data, lo, hi, false);
-    cells_mask->release();
-
-    return true;
-}
-*/
-
-
-/**
- * Special-case mask creation using a Lat/Lon combination.
- *
- * Different than creating masks solely based on a single Slice at a time,
- * this special case allows the lat and lon dimensions to be subset
- * simultaenously. This is most important when dealing with a cell-based
- * grid where the lat and lon coordinate variables share the same dimension.
- * In that case, if we were to generate masks one at a time, we'd get, in
- * logic terms, an OR over the shared dimension mask. What we really want,
- * whether the grid is cell- or rectangular-based, is an AND result -- a
- * lat lon box instead of a lat lon cross.
- *
- * This algorithm preserves whole cells.
-void Dataset::adjust_masks(const LatLonBox &box)
-{
-    TRACER("Dataset::adjust_masks(LatLonBox)\n");
-    TIMING("Dataset::adjust_masks(LatLonBox)");
-    // TODO THIS CODE SHOULD BE MOVED
-    // The distributed nature of the data should be hidden from the 
-    // Dataset class IMHO. This code also assumes the all of the variables
-    // here are distributed (which is a generally safe assumption.)
-    if (box == LatLonBox::GLOBAL) {
-        return;
-    }
-
-    if (!adjust_centers_mask(this, box)) {
-        // this process didn't own any of the data
-        return;
-    }
-}
- */
-
-
-#endif /* ADJUST_MASKS_WITHOUT_PRESERVATION */
-
-
-

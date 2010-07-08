@@ -5,11 +5,14 @@
 #include <string>
 #include <vector>
 
-#include "Dimension.H"
-
 using std::ostream;
 using std::string;
 using std::vector;
+
+#include "Dimension.H"
+
+class Aggregation;
+class Dataset;
 
 
 /**
@@ -18,7 +21,7 @@ using std::vector;
 class AggregationDimension : public Dimension
 {
     public:
-        AggregationDimension(Dimension *dim);
+        AggregationDimension(Aggregation *agg, Dimension *dim);
         virtual ~AggregationDimension();
 
         void add(Dimension *dim);
@@ -26,6 +29,7 @@ class AggregationDimension : public Dimension
         virtual string get_name() const;
         virtual int64_t get_size() const;
         virtual bool is_unlimited() const;
+        virtual Dataset* get_dataset() const;
 
         virtual ostream& print(ostream &os) const;
 
@@ -33,6 +37,7 @@ class AggregationDimension : public Dimension
         string name;
         int64_t size;
         bool _is_unlimited;
+        Aggregation *agg;
 };
 
 #endif // AGGREGATIONDIMENSION_H_

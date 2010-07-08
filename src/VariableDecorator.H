@@ -27,23 +27,26 @@ class VariableDecorator : public Variable
 
         virtual vector<Dimension*> get_dims() const;
         virtual bool has_record() const;
-        virtual int64_t num_dims() const;
+        virtual int64_t get_ndim() const;
         virtual vector<int64_t> get_shape() const;
 
         virtual vector<Attribute*> get_atts() const;
         virtual int64_t num_atts() const;
+        virtual string get_standard_name() const;
         virtual string get_long_name() const;
         virtual Attribute* get_att(const string &name,
                 bool ignore_case=false) const;
         virtual Attribute* get_att(const vector<string> &names,
                 bool ignore_case=false) const;
 
+        virtual Dataset* get_dataset() const;
+
         virtual DataType get_type() const;
 
-        virtual Array* read();
-        virtual Array* read(Array *dst);
-        virtual Array* read(int64_t record);
-        virtual Array* read(int64_t record, Array *dst);
+        virtual Array* read() const;
+        virtual Array* read(Array *dst) const;
+        virtual Array* read(int64_t record) const;
+        virtual Array* read(int64_t record, Array *dst) const;
 
         virtual Array* iread();
         virtual Array* iread(Array *dst);

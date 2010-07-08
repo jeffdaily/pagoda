@@ -128,7 +128,7 @@ int main(int argc, char **argv)
         TRACER("after writer->def_vars(vars);\n");
         for (vector<Variable*>::iterator it=vars.begin(); it!=vars.end(); ++it) {
             Variable *var = *it;
-            if (var->has_record() && var->num_dims() > 1) {
+            if (var->has_record() && var->get_ndim() > 1) {
                 subset_record(var, writer, sum_map);
             } else {
                 subset(var, writer, sum_map);
@@ -178,7 +178,7 @@ void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
 
     if (var->needs_subset()) {
         int ga_out;
-        size_t ndim = var->num_dims();
+        size_t ndim = var->get_ndim();
         int ga_masks[ndim];
         int ga_masksums[ndim];
         vector<int64_t> shape_out = var->get_sizes(true);

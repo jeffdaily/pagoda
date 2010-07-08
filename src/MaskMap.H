@@ -16,7 +16,9 @@ using std::vector;
 
 class Dataset;
 class Dimension;
+class Grid;
 class Mask;
+class Variable;
 
 typedef map<string,Mask*> masks_t;
 
@@ -32,21 +34,17 @@ class MaskMap
 {
     public:
         MaskMap();
+        MaskMap(Dataset *dataset);
         virtual ~MaskMap();
 
         void create_masks(const Dataset *dataset);
         void create_masks(const vector<Dimension*> dims);
 
         void modify(const vector<DimSlice> &slices);
-        void modify(const LatLonBox &box, const Array *lat,
-                const Array *lon, Dimension *dim);
-        void modify(const LatLonBox &box, const Array *lat, const Array *lon,
-                Dimension *lat_dim, Dimension *lon_dim);
-        void modify(Dimension *masked, Dimension *to_mask,
-                const Array *topology);
+        void modify(const LatLonBox &box, Grid *grid);
 
-        Mask* get_mask(Dimension *dim);
-        Mask* operator [] (Dimension *dim);
+        Mask* get_mask(const Dimension *dim);
+        Mask* operator [] (const Dimension *dim);
 
         ostream& print(ostream &os) const;
         friend ostream& operator << (ostream &os, const MaskMap &maskmap);
@@ -54,6 +52,15 @@ class MaskMap
 
     protected:
         Mask* get_mask(const string &name, const Dimension *dim);
+
+        void modify(const LatLonBox &box,
+                const Variable *lat, const Variable *lon,
+                Dimension *dim);
+        void modify(const LatLonBox &box,
+                const Variable *lat, const Variable *lon,
+                Dimension *lat_dim, Dimension *lon_dim);
+        void modify(Dimension *masked, Dimension *to_mask,
+                const Variable *topology);
 
         masks_t masks;
 };

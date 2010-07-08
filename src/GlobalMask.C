@@ -199,6 +199,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     void *lat_data;
     void *lon_data;
     int64_t size = get_local_size();
+    DataType type = lat->get_type();
 
     TIMING("GlobalMask::modify(LatLonBox,Array*,Array*)\n");
 
@@ -220,7 +221,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     lon_data = lon->access();
 
 #define adjust_op(DTYPE,TYPE) \
-    if (lat->get_type() == DTYPE) { \
+    if (type == DTYPE) { \
         TYPE *plat = (TYPE*)lat_data; \
         TYPE *plon = (TYPE*)lon_data; \
         for (int64_t i=0; i<size; ++i) { \
@@ -235,7 +236,9 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     adjust_op(DataType::FLOAT,float)
     adjust_op(DataType::DOUBLE,double)
     adjust_op(DataType::LONGDOUBLE,long double)
-    ; // for last else above
+    {
+        throw DataTypeException("DataType not handled", type);
+    }
 #undef adjust_op
 
     release_update();
@@ -250,6 +253,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
 
     int *mask_data;
     void *var_data;
+    DataType type = var->get_type();
 
     // bail if we don't own any of the data
     if (!owns_data()) return;
@@ -264,7 +268,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
     var_data = var->access();
 
 #define adjust_op(DTYPE,TYPE) \
-    if (var->get_type() == DTYPE) { \
+    if (type == DTYPE) { \
         TYPE *pdata = (TYPE*)var_data; \
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
             if (pdata[i] >= min && pdata[i] <= max) { \
@@ -278,7 +282,9 @@ void GlobalMask::modify(double min, double max, const Array *var)
     adjust_op(DataType::FLOAT,float)
     adjust_op(DataType::DOUBLE,double)
     adjust_op(DataType::LONGDOUBLE,long double)
-    ; // for last else above
+    {
+        throw DataTypeException("DataType not handled", type);
+    }
 #undef adjust_op
 
     release_update();

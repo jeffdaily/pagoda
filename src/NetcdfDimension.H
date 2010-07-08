@@ -9,6 +9,7 @@ using std::string;
 
 #include "Dimension.H"
 
+class Dataset;
 class NetcdfDataset;
 
 
@@ -24,8 +25,9 @@ class NetcdfDimension : public Dimension
         virtual string get_name() const;
         virtual int64_t get_size() const;
         virtual bool is_unlimited() const;
+        virtual Dataset* get_dataset() const;
 
-        NetcdfDataset* get_dataset() const;
+        NetcdfDataset* get_netcdf_dataset() const;
         int get_id() const;
 
         virtual ostream& print(ostream &os) const;

@@ -26,7 +26,7 @@ class SubsetterCommands
         void parse(int argc, char **argv);
 
         const string& get_usage() const;
-        const vector<string>& get_intput_filenames() const;
+        const vector<string>& get_input_filenames() const;
         const string& get_output_filename() const;
         const string& get_join_name() const;
         bool has_box() const;

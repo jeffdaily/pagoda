@@ -130,9 +130,9 @@ const string& SubsetterCommands::get_usage() const
 }
 
 
-const vector<string>& SubsetterCommands::get_intput_filenames() const
+const vector<string>& SubsetterCommands::get_input_filenames() const
 {
-    TIMING("SubsetterCommands::get_intput_filenames()");
+    TIMING("SubsetterCommands::get_input_filenames()");
     return input_filenames;
 }
 

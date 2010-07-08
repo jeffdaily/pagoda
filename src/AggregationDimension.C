@@ -13,11 +13,12 @@ using std::string;
 using std::vector;
 
 
-AggregationDimension::AggregationDimension(Dimension *dim)
+AggregationDimension::AggregationDimension(Aggregation *agg, Dimension *dim)
     :   Dimension()
     ,   name(dim->get_name())
     ,   size(dim->get_size())
     ,   _is_unlimited(dim->is_unlimited())
+    ,   agg(agg)
 {
     TIMING("AggregationDimension::AggregationDimension(Dimension*)");
 }
@@ -54,6 +55,12 @@ bool AggregationDimension::is_unlimited() const
 {
     TIMING("AggregationDimension::is_unlimited()");
     return _is_unlimited;
+}
+
+
+Dataset* AggregationDimension::get_dataset() const
+{
+    return (Dataset*)agg;
 }
 
 

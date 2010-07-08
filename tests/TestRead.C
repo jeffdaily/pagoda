@@ -96,9 +96,9 @@ int main(int argc, char **argv)
     }
 
     if (ok) {
-        PRINT_SYNC("ok\n");
+        pagoda::print_sync("ok\n");
     } else {
-        PRINT_SYNC("failure\n");
+        pagoda::print_sync("failure\n");
     }
 
     delete dataset;

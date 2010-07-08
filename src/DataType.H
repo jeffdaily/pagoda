@@ -18,24 +18,6 @@ using std::runtime_error;
 using std::string;
 
 
-class DataTypeException : public runtime_error
-{
-    public:
-        static string to_string(int value) {
-            ostringstream os;
-            os << value;
-            return os.str();
-        }
-
-        explicit DataTypeException(const string &what)
-            :   runtime_error(what)
-        {}
-        explicit DataTypeException(const string &what, int value)
-            :   runtime_error(what+string(" :: ")+to_string(value))
-        {}
-};
-
-
 /**
  * A common DataType object for translating from various library-specific
  * types.
@@ -61,6 +43,7 @@ class DataType
         static const DataType UINT;
         static const DataType ULONG;
         static const DataType ULONGLONG;
+        static const DataType SCHAR;
         static const DataType STRING;
 
         DataType(int type);
@@ -86,6 +69,27 @@ class DataType
         static int next_id;
         int id;
         string name;
+};
+
+
+class DataTypeException : public runtime_error
+{
+    public:
+        static string to_string(int value) {
+            ostringstream os;
+            os << value;
+            return os.str();
+        }
+
+        explicit DataTypeException(const string &what)
+            :   runtime_error(what)
+        {}
+        explicit DataTypeException(const string &what, int value)
+            :   runtime_error(what+string(" :: ")+to_string(value))
+        {}
+        explicit DataTypeException(const string &what, const DataType &type)
+            :   runtime_error(what+string(" :: ")+type.get_name())
+        {}
 };
 
 #endif // DATATYPE_H_

@@ -51,8 +51,6 @@ class Dataset
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Dataset *dataset);
 
-        virtual void decorate();
-
     protected:
         Dataset();
 };

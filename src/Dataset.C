@@ -161,7 +161,6 @@ ostream& operator << (ostream &os, const Dataset *dataset)
 
 /**
  * Examine attributes and enhance/wrap Variables appropriately.
- */
 void Dataset::decorate()
 {
     TIMING("Dataset::decorate()");
@@ -297,3 +296,4 @@ void Dataset::decorate()
     GA_Sync();
 #endif // DEBUG
 }
+*/

@@ -10,9 +10,11 @@ using std::string;
 #include "Attribute.H"
 #include "DataType.H"
 
+class Dataset;
 class NetcdfDataset;
 class NetcdfVariable;
 class Values;
+class Variable;
 
 
 /**
@@ -27,20 +29,21 @@ class NetcdfAttribute : public Attribute
 
         virtual string get_name() const;
         virtual DataType get_type() const;
-        virtual bool is_global() const;
         virtual Values* get_values() const;
 
-        NetcdfDataset* get_dataset() const;
+        virtual Dataset* get_dataset() const;
+        virtual Variable* get_var() const;
+
+        NetcdfDataset* get_netcdf_dataset() const;
+        NetcdfVariable* get_netcdf_var() const;
         int get_id() const;
-        NetcdfVariable* get_var() const;
 
     protected:
         NetcdfDataset *dataset;
-        int id;
         NetcdfVariable *var;
+        int id;
         string name;
         DataType type;
-        bool global;
         Values *values;
 };
 

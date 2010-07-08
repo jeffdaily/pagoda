@@ -10,7 +10,9 @@ using std::ostream;
 using std::string;
 
 class Attribute;
+class Dataset;
 class Values;
+class Variable;
 
 
 /**
@@ -30,8 +32,11 @@ class Attribute
 
         virtual string get_name() const = 0;
         virtual DataType get_type() const = 0;
-        virtual bool is_global() const = 0;
         virtual Values* get_values() const = 0;
+
+        virtual Dataset* get_dataset() const = 0;
+        virtual Variable* get_var() const = 0;
+
         virtual size_t get_count() const;
         virtual string get_string() const;
 

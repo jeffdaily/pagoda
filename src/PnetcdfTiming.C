@@ -12,9 +12,19 @@
 #   include <unistd.h>
 #endif
 
+#if HAVE_GA
+#   include <ga.h>
+#endif
+
 #define USE_BARRIERS
 #ifdef USE_BARRIERS
-#   define BARRIER() GA_Sync()
+#   if HAVE_GA
+#       define BARRIER() GA_Sync()
+#   elif HAVE_MPI
+#       define BARRIER() MPI_Barrier()
+#   else
+#       define BARRIER()
+#   endif
 #else
 #   define BARRIER()
 #endif
@@ -24,10 +34,10 @@
 #include <iostream>
 #include <sstream>
 
-#include <ga.h>
 #include <mpi.h>
 #include <pnetcdf.h>
 
+#include "Bootstrap.H"
 #include "Debug.H"
 #include "NetcdfError.H"
 #include "PnetcdfTiming.H"
@@ -199,7 +209,7 @@ PnetcdfTiming::PnetcdfTiming(
     }
     new_size = bytes[name] + size;
     if (new_size < bytes[name]) {
-        cerr << GA_Nodeid() << " WARNING: bytes overrun" << endl;
+        cerr << pagoda::me << " WARNING: bytes overrun" << endl;
     } else {
         bytes[name] = new_size;
     }
@@ -364,42 +374,42 @@ string PnetcdfTiming::get_stats_aggregate()
         }
     }
 
-    PRINT_SYNC("Before allreduce bytes_read:      %lu\n", bytes_read);
+    pagoda::print_sync("Before allreduce bytes_read:      %lu\n", bytes_read);
     MPI_Allreduce(&bytes_read,&bytes_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
-    PRINT_SYNC(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
+    pagoda::print_sync(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
     if (bytes_read_agg < bytes_read) {
-        PRINT_SYNC("WARNING: bytes_read_agg<bytes_read\n");
+        pagoda::print_sync("WARNING: bytes_read_agg<bytes_read\n");
     } else {
-        PRINT_SYNC("bytes_read_agg OKAY\n");
+        pagoda::print_sync("bytes_read_agg OKAY\n");
     }
 
-    PRINT_SYNC("Before allreduce bytes_write:     %lu\n", bytes_write);
+    pagoda::print_sync("Before allreduce bytes_write:     %lu\n", bytes_write);
     MPI_Allreduce(&bytes_write,&bytes_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
-    PRINT_SYNC(" after allreduce bytes_write_agg: %lu\n", bytes_write_agg);
+    pagoda::print_sync(" after allreduce bytes_write_agg: %lu\n", bytes_write_agg);
     if (bytes_write_agg < bytes_write) {
-        PRINT_SYNC("WARNING: bytes_write_agg<bytes_write\n");
+        pagoda::print_sync("WARNING: bytes_write_agg<bytes_write\n");
     } else {
-        PRINT_SYNC("bytes_write_agg OKAY\n");
+        pagoda::print_sync("bytes_write_agg OKAY\n");
     }
 
-    PRINT_SYNC("Before allreduce times_read:      %lu\n", times_read);
+    pagoda::print_sync("Before allreduce times_read:      %lu\n", times_read);
     //MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
-    PRINT_SYNC(" after allreduce times_read_agg:  %lu\n", times_read_agg);
+    pagoda::print_sync(" after allreduce times_read_agg:  %lu\n", times_read_agg);
     if (times_read_agg < times_read) {
-        PRINT_SYNC("WARNING: times_read_agg<times_read\n");
+        pagoda::print_sync("WARNING: times_read_agg<times_read\n");
     } else {
-        PRINT_SYNC("times_read_agg OKAY\n");
+        pagoda::print_sync("times_read_agg OKAY\n");
     }
 
-    PRINT_SYNC("Before allreduce times_write:     %lu\n", times_write);
+    pagoda::print_sync("Before allreduce times_write:     %lu\n", times_write);
     //MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
-    PRINT_SYNC(" after allreduce times_write_agg: %lu\n", times_write_agg);
+    pagoda::print_sync(" after allreduce times_write_agg: %lu\n", times_write_agg);
     if (times_write_agg < times_write) {
-        PRINT_SYNC("WARNING: times_write_agg<times_write\n");
+        pagoda::print_sync("WARNING: times_write_agg<times_write\n");
     } else {
-        PRINT_SYNC("times_write_agg OKAY\n");
+        pagoda::print_sync("times_write_agg OKAY\n");
     }
 
     bytes_total = bytes_read_agg + bytes_write_agg;

@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-#include <ga.h>
-
+#include "Aggregation.H"
 #include "AggregationDimension.H"
 #include "AggregationVariable.H"
 #include "Array.H"
+#include "Dataset.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -25,10 +25,15 @@ using std::vector;
 
 
 AggregationVariable::AggregationVariable(
-        AggregationDimension *agg_dim, Variable *var)
+        Aggregation *agg,
+        AggregationDimension *agg_dim,
+        Variable *var)
     :   AbstractVariable()
+    ,   agg(agg)
     ,   agg_dim(agg_dim)
     ,   vars()
+    ,   arrays_to_copy()
+    ,   array_to_fill(NULL)
 {
     TIMING("AggregationVariable::AggregationVariable(...)");
     TRACER("AggregationVariable ctor %s\n", var->get_name().c_str());
@@ -74,6 +79,13 @@ vector<Attribute*> AggregationVariable::get_atts() const
 }
 
 
+Dataset* AggregationVariable::get_dataset() const
+{
+    TIMING("AggregationVariable::get_dataset()");
+    return (Dataset*)agg;
+}
+
+
 DataType AggregationVariable::get_type() const
 {
     TIMING("AggregationVariable::get_type()");
@@ -82,7 +94,7 @@ DataType AggregationVariable::get_type() const
 
 
 #if AGGREGATION_VARIABLE_READ_LOMEM
-Array* AggregationVariable::read(Array *dst)
+Array* AggregationVariable::read(Array *dst) const
 {
     /* Reads one timestep at a time and copies to dst Array */
     Array *src;
@@ -92,7 +104,7 @@ Array* AggregationVariable::read(Array *dst)
     vector<int64_t> src_lo;
     vector<int64_t> src_hi;
 
-    ndim = num_dims();
+    ndim = get_ndim();
     dst_lo.assign(ndim, 0);     // only first index will change, rest zeros
     src_lo.assign(ndim-1, 0);   // will not change; always zeros
 
@@ -122,10 +134,10 @@ Array* AggregationVariable::read(Array *dst)
 
 #else /* AGGREGATION_VARIABLE_READ_LOMEM */
 
-Array* AggregationVariable::read(Array *dst)
+Array* AggregationVariable::read(Array *dst) const
 {    /* Reads one aggregated Variable at a time and copies to dst Array */
     int count = 0;
-    int ndim = num_dims();
+    int ndim = get_ndim();
     vector<int64_t> dst_lo(ndim, 0);
     vector<int64_t> dst_hi = get_shape();
     vector<int64_t>::iterator shape_it;
@@ -144,7 +156,7 @@ Array* AggregationVariable::read(Array *dst)
     for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
         Array *src = var->read();
-        int64_t ndim = var->num_dims();
+        int64_t ndim = var->get_ndim();
         vector<int64_t> src_lo(ndim, 0);
         vector<int64_t> src_hi = var->get_shape();
 
@@ -163,7 +175,7 @@ Array* AggregationVariable::read(Array *dst)
 #endif  /* AGGREGATION_VARIABLE_READ_LOMEM */
 
 
-Array* AggregationVariable::read(int64_t record, Array *dst)
+Array* AggregationVariable::read(int64_t record, Array *dst) const
 {
     int64_t index_within_var = record;
 

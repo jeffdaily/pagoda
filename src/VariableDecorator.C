@@ -47,10 +47,10 @@ bool VariableDecorator::has_record() const
 }
 
 
-int64_t VariableDecorator::num_dims() const
+int64_t VariableDecorator::get_ndim() const
 {
-    TIMING("VariableDecorator::num_dims()");
-    return var->num_dims();
+    TIMING("VariableDecorator::get_ndim()");
+    return var->get_ndim();
 }
 
 
@@ -72,6 +72,13 @@ int64_t VariableDecorator::num_atts() const
 {
     TIMING("VariableDecorator::num_atts()");
     return var->num_atts();
+}
+
+
+string VariableDecorator::get_standard_name() const
+{
+    TIMING("VariableDecorator::get_standard_name()");
+    return var->get_standard_name();
 }
 
 
@@ -100,6 +107,13 @@ Attribute* VariableDecorator::get_att(
 }
 
 
+Dataset* VariableDecorator::get_dataset() const
+{
+    TIMING("VariableDecorator::get_dataset()");
+    return var->get_dataset();
+}
+
+
 DataType VariableDecorator::get_type() const
 {
     TIMING("VariableDecorator::get_type()");
@@ -107,28 +121,28 @@ DataType VariableDecorator::get_type() const
 }
 
 
-Array* VariableDecorator::read()
+Array* VariableDecorator::read() const
 {
     TIMING("VariableDecorator::read()");
     return var->read();
 }
 
 
-Array* VariableDecorator::read(Array *dst)
+Array* VariableDecorator::read(Array *dst) const
 {
     TIMING("VariableDecorator::read(Array*)");
     return var->read(dst);
 }
 
 
-Array* VariableDecorator::read(int64_t record)
+Array* VariableDecorator::read(int64_t record) const
 {
     TIMING("VariableDecorator::read(int64_t)");
     return var->read(record);
 }
 
 
-Array* VariableDecorator::read(int64_t record, Array *dst)
+Array* VariableDecorator::read(int64_t record, Array *dst) const
 {
     TIMING("VariableDecorator::read(int64_t,Array*)");
     return var->read(record, dst);

@@ -29,6 +29,7 @@ const DataType DataType::USHORT("unsigned short");
 const DataType DataType::UINT("unsigned int");
 const DataType DataType::ULONG("unsigned long");
 const DataType DataType::ULONGLONG("unsigned long long");
+const DataType DataType::SCHAR("signed char");
 const DataType DataType::STRING("string");
 int DataType::next_id(1);
 
@@ -197,6 +198,8 @@ nc_type DataType::to_nc() const
     TIMING("DataType::to_nc()");
 
     if        (operator==(DataType::CHAR)) {
+        return NC_CHAR;
+    } else if (operator==(DataType::SCHAR)) {
         return NC_BYTE;
     } else if (operator==(DataType::SHORT)) {
 #if   2 == SIZEOF_SHORT
@@ -333,9 +336,9 @@ DataType DataType::to_dt(int type)
     if        (NC_NAT == type) { // Not A Type
         throw DataTypeException("NC_NAT not supported");
     } else if (NC_BYTE == type) { // signed 1 byte integer
-        return DataType::CHAR;
+        return DataType::SCHAR;
     } else if (NC_CHAR == type) { // ISO/ASCII character
-        return DataType::UCHAR;
+        return DataType::CHAR;
     } else if (NC_SHORT == type) { // signed 2 byte integer
 #if   2 == SIZEOF_SHORT
         return DataType::SHORT;

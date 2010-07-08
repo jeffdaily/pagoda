@@ -16,6 +16,13 @@ using std::string;
 #include "Util.H"
 
 
+#define DUMMY_AP(fmt) do { \
+    va_list ap; \
+    va_start(ap, fmt); \
+    va_end(ap); \
+} while (0)
+
+
 static inline int get_precision()
 {
     int precision = 1;
@@ -58,70 +65,79 @@ static inline string to_string(const char *fmt, va_list ap)
 }
 
 
-void print_zero_dummy(const char *fmt, ...)
+void pagoda::print_zero(const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
+    print_zero(stderr, to_string(fmt, ap));
     va_end(ap);
 }
 
 
-void print_zero(const char *fmt, ...)
+void pagoda::print_zero(const string &str)
+{
+    print_zero(stderr, str);
+}
+
+
+void pagoda::print_zero(FILE *stream, const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
-    print_zero(to_string(fmt, ap));
+    print_zero(stream, to_string(fmt, ap));
     va_end(ap);
 }
 
 
-void print_zero_dummy(const string &str)
-{
-}
-
-
-void print_zero(const string &str)
+void pagoda::print_zero(FILE *stream, const string &str)
 {
     if (0 == pagoda::nodeid()) {
-        fprintf(stderr, str.c_str());
-        fflush(stderr);
+        fprintf(stream, str.c_str());
+        fflush(stream);
     }
     pagoda::barrier();
 }
 
 
-void print_sync_dummy(const char *fmt, ...)
+void pagoda::print_zero_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_zero_dummy(const string &str) { }
+void pagoda::print_zero_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_zero_dummy(FILE *stream, const string &str) { }
+
+
+void pagoda::print_sync(const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
+    print_sync(stderr, to_string(fmt, ap));
     va_end(ap);
 }
 
 
+void pagoda::print_sync(const string &str)
+{
+    print_sync(stderr, str);
+}
 
-void print_sync(const char *fmt, ...)
+
+void pagoda::print_sync(FILE *stream, const char *fmt, ...)
 {
     va_list ap;
 
     va_start(ap, fmt);
-    print_sync(to_string(fmt, ap));
+    print_sync(stream, to_string(fmt, ap));
     va_end(ap);
 }
 
 
-void print_sync_dummy(const string &str)
-{
-}
-
-
-void print_sync(const string &str)
+void pagoda::print_sync(FILE *stream, const string &str)
 {
     if (0 == pagoda::nodeid()) {
-        fprintf(stderr, "[%*d] ", get_precision(), 0);
-        fprintf(stderr, str.c_str());
+        fprintf(stream, "[%*d] ", get_precision(), 0);
+        fprintf(stream, str.c_str());
         for (int proc=1,nproc=pagoda::num_nodes(); proc<nproc; ++proc) {
             MPI_Status stat;
             int count;
@@ -132,11 +148,11 @@ void print_sync(const string &str)
             msg = new char[count];
             MPI_Recv(msg, count, MPI_CHAR, proc, TAG_DEBUG, MPI_COMM_WORLD,
                     &stat);
-            fprintf(stderr, "[%*d] ", get_precision(), proc);
-            fprintf(stderr, msg);
+            fprintf(stream, "[%*d] ", get_precision(), proc);
+            fprintf(stream, msg);
             delete [] msg;
         }
-        fflush(stderr);
+        fflush(stream);
     } else {
         int count = str.size() + 1;
        
@@ -145,3 +161,9 @@ void print_sync(const string &str)
                 MPI_COMM_WORLD);
     }
 }
+
+
+void pagoda::print_sync_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_sync_dummy(const string &str) { }
+void pagoda::print_sync_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_sync_dummy(FILE *stream, const string &str) { }

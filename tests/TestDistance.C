@@ -72,9 +72,9 @@ int main(int argc, char **argv)
     GA_Initialize();
 
     if (3 != argc) {
-        PRINT_ZERO("Usage: TestDistance <source grid filename> <destination grid filename>\n");
+        pagoda::print_zero("Usage: TestDistance <source grid filename> <destination grid filename>\n");
         for (int i=0; i<argc; ++i) {
-            PRINT_ZERO("argv[%d]=%s\n", i, argv[i]);
+            pagoda::print_zero("argv[%d]=%s\n", i, argv[i]);
         }
         return 1;
     }
@@ -150,11 +150,11 @@ int main(int argc, char **argv)
             }
             GA_Sync();
             NGA_Select_elem64(g_distance, "max", &max, &index);
-            //PRINT_ZERO("max=%f\tindex=%lld\n", max, index);
+            //pagoda::print_zero("max=%f\tindex=%lld\n", max, index);
             NGA_Select_elem64(g_distance, "min", &min, &index);
-            //PRINT_ZERO("min=%f\tindex=%lld\n", min, index);
+            //pagoda::print_zero("min=%f\tindex=%lld\n", min, index);
             if (dst_i % 10 == 0) {
-                PRINT_ZERO("%lld/%lld\n", dst_i, dst_shape);
+                pagoda::print_zero("%lld/%lld\n", dst_i, dst_shape);
             }
         }
         NGA_Release_update64(g_distance, &src_lo, &src_hi);

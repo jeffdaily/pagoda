@@ -239,7 +239,9 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     put_attr_values(DataType::INT,    int)
     put_attr_values(DataType::FLOAT,  float)
     put_attr_values(DataType::DOUBLE, double)
-    ; // for last else above
+    {
+        throw DataTypeException("DataType not handled", dt);
+    }
 #undef put_attr_values
 }
 
@@ -319,7 +321,7 @@ void NetcdfFileWriter::write(Array *array, const string &name, int64_t record)
     write_var_all(float,  DataType::FLOAT)
     write_var_all(double, DataType::DOUBLE)
     {
-        throw invalid_argument("unrecognized DataType");
+        throw DataTypeException("DataType not handled", type);
     }
 #undef write_var_all
 }
@@ -374,7 +376,7 @@ void NetcdfFileWriter::write(Array *array, const string &name,
     write_var_all(float,  DataType::FLOAT)
     write_var_all(double, DataType::DOUBLE)
     {
-        throw invalid_argument("unrecognized DataType");
+        throw DataTypeException("DataType not handled", type);
     }
 #undef write_var_all
 }

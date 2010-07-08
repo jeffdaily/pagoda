@@ -5,6 +5,7 @@
 #include <pnetcdf.h>
 
 #include "Common.H"
+#include "Dataset.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
@@ -60,9 +61,16 @@ bool NetcdfDimension::is_unlimited() const
 }
 
 
-NetcdfDataset* NetcdfDimension::get_dataset() const
+Dataset* NetcdfDimension::get_dataset() const
 {
     TIMING("NetcdfDimension::get_dataset()");
+    return dataset;
+}
+
+
+NetcdfDataset* NetcdfDimension::get_netcdf_dataset() const
+{
+    TIMING("NetcdfDimension::get_netcdf_dataset()");
     return dataset;
 }
 

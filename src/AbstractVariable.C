@@ -36,9 +36,9 @@ bool AbstractVariable::has_record() const
 }
 
 
-int64_t AbstractVariable::num_dims() const
+int64_t AbstractVariable::get_ndim() const
 {
-    TIMING("AbstractVariable::num_dims()");
+    TIMING("AbstractVariable::get_ndim()");
     return get_dims().size();
 }
 
@@ -66,6 +66,20 @@ int64_t AbstractVariable::num_atts() const
 }
 
 
+string AbstractVariable::get_standard_name() const
+{
+    TIMING("AbstractVariable::get_standard_name()");
+    string att_name("standard_name");
+    Attribute *att = get_att(att_name);
+
+    if (att) {
+        return att->get_string();
+    }
+
+    return "";
+}
+
+
 string AbstractVariable::get_long_name() const
 {
     TIMING("AbstractVariable::get_long_name()");
@@ -73,10 +87,9 @@ string AbstractVariable::get_long_name() const
     Attribute *att = get_att(att_name);
 
     if (att) {
-        ostringstream val;
-        val << att->get_values();
-        return val.str();
+        return att->get_string();
     }
+
     return "";
 }
 
@@ -125,14 +138,14 @@ Attribute* AbstractVariable::get_att(
 }
 
 
-Array* AbstractVariable::read()
+Array* AbstractVariable::read() const
 {
     Array *dst = Array::create(get_type(), get_shape());
     return read(dst);
 }
 
 
-Array* AbstractVariable::read(int64_t record)
+Array* AbstractVariable::read(int64_t record) const
 {
     vector<int64_t> shape;
     Array *dst;

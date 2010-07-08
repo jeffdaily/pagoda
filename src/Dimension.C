@@ -2,7 +2,10 @@
 #   include <config.h>
 #endif
 
+#include "Dataset.H"
 #include "Dimension.H"
+#include "Mask.H"
+#include "MaskMap.H"
 #include "Timing.H"
 
 
@@ -30,6 +33,15 @@ Dimension& Dimension::operator = (const Dimension &copy)
 Dimension::~Dimension()
 {
     TIMING("Dimension::~Dimension()");
+}
+
+
+Mask* Dimension::get_mask() const
+{
+    Dataset *dataset = get_dataset();
+    MaskMap *masks = dataset->get_masks();
+    TIMING("Dimension::get_mask()");
+    return masks->get_mask(this);
 }
 
 

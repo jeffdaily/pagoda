@@ -105,7 +105,7 @@ void AggregationJoinExisting::add(Dataset *dataset)
         Dimension *dim = get_dim(other_dim->get_name());
         if (! dim) {
             if (other_dim->get_name() == agg_dim_name) {
-                agg_dim = new AggregationDimension(other_dim);
+                agg_dim = new AggregationDimension(this, other_dim);
                 dims.push_back(agg_dim);
             } else {
                 dims.push_back(other_dim);
@@ -124,7 +124,7 @@ void AggregationJoinExisting::add(Dataset *dataset)
         if (! var) {
             if (other_var->get_dims()[0]->get_name() == agg_dim_name) {
                 AggregationVariable *agg_var;
-                agg_var = new AggregationVariable(agg_dim, other_var);
+                agg_var = new AggregationVariable(this, agg_dim, other_var);
                 agg_vars[other_var->get_name()] = agg_var;
                 vars.push_back(agg_var);
             } else {

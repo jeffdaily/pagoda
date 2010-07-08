@@ -188,27 +188,27 @@ int main(int argc, char **argv)
                 break;
             default:
                 char e[2] = {optopt, '\0'};
-                PRINT_ZERO("Unrecognized option: %s\n", e);
-                PRINT_ZERO(usage);
+                pagoda::print_zero("Unrecognized option: %s\n", e);
+                pagoda::print_zero(usage);
                 return 1;
         }
     }
 
     if (optind == argc) {
-        PRINT_ZERO("ERROR: source grid required\n");
-        PRINT_ZERO(usage);
+        pagoda::print_zero("ERROR: source grid required\n");
+        pagoda::print_zero(usage);
         return 1;
     } else if (optind+1 == argc) {
-        PRINT_ZERO("ERROR: destination grid required\n");
-        PRINT_ZERO(usage);
+        pagoda::print_zero("ERROR: destination grid required\n");
+        pagoda::print_zero(usage);
         return 1;
     } else if (optind+2 == argc) {
-        PRINT_ZERO("ERROR: data file required\n");
-        PRINT_ZERO(usage);
+        pagoda::print_zero("ERROR: data file required\n");
+        pagoda::print_zero(usage);
         return 1;
     } else if (optind+3 == argc) {
-        PRINT_ZERO("ERROR: variable name required\n");
-        PRINT_ZERO(usage);
+        pagoda::print_zero("ERROR: variable name required\n");
+        pagoda::print_zero(usage);
         return 1;
     } else if (optind+4 == argc) {
         filename_grid_source = argv[optind];
@@ -216,8 +216,8 @@ int main(int argc, char **argv)
         filename_data = argv[optind+2];
         variable_name = argv[optind+3];
     } else {
-        PRINT_ZERO("ERROR: too many positional arguments\n");
-        PRINT_ZERO(usage);
+        pagoda::print_zero("ERROR: too many positional arguments\n");
+        pagoda::print_zero(usage);
         return 1;
     }
     if (outfile_name.empty()) {
@@ -244,11 +244,11 @@ int main(int argc, char **argv)
 
     bin_latitudes(src_bin, g_src_lat, g_src_lon, g_bin_extents);
     bin_latitudes(dst_bin, g_dst_lat, g_dst_lon, g_bin_extents);
-    PRINT_SYNC("src_bin.size()=%lu\n", (long unsigned)src_bin.size());
+    pagoda::print_sync("src_bin.size()=%lu\n", (long unsigned)src_bin.size());
 
     bin_sort(src_bin);
     bin_sort(dst_bin);
-    PRINT_ZERO("finished sorting\n");
+    pagoda::print_zero("finished sorting\n");
 
     long points = 0;
     long points_sum = 0;
@@ -256,19 +256,19 @@ int main(int argc, char **argv)
     for (it=src_bin.begin(),end=src_bin.end(); it!=end; ++it) {
         points += it->second.size();
     }
-    PRINT_SYNC("points=%ld\n", points);
+    pagoda::print_sync("points=%ld\n", points);
     points_sum = points;
     GA_Lgop(&points_sum, 1, "+");
-    PRINT_ZERO("points_sum=%ld\n", points_sum);
+    pagoda::print_zero("points_sum=%ld\n", points_sum);
 
     if (perform_ghost_exchange) {
         long unsigned points_after = 0;
         bin_ghost_exchange(src_bin, g_bin_extents);
-        PRINT_ZERO("finished bin ghost exchange\n");
+        pagoda::print_zero("finished bin ghost exchange\n");
         for (it=src_bin.begin(),end=src_bin.end(); it!=end; ++it) {
             points_after += it->second.size();
         }
-        PRINT_SYNC("points_after=%lu\tdiff=%lu\n",
+        pagoda::print_sync("points_after=%lu\tdiff=%lu\n",
                 points_after, points_after-points);
     }
 
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
     output_shape[1] = N;
     output_chunk[0] = 0;
     output_chunk[1] = output_shape[1];
-    PRINT_ZERO("output_shape={%ld,%ld} output_chunk={%ld,%ld}\n",
+    pagoda::print_zero("output_shape={%ld,%ld} output_chunk={%ld,%ld}\n",
             output_shape[0], output_shape[1], output_chunk[0], output_chunk[1]);
     g_weights = NGA_Create64(C_FLOAT, 2, output_shape, "weights", output_chunk);
     g_indices = NGA_Create64(C_INT,   2, output_shape, "indices", output_chunk);
@@ -294,10 +294,10 @@ int main(int argc, char **argv)
     g_results = interpolate(g_data, g_weights, g_indices);
 
     // write the results to a file!
-    PRINT_ZERO("before write_results\n");
+    pagoda::print_zero("before write_results\n");
     write_results(g_results, data_ncid, variable_name, outfile_name);
 
-    PRINT_ZERO("before cleanup\n");
+    pagoda::print_zero("before cleanup\n");
     // Cleanup.
     ncmpi::close(src_ncid);
     ncmpi::close(dst_ncid);
@@ -378,7 +378,7 @@ static void read_data(int g_a, int ncid, int varid, bool first_only)
 // Read the source file.  Create g_a's to hold variable.
 static int create_array_and_read(int ncid, char *name, bool first_only)
 {
-    PRINT_ZERO("create_array_and_read first_only=%d name=%s\n", first_only, name);
+    pagoda::print_zero("create_array_and_read first_only=%d name=%s\n", first_only, name);
     int varid;
     int ndim;
     int dimids[NC_MAX_VAR_DIMS];
@@ -392,15 +392,15 @@ static int create_array_and_read(int ncid, char *name, bool first_only)
         MPI_Offset tmp;
         ncmpi::inq_dimlen(ncid, dimids[i], &tmp);
         shape[i] = tmp;
-        PRINT_ZERO("shape[%d]=%ld\n", i, (long)shape[i]);
+        pagoda::print_zero("shape[%d]=%ld\n", i, (long)shape[i]);
     }
     if (first_only) {
-        PRINT_ZERO("first_only shape[0]=%ld\n", (long)*(shape+1));
+        pagoda::print_zero("first_only shape[0]=%ld\n", (long)*(shape+1));
         g_a = NGA_Create64(C_FLOAT, ndim-1, shape+1, name, NULL);
     } else {
         g_a = NGA_Create64(C_FLOAT, ndim, shape, name, NULL);
     }
-    PRINT_ZERO("read_data %s\n", name);
+    pagoda::print_zero("read_data %s\n", name);
     read_data(g_a, ncid, varid, first_only);
 
     return g_a;
@@ -434,7 +434,7 @@ static int calc_extents_minmax(int g_lat)
     NGA_Distribution64(g_extents, me, bin_extents_lo, bin_extents_hi);
     bin_lo = bin_extents_lo[0];
     bin_hi = bin_extents_hi[0];
-    PRINT_SYNC("bin_extents lo,hi = {%ld,%ld},{%ld,%ld}\n",
+    pagoda::print_sync("bin_extents lo,hi = {%ld,%ld},{%ld,%ld}\n",
             bin_lo, bin_extents_lo[1], bin_hi, bin_extents_hi[1]);
 
     NGA_Select_elem64(g_lat, "min", &lat_min, &lat_min_idx);
@@ -443,14 +443,14 @@ static int calc_extents_minmax(int g_lat)
     // Determine bin extents.  Currently the range for each bin is uniform.
     diff = fabs(lat_max-lat_min);
     portion = diff/nbins;
-    PRINT_ZERO("    min=%f, idx=%ld\n", lat_min, lat_min_idx);
-    PRINT_ZERO("    max=%f, idx=%ld\n", lat_max, lat_max_idx);
-    PRINT_ZERO("   diff=%f\n", diff);
-    PRINT_ZERO("portion=%f\n", portion);
+    pagoda::print_zero("    min=%f, idx=%ld\n", lat_min, lat_min_idx);
+    pagoda::print_zero("    max=%f, idx=%ld\n", lat_max, lat_max_idx);
+    pagoda::print_zero("   diff=%f\n", diff);
+    pagoda::print_zero("portion=%f\n", portion);
     // Put bin extents into g_extents in case other procs need the info.
     if (0 > bin_lo && 0 > bin_hi) {
         // nothing to do
-        PRINT_SYNC("range=NONE\n");
+        pagoda::print_sync("range=NONE\n");
     } else {
         NGA_Access64(g_extents, bin_extents_lo, bin_extents_hi,
                 &bin_extents, &bin_extents_ld);
@@ -467,7 +467,7 @@ static int calc_extents_minmax(int g_lat)
         if ((nbins-1) == bin_hi) {
             bin_extents[(bin_hi-bin_lo)*2+1] += EPSILON;
         }
-        PRINT_SYNC("range=[%f,%f)\n",
+        pagoda::print_sync("range=[%f,%f)\n",
                 bin_extents[0], bin_extents[(bin_hi-bin_lo)*2+1]);
         NGA_Release_update64(g_extents, bin_extents_lo, bin_extents_hi);
     }
@@ -576,9 +576,9 @@ static void bin_latitudes(bin_t &bin, int g_lat, int g_lon, int g_extents)
     nbins = bin_hi-bin_lo+1;
     limit = hi-lo+1;
     buffsize = limit;
-    PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
+    pagoda::print_sync("before lgop buffsize=%ld\n", buffsize);
     GA_Lgop(&buffsize, 1, "max");
-    PRINT_ZERO(" after lgop buffsize=%ld\n", buffsize);
+    pagoda::print_zero(" after lgop buffsize=%ld\n", buffsize);
     skipped.reserve(buffsize);
     received = new LatLonIdx[buffsize];
 
@@ -614,7 +614,7 @@ static void bin_latitudes(bin_t &bin, int g_lat, int g_lon, int g_extents)
         NGA_Release_update64(g_lat, &lo, &hi);
         NGA_Release_update64(g_lon, &lo, &hi);
     }
-    PRINT_SYNC("bin.size()=%lu\n", (long unsigned)bin.size());
+    pagoda::print_sync("bin.size()=%lu\n", (long unsigned)bin.size());
 
     // Now start sending all skipped data to the next process.
     send_to = me + 1;
@@ -628,7 +628,7 @@ static void bin_latitudes(bin_t &bin, int g_lat, int g_lon, int g_extents)
                     received, buffsize, LatLonIdxType,
                     recv_from, TAG_DATA, MPI_COMM_WORLD, &recv_status));
         check(MPI_Get_count(&recv_status, LatLonIdxType, &received_count));
-        PRINT_SYNC("sent=%lu,recv=%d\n",
+        pagoda::print_sync("sent=%lu,recv=%d\n",
                 (long unsigned)skipped.size(), received_count);
 
         // At this point we have sent/recv skipped data.
@@ -707,27 +707,27 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     lastproc_subscript[0] = extents_dims[0]-1;
     lastproc  = NGA_Locate64(g_extents, lastproc_subscript);
     firstproc = NGA_Locate64(g_extents, firstproc_subscript);
-    PRINT_ZERO("firstproc,lastproc = %d,%d\n", firstproc, lastproc);
+    pagoda::print_zero("firstproc,lastproc = %d,%d\n", firstproc, lastproc);
     
     if (0 > extents_lo[0] && 0 > extents_hi[0]) {
         // process doesn't own any bins
-        PRINT_ZERO("blank\n");
-        PRINT_ZERO("blank\n");
-        PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
+        pagoda::print_zero("blank\n");
+        pagoda::print_zero("blank\n");
+        pagoda::print_sync("before lgop buffsize=%ld\n", buffsize);
         GA_Lgop(&buffsize, 1, "max");
-        PRINT_ZERO("after lgop buffsize=%ld\n", buffsize);
-        PRINT_SYNC("blank\n");
-        PRINT_SYNC("blank\n");
-        PRINT_SYNC("blank\n");
-        PRINT_SYNC("blank\n");
-        PRINT_SYNC("blank\n");
-        PRINT_SYNC("blank\n");
-        // PRINT_ZERO("blank\n");
+        pagoda::print_zero("after lgop buffsize=%ld\n", buffsize);
+        pagoda::print_sync("blank\n");
+        pagoda::print_sync("blank\n");
+        pagoda::print_sync("blank\n");
+        pagoda::print_sync("blank\n");
+        pagoda::print_sync("blank\n");
+        pagoda::print_sync("blank\n");
+        // pagoda::print_zero("blank\n");
         return;
     }
 
     // Collect the extras.
-    PRINT_ZERO("before collect extras\n");
+    pagoda::print_zero("before collect extras\n");
     for (it=bin.begin(),end=bin.end(); it!=end; ++it) {
         vector<LatLonIdx>::iterator low,up;
         if (!it->second.empty()) {
@@ -743,10 +743,10 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
             buffsize = max(buffsize,extras_lower[it->first].size());
         }
     }
-    PRINT_ZERO("after collect extras\n");
-    PRINT_SYNC("before lgop buffsize=%ld\n", buffsize);
+    pagoda::print_zero("after collect extras\n");
+    pagoda::print_sync("before lgop buffsize=%ld\n", buffsize);
     GA_Lgop(&buffsize, 1, "max");
-    PRINT_ZERO("after lgop buffsize=%ld\n", buffsize);
+    pagoda::print_zero("after lgop buffsize=%ld\n", buffsize);
     lower_received = new LatLonIdx[buffsize];
     upper_received = new LatLonIdx[buffsize];
 
@@ -774,7 +774,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
                 recv_from, TAG_GHOST, MPI_COMM_WORLD, &recv_status));
         check(MPI_Get_count(&recv_status,LatLonIdxType,&lower_received_count));
     }
-    PRINT_SYNC("after sending left, lower_received_count=%d\n",
+    pagoda::print_sync("after sending left, lower_received_count=%d\n",
             lower_received_count);
 
     // Next, ship the highest right.
@@ -801,7 +801,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
                 extras_upper.begin()->second.size(), LatLonIdxType,
                 send_to, TAG_GHOST, MPI_COMM_WORLD));
     }
-    PRINT_SYNC("after sending right, upper_received_count=%d\n",
+    pagoda::print_sync("after sending right, upper_received_count=%d\n",
             upper_received_count);
 
     // First, iterate over bins while inserting from the right.
@@ -814,12 +814,12 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         ++it;
         ++it_lower;
     }
-    PRINT_SYNC("after back insertions, local\n");
+    pagoda::print_sync("after back insertions, local\n");
     if (me != lastproc) {
         it->second.insert(it->second.end(),
                 lower_received, lower_received+lower_received_count);
     }
-    PRINT_SYNC("after back insertion,  remote\n");
+    pagoda::print_sync("after back insertion,  remote\n");
 
     // Next, iterate over bins backwards while inserting from the left.
     rit = bin.rbegin();
@@ -831,12 +831,12 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
         ++rit;
         ++rit_upper;
     }
-    PRINT_SYNC("after front insertions, local\n");
+    pagoda::print_sync("after front insertions, local\n");
     if (me != firstproc) {
         rit->second.insert(rit->second.begin(),
                 upper_received, upper_received+upper_received_count);
     }
-    PRINT_SYNC("after front insertion,  remote\n");
+    pagoda::print_sync("after front insertion,  remote\n");
 
     delete [] lower_received;
     delete [] upper_received;
@@ -854,7 +854,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
 static void calc_weights(int g_weights, int g_indices,
         const bin_t &src_bin, const bin_t &dst_bin, int n)
 {
-    PRINT_ZERO("BEGIN calc_weights\n");
+    pagoda::print_zero("BEGIN calc_weights\n");
     int binidx=-1;
     bin_t::const_iterator dst_bin_it = dst_bin.begin();
     bin_t::const_iterator dst_bin_end = dst_bin.end();
@@ -977,11 +977,11 @@ static void calc_weights(int g_weights, int g_indices,
     GA_Igop(&missing_src_bin_sum, 1, "+");
     GA_Igop(&empty_src_bin_sum, 1, "+");
     GA_Igop(&empty_dst_bin_sum, 1, "+");
-    PRINT_SYNC("dst bins without src bins=%3d/%3d\n",
+    pagoda::print_sync("dst bins without src bins=%3d/%3d\n",
             missing_src_bin, missing_src_bin_sum);
-    PRINT_SYNC("           empty src bins=%3d/%3d\n",
+    pagoda::print_sync("           empty src bins=%3d/%3d\n",
             empty_src_bin, empty_src_bin_sum);
-    PRINT_SYNC("           empty dst bins=%3d/%3d\n",
+    pagoda::print_sync("           empty dst bins=%3d/%3d\n",
             empty_dst_bin, empty_dst_bin_sum);
     int64_t print_lo[2] = {0,0};
     int64_t print_hi[2] = {4,2};
@@ -1041,16 +1041,16 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     int samples;
     float F_ZERO = 0;
     
-    PRINT_ZERO("Begin interpolation\n");
+    pagoda::print_zero("Begin interpolation\n");
 
     NGA_Inquire64(g_data, &data_type, &data_ndim, data_shape);
     NGA_Inquire64(g_weights, &weights_type, &weights_ndim, weights_shape);
     NGA_Inquire64(g_indices, &indices_type, &indices_ndim, indices_shape);
     NGA_Distribution64(g_weights, me, weights_lo, weights_hi);
-    PRINT_ZERO("   data_shape={%ld,%ld}\n", data_shape[0], data_shape[1]);
-    PRINT_ZERO("weights_shape={%ld,%ld}\n", weights_shape[0], weights_shape[1]);
-    PRINT_ZERO("indices_shape={%ld,%ld}\n", indices_shape[0], indices_shape[1]);
-    PRINT_SYNC("weights_lo/hi={%ld,%ld}/{%ld,%ld}\n",
+    pagoda::print_zero("   data_shape={%ld,%ld}\n", data_shape[0], data_shape[1]);
+    pagoda::print_zero("weights_shape={%ld,%ld}\n", weights_shape[0], weights_shape[1]);
+    pagoda::print_zero("indices_shape={%ld,%ld}\n", indices_shape[0], indices_shape[1]);
+    pagoda::print_sync("weights_lo/hi={%ld,%ld}/{%ld,%ld}\n",
             weights_lo[0], weights_lo[1], weights_hi[0], weights_hi[1]);
 
     get_lo[1] = 0;
@@ -1067,7 +1067,7 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     g_result = NGA_Create64(C_FLOAT, weights_ndim, results_shape,
             "results", results_chunk);
     GA_Fill(g_result, &F_ZERO);
-    PRINT_ZERO("results_shape={%ld,%ld}\n", results_shape[0], results_shape[1]);
+    pagoda::print_zero("results_shape={%ld,%ld}\n", results_shape[0], results_shape[1]);
 
     if (0 > weights_lo[0] && 0 > weights_hi[0]) {
         // nothing to do on this proc
@@ -1075,7 +1075,7 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     }
 
 #if 0
-    PRINT_ZERO("before get loop\n");
+    pagoda::print_zero("before get loop\n");
     data = new float[data_shape[1]];
     result = new float[data_shape[1]];
     NGA_Access64(g_weights, weights_lo, weights_hi, &weights, weights_ld);
@@ -1110,7 +1110,7 @@ static int interpolate(int g_data, int g_weights, int g_indices)
     delete [] data;
     delete [] result;
 #else
-    PRINT_ZERO("before get loop\n");
+    pagoda::print_zero("before get loop\n");
     data = new float[data_shape[1]];
     result = new float[data_shape[1]];
     NGA_Access64(g_weights, weights_lo, weights_hi, &weights, weights_ld);
@@ -1189,24 +1189,24 @@ static void write_results(int g_results, int ncid_orig,
     for (int i=1; i<results_ndim+1; ++i) {
         dims_shape[i] = results_shape[i-1];
     }
-    PRINT_ZERO("dims_shape={%ld,%ld,%ld,%ld}\n",
+    pagoda::print_zero("dims_shape={%ld,%ld,%ld,%ld}\n",
             dims_shape[0], dims_shape[1], dims_shape[2], dims_shape[3]);
 
     ncmpi::create(MPI_COMM_WORLD, filename.c_str(),
             NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
     ncmpi::def_dim(ncid, "time",       dims_shape[0], &dims[0]);
-    PRINT_ZERO("      time=%d\n", dims[0]);
+    pagoda::print_zero("      time=%d\n", dims[0]);
     ncmpi::def_dim(ncid, "cells",      dims_shape[1], &dims[1]);
-    PRINT_ZERO("     cells=%d\n", dims[1]);
+    pagoda::print_zero("     cells=%d\n", dims[1]);
     ncmpi::def_dim(ncid, "interfaces", dims_shape[2], &dims[2]);
-    PRINT_ZERO("interfaces=%d\n", dims[2]);
+    pagoda::print_zero("interfaces=%d\n", dims[2]);
     ncmpi::def_var(ncid, variablename.c_str(), NC_FLOAT, 3, dims, &varid);
-    PRINT_ZERO("       var=%d\n", dims[2]);
+    pagoda::print_zero("       var=%d\n", dims[2]);
     ncmpi::put_att(ncid, varid, "missing_value", NC_FLOAT, 1, &ZERO);
     ncmpi::enddef(ncid);
 
     NGA_Distribution64(g_results, me, results_lo, results_hi);
-    PRINT_SYNC("results_lo/hi={%ld,%ld}/{%ld,%ld}\n",
+    pagoda::print_sync("results_lo/hi={%ld,%ld}/{%ld,%ld}\n",
             results_lo[0], results_lo[1], results_hi[0], results_hi[1]);
     if (0 > results_lo[0] && 0 > results_hi[0]) {
         for (int i=0; i<results_ndim; ++i) {
@@ -1233,9 +1233,9 @@ static void write_results(int g_results, int ncid_orig,
             }
         }
         if (had_a_zero) {
-            PRINT_SYNC("had a zero\n");
+            pagoda::print_sync("had a zero\n");
         } else {
-            PRINT_SYNC("data okay\n");
+            pagoda::print_sync("data okay\n");
         }
         ncmpi::put_vara_all(ncid, varid, start, count, results);
         NGA_Release64(g_results, results_lo, results_hi);

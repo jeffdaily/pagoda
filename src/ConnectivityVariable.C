@@ -5,8 +5,6 @@
 #include <cstring> // for memset
 #include <map>
 
-#include <ga.h>
-
 #include "ConnectivityVariable.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -66,7 +64,7 @@ void ConnectivityVariable::reindex()
         if (mask) {
             int me = GA_Nodeid();
             int var_handle = var->get_handle();
-            size_t var_ndim = var->num_dims();
+            size_t var_ndim = var->get_ndim();
             int64_t *var_lo = new int64_t[var_ndim];
             int64_t *var_hi = new int64_t[var_ndim];
             int64_t *var_ld = NULL;

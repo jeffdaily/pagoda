@@ -13,6 +13,7 @@ using std::vector;
 #include "DataType.H"
 
 class Attribute;
+class Dataset;
 class Dimension;
 class NetcdfAttribute;
 class NetcdfDimension;
@@ -31,25 +32,26 @@ class NetcdfVariable : public AbstractVariable
         virtual string get_name() const;
         virtual vector<Dimension*> get_dims() const;
         virtual vector<Attribute*> get_atts() const;
+        virtual Dataset* get_dataset() const;
         virtual DataType get_type() const;
-        virtual Array* read(Array *dst);
-        virtual Array* read(int64_t record, Array *dst);
+        virtual Array* read(Array *dst) const;
+        virtual Array* read(int64_t record, Array *dst) const;
         virtual Array* iread(Array *dst);
         virtual Array* iread(int64_t record, Array *dst);
 
         virtual ostream& print(ostream &os) const;
 
-        NetcdfDataset* get_dataset() const;
+        NetcdfDataset* get_netcdf_dataset() const;
         int get_id() const;
 
     protected:
-        Array* read(Array *dst, bool nonblocking);
-        Array* read(int64_t record, Array *dst, bool nonblocking);
+        Array* read(Array *dst, bool nonblocking) const;
+        Array* read(int64_t record, Array *dst, bool nonblocking) const;
         bool find_bit(const vector<Dimension*> &adims,
                 const vector<int64_t> &lo, const vector<int64_t> &hi) const;
         void do_read(Array *dst, const vector<MPI_Offset> &start,
                 const vector<MPI_Offset> &count, bool found_bit,
-                bool nonblocking);
+                bool nonblocking) const;
 
         NetcdfDataset *dataset;
         int id;

@@ -75,6 +75,13 @@ vector<Attribute*> NetcdfVariable::get_atts() const
 }
 
 
+Dataset* NetcdfVariable::get_dataset() const
+{
+    TIMING("NetcdfVariable::get_dataset()");
+    return dataset;
+}
+
+
 DataType NetcdfVariable::get_type() const
 {
     TIMING("NetcdfVariable::get_type()");
@@ -82,7 +89,7 @@ DataType NetcdfVariable::get_type() const
 }
 
 
-Array* NetcdfVariable::read(Array *dst)
+Array* NetcdfVariable::read(Array *dst) const
 {
     return read(dst, false);
 }
@@ -94,9 +101,9 @@ Array* NetcdfVariable::iread(Array *dst)
 }
 
 
-Array* NetcdfVariable::read(Array *dst, bool nonblocking)
+Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
 {
-    int64_t ndim = num_dims();
+    int64_t ndim = get_ndim();
     vector<int64_t> lo(ndim);
     vector<int64_t> hi(ndim);
     vector<MPI_Offset> start(ndim);
@@ -131,7 +138,7 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking)
 }
 
 
-Array* NetcdfVariable::read(int64_t record, Array *dst)
+Array* NetcdfVariable::read(int64_t record, Array *dst) const
 {
     return read(record, dst, false);
 }
@@ -143,9 +150,9 @@ Array* NetcdfVariable::iread(int64_t record, Array *dst)
 }
 
 
-Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking)
+Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
 {
-    int64_t ndim = num_dims();
+    int64_t ndim = get_ndim();
     vector<int64_t> lo(ndim);
     vector<int64_t> hi(ndim);
     vector<MPI_Offset> start(ndim);
@@ -216,9 +223,9 @@ bool NetcdfVariable::find_bit(const vector<Dimension*> &adims,
 
 
 void NetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, bool found_bit, bool nonblocking)
+        const vector<MPI_Offset> &count, bool found_bit, bool nonblocking) const
 {
-    int ncid = get_dataset()->get_id();
+    int ncid = get_netcdf_dataset()->get_id();
     DataType type = dst->get_type();
 
 #define read_var_all(TYPE, DT) \
@@ -230,8 +237,8 @@ void NetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
         if (nonblocking) { \
             int request; \
             request = ncmpi::iget_vara(ncid, id, &start[0], &count[0], ptr); \
-            get_dataset()->requests.push_back(request); \
-            get_dataset()->arrays_to_release.push_back(dst); \
+            get_netcdf_dataset()->requests.push_back(request); \
+            get_netcdf_dataset()->arrays_to_release.push_back(dst); \
         } else { \
             ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
         } \
@@ -242,7 +249,9 @@ void NetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
     read_var_all(int,    DataType::INT)
     read_var_all(float,  DataType::FLOAT)
     read_var_all(double, DataType::DOUBLE)
-    ; // for last else above
+    {
+        throw DataTypeException("DataType not handled", type);
+    }
 #undef read_var_all
 }
 
@@ -255,9 +264,9 @@ ostream& NetcdfVariable::print(ostream &os) const
 }
 
 
-NetcdfDataset* NetcdfVariable::get_dataset() const
+NetcdfDataset* NetcdfVariable::get_netcdf_dataset() const
 {
-    TIMING("NetcdfVariable::get_dataset()");
+    TIMING("NetcdfVariable::get_netcdf_dataset()");
     return dataset;
 }
 

@@ -7,6 +7,9 @@
 using std::ostream;
 using std::string;
 
+class Dataset;
+class Mask;
+
 
 /**
  * A Dimension is a named size.
@@ -48,12 +51,27 @@ class Dimension
         virtual bool is_unlimited() const = 0;
 
         /**
+         * Returns the Dataset this Dimension is associated with.
+         *
+         * @return the Dataset this Dimension is associated with.
+         */
+        virtual Dataset* get_dataset() const = 0;
+
+        /**
+         * Returns the Mask associated with this Dimension.
+         *
+         * @return the Mask associated with this Dimension.
+         */
+        virtual Mask* get_mask() const;
+
+        /**
          * Write this Dimension to the given stream.
          * 
          * @param[in,out] os the stream
          * @return the stream
          */
         virtual ostream& print(ostream &os) const = 0;
+
         friend ostream& operator << (ostream &os, const Dimension *other);
 
     protected:
