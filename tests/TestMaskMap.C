@@ -34,6 +34,7 @@ class DummyDimension : public Dimension
         virtual string get_name() const { return name; }
         virtual int64_t get_size() const { return size; }
         virtual bool is_unlimited() const { return false; }
+        virtual Dataset* get_dataset() const { return NULL; }
         virtual ostream& print(ostream &os) const {
             return os << "DummyDimension(" << name << "," << size << ")";
         }

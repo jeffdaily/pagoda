@@ -1,29 +1,28 @@
 #ifndef AGGREGATION_H_
 #define AGGREGATION_H_
 
-#include <iostream>
 #include <vector>
 
-using std::ostream;
 using std::vector;
 
-#include "Dataset.H"
+#include "AbstractDataset.H"
 
-class Attribute;
-class Dimension;
-class Variable;
+class Dataset;
 
 
 /**
  * Interface for an aggregated Dataset.
  */
-class Aggregation : public Dataset
+class Aggregation : public AbstractDataset
 {
     public:
         virtual ~Aggregation();
 
         virtual void add(Dataset *dataset) = 0;
         virtual void add(const vector<Dataset*> &datasets);
+        virtual vector<Dataset*> get_datasets() const = 0;
+
+        virtual void set_masks(MaskMap *masks);
 
     protected:
         Aggregation();

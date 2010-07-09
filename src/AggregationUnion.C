@@ -107,19 +107,9 @@ void AggregationUnion::add(Dataset *dataset)
 }
 
 
-void AggregationUnion::set_masks(MaskMap *masks)
+vector<Dataset*> AggregationUnion::get_datasets() const
 {
-    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
-            it!=end; ++it) {
-        (*it)->set_masks(masks);
-    }
-    this->masks = masks;
-}
-
-
-MaskMap* AggregationUnion::get_masks() const
-{
-    return masks;
+    return datasets;
 }
 
 

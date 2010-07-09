@@ -1,0 +1,18 @@
+DATATYPE_EXPAND(DataType::CHAR,char)
+DATATYPE_EXPAND(DataType::SHORT,short)
+DATATYPE_EXPAND(DataType::INT,int)
+DATATYPE_EXPAND(DataType::LONG,long)
+DATATYPE_EXPAND(DataType::LONGLONG,long long)
+DATATYPE_EXPAND(DataType::FLOAT,float)
+DATATYPE_EXPAND(DataType::DOUBLE,double)
+DATATYPE_EXPAND(DataType::LONGDOUBLE,long double)
+DATATYPE_EXPAND(DataType::UCHAR,unsigned char)
+DATATYPE_EXPAND(DataType::USHORT,unsigned short)
+DATATYPE_EXPAND(DataType::UINT,unsigned int)
+DATATYPE_EXPAND(DataType::ULONG,unsigned long)
+DATATYPE_EXPAND(DataType::ULONGLONG,unsigned long long)
+DATATYPE_EXPAND(DataType::SCHAR,signed char)
+{
+    throw DataTypeException("DataType not handled", type);
+}
+#undef DATATYPE_EXPAND

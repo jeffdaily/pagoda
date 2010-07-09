@@ -55,7 +55,7 @@ class Mask : public Array
          *
          * @return the number of set bits in this Mask
          */
-        virtual int64_t get_count() const = 0;
+        virtual int64_t get_count() = 0;
 
         /**
          * Set all mask bits to zero.
@@ -105,21 +105,27 @@ class Mask : public Array
          * The enumeration takes into account the masked bits.  The first set
          * bit is 0, the next is 1, and so on.  Any unset bit is set to -1.
          *
+         * The Array should NOT be deleted -- it is owned by this Mask.  The
+         * enumeration will be recomputed only as needed, as well.
+         *
          * For example:
          * Mask:   0  0  0  0  1  1  1  0  1  2 -1  0  1
          * Rtrn:  -1 -1 -1 -1  0  1  2 -1  3  4  5 -1  6
          *
          * @return the enumerated, reindexed Array
          */
-        virtual Array* reindex() const = 0;
+        virtual Array* reindex() = 0;
 
         /**
          * Return a new Array containing the partial sum of this Mask.
          *
+         * The Array should NOT be deleted -- it is owned by this Mask.  The
+         * partial_sum will be recomputed only as needed, as well.
+         *
          * @param[in] exclude whether the first value is always 0
          * @return the partially summed Array
          */
-        virtual Array* partial_sum(bool exclude) const = 0;
+        virtual Array* partial_sum(bool exclude) = 0;
 
         /**
          * Write this Mask to the given stream.

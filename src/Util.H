@@ -36,6 +36,9 @@ void gop_min(vector<long> &values);
 void gop_sum(vector<int> &values);
 void gop_sum(vector<long> &values);
 void gop_sum(vector<long long> &values);
+#if NEED_VECTOR_INT64_T_GOP
+void gop_sum(vector<int64_t> &values);
+#endif
 void gop_sum(vector<float> &values);
 void gop_sum(vector<double> &values);
 void gop_sum(vector<long double> &values);

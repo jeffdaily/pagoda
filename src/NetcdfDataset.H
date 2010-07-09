@@ -9,12 +9,11 @@
 using std::string;
 using std::vector;
 
-#include "Dataset.H"
+#include "AbstractDataset.H"
 
 class Array;
 class Attribute;
 class Dimension;
-class MaskMap;
 class NetcdfAttribute;
 class NetcdfDimension;
 class NetcdfVariable;
@@ -24,7 +23,7 @@ class Variable;
 /**
  * The pnetcdf implementation of the Dataset.
  */
-class NetcdfDataset : public Dataset
+class NetcdfDataset : public AbstractDataset
 {
     public:
         NetcdfDataset(const string &filename);
@@ -33,9 +32,6 @@ class NetcdfDataset : public Dataset
         virtual vector<Attribute*> get_atts() const;
         virtual vector<Dimension*> get_dims() const;
         virtual vector<Variable*> get_vars() const;
-
-        virtual void set_masks(MaskMap *masks);
-        virtual MaskMap* get_masks() const;
 
         virtual void wait();
 
@@ -58,7 +54,6 @@ class NetcdfDataset : public Dataset
         vector<NetcdfAttribute*> atts;
         vector<NetcdfDimension*> dims;
         vector<NetcdfVariable*> vars;
-        MaskMap *masks;
 
         vector<int> requests;
         vector<Array*> arrays_to_release;

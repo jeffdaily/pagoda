@@ -30,9 +30,7 @@ class AggregationUnion : public Aggregation
         virtual vector<Variable*> get_vars() const;
 
         virtual void add(Dataset *dataset);
-
-        virtual void set_masks(MaskMap *masks);
-        virtual MaskMap* get_masks() const;
+        virtual vector<Dataset*> get_datasets() const;
 
         virtual void wait();
 
@@ -43,7 +41,6 @@ class AggregationUnion : public Aggregation
         vector<Attribute*> atts;
         vector<Dimension*> dims;
         vector<Variable*> vars;
-        MaskMap *masks;
 };
 
 #endif // AGGREGATIONUNION_H_

@@ -27,7 +27,7 @@ class GlobalMask :  public Mask
 
         // Mask virtuals
         virtual string get_name() const;
-        virtual int64_t get_count() const;
+        virtual int64_t get_count();
         virtual void clear();
         virtual void reset();
 
@@ -36,8 +36,8 @@ class GlobalMask :  public Mask
                             const Array *lat, const Array *lon);
         virtual void modify(double low, double hi, const Array *var);
 
-        virtual Array* reindex() const;
-        virtual Array* partial_sum(bool exclude) const;
+        virtual Array* reindex();
+        virtual Array* partial_sum(bool exclude);
 
         // Array forwards and virtuals
         virtual DataType get_type() const;
@@ -72,8 +72,8 @@ class GlobalMask :  public Mask
                          const vector<int64_t> &lo,
                          const vector<int64_t> &hi,
                          const vector<int64_t> &ld);
-        virtual void scatter(void *buffer, const vector<int64_t> &subscripts);
-        virtual void* gather(const vector<int64_t> &subscripts) const;
+        virtual void scatter(void *buffer, vector<int64_t> &subscripts);
+        virtual void* gather(vector<int64_t> &subscripts) const;
 
         // shared virtuals
         virtual ostream& print(ostream &os) const;
@@ -85,6 +85,13 @@ class GlobalMask :  public Mask
 
     protected:
         GlobalArray *mask;
+        Array *index;
+        Array *sum;
+        int64_t count;
+        bool last_excl;
+        bool dirty_index;
+        bool dirty_sum;
+        bool dirty_count;
         string name;
 };
 

@@ -138,6 +138,36 @@ Attribute* AbstractVariable::get_att(
 }
 
 
+vector<Mask*> AbstractVariable::get_masks() const
+{
+    vector<Dimension*> dims = get_dims();
+    vector<Dimension*>::iterator dim_it = dims.begin();
+    vector<Mask*> ret;
+
+    for ( ; dim_it!=dims.end(); ++dim_it) {
+        ret.push_back((*dim_it)->get_mask());
+    }
+
+    return ret;
+}
+
+
+bool AbstractVariable::needs_subset() const
+{
+    vector<Mask*> masks;
+    vector<Mask*>::iterator mask_it;
+
+    masks = get_masks();
+    for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
+        if ((*mask_it)->get_count() != (*mask_it)->get_size()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 Array* AbstractVariable::read() const
 {
     Array *dst = Array::create(get_type(), get_shape());

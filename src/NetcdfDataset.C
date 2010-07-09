@@ -5,6 +5,7 @@
 #include <pnetcdf.h>
 
 #include "Array.H"
+#include "Grid.H"
 #include "NetcdfAttribute.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
@@ -16,14 +17,13 @@
 
 
 NetcdfDataset::NetcdfDataset(const string &filename)
-    :   Dataset()
+    :   AbstractDataset()
     ,   filename(filename)
     ,   ncid(-1)
     ,   udim(-1)
     ,   atts()
     ,   dims()
     ,   vars()
-    ,   masks(NULL)
     ,   requests()
     ,   arrays_to_release()
 {
@@ -122,20 +122,6 @@ NetcdfVariable* NetcdfDataset::get_var(size_t i) const
 {
     TIMING("NetcdfDataset::get_var(size_t)");
     return vars.at(i);
-}
-
-
-void NetcdfDataset::set_masks(MaskMap *masks)
-{
-    TIMING("NetcdfDataset::set_masks(MaskMap*)");
-    this->masks = masks;
-}
-
-
-MaskMap* NetcdfDataset::get_masks() const
-{
-    TIMING("NetcdfDataset::get_masks()");
-    return masks;
 }
 
 

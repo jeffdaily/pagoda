@@ -87,6 +87,13 @@ class Array
         virtual int64_t get_ndim() const = 0;
 
         /**
+         * Returns true if the number of dimensions is zero.
+         *
+         * @return true if the number of dimensions is zero.
+         */
+        virtual bool is_scalar() const;
+
+        /**
          * Fills the array with the given value.
          *
          * The value must point to the appropriate type.
@@ -306,7 +313,7 @@ class Array
          * @param[in] subscripts the indices of where to scatter
          */
         virtual void scatter(void *buffer,
-                             const vector<int64_t> &subscripts) = 0;
+                             vector<int64_t> &subscripts) = 0;
 
         /**
          * Gathers values from this Array into a local buffer.
@@ -317,7 +324,7 @@ class Array
          * @param[in] subscripts the indices from where to gather
          * @return the gathered values
          */
-        virtual void* gather(const vector<int64_t> &subscripts) const = 0;
+        virtual void* gather(vector<int64_t> &subscripts) const = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Array *array);

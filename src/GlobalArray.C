@@ -2,10 +2,13 @@
 #   include <config.h>
 #endif
 
+#include <sstream>
 #include <typeinfo>
 
 #include <ga.h>
 
+#include "DataType.H"
+#include "Debug.H"
 #include "GlobalArray.H"
 #include "NotImplementedException.H"
 #include "Timing.H"
@@ -34,6 +37,23 @@ static void cast(InputIterator1 first, InputIterator1 last, InputIterator2 resul
 }
 
 
+void GlobalArray::create()
+{
+    handle = NGA_Create64(type.to_ga(), shape.size(), &shape[0], "name", NULL);
+    set_distribution();
+}
+
+
+void GlobalArray::create_scalar()
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        scalar = (void*)(new T); \
+    } else
+#include "DataType.def"
+}
+
+
 GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
     :   Array()
     ,   handle(0)
@@ -41,9 +61,13 @@ GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
     ,   shape(shape)
     ,   lo()
     ,   hi()
+    ,   scalar(NULL)
 {
-    handle = NGA_Create64(type.to_ga(), shape.size(), &shape[0], "name", NULL);
-    set_distribution();
+    if (is_scalar()) {
+        create_scalar();
+    } else {
+        create();
+    }
 }
 
 
@@ -54,13 +78,17 @@ GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
     ,   shape()
     ,   lo()
     ,   hi()
+    ,   scalar(NULL)
 {
     for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
             it!=end; ++it) {
         shape.push_back((*it)->get_size());
     }
-    handle = NGA_Create64(type.to_ga(), shape.size(), &shape[0], "name", NULL);
-    set_distribution();
+    if (is_scalar()) {
+        create_scalar();
+    } else {
+        create();
+    }
 }
 
 
@@ -71,14 +99,32 @@ GlobalArray::GlobalArray(const GlobalArray &that)
     ,   shape(that.shape)
     ,   lo(that.lo)
     ,   hi(that.hi)
+    ,   scalar(NULL)
 {
-    handle = GA_Duplicate(that.handle, "noname");
+    if (is_scalar()) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            scalar = (void*)(new T); \
+            *((T*)scalar) = *((T*)(that.scalar)); \
+        } else
+#include "DataType.def"
+    } else {
+        handle = GA_Duplicate(that.handle, "noname");
+    }
 }
 
 
 GlobalArray::~GlobalArray()
 {
-    GA_Destroy(handle);
+    if (is_scalar()) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            delete ((T*)scalar); \
+        } else
+#include "DataType.def"
+    } else {
+        GA_Destroy(handle);
+    }
 }
 
 
@@ -114,14 +160,30 @@ int64_t GlobalArray::get_ndim() const
 
 void GlobalArray::fill(void *value)
 {
-    GA_Fill(handle, value);
+    if (is_scalar()) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            *((T*)scalar) = *((T*)value); \
+        } else
+#include "DataType.def"
+    } else {
+        GA_Fill(handle, value);
+    }
 }
 
 
 void GlobalArray::copy(const Array *src)
 {
     if (typeid(*src) == typeid(*this)) {
-        GA_Copy(((GlobalArray*)src)->handle, handle);
+        if (is_scalar()) {
+#define DATATYPE_EXPAND(DT,T) \
+            if (DT == type) { \
+                *((T*)scalar) = *((T*)(((GlobalArray*)src)->scalar)); \
+            } else
+#include "DataType.def"
+        } else {
+            GA_Copy(((GlobalArray*)src)->handle, handle);
+        }
     }
     throw NotImplementedException("GlobalArray::copy(Array*) of differing Array implementations");
 }
@@ -134,15 +196,19 @@ void GlobalArray::copy(const Array *src,
         const vector<int64_t> &dst_hi)
 {
     if (typeid(*src) == typeid(*this)) {
-        vector<int64_t> src_lo_copy(src_lo.begin(), src_lo.end());
-        vector<int64_t> src_hi_copy(src_hi.begin(), src_hi.end());
-        vector<int64_t> dst_lo_copy(dst_lo.begin(), dst_lo.end());
-        vector<int64_t> dst_hi_copy(dst_hi.begin(), dst_hi.end());
-        NGA_Copy_patch64('n',
-                ((GlobalArray*)src)->handle,
-                &src_lo_copy[0], &src_hi_copy[0],
-                handle,
-                &dst_lo_copy[0], &dst_hi_copy[0]);
+        if (is_scalar()) {
+            throw NotImplementedException("GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) no implemented for scalars");
+        } else {
+            vector<int64_t> src_lo_copy(src_lo.begin(), src_lo.end());
+            vector<int64_t> src_hi_copy(src_hi.begin(), src_hi.end());
+            vector<int64_t> dst_lo_copy(dst_lo.begin(), dst_lo.end());
+            vector<int64_t> dst_hi_copy(dst_hi.begin(), dst_hi.end());
+            NGA_Copy_patch64('n',
+                    ((GlobalArray*)src)->handle,
+                    &src_lo_copy[0], &src_hi_copy[0],
+                    handle,
+                    &dst_lo_copy[0], &dst_hi_copy[0]);
+        }
     }
     throw NotImplementedException("GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
 }
@@ -150,9 +216,12 @@ void GlobalArray::copy(const Array *src,
 
 ostream& operator << (ostream &os, const GlobalArray &array)
 {
-    os << "GlobalArray(" << array.get_type() << ",";
     vector<int64_t> shape = array.get_shape();
-    os << "shape(" << shape[0];
+
+    os << "GlobalArray(" << array.get_type() << ",shape(";
+    if (!shape.empty()) {
+        os << shape[0];
+    }
     for (size_t i=1,limit=shape.size(); i<limit; ++i) {
         os << "," << shape[i];
     }
@@ -241,39 +310,26 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
 GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
 {
     if (type == that.type && shape == that.shape) {
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             t alpha = 1, beta = 1; \
             GA_Add(&alpha, handle, &beta, that.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else if (shape == that.shape) {
         // we must cast to same type before operation
         GlobalArray casted(type, shape);
         casted = that;
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             t alpha = 1, beta = 1; \
             GA_Add(&alpha, handle, &beta, casted.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else {
         GA_Error("shape mismatch",0);
     }
+
     return *this;
 }
 
@@ -281,39 +337,26 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
 GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
 {
     if (type == that.type && shape == that.shape) {
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             t alpha = 1, beta = -1; \
             GA_Add(&alpha, handle, &beta, that.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else if (shape == that.shape) {
         // we must cast to same type before operation
         GlobalArray casted(type, shape);
         casted = that;
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             t alpha = 1, beta = -1; \
             GA_Add(&alpha, handle, &beta, casted.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else {
         GA_Error("shape mismatch",0);
     }
+
     return *this;
 }
 
@@ -321,37 +364,24 @@ GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
 GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
 {
     if (type == that.type && shape == that.shape) {
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             GA_Elem_multiply(handle, that.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else if (shape == that.shape) {
         // we must cast to same type before operation
         GlobalArray casted(type, shape);
         casted = that;
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             GA_Elem_multiply(handle, casted.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else {
         GA_Error("shape mismatch",0);
     }
+
     return *this;
 }
 
@@ -359,37 +389,24 @@ GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
 GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
 {
     if (type == that.type && shape == that.shape) {
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             GA_Elem_divide(handle, that.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else if (shape == that.shape) {
         // we must cast to same type before operation
         GlobalArray casted(type, shape);
         casted = that;
-#define operator_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             GA_Elem_divide(handle, casted.handle, handle); \
         } else
-        operator_helper(MT_C_INT,     int)
-        operator_helper(MT_C_LONGINT, long)
-        operator_helper(MT_C_LONGLONG,long long)
-        operator_helper(MT_C_FLOAT,   float)
-        operator_helper(MT_C_DBL,     double)
-        operator_helper(MT_C_LDBL,    long double)
-        ; // for last else above
-#undef operator_helper
+#include "GlobalArray.def"
     } else {
         GA_Error("shape mismatch",0);
     }
+
     return *this;
 }
 
@@ -403,13 +420,23 @@ void GlobalArray::set_distribution()
 }
 
 
+bool GlobalArray::is_scalar() const
+{
+    return shape.empty();
+}
+
+
 /**
  * Return true if this process owns a portion of this GlobalArray.
  */
 bool GlobalArray::owns_data() const
 {
-    return !(less_than(lo.begin(),lo.end(),0)
-            || less_than(hi.begin(),hi.end(),0));
+    if (is_scalar()) {
+        return true;
+    } else {
+        return !(less_than(lo.begin(),lo.end(),0)
+                || less_than(hi.begin(),hi.end(),0));
+    }
 }
 
 
@@ -423,35 +450,49 @@ void GlobalArray::get_distribution(
 
 void* GlobalArray::access()
 {
-    void *tmp;
-    vector<int64_t> ld(lo.size());
-    NGA_Access64(handle, &lo[0], &hi[0], &tmp, &ld[0]);
-    return tmp;
+    if (is_scalar()) {
+        return scalar;
+    } else {
+        void *tmp;
+        vector<int64_t> ld(lo.size());
+        NGA_Access64(handle, &lo[0], &hi[0], &tmp, &ld[0]);
+        return tmp;
+    }
 }
 
 
 void* GlobalArray::access() const
 {
-    void *tmp;
-    vector<int64_t> ld(lo.size());
-    vector<int64_t> lo_copy(lo.begin(),lo.end());
-    vector<int64_t> hi_copy(hi.begin(),hi.end());
-    NGA_Access64(handle, &lo_copy[0], &hi_copy[0], &tmp, &ld[0]);
-    return tmp;
+    if (is_scalar()) {
+        return scalar;
+    } else {
+        void *tmp;
+        vector<int64_t> ld(lo.size());
+        vector<int64_t> lo_copy(lo.begin(),lo.end());
+        vector<int64_t> hi_copy(hi.begin(),hi.end());
+        NGA_Access64(handle, &lo_copy[0], &hi_copy[0], &tmp, &ld[0]);
+        return tmp;
+    }
 }
 
 
 void GlobalArray::release() const
 {
-    vector<int64_t> lo_copy(lo.begin(),lo.end());
-    vector<int64_t> hi_copy(hi.begin(),hi.end());
-    NGA_Release64(handle, &lo_copy[0], &hi_copy[0]);
+    if (is_scalar()) {
+    } else {
+        vector<int64_t> lo_copy(lo.begin(),lo.end());
+        vector<int64_t> hi_copy(hi.begin(),hi.end());
+        NGA_Release64(handle, &lo_copy[0], &hi_copy[0]);
+    }
 }
 
 
 void GlobalArray::release_update()
 {
-    NGA_Release_update64(handle, &lo[0], &hi[0]);
+    if (is_scalar()) {
+    } else {
+        NGA_Release_update64(handle, &lo[0], &hi[0]);
+    }
 }
 
 
@@ -485,18 +526,17 @@ void GlobalArray::put(void *buffer,
 }
 
 
-void GlobalArray::scatter(void *buffer, const vector<int64_t> &subscripts)
+void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
 {
     // GA has a funky C signature for this one...
-    vector<int64_t> subscripts_copy(subscripts.begin(),subscripts.end());
     int64_t ndim = get_ndim();
-    int64_t n = subscripts_copy.size() / ndim;
+    int64_t n = subscripts.size() / ndim;
     int64_t **subs = new int64_t*[n];
 
     TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
 
     for (size_t i=0; i<n; ++i) {
-        subs[i] = &subscripts_copy[i*ndim];
+        subs[i] = &subscripts[i*ndim];
     }
 
     NGA_Scatter64(handle, buffer, subs, n);
@@ -505,33 +545,25 @@ void GlobalArray::scatter(void *buffer, const vector<int64_t> &subscripts)
 }
 
 
-void* GlobalArray::gather(const vector<int64_t> &subscripts) const
+void* GlobalArray::gather(vector<int64_t> &subscripts) const
 {
     // GA has a funky C signature for this one...
-    vector<int64_t> subscripts_copy(subscripts.begin(),subscripts.end());
     int64_t ndim = get_ndim();
-    int64_t n = subscripts_copy.size() / ndim;
+    int64_t n = subscripts.size() / ndim;
     int64_t **subs = new int64_t*[n];
     void *buffer;
 
     TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
 
     for (size_t i=0; i<n; ++i) {
-        subs[i] = &subscripts_copy[i*ndim];
+        subs[i] = &subscripts[i*ndim];
     }
 
-#define gather_helper(mt,t) \
+#define GATYPE_EXPAND(mt,t) \
     if (type == mt) { \
         buffer = new t[n]; \
     } else
-    gather_helper(C_INT,     int)
-    gather_helper(C_LONG,    long)
-    gather_helper(C_LONGLONG,long long)
-    gather_helper(C_FLOAT,   float)
-    gather_helper(C_DBL,     double)
-    gather_helper(C_LDBL,    long double)
-    ; // for last else above
-#undef gather_helper
+#include "GlobalArray.def"
     
     NGA_Gather64(handle, buffer, subs, n);
 
@@ -548,5 +580,15 @@ ostream& GlobalArray::print(ostream &os) const
 
 void GlobalArray::dump() const
 {
-    GA_Print(handle);
+    if (is_scalar()) {
+#define GATYPE_EXPAND(mt,t) \
+        if (type == mt) { \
+            std::ostringstream os; \
+            os << *((t*)scalar) << std::endl; \
+            pagoda::print_zero(os.str()); \
+        } else
+#include "GlobalArray.def"
+    } else {
+        GA_Print(handle);
+    }
 }

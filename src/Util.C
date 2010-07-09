@@ -192,6 +192,33 @@ void pagoda::gop_sum(vector<long long> &values)
 }
 
 
+#if NEED_VECTOR_INT64_T_GOP
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */ 
+void pagoda::gop_sum(vector<int64_t> &values)
+{
+#   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
+    GA_Llgop(&values[0], values.size(), "+");
+#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG
+    GA_Lgop(&values[0], values.size(), "+");
+#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
+    GA_Igop(&values[0], values.size(), "+");
+#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
+    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
+    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_INT
+    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+#   else
+#       error
+#   endif
+}
+#endif /* NEED_VECTOR_INT64_T_GOP */
+
+
 /**
  * Returns the sum of all values from all processes.
  *

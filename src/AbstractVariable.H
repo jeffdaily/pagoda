@@ -15,6 +15,7 @@ using std::vector;
 class Array;
 class Attribute;
 class Dataset;
+class Mask;
 
 
 /**
@@ -43,6 +44,8 @@ class AbstractVariable : public Variable
                 bool ignore_case=false) const;
 
         virtual Dataset* get_dataset() const = 0;
+        virtual vector<Mask*> get_masks() const;
+        virtual bool needs_subset() const;
 
         virtual DataType get_type() const = 0;
 

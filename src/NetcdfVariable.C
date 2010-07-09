@@ -134,6 +134,11 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
 
     do_read(dst, start, count, found_bit, nonblocking);
 
+    // check whether a subset is needed
+    if (needs_subset()) {
+        pagoda::print_sync("needs subset\n");
+    }
+
     return dst;
 }
 
@@ -185,6 +190,11 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     }
 
     do_read(dst, start, count, found_bit, nonblocking);
+
+    // check whether a subset is needed
+    if (needs_subset()) {
+        pagoda::print_sync("needs subset record\n");
+    }
 
     return dst;
 }

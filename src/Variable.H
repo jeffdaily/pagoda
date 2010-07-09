@@ -15,6 +15,7 @@ class Array;
 class Attribute;
 class Dataset;
 class Dimension;
+class Mask;
 
 
 /**
@@ -45,6 +46,8 @@ class Variable
                 bool ignore_case=false) const = 0;
 
         virtual Dataset* get_dataset() const = 0;
+        virtual vector<Mask*> get_masks() const = 0;
+        virtual bool needs_subset() const = 0;
 
         virtual DataType get_type() const = 0;
 

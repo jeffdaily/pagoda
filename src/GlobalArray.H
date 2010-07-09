@@ -51,8 +51,8 @@ class GlobalArray : public Array
                          const vector<int64_t> &lo,
                          const vector<int64_t> &hi,
                          const vector<int64_t> &ld);
-        virtual void scatter(void *buffer, const vector<int64_t> &subscripts);
-        virtual void* gather(const vector<int64_t> &subscripts) const;
+        virtual void scatter(void *buffer, vector<int64_t> &subscripts);
+        virtual void* gather(vector<int64_t> &subscripts) const;
 
         virtual ostream& print(ostream &os) const;
 
@@ -66,13 +66,18 @@ class GlobalArray : public Array
         GlobalArray& operator/=(const GlobalArray &that);
 
     protected:
+        void create();
+        void create_scalar();
         void set_distribution();
+        bool is_scalar() const;
 
         int handle;
         DataType type;
         vector<int64_t> shape;
         vector<int64_t> lo;
         vector<int64_t> hi;
+
+        void *scalar;
 };
 
 #endif /* GLOBALARRAY_H_ */

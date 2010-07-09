@@ -1,0 +1,10 @@
+GATYPE_EXPAND(MT_C_INT,     int)
+GATYPE_EXPAND(MT_C_LONGINT, long)
+GATYPE_EXPAND(MT_C_LONGLONG,long long)
+GATYPE_EXPAND(MT_C_FLOAT,   float)
+GATYPE_EXPAND(MT_C_DBL,     double)
+GATYPE_EXPAND(MT_C_LDBL,    long double)
+{
+    throw DataTypeException("GA type not handled", type);
+}
+#undef GATYPE_EXPAND

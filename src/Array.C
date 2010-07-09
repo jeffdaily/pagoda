@@ -48,6 +48,12 @@ int64_t Array::get_local_size() const
 }
 
 
+bool Array::is_scalar() const
+{
+    return get_ndim() == 0;
+}
+
+
 bool Array::same_distribution(const Array *other) const
 {
     vector<long> values(1,

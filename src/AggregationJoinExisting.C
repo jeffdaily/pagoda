@@ -144,19 +144,9 @@ void AggregationJoinExisting::add(Dataset *dataset)
 }
 
 
-void AggregationJoinExisting::set_masks(MaskMap *masks)
+vector<Dataset*> AggregationJoinExisting::get_datasets() const
 {
-    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
-            it!=end; ++it) {
-        (*it)->set_masks(masks);
-    }
-    this->masks = masks;
-}
-
-
-MaskMap* AggregationJoinExisting::get_masks() const
-{
-    return masks;
+    return datasets;
 }
 
 

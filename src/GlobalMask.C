@@ -20,6 +20,7 @@
 #include "Pack.H"
 #include "Slice.H"
 #include "Timing.H"
+#include "Util.H"
 #include "Variable.H"
 
 using std::accumulate;
@@ -34,6 +35,13 @@ using std::vector;
 GlobalMask::GlobalMask(const Dimension *dim)
     :   Mask()
     ,   mask(NULL)
+    ,   index(NULL)
+    ,   sum(NULL)
+    ,   count(-1)
+    ,   last_excl(false)
+    ,   dirty_index(true)
+    ,   dirty_sum(true)
+    ,   dirty_count(true)
     ,   name(dim->get_name())
 {
     int ONE = 1;
@@ -54,6 +62,13 @@ GlobalMask::GlobalMask(const Dimension *dim)
 GlobalMask::GlobalMask(const GlobalMask &that)
     :   Mask()
     ,   mask(NULL)
+    ,   index(NULL)
+    ,   sum(NULL)
+    ,   count(-1)
+    ,   last_excl(false)
+    ,   dirty_index(true)
+    ,   dirty_sum(true)
+    ,   dirty_count(true)
     ,   name(that.name)
 {
     TIMING("GlobalMask::GlobalMask(GlobalMask)");
@@ -71,6 +86,8 @@ GlobalMask::~GlobalMask()
     TIMING("GlobalMask::~GlobalMask()");
 
     delete mask;
+    delete index;
+    delete sum;
 }
 
 
@@ -87,33 +104,29 @@ string GlobalMask::get_name() const
  *
  * @return the number of set bits
  */
-int64_t GlobalMask::get_count() const
+int64_t GlobalMask::get_count()
 {
-    int64_t ZERO = 0;
-    vector<int64_t> counts(GA_Nnodes());
-
     TIMING("GlobalMask::get_count()");
 
-    std::fill(counts.begin(), counts.end(), ZERO);
-    if (owns_data()) {
-        int *data = (int*)access();
-        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
-            if (data[i] != 0) {
-                ++(counts[GA_Nodeid()]);
+    if (dirty_count) {
+        int64_t ZERO = 0;
+        vector<int64_t> counts(pagoda::num_nodes(), ZERO);
+
+        if (owns_data()) {
+            int *data = (int*)access();
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
+                if (data[i] != 0) {
+                    ++(counts[pagoda::nodeid()]);
+                }
             }
+            release();
         }
-        release();
+        pagoda::gop_sum(counts);
+        count = accumulate(counts.begin(), counts.end(), ZERO);
+        dirty_count = false;
     }
-#if SIZEOF_INT64_T == SIZEOF_INT
-    armci_msg_igop(&counts[0], GA_Nnodes(), "+");
-#elif SIZEOF_INT64_T == SIZEOF_LONG
-    armci_msg_lgop(&counts[0], GA_Nnodes(), "+");
-#elif SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    armci_msg_llgop(&counts[0], GA_Nnodes(), "+");
-#else
-#   error SIZEOF_INT64_T == ???
-#endif
-    return accumulate(counts.begin(), counts.end(), ZERO);
+
+    return count;
 }
 
 
@@ -159,6 +172,10 @@ void GlobalMask::modify(const DimSlice &slice)
 
     TIMING("GlobalMask::modify(DimSlice)");
 
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
+
     // bail if mask doesn't own any of the data
     if (!owns_data()) return;
 
@@ -203,17 +220,21 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
 
     TIMING("GlobalMask::modify(LatLonBox,Array*,Array*)\n");
 
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
+
     // bail if we don't own any of the data
     if (!owns_data()) return;
 
     // lat, lon, and this must have the same shape
     // but it is assumed that they have the same distributions
     if (lat->get_shape() != lon->get_shape()) {
-        GA_Error("GlobalMask::modify lat lon shape mismatch", 0);
+        pagoda::abort("GlobalMask::modify lat lon shape mismatch", 0);
     } else if (get_shape() != lat->get_shape()) {
-        GA_Error("GlobalMask::modify mask lat/lon shape mismatch", 0);
+        pagoda::abort("GlobalMask::modify mask lat/lon shape mismatch", 0);
     } else if (lat->get_type() != lon->get_type()) {
-        GA_Error("GlobalMask::modify lat lon types differ", 0);
+        pagoda::abort("GlobalMask::modify lat lon types differ", 0);
     }
 
     mask_data = (int*)access();
@@ -249,11 +270,15 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
 
 void GlobalMask::modify(double min, double max, const Array *var)
 {
-    TIMING("GlobalMask::modify(double,double,Variable*,bool)");
-
     int *mask_data;
     void *var_data;
     DataType type = var->get_type();
+
+    TIMING("GlobalMask::modify(double,double,Variable*,bool)");
+
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
 
     // bail if we don't own any of the data
     if (!owns_data()) return;
@@ -261,7 +286,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
     // lat, lon, and this must have the same shape
     // but it is assumed that they have the same distributions
     if (get_shape() != var->get_shape()) {
-        GA_Error("GlobalMask::modify mask var shape mismatch", 0);
+        pagoda::abort("GlobalMask::modify mask var shape mismatch", 0);
     }
 
     mask_data = (int*)access();
@@ -327,46 +352,58 @@ void GlobalMask::normalize()
  *
  * @return the enumerated, reindexed Array
  */
-Array* GlobalMask::reindex() const
+Array* GlobalMask::reindex()
 {
     vector<int64_t> count(1, get_count());
     vector<int64_t> size(1, get_size());
-    Array *ret;
     Array *tmp;
     int NEG_ONE = -1;
 
     TIMING("GlobalMask::reindex()");
     TRACER("GlobalMask::reindex() BEGIN\n");
 
-    ret = new GlobalArray(C_INT, size);
+    if (dirty_index) {
+        if (!index) {
+            index = new GlobalArray(C_INT, size);
+        }
 
-    if (count[0] > 0) {
-        ret->fill(&NEG_ONE);
-        tmp = new GlobalArray(C_INT, count);
-        pagoda::enumerate(tmp, NULL, NULL);
-        pagoda::unpack1d(tmp, ret, mask);
-        delete tmp;
-    } else {
-        pagoda::enumerate(ret, NULL, NULL);
+        if (count[0] > 0) {
+            index->fill(&NEG_ONE);
+            tmp = new GlobalArray(C_INT, count);
+            pagoda::enumerate(tmp, NULL, NULL);
+            pagoda::unpack1d(tmp, index, mask);
+            delete tmp;
+        } else {
+            pagoda::enumerate(index, NULL, NULL);
+        }
+        dirty_index = false;
     }
 
     TRACER("GlobalMask::reindex() END\n");
 
-    return ret;
+    return index;
 }
 
 
-/**
- * TODO
- */
-Array* GlobalMask::partial_sum(bool excl) const
+Array* GlobalMask::partial_sum(bool excl)
 {
-    Array *ret = Array::create(get_type(), get_shape());
 
     TIMING("GlobalMask::partial_sum(bool)");
-    pagoda::partial_sum(this, ret, excl);
 
-    return ret;
+    if (last_excl != excl) {
+        dirty_sum = true;
+    }
+    last_excl = excl;
+
+    if (dirty_sum) {
+        if (!sum) {
+            sum = Array::create(get_type(), get_shape());
+        }
+        pagoda::partial_sum(this, sum, excl);
+        dirty_sum = false;
+    }
+
+    return sum;
 }
 
 
@@ -479,13 +516,13 @@ void GlobalMask::put(
 }
 
 
-void GlobalMask::scatter(void *buffer, const vector<int64_t> &subscripts)
+void GlobalMask::scatter(void *buffer, vector<int64_t> &subscripts)
 {
     mask->scatter(buffer,subscripts);
 }
 
 
-void* GlobalMask::gather(const vector<int64_t> &subscripts) const
+void* GlobalMask::gather(vector<int64_t> &subscripts) const
 {
     return mask->gather(subscripts);
 }
