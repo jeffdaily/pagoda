@@ -9,6 +9,7 @@
 
 #include "DataType.H"
 #include "Debug.H"
+#include "Error.H"
 #include "GlobalArray.H"
 #include "NotImplementedException.H"
 #include "Timing.H"
@@ -291,7 +292,7 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
             cast_helper(MT_C_DBL,     double,     MT_C_LDBL,long double)
             cast_helper(MT_C_LDBL,    long double,MT_C_LDBL,long double)
             {
-                GA_Error("Types not recognized for cast",0);
+                ERR("Types not recognized for cast");
             }
 #undef cast_helper
             NGA_Release64(that.handle, &lo[0], &hi[0]);
@@ -300,7 +301,7 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
             // we don't own any of the data, do nothing
         }
     } else {
-        GA_Error("shape mismatch",0);
+        ERR("shape mismatch");
     }
 
     return *this;
@@ -327,7 +328,7 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
         } else
 #include "GlobalArray.def"
     } else {
-        GA_Error("shape mismatch",0);
+        ERR("shape mismatch");
     }
 
     return *this;
@@ -354,7 +355,7 @@ GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
         } else
 #include "GlobalArray.def"
     } else {
-        GA_Error("shape mismatch",0);
+        ERR("shape mismatch");
     }
 
     return *this;
@@ -379,7 +380,7 @@ GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
         } else
 #include "GlobalArray.def"
     } else {
-        GA_Error("shape mismatch",0);
+        ERR("shape mismatch");
     }
 
     return *this;
@@ -404,7 +405,7 @@ GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
         } else
 #include "GlobalArray.def"
     } else {
-        GA_Error("shape mismatch",0);
+        ERR("shape mismatch");
     }
 
     return *this;
@@ -541,7 +542,7 @@ void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
 
     NGA_Scatter64(handle, buffer, subs, n);
 
-    delete subs;
+    delete [] subs;
 }
 
 

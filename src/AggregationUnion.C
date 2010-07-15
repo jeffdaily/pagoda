@@ -30,10 +30,12 @@ AggregationUnion::AggregationUnion()
 
 AggregationUnion::~AggregationUnion()
 {
-    TIMING("AggregationUnion::~AggregationUnion()");
     // deleting the datasets should also delete their associate members
     vector<Dataset*>::iterator it = datasets.begin();
     vector<Dataset*>::iterator end = datasets.end();
+
+    TIMING("AggregationUnion::~AggregationUnion()");
+
     for (; it!=end; ++it) {
         Dataset *dataset = *it;
         delete dataset;

@@ -27,7 +27,7 @@
 #include "NetcdfError.H"
 #include "RangeException.H"
 #include "Slice.H"
-#include "SubsetterException.H"
+#include "PagodaException.H"
 
 using std::copy;
 using std::cout;
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
         while ((c = getopt(argc, argv, "hb:g:d:")) != -1) {
             switch (c) {
                 case 'h':
-                    throw SubsetterException(AT, usage);
+                    throw PagodaException(AT, usage);
                 case 'b':
                     wants_region = true;
                     box = LatLonBox(optarg);
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
                     ostringstream os;
                     os << "ERROR: Unrecognized argument '" << c << "'" << endl;
                     os << usage << endl;
-                    throw SubsetterException(AT, os.str());
+                    throw PagodaException(AT, os.str());
             }
         }
 
@@ -222,12 +222,12 @@ int main(int argc, char **argv)
             ostringstream os;
             os << "ERROR: Input and output file arguments required" << endl;
             os << usage << endl;
-            throw SubsetterException(AT, os.str());
+            throw PagodaException(AT, os.str());
         } else if (optind+1 == argc) {
             ostringstream os;
             os << "ERROR: Output file argument required" << endl;
             os << usage << endl;
-            throw SubsetterException(AT, os.str());
+            throw PagodaException(AT, os.str());
         } else if (optind+2 == argc) {
             input_filename = argv[optind];
             output_filename = argv[optind+1];
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
             ostringstream os;
             os << "ERROR: Too many files specified" << endl;
             os << usage << endl;
-            throw SubsetterException(AT, os.str());
+            throw PagodaException(AT, os.str());
         }
 
         // open our input file and gather its header info
@@ -486,7 +486,7 @@ int main(int argc, char **argv)
         error = ncmpi_close(ncid_out);
         ERRNO_CHECK(error);
 
-    } catch (SubsetterException &ex) {
+    } catch (PagodaException &ex) {
         if (ME == 0) cout << ex.what() << endl;
     }
 
@@ -911,7 +911,7 @@ Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
 
 Mask create_composite_mask3d(MaskMap &masks, DimInfoVec dims)
 {
-    throw SubsetterException(AT, "create_composite_mask3d NOT IMPLEMENTED");
+    throw PagodaException(AT, "create_composite_mask3d NOT IMPLEMENTED");
     /*
        string name = composite_name(dims);
        MPI_Offset size = dims[0].size * dims[1].size * dims[2].size;

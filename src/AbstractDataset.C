@@ -19,7 +19,7 @@
 AbstractDataset::AbstractDataset()
     :   Dataset()
     ,   grids()
-    ,   masks(NULL)
+    ,   masks()
 {
     TIMING("AbstractDataset::AbstractDataset()");
 }
@@ -30,7 +30,6 @@ AbstractDataset::~AbstractDataset()
     TIMING("AbstractDataset::~AbstractDataset()");
     transform(grids.begin(), grids.end(), grids.begin(),
             pagoda::ptr_deleter<Grid*>);
-    delete masks;
 }
 
 
@@ -146,11 +145,33 @@ Variable* AbstractDataset::get_var(
 
 void AbstractDataset::set_masks(MaskMap *masks)
 {
-    this->masks = masks;
+    this->masks.assign(1,masks);
+}
+
+
+void AbstractDataset::push_masks(MaskMap *masks)
+{
+    this->masks.push_back(masks);
+}
+
+
+MaskMap* AbstractDataset::pop_masks()
+{
+    if (masks.empty()) {
+        return NULL;
+    } else {
+        MaskMap *ret = masks.back();
+        masks.pop_back();
+        return ret;
+    }
 }
 
 
 MaskMap* AbstractDataset::get_masks() const
 {
-    return masks;
+    if (masks.empty()) {
+        return NULL;
+    } else {
+        return masks.back();
+    }
 }

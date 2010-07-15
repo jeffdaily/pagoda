@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "Error.H"
-#include "SubsetterException.H"
+#include "PagodaException.H"
 
 using std::endl;
 using std::ostringstream;
@@ -17,7 +17,7 @@ do { \
     __os << __prefix << __errstr << endl; \
     const string __msg(__os.str()); \
     const string __where(AT); \
-    throw SubsetterException(__where, __msg); \
+    throw PagodaException(__where, __msg); \
 } while (0)
 
 #define ERRNO_CHECK(n) \

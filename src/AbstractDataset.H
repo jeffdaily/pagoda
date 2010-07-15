@@ -49,6 +49,8 @@ class AbstractDataset : public Dataset
                 bool ignore_case=false, bool within=false) const;
 
         virtual void set_masks(MaskMap *masks);
+        virtual void push_masks(MaskMap *masks);
+        virtual MaskMap* pop_masks();
         virtual MaskMap* get_masks() const;
 
         virtual void wait() = 0;
@@ -59,7 +61,7 @@ class AbstractDataset : public Dataset
         AbstractDataset();
 
         vector<Grid*> grids;
-        MaskMap *masks;
+        vector<MaskMap*> masks;
 };
 
 #endif // ABSTRACTDATASET_H_

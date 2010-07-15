@@ -48,6 +48,8 @@ class Dataset
                 bool ignore_case=false, bool within=false) const = 0;
 
         virtual void set_masks(MaskMap *masks) = 0;
+        virtual void push_masks(MaskMap *masks) = 0;
+        virtual MaskMap* pop_masks() = 0;
         virtual MaskMap* get_masks() const = 0;
 
         virtual void wait() = 0;

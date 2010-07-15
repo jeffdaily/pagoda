@@ -8,8 +8,8 @@
 
 #include "Common.H"
 #include "Error.H"
+#include "PagodaException.H"
 #include "SubsetterCommands.H"
-#include "SubsetterException.H"
 #include "Timing.H"
 
 
@@ -65,7 +65,7 @@ void SubsetterCommands::parse(int argc, char **argv)
     while ((c = getopt(argc, argv, "hb:d:j:")) != -1) {
         switch (c) {
             case 'h':
-                throw SubsetterException(AT, usage);
+                throw PagodaException(AT, usage);
             case 'b':
                 _has_box = true;
                 box = LatLonBox(string(optarg));
@@ -88,7 +88,7 @@ void SubsetterCommands::parse(int argc, char **argv)
                 os << "ERROR: Unrecognized argument '" << c << "'" << endl;
                 os << usage << endl;
                 const string msg(os.str());
-                throw SubsetterException(AT, msg);
+                throw PagodaException(AT, msg);
         }
     }
 
@@ -97,13 +97,13 @@ void SubsetterCommands::parse(int argc, char **argv)
         os << "ERROR: Input and output file arguments required" << endl;
         os << usage << endl;
         const string msg(os.str());
-        throw SubsetterException(AT, msg);
+        throw PagodaException(AT, msg);
     } else if (optind+1 == argc) {
         ostringstream os;
         os << "ERROR: Output file argument required" << endl;
         os << usage << endl;
         const string msg(os.str());
-        throw SubsetterException(AT, msg);
+        throw PagodaException(AT, msg);
     }
 
     while (optind < argc-1) {

@@ -100,20 +100,11 @@ void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
 
     ld.erase(ld.begin());
 
-#define get_helper(mt,t) \
-    if (type == mt) { \
-        buffer = new t[buffer_size]; \
+#define DATATYPE_EXPAND(DT,T) \
+    if (type == DT) { \
+        buffer = new T[buffer_size]; \
     } else
-    get_helper(DataType::INT,       int)
-    get_helper(DataType::LONG,      long)
-    get_helper(DataType::LONGLONG,  long long)
-    get_helper(DataType::FLOAT,     float)
-    get_helper(DataType::DOUBLE,    double)
-    get_helper(DataType::LONGDOUBLE,long double)
-    {
-        pagoda::abort("Array::get DataType not handled");
-    }
-#undef get_helper
+#include "DataType.def"
 
     return get(buffer, lo, hi, ld);
 }

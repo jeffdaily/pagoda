@@ -6,6 +6,7 @@
 
 #include "Array.H"
 #include "Debug.H"
+#include "Mask.H"
 #include "Pack.H"
 #include "Timing.H"
 #include "Util.H"
@@ -178,7 +179,25 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
  * N-Dimensional packing/subsetting.
  */
 void pagoda::pack(const Array *g_src, Array *g_dst,
-        vector<Array*> g_masks, vector<Array*> g_masksums)
+        const vector<Mask*> &g_masks)
+{
+    vector<Array*> sums;
+    vector<Array*> masks_copy(g_masks.begin(), g_masks.end());
+    vector<Mask*>::const_iterator it;
+
+    for (it=g_masks.begin(); it!=g_masks.end(); ++it) {
+        sums.push_back((*it)->partial_sum(false));
+    }
+
+    pack(g_src, g_dst, masks_copy, sums);
+}
+
+
+/**
+ * N-Dimensional packing/subsetting.
+ */
+void pagoda::pack(const Array *g_src, Array *g_dst,
+        const vector<Array*> &g_masks, const vector<Array*> &g_masksums)
 {
     int me = pagoda::nodeid();
 
@@ -243,7 +262,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                 int *tmp = (int*)g_masksums[i]->get(lo_src[i],lo_src[i]);
                 lo_dst[i] = *tmp;
                 hi_dst[i] = *tmp+local_counts[i]-1;
-                delete tmp;
+                delete [] tmp;
             }
             //printf("ld_dst=");
             for (int i=0; i<ndim_src-1; ++i) {

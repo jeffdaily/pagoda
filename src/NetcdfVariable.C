@@ -14,6 +14,7 @@
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
 #include "NetcdfVariable.H"
+#include "Pack.H"
 #include "Pnetcdf.H"
 #include "Timing.H"
 #include "Util.H"
@@ -51,6 +52,9 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
 NetcdfVariable::~NetcdfVariable()
 {
     TIMING("NetcdfVariable::~NetcdfVariable()");
+
+    transform(atts.begin(), atts.end(), atts.begin(),
+            pagoda::ptr_deleter<NetcdfAttribute*>);
 }
 
 
@@ -109,19 +113,30 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
     vector<MPI_Offset> start(ndim);
     vector<MPI_Offset> count(ndim);
     bool found_bit = true;
+    Array *tmp;
 
     TRACER("NetcdfVariable::read(Array*) %s\n", get_name().c_str());
     TIMING("NetcdfVariable::read(Array*)");
 
-    dst->get_distribution(lo,hi);
+    // if we are subsetting, then the passed in array is different than the
+    // one in which the data is read into
+    if (needs_subset()) {
+        get_dataset()->push_masks(NULL);
+        tmp = Array::create(type, get_shape());
+        get_dataset()->pop_masks();
+    } else {
+        tmp = dst;
+    }
+    
+    tmp->get_distribution(lo,hi);
 
-    if (dst->get_ndim() != ndim) {
+    if (tmp->get_ndim() != ndim) {
         pagoda::abort("NetcdfVariable::read(Array*) :: shape mismatch");
     }
 
     found_bit = find_bit(get_dims(), lo, hi);
 
-    if (dst->owns_data() && found_bit) {
+    if (tmp->owns_data() && found_bit) {
         for (int64_t dimidx=0; dimidx<ndim; ++dimidx) {
             start[dimidx] = lo[dimidx];
             count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
@@ -132,11 +147,12 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
         fill(count.begin(), count.end(), 0);
     }
 
-    do_read(dst, start, count, found_bit, nonblocking);
+    do_read(tmp, start, count, found_bit, nonblocking);
 
     // check whether a subset is needed
     if (needs_subset()) {
-        pagoda::print_sync("needs subset\n");
+        pagoda::pack(tmp, dst, get_masks());
+        delete tmp;
     }
 
     return dst;

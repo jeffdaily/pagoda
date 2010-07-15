@@ -14,8 +14,10 @@ class Array;
 namespace pagoda
 {
     void partial_sum(const Array *g_src, Array *g_dst, bool excl);
+    void pack(const Array *g_src, Array *g_dst, const vector<Mask*> &g_masks);
     void pack(const Array *g_src, Array *g_dst,
-              vector<Array*> g_masks, vector<Array*> g_masksums);
+              const vector<Array*> &g_masks,
+              const vector<Array*> &g_masksums);
     void unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result);
     void unravel64(int64_t x,
                    const vector<int64_t> &dims,

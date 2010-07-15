@@ -19,9 +19,9 @@ using std::ostringstream;
 #include "DistributedMask.H"
 #include "FileWriter.H"
 #include "Pack.H"
+#include "PagodaException.H"
 #include "Pnetcdf.H"
 #include "SubsetterCommands.H"
-#include "SubsetterException.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Variable.H"
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
         try {
             cmd.parse(argc,argv);
         }
-        catch (SubsetterException &ex) {
+        catch (PagodaException &ex) {
             if (0 == GA_Nodeid()) {
                 fprintf(stderr, "%s\n", ex.what());
                 fflush(stderr);

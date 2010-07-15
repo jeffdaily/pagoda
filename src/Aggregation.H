@@ -23,6 +23,8 @@ class Aggregation : public AbstractDataset
         virtual vector<Dataset*> get_datasets() const = 0;
 
         virtual void set_masks(MaskMap *masks);
+        virtual void push_masks(MaskMap *masks);
+        virtual MaskMap* pop_masks();
 
     protected:
         Aggregation();

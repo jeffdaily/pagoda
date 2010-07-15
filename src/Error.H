@@ -4,11 +4,12 @@
 #include <iostream>
 #include <sstream>
 
-#include "SubsetterException.H"
-
 using std::cerr;
 using std::endl;
 using std::ostringstream;
+
+#include "PagodaException.H"
+
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -22,7 +23,18 @@ do { \
     const string __msg(__os.str()); \
     const string __where(AT); \
     cerr << __where << ": " << __msg << endl; \
-    throw SubsetterException(__where, __msg); \
+    throw PagodaException(__where, __msg); \
+} while (0)
+
+#define ERRCODE(e,code) \
+do { \
+    ostringstream __os; \
+    const string __prefix("Error: "); \
+    __os << __prefix << e << endl; \
+    const string __msg(__os.str()); \
+    const string __where(AT); \
+    cerr << __where << ": " << __msg << endl; \
+    throw PagodaException(__where, __msg, code); \
 } while (0)
 
 #endif // ERROR_H_

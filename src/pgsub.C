@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 
         pagoda::calculate_required_memory(vars);
 
-        grids = Grid::get_grids(dataset);
+        grids = dataset->get_grids();
         if (grids.empty()) {
             pagoda::print_zero("no grid found\n");
         } else {
@@ -78,16 +78,24 @@ int main(int argc, char **argv)
         masks->modify(cmd.get_slices());
         masks->modify(cmd.get_box(), grid);
 
-        // read and delete each variable...
+        writer = FileWriter::create(cmd.get_output_filename());
+        writer->copy_atts(dataset->get_atts());
+        writer->def_dims(dataset->get_dims());
+        writer->def_vars(vars);
+
+        // read/subset and write each variable...
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             pagoda::print_zero((*var_it)->get_name() + "\n");
             Array *array = (*var_it)->read();
-            delete array;
+            writer->write(array, (*var_it)->get_name());
         }
 
         // clean up
         delete dataset;
         delete masks;
+        delete writer;
+
+        pagoda::finalize();
 
     } catch (exception &ex) {
         pagoda::abort(ex.what());

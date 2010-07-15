@@ -36,8 +36,8 @@ void print_sync_dummy(FILE *stream, const string &str);
 template <class Collection>
 string vec_to_string(
         const Collection &collection,
-        char const * delimiter,
-        const string &name)
+        char const * delimiter=",",
+        const string &name="")
 {
     typedef typename Collection::const_iterator iter;
     std::ostringstream os;
@@ -56,7 +56,7 @@ string vec_to_string(
     for ( ; beg != end; ++beg) {
         os << delimiter << *beg;
     }
-    os << "}\n";
+    os << "}";
 
     return os.str();
 }

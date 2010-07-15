@@ -36,9 +36,35 @@ void Aggregation::set_masks(MaskMap *masks)
     vector<Dataset*> datasets = get_datasets();
     vector<Dataset*>::iterator it;
 
-    AbstractDataset::set_masks(masks);
-
     for (it=datasets.begin(); it!=datasets.end(); ++it) {
         (*it)->set_masks(masks);
     }
+
+    AbstractDataset::set_masks(masks);
+}
+
+
+void Aggregation::push_masks(MaskMap *masks)
+{
+    vector<Dataset*> datasets = get_datasets();
+    vector<Dataset*>::iterator it;
+
+    for (it=datasets.begin(); it!=datasets.end(); ++it) {
+        (*it)->push_masks(masks);
+    }
+
+    AbstractDataset::push_masks(masks);
+}
+
+
+MaskMap* Aggregation::pop_masks()
+{
+    vector<Dataset*> datasets = get_datasets();
+    vector<Dataset*>::iterator it;
+
+    for (it=datasets.begin(); it!=datasets.end(); ++it) {
+        (*it)->pop_masks();
+    }
+
+    return AbstractDataset::pop_masks();
 }

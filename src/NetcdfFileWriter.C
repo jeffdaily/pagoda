@@ -120,7 +120,7 @@ int NetcdfFileWriter::get_dim_id(const string &name) const
     }
 
     strerr << "'" << name << "' is not a valid dimension name";
-    throw invalid_argument(strerr.str());
+    ERR(strerr.str());
 }
 
 
@@ -136,7 +136,7 @@ int64_t NetcdfFileWriter::get_dim_size(const string &name) const
     }
 
     strerr << "'" << name << "' is not a valid dimension name";
-    throw invalid_argument(strerr.str());
+    ERR(strerr.str());
 }
 
 
@@ -152,7 +152,7 @@ int NetcdfFileWriter::get_var_id(const string &name) const
     }
 
     strerr << "'" << name << "' is not a valid variable name";
-    throw invalid_argument(strerr.str());
+    ERR(strerr.str());
 }
 
 
@@ -168,7 +168,7 @@ vector<int> NetcdfFileWriter::get_var_dims(const string &name) const
     }
 
     strerr << "'" << name << "' is not a valid variable name";
-    throw invalid_argument(strerr.str());
+    ERR(strerr.str());
 }
 
 
@@ -184,7 +184,7 @@ vector<int64_t> NetcdfFileWriter::get_var_shape(const string &name) const
     }
 
     strerr << "'" << name << "' is not a valid variable name";
-    throw invalid_argument(strerr.str());
+    ERR(strerr.str());
 }
 
 
@@ -194,7 +194,7 @@ void NetcdfFileWriter::def_check() const
     if (!is_in_define_mode) {
         ostringstream strerr;
         strerr << "cannot (re)define output file after writing begins";
-        throw invalid_argument(strerr.str());
+        ERR(strerr.str());
     }
 }
 
@@ -263,7 +263,7 @@ void NetcdfFileWriter::write(Array *array, const string &name)
 
     // verify that the given array has the same shape as the defined variable
     if (shape_to_compare != array->get_shape()) {
-        throw invalid_argument("shape mismatch");
+        ERR("shape mismatch");
     }
 
     write(array, name, start);
@@ -285,11 +285,11 @@ void NetcdfFileWriter::write(Array *array, const string &name, int64_t record)
             (long)record, name.c_str());
 
     if (array_shape.size()+1 != shape.size()) {
-        throw invalid_argument("array rank mismatch");
+        ERR("array rank mismatch");
     }
     shape.erase(shape.begin()); // remove record dimension
     if (array_shape != shape) {
-        throw invalid_argument("array shape mismatch");
+        ERR("array shape mismatch");
     }
 
     maybe_enddef();
@@ -345,10 +345,10 @@ void NetcdfFileWriter::write(Array *array, const string &name,
     TRACER("NetcdfFileWriter::write %s\n", name.c_str());
 
     if (start.size() != shape.size()) {
-        throw invalid_argument("start rank mismatch");
+        ERR("start rank mismatch");
     }
     if (array_shape.size() != shape.size()) {
-        throw invalid_argument("array rank mismatch");
+        ERR("array rank mismatch");
     }
 
     maybe_enddef();

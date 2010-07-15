@@ -7,6 +7,7 @@
 #include "AbstractVariable.H"
 #include "Array.H"
 #include "Attribute.H"
+#include "Dataset.H"
 #include "Dimension.H"
 #include "Mask.H"
 #include "StringComparator.H"
@@ -45,14 +46,25 @@ int64_t AbstractVariable::get_ndim() const
 
 vector<int64_t> AbstractVariable::get_shape() const
 {
-    TIMING("AbstractVariable::get_sizes(bool)");
     vector<int64_t> shape;
-    vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::const_iterator it = dims.begin();
-    vector<Dimension*>::const_iterator end = dims.end();
 
-    for (; it!=end; ++it) {
-        shape.push_back((*it)->get_size());
+    TIMING("AbstractVariable::get_shape(bool)");
+
+    if (get_dataset()->get_masks()) {
+        vector<Mask*> masks = get_masks();
+        vector<Mask*>::const_iterator it = masks.begin();
+        vector<Mask*>::const_iterator end = masks.end();
+        for ( ; it!=end; ++it) {
+            shape.push_back((*it)->get_count());
+        }
+    } else {
+        vector<Dimension*> dims = get_dims();
+        vector<Dimension*>::const_iterator it = dims.begin();
+        vector<Dimension*>::const_iterator end = dims.end();
+
+        for ( ; it!=end; ++it) {
+            shape.push_back((*it)->get_size());
+        }
     }
 
     return shape;
@@ -140,12 +152,15 @@ Attribute* AbstractVariable::get_att(
 
 vector<Mask*> AbstractVariable::get_masks() const
 {
-    vector<Dimension*> dims = get_dims();
-    vector<Dimension*>::iterator dim_it = dims.begin();
     vector<Mask*> ret;
 
-    for ( ; dim_it!=dims.end(); ++dim_it) {
-        ret.push_back((*dim_it)->get_mask());
+    if (get_dataset()->get_masks()) {
+        vector<Dimension*> dims = get_dims();
+        vector<Dimension*>::iterator dim_it = dims.begin();
+
+        for ( ; dim_it!=dims.end(); ++dim_it) {
+            ret.push_back((*dim_it)->get_mask());
+        }
     }
 
     return ret;
@@ -159,7 +174,9 @@ bool AbstractVariable::needs_subset() const
 
     masks = get_masks();
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
-        if ((*mask_it)->get_count() != (*mask_it)->get_size()) {
+        int64_t count = (*mask_it)->get_count();
+        int64_t size = (*mask_it)->get_size();
+        if (count != size) {
             return true;
         }
     }

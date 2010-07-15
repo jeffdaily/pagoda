@@ -6,6 +6,8 @@
 
 #include "Common.H"
 #include "Dataset.H"
+#include "Mask.H"
+#include "MaskMap.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
 #include "NetcdfError.H"
@@ -50,6 +52,9 @@ string NetcdfDimension::get_name() const
 int64_t NetcdfDimension::get_size() const
 {
     TIMING("NetcdfDimension::get_size()");
+    if (get_dataset()->get_masks()) {
+        return get_dataset()->get_masks()->get_mask(this)->get_count();
+    }
     return size;
 }
 
