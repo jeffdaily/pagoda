@@ -532,7 +532,7 @@ void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
     // GA has a funky C signature for this one...
     int64_t ndim = get_ndim();
     int64_t n = subscripts.size() / ndim;
-    int64_t **subs = new int64_t*[n];
+    vector<int64_t*> subs(n,0);
 
     TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
 
@@ -540,9 +540,7 @@ void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
         subs[i] = &subscripts[i*ndim];
     }
 
-    NGA_Scatter64(handle, buffer, subs, n);
-
-    delete [] subs;
+    NGA_Scatter64(handle, buffer, &subs[0], n);
 }
 
 
@@ -551,10 +549,10 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
     // GA has a funky C signature for this one...
     int64_t ndim = get_ndim();
     int64_t n = subscripts.size() / ndim;
-    int64_t **subs = new int64_t*[n];
+    vector<int64_t*> subs(n,0);
     void *buffer;
 
-    TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
+    TIMING("GlobalArray::gather(void*,vector<int64_t>)");
 
     for (size_t i=0; i<n; ++i) {
         subs[i] = &subscripts[i*ndim];
@@ -566,9 +564,9 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
     } else
 #include "GlobalArray.def"
     
-    NGA_Gather64(handle, buffer, subs, n);
+    NGA_Gather64(handle, buffer, &subs[0], n);
 
-    delete subs;
+    return buffer;
 }
 
 

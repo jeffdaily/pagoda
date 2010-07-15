@@ -153,6 +153,9 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
     if (needs_subset()) {
         pagoda::pack(tmp, dst, get_masks());
         delete tmp;
+        if (needs_renumber()) {
+            renumber(dst);
+        }
     }
 
     return dst;
@@ -180,19 +183,33 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     vector<MPI_Offset> count(ndim);
     vector<Dimension*> adims(dims.begin()+1,dims.end());
     bool found_bit = true;
+    Array *tmp;
 
     TRACER("NetcdfVariable::read(int64_t,Array*) %s\n", get_name().c_str());
     TIMING("NetcdfVariable::read(int64_t,Array*)");
 
-    dst->get_distribution(lo,hi);
+    // if we are subsetting, then the passed in array is different than the
+    // one in which the data is read into
+    if (needs_subset()) {
+        vector<int64_t> shape;
+        get_dataset()->push_masks(NULL);
+        shape = get_shape();
+        get_dataset()->pop_masks();
+        shape.erase(shape.begin());
+        tmp = Array::create(type, shape);
+    } else {
+        tmp = dst;
+    }
+    
+    tmp->get_distribution(lo,hi);
 
-    if (dst->get_ndim()+1 != ndim) {
+    if (tmp->get_ndim()+1 != ndim) {
         pagoda::abort("NetcdfVariable::read(int64_t,Array*) :: shape mismatch");
     }
 
     found_bit = find_bit(adims, lo, hi);
 
-    if (dst->owns_data() && found_bit) {
+    if (tmp->owns_data() && found_bit) {
         start[0] = record;
         count[0] = 1;
         for (int64_t dimidx=1; dimidx<ndim; ++dimidx) {
@@ -205,11 +222,17 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
         fill(count.begin(), count.end(), 0);
     }
 
-    do_read(dst, start, count, found_bit, nonblocking);
+    do_read(tmp, start, count, found_bit, nonblocking);
 
     // check whether a subset is needed
     if (needs_subset()) {
-        pagoda::print_sync("needs subset record\n");
+        vector<Mask*> masks = get_masks();
+        masks.erase(masks.begin());
+        pagoda::pack(tmp, dst, masks);
+        delete tmp;
+        if (needs_renumber()) {
+            renumber(dst);
+        }
     }
 
     return dst;

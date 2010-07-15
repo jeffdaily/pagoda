@@ -23,7 +23,6 @@ using std::vector;
 #include "Attribute.H"
 #include "Dimension.H"
 #include "NetcdfDataset.H"
-#include "SubsetterException.H"
 #include "Util.H"
 #include "Variable.H"
 

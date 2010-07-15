@@ -72,7 +72,6 @@ int main(int argc, char **argv)
         } else {
             grid = grids[0];
         }
-        pagoda::print_zero("grids.size()=%zd\n", grids.size());
         
         masks = new MaskMap(dataset);
         masks->modify(cmd.get_slices());
@@ -85,9 +84,9 @@ int main(int argc, char **argv)
 
         // read/subset and write each variable...
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
-            pagoda::print_zero((*var_it)->get_name() + "\n");
-            Array *array = (*var_it)->read();
-            writer->write(array, (*var_it)->get_name());
+            Variable *var = *var_it;
+            Array *array = var->read();
+            writer->write(array, var->get_name());
         }
 
         // clean up

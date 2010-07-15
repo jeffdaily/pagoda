@@ -26,7 +26,6 @@ using std::vector;
 #include "Mask.H"
 #include "NetcdfDataset.H"
 #include "NetcdfDimension.H"
-#include "SubsetterException.H"
 #include "Util.H"
 
 

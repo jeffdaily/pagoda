@@ -16,22 +16,30 @@ using namespace std;
 #include "Bootstrap.H"
 #include "DataType.H"
 #include "Debug.H"
+#include "Pack.H"
 #include "Util.H"
+
+
+template <class T> void print1d(Array *array);
+template <class T> void print2d(Array *array);
 
 
 int main(int argc, char **argv)
 {
     Array *array;
+    Array *index;
     vector<int64_t> shape(2,20);
-    vector<double> buffer;
+    vector<int> buffer;
     vector<int64_t> subscripts;
-    double NEG_ONE = -1;
+    int fill_value;
+    int enumerate_start = 1;
 
     pagoda::initialize(&argc, &argv);
     pagoda::calculate_required_memory();
 
-    array = Array::create(DataType::DOUBLE, shape);
-    array->fill(&NEG_ONE);
+    fill_value = pagoda::npe;
+    array = Array::create(DataType::INT, shape);
+    array->fill(&fill_value);
 
     // each process scatters their id
     for (int64_t i=pagoda::me; i<shape[1]; i+=pagoda::npe) {
@@ -50,17 +58,66 @@ int main(int argc, char **argv)
         }
     }
     array->scatter(&buffer[0], subscripts);
-    pagoda::barrier();
+    pagoda::print_zero("scatter test results\n");
+    print2d<int>(array);
 
+    // this tests pagoda::enumerate
+    index = Array::create(DataType::INT, vector<int64_t>(1, pagoda::npe+1));
+    pagoda::enumerate(index, &enumerate_start, NULL);
+    pagoda::print_zero("enumerate test results\n");
+    print1d<int>(index);
+
+    // this tests pagoda::renumber
+    pagoda::renumber(array, index);
+    pagoda::print_zero("renumber test results\n");
+    print2d<int>(array);
+
+    delete array;
+    delete index;
+
+    pagoda::finalize();
+
+    return EXIT_SUCCESS;
+};
+
+
+template <class T>
+void print1d(Array *array)
+{
     if (0 == pagoda::me) {
+        vector<int64_t> shape = array->get_shape();
+        vector<int64_t> lo(1,0);
+        vector<int64_t> hi(shape);
+        int64_t idx = 0;
+        T *data;
+
+        hi[0] -= 1;
+        data = (T*)array->get(lo,hi);
+
+        for (int64_t i=0; i<shape[0]; ++i) {
+            cout << setw(3) << data[idx++];
+        }
+        cout << endl;
+
+        delete [] data;
+    }
+    pagoda::barrier();
+}
+
+
+template <class T>
+void print2d(Array *array)
+{
+    if (0 == pagoda::me) {
+        vector<int64_t> shape = array->get_shape();
         vector<int64_t> lo(2,0);
         vector<int64_t> hi(shape);
         int64_t idx = 0;
-        double *data;
+        T *data;
 
         hi[0] -= 1;
         hi[1] -= 1;
-        data = (double*)array->get(lo,hi);
+        data = (T*)array->get(lo,hi);
 
         for (int64_t i=0; i<shape[0]; ++i) {
             for (int64_t j=0; j<shape[1]; ++j) {
@@ -71,10 +128,5 @@ int main(int argc, char **argv)
 
         delete [] data;
     }
-
-    delete array;
-
-    pagoda::finalize();
-
-    return EXIT_SUCCESS;
-};
+    pagoda::barrier();
+}

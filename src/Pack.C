@@ -6,6 +6,7 @@
 
 #include "Array.H"
 #include "Debug.H"
+#include "Error.H"
 #include "Mask.H"
 #include "Pack.H"
 #include "Timing.H"
@@ -479,4 +480,60 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     }
 #undef unpack1d_op
     TRACER("unpack1d END\n");
+}
+
+
+/**
+ * Reassign the values of the given integer Array based on the given index
+ * integer Array.
+ *
+ * The index Array is a 1-D mapping from its zero-based index to a new index
+ * value.  The index Array is assumed to be 1-dimensional and an integer
+ * Array.
+ *
+ * @param[in,out] array the Array to renumber
+ * @param[in] index the values to use when renumbering
+ */
+void pagoda::renumber(Array *array, const Array *index)
+{
+    int *buf;
+    map<int64_t,int64_t> m;
+    map<int64_t,int64_t>::iterator m_it;
+    map<int64_t,int64_t>::iterator m_end;
+    vector<int64_t> subscripts;
+
+    if (index->get_ndim() != 1) {
+        ERR("index Array must be 1-dimensional");
+    }
+
+    if (!array->owns_data()) {
+        return;
+    }
+
+    buf = (int*)array->access();
+    for (int64_t i=0,limit=array->get_local_size(); i<limit; ++i) {
+        m[buf[i]] = -1;
+    }
+    array->release();
+
+    subscripts.reserve(m.size());
+    for (m_it=m.begin(),m_end=m.end(); m_it!=m_end; ++m_it) {
+        subscripts.push_back(m_it->first);
+    }
+
+    // do the gather
+    buf = (int*)index->gather(subscripts);
+
+    // create the mapping
+    for (size_t i=0,limit=subscripts.size(); i<limit; ++i) {
+        m[subscripts[i]] = buf[i];
+    }
+    delete [] buf;
+
+    // use the mapping to renumber the values
+    buf = (int*)array->access();
+    for (int64_t i=0,limit=array->get_local_size(); i<limit; ++i) {
+        buf[i] = m.find(buf[i])->second;
+    }
+    array->release_update();
 }

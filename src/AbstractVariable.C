@@ -9,7 +9,9 @@
 #include "Attribute.H"
 #include "Dataset.H"
 #include "Dimension.H"
+#include "Grid.H"
 #include "Mask.H"
+#include "Pack.H"
 #include "StringComparator.H"
 #include "Timing.H"
 #include "Variable.H"
@@ -169,10 +171,9 @@ vector<Mask*> AbstractVariable::get_masks() const
 
 bool AbstractVariable::needs_subset() const
 {
-    vector<Mask*> masks;
+    vector<Mask*> masks = get_masks();;
     vector<Mask*>::iterator mask_it;
 
-    masks = get_masks();
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
         int64_t count = (*mask_it)->get_count();
         int64_t size = (*mask_it)->get_size();
@@ -182,6 +183,58 @@ bool AbstractVariable::needs_subset() const
     }
 
     return false;
+}
+
+
+/**
+ * If this is a topology Variable and its connected Dimension has been subset,
+ * we must renumber this Variable's values.
+ *
+ * @return true if this Variable should be renumbered
+ */
+bool AbstractVariable::needs_renumber() const
+{
+    vector<Grid*> grids = get_dataset()->get_grids();
+    vector<Grid*>::iterator grid_it;
+
+    for (grid_it=grids.begin(); grid_it!=grids.end(); ++grid_it) {
+        Grid *grid = *grid_it;
+        if (grid->is_topology(this)) {
+            Dimension *dim = grid->get_topology_dim(this);
+            Mask *mask = dim->get_mask();
+            int64_t count = mask->get_count();
+            int64_t size = mask->get_size();
+            if (count != size) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * If this is a topology Variable and its connected Dimension has been subset,
+ * go ahead and renumber the given array assuming it was something that was
+ * read earlier.
+ *
+ * @param[in] array the Array to renumber
+ */
+void AbstractVariable::renumber(Array *array) const
+{
+    vector<Grid*> grids = get_dataset()->get_grids();
+    vector<Grid*>::iterator grid_it;
+
+    for (grid_it=grids.begin(); grid_it!=grids.end(); ++grid_it) {
+        Grid *grid = *grid_it;
+        if (grid->is_topology(this)) {
+            Dimension *dim = grid->get_topology_dim(this);
+            Mask *mask = dim->get_mask();
+            pagoda::renumber(array, mask->reindex());
+            break;
+        }
+    }
 }
 
 

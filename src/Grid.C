@@ -12,6 +12,7 @@ using std::ostream;
 using std::string;
 using std::vector;
 
+#include "Error.H"
 #include "Grid.H"
 #include "GeoGrid.H"
 
@@ -94,4 +95,75 @@ Grid::Grid()
 
 Grid::~Grid()
 {
+}
+
+
+bool Grid::is_topology(const Variable *var)
+{
+    if (!var) {
+        return false;
+    }
+
+    if (var == get_cell_cells()) {
+        return true;
+    }
+    if (var == get_cell_edges()) {
+        return true;
+    }
+    if (var == get_cell_corners()) {
+        return true;
+    }
+    if (var == get_edge_cells()) {
+        return true;
+    }
+    if (var == get_edge_edges()) {
+        return true;
+    }
+    if (var == get_edge_corners()) {
+        return true;
+    }
+    if (var == get_corner_cells()) {
+        return true;
+    }
+    if (var == get_corner_edges()) {
+        return true;
+    }
+    if (var == get_corner_corners()) {
+        return true;
+    }
+
+    return false;
+}
+
+
+Dimension* Grid::get_topology_dim(const Variable *var)
+{
+    if (var == get_cell_cells()) {
+        return get_cell_dim();
+    }
+    if (var == get_cell_edges()) {
+        return get_edge_dim();
+    }
+    if (var == get_cell_corners()) {
+        return get_corner_dim();
+    }
+    if (var == get_edge_cells()) {
+        return get_cell_dim();
+    }
+    if (var == get_edge_edges()) {
+        return get_edge_dim();
+    }
+    if (var == get_edge_corners()) {
+        return get_corner_dim();
+    }
+    if (var == get_corner_cells()) {
+        return get_cell_dim();
+    }
+    if (var == get_corner_edges()) {
+        return get_edge_dim();
+    }
+    if (var == get_corner_corners()) {
+        return get_corner_dim();
+    }
+    ERR("variable is not a topology variable");
 }

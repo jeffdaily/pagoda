@@ -67,6 +67,10 @@ class Grid
         virtual Variable* get_corner_lat() = 0;
         virtual Variable* get_corner_lon() = 0;
 
+        virtual Dimension* get_cell_dim() = 0;
+        virtual Dimension* get_edge_dim() = 0;
+        virtual Dimension* get_corner_dim() = 0;
+
         virtual Variable* get_cell_cells() = 0;
         virtual Variable* get_cell_edges() = 0;
         virtual Variable* get_cell_corners() = 0;
@@ -76,6 +80,9 @@ class Grid
         virtual Variable* get_corner_cells() = 0;
         virtual Variable* get_corner_edges() = 0;
         virtual Variable* get_corner_corners() = 0;
+
+        virtual bool is_topology(const Variable *var);
+        virtual Dimension* get_topology_dim(const Variable *var);
 
         virtual const Dataset* get_dataset() const = 0;
 

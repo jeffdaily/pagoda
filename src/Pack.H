@@ -24,6 +24,7 @@ namespace pagoda
                    vector<int64_t> &result);
     void enumerate(Array *src, void *start, void *inc);
     void unpack1d(const Array *g_src, Array *g_dst, Array *g_msk);
+    void renumber(Array *array, const Array *index);
 };
 
 #endif // PACK_H_

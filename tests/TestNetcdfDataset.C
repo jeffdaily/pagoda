@@ -19,7 +19,6 @@ using std::vector;
 #include "Bootstrap.H"
 #include "Dimension.H"
 #include "NetcdfDataset.H"
-#include "SubsetterException.H"
 #include "Util.H"
 #include "Variable.H"
 

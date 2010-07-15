@@ -20,7 +20,6 @@ using std::vector;
 #include "Dataset.H"
 #include "Dimension.H"
 #include "Mask.H"
-#include "SubsetterException.H"
 #include "Util.H"
 
 
