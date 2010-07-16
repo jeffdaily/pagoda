@@ -30,6 +30,8 @@ class AbstractDataset : public Dataset
     public:
         virtual ~AbstractDataset();
 
+        virtual void close() = 0;
+
         virtual vector<Attribute*> get_atts() const = 0;
         virtual vector<Dimension*> get_dims() const = 0;
         virtual vector<Variable*> get_vars() const = 0;

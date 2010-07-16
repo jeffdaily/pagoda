@@ -28,6 +28,7 @@ class NetcdfDataset : public AbstractDataset
     public:
         NetcdfDataset(const string &filename);
         virtual ~NetcdfDataset();
+        virtual void close();
 
         virtual vector<Attribute*> get_atts() const;
         virtual vector<Dimension*> get_dims() const;
@@ -57,6 +58,7 @@ class NetcdfDataset : public AbstractDataset
 
         vector<int> requests;
         vector<Array*> arrays_to_release;
+        bool open;
 };
 
 #endif // NETCDFDATASET_H_

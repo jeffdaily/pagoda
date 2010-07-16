@@ -26,6 +26,7 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ,   vars()
     ,   requests()
     ,   arrays_to_release()
+    ,   open(true)
 {
     TIMING("NetcdfDataset::NetcdfDataset(string)");
     int ndim;
@@ -55,7 +56,16 @@ NetcdfDataset::~NetcdfDataset()
             ptr_deleter<NetcdfDimension*>);
     transform(vars.begin(), vars.end(), vars.begin(),
             ptr_deleter<NetcdfVariable*>);
-    ncmpi::close(ncid);
+    close();
+}
+
+
+void NetcdfDataset::close()
+{
+    if (open) {
+        open = false;
+        ncmpi::close(ncid);
+    }
 }
 
 

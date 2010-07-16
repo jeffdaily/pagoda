@@ -17,6 +17,7 @@ class Aggregation : public AbstractDataset
 {
     public:
         virtual ~Aggregation();
+        virtual void close();
 
         virtual void add(Dataset *dataset) = 0;
         virtual void add(const vector<Dataset*> &datasets);

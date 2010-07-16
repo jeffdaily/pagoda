@@ -24,6 +24,7 @@ class NetcdfFileWriter : public FileWriter
     public:
         NetcdfFileWriter(const string &filename);
         virtual ~NetcdfFileWriter();
+        virtual void close();
 
         virtual void def_dim(const string &name, int64_t size);
 
@@ -66,6 +67,8 @@ class NetcdfFileWriter : public FileWriter
         map<string,int>              var_id;
         map<string,vector<int> >     var_dims;
         map<string,vector<int64_t> > var_shape;
+
+        bool open;
 };
 
 #endif // NETCDFFILEWRITER_H_

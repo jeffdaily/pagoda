@@ -18,6 +18,18 @@ Aggregation::Aggregation()
 Aggregation::~Aggregation()
 {
     TIMING("Aggregation::~Aggregation()");
+    close();
+}
+
+
+void Aggregation::close()
+{
+    vector<Dataset*> datasets = get_datasets();
+    vector<Dataset*>::iterator it;
+
+    for (it=datasets.begin(); it!=datasets.end(); ++it) {
+        (*it)->close();
+    }
 }
 
 

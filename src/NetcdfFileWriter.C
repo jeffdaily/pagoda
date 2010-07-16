@@ -39,6 +39,7 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
     ,   var_id()
     ,   var_dims()
     ,   var_shape()
+    ,   open(true)
 {
     TIMING("NetcdfFileWriter::NetcdfFileWriter(string)");
     TRACER("NetcdfFileWriter ctor(%s)\n", filename.c_str());
@@ -51,7 +52,16 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
 NetcdfFileWriter::~NetcdfFileWriter()
 {
     TIMING("NetcdfFileWriter::~NetcdfFileWriter()");
-    ncmpi::close(ncid);
+    close();
+}
+
+
+void NetcdfFileWriter::close()
+{
+    if (open) {
+        open = false;
+        ncmpi::close(ncid);
+    }
 }
 
 
