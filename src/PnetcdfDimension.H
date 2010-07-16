@@ -1,5 +1,5 @@
-#ifndef NETCDFDIMENSION_H_
-#define NETCDFDIMENSION_H_
+#ifndef PNETCDFDIMENSION_H_
+#define PNETCDFDIMENSION_H_
 
 #include <iostream>
 #include <string>
@@ -40,4 +40,4 @@ class PnetcdfDimension : public Dimension
         bool unlimited;
 };
 
-#endif // DIMENSION_H_
+#endif // PNETCDFDIMENSION_H_

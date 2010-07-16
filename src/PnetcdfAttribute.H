@@ -1,5 +1,5 @@
-#ifndef NETCDFATTRIBUTE_H_
-#define NETCDFATTRIBUTE_H_
+#ifndef PNETCDFATTRIBUTE_H_
+#define PNETCDFATTRIBUTE_H_
 
 #include <iostream>
 #include <string>
@@ -47,4 +47,4 @@ class PnetcdfAttribute : public Attribute
         Values *values;
 };
 
-#endif // NETCDFATTRIBUTE_H_
+#endif // PNETCDFATTRIBUTE_H_

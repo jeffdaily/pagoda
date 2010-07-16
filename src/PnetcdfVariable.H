@@ -1,5 +1,5 @@
-#ifndef NETCDFVARIABLE_H_
-#define NETCDFVARIABLE_H_
+#ifndef PNETCDFVARIABLE_H_
+#define PNETCDFVARIABLE_H_
 
 #include <iostream>
 #include <string>
@@ -61,4 +61,4 @@ class PnetcdfVariable : public AbstractVariable
         DataType type;
 };
 
-#endif // NETCDFVARIABLE_H_
+#endif // PNETCDFVARIABLE_H_

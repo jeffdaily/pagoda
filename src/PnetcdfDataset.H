@@ -1,5 +1,5 @@
-#ifndef NETCDFDATASET_H_
-#define NETCDFDATASET_H_
+#ifndef PNETCDFDATASET_H_
+#define PNETCDFDATASET_H_
 
 #include <pnetcdf.h>
 
@@ -61,4 +61,4 @@ class PnetcdfDataset : public AbstractDataset
         bool open;
 };
 
-#endif // NETCDFDATASET_H_
+#endif // PNETCDFDATASET_H_

@@ -1,5 +1,5 @@
-#ifndef NETCDFFILEWRITER_H_
-#define NETCDFFILEWRITER_H_
+#ifndef PNETCDFFILEWRITER_H_
+#define PNETCDFFILEWRITER_H_
 
 #include <string>
 #include <map>
@@ -71,4 +71,4 @@ class PnetcdfFileWriter : public FileWriter
         bool open;
 };
 
-#endif // NETCDFFILEWRITER_H_
+#endif // PNETCDFFILEWRITER_H_

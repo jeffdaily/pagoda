@@ -1,5 +1,5 @@
-#ifndef NETCDFERROR_H_
-#define NETCDFERROR_H_
+#ifndef PNETCDFERROR_H_
+#define PNETCDFERROR_H_
 
 #include <sstream>
 
@@ -27,4 +27,4 @@ do { \
     } \
 } while (0)
 
-#endif // NETCDFERROR_H_
+#endif // PNETCDFERROR_H_
