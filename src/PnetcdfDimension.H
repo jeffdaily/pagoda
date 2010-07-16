@@ -10,30 +10,30 @@ using std::string;
 #include "Dimension.H"
 
 class Dataset;
-class NetcdfDataset;
+class PnetcdfDataset;
 
 
 /**
  * The pnetcdf implementation of the Dimension.
  */
-class NetcdfDimension : public Dimension
+class PnetcdfDimension : public Dimension
 {
     public:
-        NetcdfDimension(NetcdfDataset *dataset, int dimid);
-        virtual ~NetcdfDimension();
+        PnetcdfDimension(PnetcdfDataset *dataset, int dimid);
+        virtual ~PnetcdfDimension();
 
         virtual string get_name() const;
         virtual int64_t get_size() const;
         virtual bool is_unlimited() const;
         virtual Dataset* get_dataset() const;
 
-        NetcdfDataset* get_netcdf_dataset() const;
+        PnetcdfDataset* get_netcdf_dataset() const;
         int get_id() const;
 
         virtual ostream& print(ostream &os) const;
 
     protected:
-        NetcdfDataset *dataset;
+        PnetcdfDataset *dataset;
         int id;
         string name;
         int64_t size;

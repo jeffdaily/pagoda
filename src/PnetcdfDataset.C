@@ -6,17 +6,17 @@
 
 #include "Array.H"
 #include "Grid.H"
-#include "NetcdfAttribute.H"
-#include "NetcdfDataset.H"
-#include "NetcdfDimension.H"
-#include "NetcdfError.H"
-#include "NetcdfVariable.H"
+#include "PnetcdfAttribute.H"
+#include "PnetcdfDataset.H"
+#include "PnetcdfDimension.H"
+#include "PnetcdfError.H"
+#include "PnetcdfVariable.H"
 #include "Pnetcdf.H"
 #include "Timing.H"
 #include "Util.H"
 
 
-NetcdfDataset::NetcdfDataset(const string &filename)
+PnetcdfDataset::PnetcdfDataset(const string &filename)
     :   AbstractDataset()
     ,   filename(filename)
     ,   ncid(-1)
@@ -28,39 +28,39 @@ NetcdfDataset::NetcdfDataset(const string &filename)
     ,   arrays_to_release()
     ,   open(true)
 {
-    TIMING("NetcdfDataset::NetcdfDataset(string)");
+    TIMING("PnetcdfDataset::PnetcdfDataset(string)");
     int ndim;
     int nvar;
     int natt;
     ncmpi::open(MPI_COMM_WORLD, filename.c_str(), NC_NOWRITE, MPI_INFO_NULL, &ncid);
     ncmpi::inq(ncid, &ndim, &nvar, &natt, &udim);
     for (int attid=0; attid<natt; ++attid) {
-        atts.push_back(new NetcdfAttribute(this, attid));
+        atts.push_back(new PnetcdfAttribute(this, attid));
     }
     for (int dimid=0; dimid<ndim; ++dimid) {
-        dims.push_back(new NetcdfDimension(this, dimid));
+        dims.push_back(new PnetcdfDimension(this, dimid));
     }
     for (int varid=0; varid<nvar; ++varid) {
-        vars.push_back(new NetcdfVariable(this, varid));
+        vars.push_back(new PnetcdfVariable(this, varid));
     }
 }
 
 
-NetcdfDataset::~NetcdfDataset()
+PnetcdfDataset::~PnetcdfDataset()
 {
-    TIMING("NetcdfDataset::~NetcdfDataset()");
+    TIMING("PnetcdfDataset::~PnetcdfDataset()");
     using pagoda::ptr_deleter;
     transform(atts.begin(), atts.end(), atts.begin(),
-            ptr_deleter<NetcdfAttribute*>);
+            ptr_deleter<PnetcdfAttribute*>);
     transform(dims.begin(), dims.end(), dims.begin(),
-            ptr_deleter<NetcdfDimension*>);
+            ptr_deleter<PnetcdfDimension*>);
     transform(vars.begin(), vars.end(), vars.begin(),
-            ptr_deleter<NetcdfVariable*>);
+            ptr_deleter<PnetcdfVariable*>);
     close();
 }
 
 
-void NetcdfDataset::close()
+void PnetcdfDataset::close()
 {
     if (open) {
         open = false;
@@ -69,12 +69,12 @@ void NetcdfDataset::close()
 }
 
 
-vector<Attribute*> NetcdfDataset::get_atts() const
+vector<Attribute*> PnetcdfDataset::get_atts() const
 {
     vector<Attribute*> ret;
-    vector<NetcdfAttribute*>::const_iterator it;
+    vector<PnetcdfAttribute*>::const_iterator it;
 
-    TIMING("NetcdfDataset::get_atts()");
+    TIMING("PnetcdfDataset::get_atts()");
 
     for (it=atts.begin(); it!=atts.end(); ++it) {
         ret.push_back(*it);
@@ -84,12 +84,12 @@ vector<Attribute*> NetcdfDataset::get_atts() const
 }
 
 
-vector<Dimension*> NetcdfDataset::get_dims() const
+vector<Dimension*> PnetcdfDataset::get_dims() const
 {
     vector<Dimension*> ret;
-    vector<NetcdfDimension*>::const_iterator it;
+    vector<PnetcdfDimension*>::const_iterator it;
 
-    TIMING("NetcdfDataset::get_dims()");
+    TIMING("PnetcdfDataset::get_dims()");
 
     for (it=dims.begin(); it!=dims.end(); ++it) {
         ret.push_back(*it);
@@ -99,12 +99,12 @@ vector<Dimension*> NetcdfDataset::get_dims() const
 }
 
 
-vector<Variable*> NetcdfDataset::get_vars() const
+vector<Variable*> PnetcdfDataset::get_vars() const
 {
     vector<Variable*> ret;
-    vector<NetcdfVariable*>::const_iterator it;
+    vector<PnetcdfVariable*>::const_iterator it;
 
-    TIMING("NetcdfDataset::get_vars()");
+    TIMING("PnetcdfDataset::get_vars()");
 
     for (it=vars.begin(); it!=vars.end(); ++it) {
         ret.push_back(*it);
@@ -114,30 +114,30 @@ vector<Variable*> NetcdfDataset::get_vars() const
 }
 
 
-NetcdfAttribute* NetcdfDataset::get_att(size_t i) const
+PnetcdfAttribute* PnetcdfDataset::get_att(size_t i) const
 {
-    TIMING("NetcdfDataset::get_att(size_t)");
+    TIMING("PnetcdfDataset::get_att(size_t)");
     return atts.at(i);
 }
 
 
-NetcdfDimension* NetcdfDataset::get_dim(size_t i) const
+PnetcdfDimension* PnetcdfDataset::get_dim(size_t i) const
 {
-    TIMING("NetcdfDataset::get_dim(size_t)");
+    TIMING("PnetcdfDataset::get_dim(size_t)");
     return dims.at(i);
 }
 
 
-NetcdfVariable* NetcdfDataset::get_var(size_t i) const
+PnetcdfVariable* PnetcdfDataset::get_var(size_t i) const
 {
-    TIMING("NetcdfDataset::get_var(size_t)");
+    TIMING("PnetcdfDataset::get_var(size_t)");
     return vars.at(i);
 }
 
 
-void NetcdfDataset::wait()
+void PnetcdfDataset::wait()
 {
-    TIMING("NetcdfDataset::wait()");
+    TIMING("PnetcdfDataset::wait()");
 
     if (!requests.empty()) {
         vector<int> statuses(requests.size());
@@ -151,29 +151,29 @@ void NetcdfDataset::wait()
 }
 
 
-ostream& NetcdfDataset::print(ostream &os) const
+ostream& PnetcdfDataset::print(ostream &os) const
 {
-    TIMING("NetcdfDataset::print(ostream)");
-    return os << "NetcdfDataset(" << filename << ")";
+    TIMING("PnetcdfDataset::print(ostream)");
+    return os << "PnetcdfDataset(" << filename << ")";
 }
 
 
-string NetcdfDataset::get_filename() const
+string PnetcdfDataset::get_filename() const
 {
-    TIMING("NetcdfDataset::get_filename()");
+    TIMING("PnetcdfDataset::get_filename()");
     return filename;
 }
 
 
-int NetcdfDataset::get_id() const
+int PnetcdfDataset::get_id() const
 {
-    TIMING("NetcdfDataset::get_id()");
+    TIMING("PnetcdfDataset::get_id()");
     return ncid;
 }
 
 
-NetcdfDimension* NetcdfDataset::get_udim() const
+PnetcdfDimension* PnetcdfDataset::get_udim() const
 {
-    TIMING("NetcdfDataset::get_udim()");
+    TIMING("PnetcdfDataset::get_udim()");
     return dims.at(udim);
 }

@@ -3,7 +3,7 @@
 #endif
 
 #include "Dataset.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Timing.H"
 #include "Util.H"
 
@@ -14,7 +14,7 @@ Dataset* Dataset::open(const string &filename)
     Dataset *dataset = NULL;
     string EXT_NC(".nc");
     if (pagoda::ends_with(filename, EXT_NC)) {
-        dataset = new NetcdfDataset(filename);
+        dataset = new PnetcdfDataset(filename);
     }
     return dataset;
 }

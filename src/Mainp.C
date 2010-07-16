@@ -24,7 +24,7 @@
 #include "Debug.H"
 #include "Error.H"
 #include "LatLonBox.H"
-#include "NetcdfError.H"
+#include "PnetcdfError.H"
 #include "RangeException.H"
 #include "Slice.H"
 #include "PagodaException.H"

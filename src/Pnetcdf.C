@@ -5,7 +5,7 @@
 #include <pnetcdf.h>
 
 #include "Debug.H"
-#include "NetcdfError.H"
+#include "PnetcdfError.H"
 #include "Pnetcdf.H"
 #include "PnetcdfTiming.H"
 

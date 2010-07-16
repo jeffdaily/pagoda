@@ -12,7 +12,7 @@
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Dimension.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     }
     Aggregation *dataset = new AggregationJoinExisting(argv[1]);
     for (int argi=2; argi<argc; ++argi) {
-        dataset->add(new NetcdfDataset(argv[argi]));
+        dataset->add(new PnetcdfDataset(argv[argi]));
     }
 
     if (0 == pagoda::me) {

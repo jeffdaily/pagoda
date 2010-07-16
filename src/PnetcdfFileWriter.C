@@ -14,10 +14,10 @@
 #include "Debug.H"
 #include "Dimension.H"
 #include "Mask.H"
-#include "NetcdfDimension.H"
-#include "NetcdfError.H"
-#include "NetcdfFileWriter.H"
-#include "NetcdfVariable.H"
+#include "PnetcdfDimension.H"
+#include "PnetcdfError.H"
+#include "PnetcdfFileWriter.H"
+#include "PnetcdfVariable.H"
 #include "Pack.H"
 #include "Pnetcdf.H"
 #include "Util.H"
@@ -29,7 +29,7 @@ using std::string;
 using std::vector;
 
 
-NetcdfFileWriter::NetcdfFileWriter(const string &filename)
+PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     :   FileWriter()
     ,   is_in_define_mode(true)
     ,   filename(filename)
@@ -41,22 +41,22 @@ NetcdfFileWriter::NetcdfFileWriter(const string &filename)
     ,   var_shape()
     ,   open(true)
 {
-    TIMING("NetcdfFileWriter::NetcdfFileWriter(string)");
-    TRACER("NetcdfFileWriter ctor(%s)\n", filename.c_str());
+    TIMING("PnetcdfFileWriter::PnetcdfFileWriter(string)");
+    TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
     ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
     //ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_DATA, MPI_INFO_NULL, &ncid);
 }
 
 
-NetcdfFileWriter::~NetcdfFileWriter()
+PnetcdfFileWriter::~PnetcdfFileWriter()
 {
-    TIMING("NetcdfFileWriter::~NetcdfFileWriter()");
+    TIMING("PnetcdfFileWriter::~PnetcdfFileWriter()");
     close();
 }
 
 
-void NetcdfFileWriter::close()
+void PnetcdfFileWriter::close()
 {
     if (open) {
         open = false;
@@ -65,11 +65,11 @@ void NetcdfFileWriter::close()
 }
 
 
-void NetcdfFileWriter::def_dim(const string &name, int64_t size)
+void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 {
     int id;
 
-    TIMING("NetcdfFileWriter::def_dim(Dimension*)");
+    TIMING("PnetcdfFileWriter::def_dim(Dimension*)");
 
     def_check();
 
@@ -78,13 +78,13 @@ void NetcdfFileWriter::def_dim(const string &name, int64_t size)
     }
 
     ncmpi::def_dim(ncid, name.c_str(), size, &id);
-    TRACER("NetcdfFileWriter::def_dim %s=%lld id=%d\n", name.c_str(), size, id);
+    TRACER("PnetcdfFileWriter::def_dim %s=%lld id=%d\n", name.c_str(), size, id);
     dim_id[name] = id;
     dim_size[name] = size;
 }
 
 
-void NetcdfFileWriter::def_var(const string &name,
+void PnetcdfFileWriter::def_var(const string &name,
         const vector<string> &dims,
         const DataType &type,
         const vector<Attribute*> &atts)
@@ -94,7 +94,7 @@ void NetcdfFileWriter::def_var(const string &name,
     vector<int64_t> shape;
     int id;
 
-    TIMING("NetcdfFileWriter::def_var(string,vector<string>)");
+    TIMING("PnetcdfFileWriter::def_var(string,vector<string>)");
 
     def_check();
 
@@ -111,19 +111,19 @@ void NetcdfFileWriter::def_var(const string &name,
 }
 
 
-ostream& NetcdfFileWriter::print(ostream &os) const
+ostream& PnetcdfFileWriter::print(ostream &os) const
 {
-    TIMING("NetcdfFileWriter::print(ostream)");
-    return os << "NetcdfFileWriter(" << filename << ")";
+    TIMING("PnetcdfFileWriter::print(ostream)");
+    return os << "PnetcdfFileWriter(" << filename << ")";
 }
 
 
-int NetcdfFileWriter::get_dim_id(const string &name) const
+int PnetcdfFileWriter::get_dim_id(const string &name) const
 {
     ostringstream strerr;
     map<string,int>::const_iterator it = dim_id.find(name);
 
-    TIMING("NetcdfFileWriter::get_dim_id(string)");
+    TIMING("PnetcdfFileWriter::get_dim_id(string)");
 
     if (it != dim_id.end()) {
         return it->second;
@@ -134,12 +134,12 @@ int NetcdfFileWriter::get_dim_id(const string &name) const
 }
 
 
-int64_t NetcdfFileWriter::get_dim_size(const string &name) const
+int64_t PnetcdfFileWriter::get_dim_size(const string &name) const
 {
     ostringstream strerr;
     map<string,int64_t>::const_iterator it = dim_size.find(name);
 
-    TIMING("NetcdfFileWriter::get_dim_size(string)");
+    TIMING("PnetcdfFileWriter::get_dim_size(string)");
 
     if (it != dim_size.end()) {
         return it->second;
@@ -150,12 +150,12 @@ int64_t NetcdfFileWriter::get_dim_size(const string &name) const
 }
 
 
-int NetcdfFileWriter::get_var_id(const string &name) const
+int PnetcdfFileWriter::get_var_id(const string &name) const
 {
     ostringstream strerr;
     map<string,int>::const_iterator it = var_id.find(name);
 
-    TIMING("NetcdfFileWriter::get_var_id(string)");
+    TIMING("PnetcdfFileWriter::get_var_id(string)");
 
     if (it != var_id.end()) {
         return it->second;
@@ -166,12 +166,12 @@ int NetcdfFileWriter::get_var_id(const string &name) const
 }
 
 
-vector<int> NetcdfFileWriter::get_var_dims(const string &name) const
+vector<int> PnetcdfFileWriter::get_var_dims(const string &name) const
 {
     ostringstream strerr;
     map<string,vector<int> >::const_iterator it = var_dims.find(name);
 
-    TIMING("NetcdfFileWriter::get_var_dims(string)");
+    TIMING("PnetcdfFileWriter::get_var_dims(string)");
 
     if (it != var_dims.end()) {
         return it->second;
@@ -182,12 +182,12 @@ vector<int> NetcdfFileWriter::get_var_dims(const string &name) const
 }
 
 
-vector<int64_t> NetcdfFileWriter::get_var_shape(const string &name) const
+vector<int64_t> PnetcdfFileWriter::get_var_shape(const string &name) const
 {
     ostringstream strerr;
     map<string,vector<int64_t> >::const_iterator it = var_shape.find(name);
 
-    TIMING("NetcdfFileWriter::get_var_shape(string)");
+    TIMING("PnetcdfFileWriter::get_var_shape(string)");
 
     if (it != var_shape.end()) {
         return it->second;
@@ -198,9 +198,9 @@ vector<int64_t> NetcdfFileWriter::get_var_shape(const string &name) const
 }
 
 
-void NetcdfFileWriter::def_check() const
+void PnetcdfFileWriter::def_check() const
 {
-    TIMING("NetcdfFileWriter::def_check()");
+    TIMING("PnetcdfFileWriter::def_check()");
     if (!is_in_define_mode) {
         ostringstream strerr;
         strerr << "cannot (re)define output file after writing begins";
@@ -209,32 +209,32 @@ void NetcdfFileWriter::def_check() const
 }
 
 
-void NetcdfFileWriter::maybe_enddef()
+void PnetcdfFileWriter::maybe_enddef()
 {
-    TIMING("NetcdfFileWriter::maybe_enddef()");
+    TIMING("PnetcdfFileWriter::maybe_enddef()");
     if (is_in_define_mode) {
         is_in_define_mode = false;
         ncmpi::enddef(ncid);
-        TRACER("NetcdfFileWriter::maybe_enddef END DEF\n");
+        TRACER("PnetcdfFileWriter::maybe_enddef END DEF\n");
     }
 }
 
 
-void NetcdfFileWriter::copy_att(Attribute *att, const string &name)
+void PnetcdfFileWriter::copy_att(Attribute *att, const string &name)
 {
-    TIMING("NetcdfFileWriter::copy_att(Attribute*,string)");
+    TIMING("PnetcdfFileWriter::copy_att(Attribute*,string)");
     copy_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
 }
 
 
-void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
+void PnetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 {
     string name = attr->get_name();
     DataType dt = attr->get_type();
     MPI_Offset len = attr->get_count();
 
-    TIMING("NetcdfFileWriter::copy_att_id(Attribute*,int)");
-    TRACER("NetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
+    TIMING("PnetcdfFileWriter::copy_att_id(Attribute*,int)");
+    TRACER("PnetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
 
     def_check();
 
@@ -256,9 +256,9 @@ void NetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 }
 
 
-void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
+void PnetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 {
-    //TIMING("NetcdfFileWriter::copy_atts_id(vector<Attribute*>,int)");
+    //TIMING("PnetcdfFileWriter::copy_atts_id(vector<Attribute*>,int)");
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
         copy_att_id(*att_it, varid);
@@ -266,7 +266,7 @@ void NetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
 }
 
 
-void NetcdfFileWriter::write(Array *array, const string &name)
+void PnetcdfFileWriter::write(Array *array, const string &name)
 {
     vector<int64_t> shape_to_compare = get_var_shape(name);
     vector<int64_t> start(shape_to_compare.size(), 0);
@@ -280,7 +280,7 @@ void NetcdfFileWriter::write(Array *array, const string &name)
 }
 
 
-void NetcdfFileWriter::write(Array *array, const string &name, int64_t record)
+void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
 {
     DataType type = array->get_type();
     vector<int64_t> array_shape = array->get_shape();
@@ -290,8 +290,8 @@ void NetcdfFileWriter::write(Array *array, const string &name, int64_t record)
     vector<MPI_Offset> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
-    TIMING("NetcdfFileWriter::write(Array*,string,int64_t)");
-    TRACER("NetcdfFileWriter::write record %ld %s\n",
+    TIMING("PnetcdfFileWriter::write(Array*,string,int64_t)");
+    TRACER("PnetcdfFileWriter::write record %ld %s\n",
             (long)record, name.c_str());
 
     if (array_shape.size()+1 != shape.size()) {
@@ -338,7 +338,7 @@ void NetcdfFileWriter::write(Array *array, const string &name, int64_t record)
 
 
 // it's a "patch" write.  the "hi" is implied by the shape of the given array
-void NetcdfFileWriter::write(Array *array, const string &name,
+void PnetcdfFileWriter::write(Array *array, const string &name,
         const vector<int64_t> &start)
 {
     DataType type = array->get_type();
@@ -351,8 +351,8 @@ void NetcdfFileWriter::write(Array *array, const string &name,
     vector<MPI_Offset> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
-    TIMING("NetcdfFileWriter::write(Array*,string,vector<int64_t>)");
-    TRACER("NetcdfFileWriter::write %s\n", name.c_str());
+    TIMING("PnetcdfFileWriter::write(Array*,string,vector<int64_t>)");
+    TRACER("PnetcdfFileWriter::write %s\n", name.c_str());
 
     if (start.size() != shape.size()) {
         ERR("start rank mismatch");

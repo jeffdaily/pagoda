@@ -17,7 +17,7 @@
 #include "AggregationUnion.H"
 #include "Attribute.H"
 #include "Dimension.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     }
     Aggregation *dataset = new AggregationUnion;
     for (int argi=1; argi<argc; ++argi) {
-        dataset->add(new NetcdfDataset(argv[argi]));
+        dataset->add(new PnetcdfDataset(argv[argi]));
     }
 
     if (0 == me) {

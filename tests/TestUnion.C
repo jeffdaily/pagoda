@@ -12,7 +12,7 @@
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Dimension.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Util.H"
 #include "Variable.H"
 

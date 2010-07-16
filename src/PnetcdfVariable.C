@@ -9,18 +9,18 @@
 #include "Common.H"
 #include "Debug.H"
 #include "Mask.H"
-#include "NetcdfAttribute.H"
-#include "NetcdfDataset.H"
-#include "NetcdfDimension.H"
-#include "NetcdfError.H"
-#include "NetcdfVariable.H"
+#include "PnetcdfAttribute.H"
+#include "PnetcdfDataset.H"
+#include "PnetcdfDimension.H"
+#include "PnetcdfError.H"
+#include "PnetcdfVariable.H"
 #include "Pack.H"
 #include "Pnetcdf.H"
 #include "Timing.H"
 #include "Util.H"
 
 
-NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
+PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     :   AbstractVariable()
     ,   dataset(dataset)
     ,   id(varid)
@@ -29,7 +29,7 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
     ,   atts()
     ,   type(NC_CHAR)
 {
-    TIMING("NetcdfVariable::NetcdfVariable(NetcdfDataset*,int)");
+    TIMING("PnetcdfVariable::PnetcdfVariable(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
     int ndim;
     ncmpi::inq_ndims(ncid, &ndim);
@@ -44,68 +44,68 @@ NetcdfVariable::NetcdfVariable(NetcdfDataset *dataset, int varid)
         dims.push_back(dataset->get_dim(dim_ids[dimidx]));
     }
     for (int attid=0; attid<natt; ++attid) {
-        atts.push_back(new NetcdfAttribute(dataset, attid, this));
+        atts.push_back(new PnetcdfAttribute(dataset, attid, this));
     }
 }
 
 
-NetcdfVariable::~NetcdfVariable()
+PnetcdfVariable::~PnetcdfVariable()
 {
-    TIMING("NetcdfVariable::~NetcdfVariable()");
+    TIMING("PnetcdfVariable::~PnetcdfVariable()");
 
     transform(atts.begin(), atts.end(), atts.begin(),
-            pagoda::ptr_deleter<NetcdfAttribute*>);
+            pagoda::ptr_deleter<PnetcdfAttribute*>);
 }
 
 
-string NetcdfVariable::get_name() const
+string PnetcdfVariable::get_name() const
 {
-    TIMING("NetcdfVariable::get_name()");
+    TIMING("PnetcdfVariable::get_name()");
     return name;
 }
 
 
-vector<Dimension*> NetcdfVariable::get_dims() const
+vector<Dimension*> PnetcdfVariable::get_dims() const
 {
-    TIMING("NetcdfVariable::get_dims()");
+    TIMING("PnetcdfVariable::get_dims()");
     return vector<Dimension*>(dims.begin(), dims.end());
 }
 
 
-vector<Attribute*> NetcdfVariable::get_atts() const
+vector<Attribute*> PnetcdfVariable::get_atts() const
 {
-    TIMING("NetcdfVariable::get_atts()");
+    TIMING("PnetcdfVariable::get_atts()");
     return vector<Attribute*>(atts.begin(), atts.end());
 }
 
 
-Dataset* NetcdfVariable::get_dataset() const
+Dataset* PnetcdfVariable::get_dataset() const
 {
-    TIMING("NetcdfVariable::get_dataset()");
+    TIMING("PnetcdfVariable::get_dataset()");
     return dataset;
 }
 
 
-DataType NetcdfVariable::get_type() const
+DataType PnetcdfVariable::get_type() const
 {
-    TIMING("NetcdfVariable::get_type()");
+    TIMING("PnetcdfVariable::get_type()");
     return type;
 }
 
 
-Array* NetcdfVariable::read(Array *dst) const
+Array* PnetcdfVariable::read(Array *dst) const
 {
     return read(dst, false);
 }
 
 
-Array* NetcdfVariable::iread(Array *dst)
+Array* PnetcdfVariable::iread(Array *dst)
 {
     return read(dst, true);
 }
 
 
-Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
+Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
 {
     int64_t ndim = get_ndim();
     vector<int64_t> lo(ndim);
@@ -115,8 +115,8 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("NetcdfVariable::read(Array*) %s\n", get_name().c_str());
-    TIMING("NetcdfVariable::read(Array*)");
+    TRACER("PnetcdfVariable::read(Array*) %s\n", get_name().c_str());
+    TIMING("PnetcdfVariable::read(Array*)");
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into
@@ -131,7 +131,7 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
     tmp->get_distribution(lo,hi);
 
     if (tmp->get_ndim() != ndim) {
-        pagoda::abort("NetcdfVariable::read(Array*) :: shape mismatch");
+        pagoda::abort("PnetcdfVariable::read(Array*) :: shape mismatch");
     }
 
     found_bit = find_bit(get_dims(), lo, hi);
@@ -162,19 +162,19 @@ Array* NetcdfVariable::read(Array *dst, bool nonblocking) const
 }
 
 
-Array* NetcdfVariable::read(int64_t record, Array *dst) const
+Array* PnetcdfVariable::read(int64_t record, Array *dst) const
 {
     return read(record, dst, false);
 }
 
 
-Array* NetcdfVariable::iread(int64_t record, Array *dst)
+Array* PnetcdfVariable::iread(int64_t record, Array *dst)
 {
     return read(record, dst, true);
 }
 
 
-Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
+Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
 {
     int64_t ndim = get_ndim();
     vector<int64_t> lo(ndim);
@@ -185,8 +185,8 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("NetcdfVariable::read(int64_t,Array*) %s\n", get_name().c_str());
-    TIMING("NetcdfVariable::read(int64_t,Array*)");
+    TRACER("PnetcdfVariable::read(int64_t,Array*) %s\n", get_name().c_str());
+    TIMING("PnetcdfVariable::read(int64_t,Array*)");
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into
@@ -204,7 +204,7 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     tmp->get_distribution(lo,hi);
 
     if (tmp->get_ndim()+1 != ndim) {
-        pagoda::abort("NetcdfVariable::read(int64_t,Array*) :: shape mismatch");
+        pagoda::abort("PnetcdfVariable::read(int64_t,Array*) :: shape mismatch");
     }
 
     found_bit = find_bit(adims, lo, hi);
@@ -239,7 +239,7 @@ Array* NetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
 }
 
 
-bool NetcdfVariable::find_bit(const vector<Dimension*> &adims,
+bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
         const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
     bool found_bit = true;
@@ -271,7 +271,7 @@ bool NetcdfVariable::find_bit(const vector<Dimension*> &adims,
 }
 
 
-void NetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
+void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
         const vector<MPI_Offset> &count, bool found_bit, bool nonblocking) const
 {
     int ncid = get_netcdf_dataset()->get_id();
@@ -305,23 +305,23 @@ void NetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
 }
 
 
-ostream& NetcdfVariable::print(ostream &os) const
+ostream& PnetcdfVariable::print(ostream &os) const
 {
-    TIMING("NetcdfVariable::print(ostream)");
-    os << "NetcdfVariable(" << name << ")";
+    TIMING("PnetcdfVariable::print(ostream)");
+    os << "PnetcdfVariable(" << name << ")";
     return os;
 }
 
 
-NetcdfDataset* NetcdfVariable::get_netcdf_dataset() const
+PnetcdfDataset* PnetcdfVariable::get_netcdf_dataset() const
 {
-    TIMING("NetcdfVariable::get_netcdf_dataset()");
+    TIMING("PnetcdfVariable::get_netcdf_dataset()");
     return dataset;
 }
 
 
-int NetcdfVariable::get_id() const
+int PnetcdfVariable::get_id() const
 {
-    TIMING("NetcdfVariable::get_id()");
+    TIMING("PnetcdfVariable::get_id()");
     return id;
 }

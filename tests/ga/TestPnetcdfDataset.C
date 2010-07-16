@@ -22,7 +22,7 @@ using std::vector;
 // C++ includes
 #include "Attribute.H"
 #include "Dimension.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     string s("        ");
 
     cout << "netcdf " << argv[1] << endl;
-    Dataset *dataset = new NetcdfDataset(argv[1]);
+    Dataset *dataset = new PnetcdfDataset(argv[1]);
 
     cout << "dimensions:" << endl;
     vector<Dimension*> dims = dataset->get_dims();

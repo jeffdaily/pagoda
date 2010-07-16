@@ -22,9 +22,9 @@ using std::vector;
 
 // C++ includes
 #include "Attribute.H"
-#include "NetcdfAttribute.H"
-#include "NetcdfDataset.H"
-#include "NetcdfVariable.H"
+#include "PnetcdfAttribute.H"
+#include "PnetcdfDataset.H"
+#include "PnetcdfVariable.H"
 #include "Util.H"
 #include "Values.H"
 #include "Variable.H"
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         cout << argv[argi] << endl;
     }
 
-    NetcdfDataset *dataset = new NetcdfDataset(argv[1]);
+    PnetcdfDataset *dataset = new PnetcdfDataset(argv[1]);
 
     cout << "@@@@@@@@@@@@@@@@@@@ GLOBAL ATTRIBUTES" << endl;
     vector<Attribute*> atts = dataset->get_atts();

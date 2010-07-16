@@ -11,8 +11,8 @@ using std::string;
 #include "DataType.H"
 
 class Dataset;
-class NetcdfDataset;
-class NetcdfVariable;
+class PnetcdfDataset;
+class PnetcdfVariable;
 class Values;
 class Variable;
 
@@ -20,12 +20,12 @@ class Variable;
 /**
  * The pnetcdf implementation of an Attribute.
  */
-class NetcdfAttribute : public Attribute
+class PnetcdfAttribute : public Attribute
 {
     public:
-        NetcdfAttribute(NetcdfDataset *dataset, int attid,
-                NetcdfVariable *var=NULL);
-        virtual ~NetcdfAttribute();
+        PnetcdfAttribute(PnetcdfDataset *dataset, int attid,
+                PnetcdfVariable *var=NULL);
+        virtual ~PnetcdfAttribute();
 
         virtual string get_name() const;
         virtual DataType get_type() const;
@@ -34,13 +34,13 @@ class NetcdfAttribute : public Attribute
         virtual Dataset* get_dataset() const;
         virtual Variable* get_var() const;
 
-        NetcdfDataset* get_netcdf_dataset() const;
-        NetcdfVariable* get_netcdf_var() const;
+        PnetcdfDataset* get_netcdf_dataset() const;
+        PnetcdfVariable* get_netcdf_var() const;
         int get_id() const;
 
     protected:
-        NetcdfDataset *dataset;
-        NetcdfVariable *var;
+        PnetcdfDataset *dataset;
+        PnetcdfVariable *var;
         int id;
         string name;
         DataType type;

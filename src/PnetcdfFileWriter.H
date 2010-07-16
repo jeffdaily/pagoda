@@ -8,7 +8,7 @@
 #include "FileWriter.H"
 
 class Dataset;
-class NetcdfVariable;
+class PnetcdfVariable;
 class Variable;
 
 using std::string;
@@ -19,11 +19,11 @@ using std::vector;
 /**
  * Writes a Dataset to a netcdf-3 file using pnetcdf.
  */
-class NetcdfFileWriter : public FileWriter
+class PnetcdfFileWriter : public FileWriter
 {
     public:
-        NetcdfFileWriter(const string &filename);
-        virtual ~NetcdfFileWriter();
+        PnetcdfFileWriter(const string &filename);
+        virtual ~PnetcdfFileWriter();
         virtual void close();
 
         virtual void def_dim(const string &name, int64_t size);

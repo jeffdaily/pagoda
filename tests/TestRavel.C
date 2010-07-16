@@ -20,7 +20,7 @@ using std::vector;
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Dimension.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Pack.H"
 #include "Util.H"
 #include "Variable.H"

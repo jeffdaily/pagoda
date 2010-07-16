@@ -6,10 +6,10 @@
 
 #include "Common.H"
 #include "DataType.H"
-#include "NetcdfAttribute.H"
-#include "NetcdfDataset.H"
-#include "NetcdfError.H"
-#include "NetcdfVariable.H"
+#include "PnetcdfAttribute.H"
+#include "PnetcdfDataset.H"
+#include "PnetcdfError.H"
+#include "PnetcdfVariable.H"
 #include "Pnetcdf.H"
 #include "Util.H"
 #include "Values.H"
@@ -17,10 +17,10 @@
 #include "TypedValues.H"
 
 
-NetcdfAttribute::NetcdfAttribute(
-        NetcdfDataset *dataset,
+PnetcdfAttribute::PnetcdfAttribute(
+        PnetcdfDataset *dataset,
         int attid,
-        NetcdfVariable *var)
+        PnetcdfVariable *var)
     :   Attribute()
     ,   dataset(dataset)
     ,   var(var)
@@ -36,7 +36,7 @@ NetcdfAttribute::NetcdfAttribute(
     MPI_Offset len_mpi;
     size_t len;
 
-    TIMING("NetcdfAttribute::NetcdfAttribute(...)");
+    TIMING("PnetcdfAttribute::PnetcdfAttribute(...)");
 
     ncmpi::inq_attname(ncid, varid, attid, att_name_tmp);
     name = string(att_name_tmp);
@@ -63,62 +63,62 @@ NetcdfAttribute::NetcdfAttribute(
 }
 
 
-NetcdfAttribute::~NetcdfAttribute()
+PnetcdfAttribute::~PnetcdfAttribute()
 {
-    TIMING("NetcdfAttribute::~NetcdfAttribute()");
+    TIMING("PnetcdfAttribute::~PnetcdfAttribute()");
     delete values;
 }
 
 
-string NetcdfAttribute::get_name() const
+string PnetcdfAttribute::get_name() const
 {
-    TIMING("NetcdfAttribute::get_name()");
+    TIMING("PnetcdfAttribute::get_name()");
     return name;
 }
 
 
-DataType NetcdfAttribute::get_type() const
+DataType PnetcdfAttribute::get_type() const
 {
-    TIMING("NetcdfAttribute::get_type()");
+    TIMING("PnetcdfAttribute::get_type()");
     return type;
 }
 
 
-Values* NetcdfAttribute::get_values() const
+Values* PnetcdfAttribute::get_values() const
 {
-    TIMING("NetcdfAttribute::get_values()");
+    TIMING("PnetcdfAttribute::get_values()");
     return values;
 }
 
 
-Dataset* NetcdfAttribute::get_dataset() const
+Dataset* PnetcdfAttribute::get_dataset() const
 {
     return dataset;
 }
 
 
-Variable* NetcdfAttribute::get_var() const
+Variable* PnetcdfAttribute::get_var() const
 {
     return var;
 }
 
 
-NetcdfDataset* NetcdfAttribute::get_netcdf_dataset() const
+PnetcdfDataset* PnetcdfAttribute::get_netcdf_dataset() const
 {
-    TIMING("NetcdfAttribute::get_netcdf_dataset()");
+    TIMING("PnetcdfAttribute::get_netcdf_dataset()");
     return dataset;
 }
 
 
-NetcdfVariable* NetcdfAttribute::get_netcdf_var() const
+PnetcdfVariable* PnetcdfAttribute::get_netcdf_var() const
 {
-    TIMING("NetcdfAttribute::get_netcdf_var()");
+    TIMING("PnetcdfAttribute::get_netcdf_var()");
     return var;
 }
 
 
-int NetcdfAttribute::get_id() const
+int PnetcdfAttribute::get_id() const
 {
-    TIMING("NetcdfAttribute::get_id()");
+    TIMING("PnetcdfAttribute::get_id()");
     return id;
 }

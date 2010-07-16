@@ -15,18 +15,18 @@ using std::vector;
 class Attribute;
 class Dataset;
 class Dimension;
-class NetcdfAttribute;
-class NetcdfDimension;
+class PnetcdfAttribute;
+class PnetcdfDimension;
 
 
 /**
  * The pnetcdf implementation of the Variable.
  */
-class NetcdfVariable : public AbstractVariable
+class PnetcdfVariable : public AbstractVariable
 {
     public:
-        NetcdfVariable(NetcdfDataset *dataset, int varid);
-        virtual ~NetcdfVariable();
+        PnetcdfVariable(PnetcdfDataset *dataset, int varid);
+        virtual ~PnetcdfVariable();
 
         // virtuals from AbstractVariable
         virtual string get_name() const;
@@ -41,7 +41,7 @@ class NetcdfVariable : public AbstractVariable
 
         virtual ostream& print(ostream &os) const;
 
-        NetcdfDataset* get_netcdf_dataset() const;
+        PnetcdfDataset* get_netcdf_dataset() const;
         int get_id() const;
 
     protected:
@@ -53,11 +53,11 @@ class NetcdfVariable : public AbstractVariable
                 const vector<MPI_Offset> &count, bool found_bit,
                 bool nonblocking) const;
 
-        NetcdfDataset *dataset;
+        PnetcdfDataset *dataset;
         int id;
         string name;
-        vector<NetcdfDimension*> dims;
-        vector<NetcdfAttribute*> atts;
+        vector<PnetcdfDimension*> dims;
+        vector<PnetcdfAttribute*> atts;
         DataType type;
 };
 

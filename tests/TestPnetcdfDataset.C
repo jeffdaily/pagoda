@@ -18,7 +18,7 @@ using std::vector;
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Dimension.H"
-#include "NetcdfDataset.H"
+#include "PnetcdfDataset.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
     if (argc < 2) {
         if (0 == pagoda::me) {
-            cout << "Usage: TestNetcdfDataset file.nc" << endl;
+            cout << "Usage: TestPnetcdfDataset file.nc" << endl;
         }
         pagoda::finalize();
         return EXIT_FAILURE;
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 
 
     cout << "netcdf " << argv[1] << endl;
-    dataset = new NetcdfDataset(argv[1]);
+    dataset = new PnetcdfDataset(argv[1]);
 
     cout << "dimensions:" << endl;
     dims = dataset->get_dims();

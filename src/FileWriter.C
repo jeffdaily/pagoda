@@ -9,7 +9,7 @@
 #include "Dimension.H"
 #include "FileWriter.H"
 #include "Mask.H"
-#include "NetcdfFileWriter.H"
+#include "PnetcdfFileWriter.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Variable.H"
@@ -25,7 +25,7 @@ FileWriter* FileWriter::create(const string &filename)
     FileWriter *writer = NULL;
     string EXT_NC(".nc");
     if (pagoda::ends_with(filename, EXT_NC)) {
-        writer = new NetcdfFileWriter(filename);
+        writer = new PnetcdfFileWriter(filename);
     }
     return writer;
 }

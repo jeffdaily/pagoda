@@ -39,7 +39,7 @@
 
 #include "Bootstrap.H"
 #include "Debug.H"
-#include "NetcdfError.H"
+#include "PnetcdfError.H"
 #include "PnetcdfTiming.H"
 
 using std::cerr;

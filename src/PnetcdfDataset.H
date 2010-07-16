@@ -14,20 +14,20 @@ using std::vector;
 class Array;
 class Attribute;
 class Dimension;
-class NetcdfAttribute;
-class NetcdfDimension;
-class NetcdfVariable;
+class PnetcdfAttribute;
+class PnetcdfDimension;
+class PnetcdfVariable;
 class Variable;
 
 
 /**
  * The pnetcdf implementation of the Dataset.
  */
-class NetcdfDataset : public AbstractDataset
+class PnetcdfDataset : public AbstractDataset
 {
     public:
-        NetcdfDataset(const string &filename);
-        virtual ~NetcdfDataset();
+        PnetcdfDataset(const string &filename);
+        virtual ~PnetcdfDataset();
         virtual void close();
 
         virtual vector<Attribute*> get_atts() const;
@@ -38,23 +38,23 @@ class NetcdfDataset : public AbstractDataset
 
         virtual ostream& print(ostream &os) const;
 
-        NetcdfAttribute* get_att(size_t i) const;
-        NetcdfDimension* get_dim(size_t i) const;
-        NetcdfVariable*  get_var(size_t i) const;
+        PnetcdfAttribute* get_att(size_t i) const;
+        PnetcdfDimension* get_dim(size_t i) const;
+        PnetcdfVariable*  get_var(size_t i) const;
 
         string get_filename() const;
         int get_id() const;
-        NetcdfDimension* get_udim() const;
+        PnetcdfDimension* get_udim() const;
 
-        friend class NetcdfVariable;
+        friend class PnetcdfVariable;
 
     protected:
         string filename;
         int ncid;
         int udim;
-        vector<NetcdfAttribute*> atts;
-        vector<NetcdfDimension*> dims;
-        vector<NetcdfVariable*> vars;
+        vector<PnetcdfAttribute*> atts;
+        vector<PnetcdfDimension*> dims;
+        vector<PnetcdfVariable*> vars;
 
         vector<int> requests;
         vector<Array*> arrays_to_release;
