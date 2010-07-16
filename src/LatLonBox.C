@@ -89,6 +89,41 @@ void LatLonBox::set(const string &latLonString)
 }
 
 
+void LatLonBox::set_auxiliary(const string &latLonString)
+{
+    vector<string> latLonParts;
+    istringstream iss(latLonString);
+    string token;
+
+    TIMING("LatLonBox::set_auxiliary(string)");
+
+    while (!iss.eof()) {
+        getline(iss, token, ',');
+        latLonParts.push_back(token);
+    }
+
+    if (latLonParts.size() != 4) {
+        throw RangeException(string("invalid box string"));
+    }
+
+    istringstream sn(latLonParts[3]);
+    istringstream ss(latLonParts[2]);
+    istringstream se(latLonParts[1]);
+    istringstream sw(latLonParts[0]);
+    sn >> n;
+    ss >> s;
+    se >> e;
+    sw >> w;
+    if (!sn || !ss || !se || !sw) {
+        throw RangeException(string("invalid box string"));
+    }
+    x = ((w+e)/2);
+    y = ((n+s)/2);
+
+    check();
+}
+
+
 void LatLonBox::set(double north, double south, double east, double west)
 {
     TIMING("LatLonBox::set(double,double,double,double)");

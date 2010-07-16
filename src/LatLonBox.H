@@ -20,6 +20,7 @@ class LatLonBox
         LatLonBox(const LatLonBox &range);
 
         void set(const string &latLonString);
+        void set_auxiliary(const string &latLonString);
         void set(double north, double south, double east, double west);
 
         bool operator == (const LatLonBox &that) const;

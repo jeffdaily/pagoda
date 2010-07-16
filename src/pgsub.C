@@ -52,16 +52,7 @@ int main(int argc, char **argv)
         pagoda::initialize(&argc, &argv);
 
         cmd.parse(argc,argv);
-        infiles = cmd.get_input_filenames();
-        if (cmd.get_join_name().empty()) {
-            dataset = agg = new AggregationUnion;
-        } else {
-            dataset = agg = new AggregationJoinExisting(cmd.get_join_name());
-        }
-        for (size_t i=0,limit=infiles.size(); i<limit; ++i) {
-            agg->add(Dataset::open(infiles[i]));
-        }
-
+        dataset = cmd.get_dataset();
         vars = dataset->get_vars();
 
         pagoda::calculate_required_memory(vars);
@@ -77,7 +68,7 @@ int main(int argc, char **argv)
         masks->modify(cmd.get_slices());
         masks->modify(cmd.get_box(), grid);
 
-        writer = FileWriter::create(cmd.get_output_filename());
+        writer = cmd.get_output();
         writer->copy_atts(dataset->get_atts());
         writer->def_dims(dataset->get_dims());
         writer->def_vars(vars);

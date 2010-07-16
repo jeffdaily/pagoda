@@ -171,9 +171,19 @@ ostream& operator<< (ostream &os, const Slice<T> &other)
 {
     os << "Slice("
         << other.name << ","
-        << other.start << ","
-        << (other.stop ? *other.stop : "NULL") << ","
-        << (other.step ? *other.step : "NULL") << ")";
+        << other.start << ",";
+    if (other.stop) {
+        os << *other.stop;
+    } else {
+        os << "NULL";
+    }
+    os << ",";
+    if (other.step) {
+        os << *other.step;
+    } else {
+        os << "NULL";
+    }
+    os << ")";
     return os;
 }
 

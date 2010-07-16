@@ -43,6 +43,9 @@ AC_LANG_PUSH([C])
 # Checks for C programs.
 AC_PROG_CC([mpicc hcc mpxlc_r mpxlc mpcc cmpicc cc])
 
+# Needed so that _GNU_SOURCE is defined thus enabling getopt_long.
+AC_USE_SYSTEM_EXTENSIONS
+
 # Checks for C header files.
 AC_CHECK_HEADERS([inttypes.h stdint.h stdlib.h sys/time.h time.h unistd.h])
 

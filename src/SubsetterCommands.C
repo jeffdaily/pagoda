@@ -6,15 +6,23 @@
 #   include <unistd.h> // for getopt
 #endif
 
+#include "Aggregation.H"
+#include "AggregationJoinExisting.H"
+#include "AggregationUnion.H"
+#include "CommandLineOption.H"
+#include "CommandLineParser.H"
 #include "Common.H"
+#include "Dataset.H"
 #include "Error.H"
+#include "FileWriter.H"
 #include "PagodaException.H"
 #include "SubsetterCommands.H"
 #include "Timing.H"
 
 
 SubsetterCommands::SubsetterCommands()
-    :   input_filenames()
+    :   CommandLineParser()
+    ,   input_filenames()
     ,   output_filename("")
     ,   join_name("")
     ,   slices()
@@ -22,6 +30,7 @@ SubsetterCommands::SubsetterCommands()
     ,   box()
 {
     TIMING("SubsetterCommands::SubsetterCommands()");
+    init();
 }
 
 
@@ -34,19 +43,17 @@ SubsetterCommands::SubsetterCommands(int argc, char **argv)
     ,   box()
 {
     TIMING("SubsetterCommands::SubsetterCommands(int,char**)");
+    init();
     parse(argc, argv);
 }
 
 
-SubsetterCommands::SubsetterCommands(const SubsetterCommands &that)
-    :   input_filenames(that.input_filenames)
-    ,   output_filename(that.output_filename)
-    ,   join_name(that.join_name)
-    ,   slices(that.slices)
-    ,   _has_box(that._has_box)
-    ,   box(that.box)
+void SubsetterCommands::init()
 {
-    TIMING("SubsetterCommands::SubsetterCommands(SubsetterCommands)");
+    push_back(&CommandLineOption::OUTPUT);
+    push_back(&CommandLineOption::LATLONBOX);
+    push_back(&CommandLineOption::DIMENSION);
+    push_back(&CommandLineOption::VARIABLE);
 }
 
 
@@ -56,117 +63,101 @@ SubsetterCommands::~SubsetterCommands()
 }
 
 
-void SubsetterCommands::parse(int argc, char **argv)
+Dataset* SubsetterCommands::get_dataset() const
 {
-    TIMING("SubsetterCommands::parse(int,char**)");
-    int c;
-    opterr = 0;
-    const string usage = get_usage();
-    while ((c = getopt(argc, argv, "hb:d:j:")) != -1) {
-        switch (c) {
-            case 'h':
-                throw PagodaException(AT, usage);
-            case 'b':
-                _has_box = true;
-                box = LatLonBox(string(optarg));
-                // HACK - we know our stuff is in radians
-                // so convert the degrees from cmd line to radians
-                box.scale(RAD_PER_DEG);
-                break;
-            case 'd':
-                try {
-                    slices.push_back(DimSlice(optarg));
-                } catch (RangeException &ex) {
-                    ERR("Bad dimension slice");
-                }
-                break;
-            case 'j':
-                join_name = optarg;
-                break;
-            default:
-                ostringstream os;
-                os << "ERROR: Unrecognized argument '" << c << "'" << endl;
-                os << usage << endl;
-                const string msg(os.str());
-                throw PagodaException(AT, msg);
+    Dataset *dataset;
+    Aggregation *agg;
+
+    if (input_filenames.empty()) {
+        ERR("Missing input files");
+    }
+
+    if (input_filenames.size() == 1) {
+        dataset = Dataset::open(input_filenames[0]);
+    } else {
+        if (join_name.empty()) {
+            dataset = agg = new AggregationUnion;
+        } else {
+            dataset = agg = new AggregationJoinExisting(join_name);
+        }
+        for (size_t i=0,limit=input_filenames.size(); i<limit; ++i) {
+            agg->add(Dataset::open(input_filenames[i]));
         }
     }
 
-    if (optind == argc) {
-        ostringstream os;
-        os << "ERROR: Input and output file arguments required" << endl;
-        os << usage << endl;
-        const string msg(os.str());
-        throw PagodaException(AT, msg);
-    } else if (optind+1 == argc) {
-        ostringstream os;
-        os << "ERROR: Output file argument required" << endl;
-        os << usage << endl;
-        const string msg(os.str());
-        throw PagodaException(AT, msg);
+    return dataset;
+}
+
+
+FileWriter* SubsetterCommands::get_output() const
+{
+    return FileWriter::create(output_filename);
+}
+
+
+void SubsetterCommands::parse(int argc, char **argv)
+{
+    TIMING("SubsetterCommands::parse(int,char**)");
+
+    CommandLineParser::parse(argc,argv);
+
+    if (positional_arguments.empty()) {
+        ERR("input and output file arguments required");
     }
 
-    while (optind < argc-1) {
-        input_filenames.push_back(string(argv[optind]));
-        ++optind;
+    if (count("output") == 0) {
+        if (positional_arguments.size() == 1) {
+            ERR("output file argument required");
+        } else if (positional_arguments.size() == 0) {
+            ERR("input and output file arguments required");
+        }
+        output_filename = positional_arguments.back();
+        input_filenames.assign(positional_arguments.begin(),
+                positional_arguments.end()-1);
+    } else if (count("output") == 1) {
+        output_filename = get_argument("output");
+        input_filenames = positional_arguments;
+    } else if (count("output") > 1) {
+        ERR("too many output file arguments");
     }
-    output_filename = argv[optind];
+
+    if (count("auxiliary") == 0) {
+    } else if (count("auxiliary") == 1) {
+        //box.set(get_argument("auxiliary"));
+        box.set_auxiliary(get_argument("auxiliary"));
+    } else {
+        ERR("too many auxiliary coordinate boxes");
+    }
 }
 
 
-const string& SubsetterCommands::get_usage() const
-{
-    TIMING("SubsetterCommands::get_usage()");
-    static string usage = ""
-        "Usage: subsetter [options] infile1 [infile2 ...] output_filename\n"
-        "\n"
-        "Generic options:\n"
-        "-h                                 produce this usage statement\n"
-        "-b box north,south,east,west       limits in degrees\n"
-        "-d dimension,start[,stop[,step]]   as integer indices\n"
-        "-j name                            name of dim to join on\n"
-        ;
-    return usage;
-}
-
-
-const vector<string>& SubsetterCommands::get_input_filenames() const
-{
-    TIMING("SubsetterCommands::get_input_filenames()");
-    return input_filenames;
-}
-
-
-const string& SubsetterCommands::get_output_filename() const
-{
-    TIMING("SubsetterCommands::get_output_filename()");
-    return output_filename;
-}
-
-
-const string& SubsetterCommands::get_join_name() const
-{
-    TIMING("SubsetterCommands::get_join_name()");
-    return join_name;
-}
-
-
-bool SubsetterCommands::has_box() const
-{
-    TIMING("SubsetterCommands::has_box()");
-    return _has_box;
-}
-
-
-const LatLonBox& SubsetterCommands::get_box() const
+LatLonBox SubsetterCommands::get_box() const
 {
     TIMING("SubsetterCommands::get_box()");
     return box;
 }
 
 
-const vector<DimSlice>& SubsetterCommands::get_slices() const
+vector<DimSlice> SubsetterCommands::get_slices() const
 {
     TIMING("SubsetterCommands::get_slices()");
     return slices;
+}
+
+
+vector<string> SubsetterCommands::get_input_filenames() const
+{
+    return input_filenames;
+}
+
+
+string SubsetterCommands::get_output_filename() const
+{
+    return output_filename;
+}
+
+
+string SubsetterCommands::get_join_name() const
+{
+    return join_name;
 }
