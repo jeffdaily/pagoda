@@ -15,12 +15,11 @@ class LatLonBox
 {
     public:
         LatLonBox();
-        LatLonBox(const string &latLonString);
+        LatLonBox(const string &latLonString, bool aux_order=false);
         LatLonBox(double north, double south, double east, double west);
         LatLonBox(const LatLonBox &range);
 
-        void set(const string &latLonString);
-        void set_auxiliary(const string &latLonString);
+        void set(const string &latLonString, bool aux_order=false);
         void set(double north, double south, double east, double west);
 
         bool operator == (const LatLonBox &that) const;

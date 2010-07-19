@@ -22,11 +22,13 @@ int main(int argc, char **argv)
     cmd.parse(argc,argv);
 
     if (0 == pagoda::me) {
-        cout << cmd.get_usage() << endl;
-        cout << pagoda::vec_to_string(cmd.get_input_filenames()) << endl;
-        cout << cmd.get_output_filename() << endl;
-        cout << pagoda::vec_to_string(cmd.get_slices()) << endl;
-        cout << cmd.get_box() << endl;
+        cout << "boxes=" << pagoda::vec_to_string(cmd.get_boxes(),";") << endl;
+        cout << "slices=" << pagoda::vec_to_string(cmd.get_slices(),";") << endl;
+        cout << "inputs=" << pagoda::vec_to_string(cmd.get_input_filenames(),";") << endl;
+        cout << "output=" << cmd.get_output_filename() << endl;
+        cout << "variables=" << pagoda::vec_to_string(cmd.get_variables(),";") << endl;
+        cout << "exclude=" << cmd.get_exclude() << endl;
+        cout << "join=" << cmd.get_join_name() << endl;
     }
 
     pagoda::finalize();

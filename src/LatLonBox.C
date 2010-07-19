@@ -29,10 +29,10 @@ LatLonBox::LatLonBox()
 }
 
 
-LatLonBox::LatLonBox(const string &latLonString)
+LatLonBox::LatLonBox(const string &latLonString, bool aux_order)
 {
     TIMING("LatLonBox::LatLonBox(string)");
-    set(latLonString);
+    set(latLonString, aux_order);
 }
 
 
@@ -55,47 +55,17 @@ LatLonBox::LatLonBox(const LatLonBox &range)
 }
 
 
-void LatLonBox::set(const string &latLonString)
+void LatLonBox::set(const string &latLonString, bool aux_order)
 {
+    vector<string> latLonParts;
+    istringstream iss(latLonString);
+    string token;
+    istringstream sn;
+    istringstream ss;
+    istringstream se;
+    istringstream sw;
+
     TIMING("LatLonBox::set(string)");
-    vector<string> latLonParts;
-    istringstream iss(latLonString);
-
-    string token;
-    while (!iss.eof()) {
-        getline(iss, token, ',');
-        latLonParts.push_back(token);
-    }
-
-    if (latLonParts.size() != 4) {
-        throw RangeException(string("invalid box string"));
-    }
-
-    istringstream sn(latLonParts[0]);
-    istringstream ss(latLonParts[1]);
-    istringstream se(latLonParts[2]);
-    istringstream sw(latLonParts[3]);
-    sn >> n;
-    ss >> s;
-    se >> e;
-    sw >> w;
-    if (!sn || !ss || !se || !sw) {
-        throw RangeException(string("invalid box string"));
-    }
-    x = ((w+e)/2);
-    y = ((n+s)/2);
-
-    check();
-}
-
-
-void LatLonBox::set_auxiliary(const string &latLonString)
-{
-    vector<string> latLonParts;
-    istringstream iss(latLonString);
-    string token;
-
-    TIMING("LatLonBox::set_auxiliary(string)");
 
     while (!iss.eof()) {
         getline(iss, token, ',');
@@ -106,10 +76,17 @@ void LatLonBox::set_auxiliary(const string &latLonString)
         throw RangeException(string("invalid box string"));
     }
 
-    istringstream sn(latLonParts[3]);
-    istringstream ss(latLonParts[2]);
-    istringstream se(latLonParts[1]);
-    istringstream sw(latLonParts[0]);
+    if (aux_order) {
+        sn.str(latLonParts[3]);
+        ss.str(latLonParts[2]);
+        se.str(latLonParts[1]);
+        sw.str(latLonParts[0]);
+    } else {
+        sn.str(latLonParts[0]);
+        ss.str(latLonParts[1]);
+        se.str(latLonParts[2]);
+        sw.str(latLonParts[3]);
+    }
     sn >> n;
     ss >> s;
     se >> e;

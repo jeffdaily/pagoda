@@ -8,6 +8,9 @@
 #include "CommandLineOption.H"
 
 
+CommandLineOption CommandLineOption::HELP(
+        'h', "help", false,
+        "print this usage information and exit");
 CommandLineOption CommandLineOption::INPUT_PATH(
         'p', "path", true,
         "path prefix for all input filenames");
@@ -29,9 +32,12 @@ CommandLineOption CommandLineOption::COORDS(
 CommandLineOption CommandLineOption::DIMENSION(
         'd', "dimension", true,
         "dim[,min[,max[,stride]]]");
-CommandLineOption CommandLineOption::LATLONBOX(
+CommandLineOption CommandLineOption::AUXILIARY(
         'X', "auxiliary", true,
         "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");
+CommandLineOption CommandLineOption::LATLONBOX(
+        'b', "box", true,
+        "north,south,east,west lat/lon bounding box");
 CommandLineOption CommandLineOption::OPERATION(
         'y', "operation", true,
         "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");

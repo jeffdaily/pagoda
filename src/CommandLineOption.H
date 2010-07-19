@@ -36,6 +36,7 @@ class CommandLineOption
 
         static struct option get_long_opt_null();
 
+        static CommandLineOption HELP;
         static CommandLineOption INPUT_PATH;
         static CommandLineOption OUTPUT;
         static CommandLineOption VARIABLE;
@@ -43,6 +44,7 @@ class CommandLineOption
         static CommandLineOption NO_COORDS;
         static CommandLineOption COORDS;
         static CommandLineOption DIMENSION;
+        static CommandLineOption AUXILIARY;
         static CommandLineOption LATLONBOX;
         static CommandLineOption OPERATION;
         static CommandLineOption OVERWRITE;

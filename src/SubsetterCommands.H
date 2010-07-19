@@ -18,7 +18,7 @@ class FileWriter;
 /**
  * All command-line parsing for the subsetter.
  */
-class SubsetterCommands : public CommandLineParser
+class SubsetterCommands
 {
     public:
         SubsetterCommands();
@@ -29,22 +29,25 @@ class SubsetterCommands : public CommandLineParser
 
         Dataset* get_dataset() const;
         FileWriter* get_output() const;
-        LatLonBox get_box() const;
+        vector<LatLonBox> get_boxes() const;
         vector<DimSlice> get_slices() const;
-
         vector<string> get_input_filenames() const;
         string get_output_filename() const;
+        vector<string> get_variables() const;
+        bool get_exclude() const;
         string get_join_name() const;
 
     protected:
         void init();
 
+        CommandLineParser parser;
         vector<string> input_filenames;
         string output_filename;
+        vector<string> variables;
+        bool exclude;
         string join_name;
         vector<DimSlice> slices;
-        bool _has_box;
-        LatLonBox box;
+        vector<LatLonBox> boxes;
 };
 
 #endif // SUBSETTERCOMMANDS_H_

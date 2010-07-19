@@ -37,7 +37,7 @@ void CommandLineParser::parse(int argc, char **argv)
     int opt;
     string opt_string;
     vector<struct option> long_opts;
-    int long_index;
+    int long_index = -1;
     optvec_t::const_iterator it;
 
     // build the opt_string and long_opts
@@ -51,17 +51,18 @@ void CommandLineParser::parse(int argc, char **argv)
     // do the parsing
     while ((opt = getopt_long(argc, argv, opt_string.c_str(),
                     &long_opts[0], &long_index)) != -1) {
+        if (opt == '?') {
+            // getopt prints a warning
+            throw PagodaException("see --help for details");
+        }
         for (it=options.begin(); it!=options.end(); ++it) {
-            if (opt == 0) {
-                if ((*it)->handle(opt, optarg, long_opts[long_index].name)) {
-                    break;
-                }
-            } else {
-                if ((*it)->handle(opt, optarg)) {
-                    break;
-                }
+            string name = long_index >= 0 ? long_opts[long_index].name : "";
+            string arg = optarg ? optarg : "";
+            if ((*it)->handle(opt, arg, name)) {
+                break;
             }
         }
+        long_index = -1;
     }
     
     // the positional arguments are left, put them in a vector<string>
@@ -98,6 +99,12 @@ vector<string> CommandLineParser::get_arguments(const string &name) const
         return it->second->get_arguments();
     }
     return vector<string>();
+}
+
+
+vector<string> CommandLineParser::get_positional_arguments() const
+{
+    return positional_arguments;
 }
 
 

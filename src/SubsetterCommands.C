@@ -6,6 +6,8 @@
 #   include <unistd.h> // for getopt
 #endif
 
+#include <algorithm>
+
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
@@ -21,13 +23,14 @@
 
 
 SubsetterCommands::SubsetterCommands()
-    :   CommandLineParser()
+    :   parser()
     ,   input_filenames()
     ,   output_filename("")
+    ,   variables()
+    ,   exclude(false)
     ,   join_name("")
     ,   slices()
-    ,   _has_box(false)
-    ,   box()
+    ,   boxes()
 {
     TIMING("SubsetterCommands::SubsetterCommands()");
     init();
@@ -37,10 +40,11 @@ SubsetterCommands::SubsetterCommands()
 SubsetterCommands::SubsetterCommands(int argc, char **argv)
     :   input_filenames()
     ,   output_filename("")
+    ,   variables()
+    ,   exclude(false)
     ,   join_name("")
     ,   slices()
-    ,   _has_box(false)
-    ,   box()
+    ,   boxes()
 {
     TIMING("SubsetterCommands::SubsetterCommands(int,char**)");
     init();
@@ -50,16 +54,99 @@ SubsetterCommands::SubsetterCommands(int argc, char **argv)
 
 void SubsetterCommands::init()
 {
-    push_back(&CommandLineOption::OUTPUT);
-    push_back(&CommandLineOption::LATLONBOX);
-    push_back(&CommandLineOption::DIMENSION);
-    push_back(&CommandLineOption::VARIABLE);
+    parser.push_back(&CommandLineOption::OUTPUT);
+    parser.push_back(&CommandLineOption::AUXILIARY);
+    parser.push_back(&CommandLineOption::LATLONBOX);
+    parser.push_back(&CommandLineOption::DIMENSION);
+    parser.push_back(&CommandLineOption::VARIABLE);
+    parser.push_back(&CommandLineOption::EXCLUDE);
+    parser.push_back(&CommandLineOption::JOIN);
+    parser.push_back(&CommandLineOption::UNION);
 }
 
 
 SubsetterCommands::~SubsetterCommands()
 {
     TIMING("SubsetterCommands::~SubsetterCommands()");
+}
+
+
+void SubsetterCommands::parse(int argc, char **argv)
+{
+    vector<string> positional_arguments;
+
+    TIMING("SubsetterCommands::parse(int,char**)");
+
+    parser.parse(argc,argv);
+    positional_arguments = parser.get_positional_arguments();
+
+    if (positional_arguments.empty()) {
+        ERR("input and output file arguments required");
+    }
+
+    if (parser.count("output") == 0) {
+        if (positional_arguments.size() == 1) {
+            ERR("output file argument required");
+        } else if (positional_arguments.size() == 0) {
+            ERR("input and output file arguments required");
+        }
+        output_filename = positional_arguments.back();
+        input_filenames.assign(positional_arguments.begin(),
+                positional_arguments.end()-1);
+    } else if (parser.count("output") == 1) {
+        output_filename = parser.get_argument("output");
+        input_filenames = positional_arguments;
+    } else if (parser.count("output") > 1) {
+        ERR("too many output file arguments");
+    }
+
+    if (parser.count("auxiliary")) {
+        vector<string> args = parser.get_arguments("auxiliary");
+        for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
+            boxes.push_back(LatLonBox(*it, true));
+        }
+    }
+
+    if (parser.count("box")) {
+        vector<string> args = parser.get_arguments("box");
+        for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
+            boxes.push_back(LatLonBox(*it));
+        }
+    }
+
+    if (parser.count("exclude")) {
+        exclude = true;
+    }
+
+    if (parser.count("variable")) {
+        vector<string> args = parser.get_arguments("variable");
+        vector<string>::iterator truncate_location;
+        for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
+            istringstream iss(*it);
+            while (iss) {
+                string value;
+                getline(iss, value, ',');
+                if (!value.empty()) {
+                        variables.push_back(value);
+                }
+            }
+        }
+        // sort and remove duplicates
+        std::sort(variables.begin(), variables.end());
+        truncate_location = std::unique(variables.begin(), variables.end());
+        variables.resize(truncate_location - variables.begin());
+    }
+
+    if (parser.count("dimension")) {
+        vector<string> args = parser.get_arguments("dimension");
+        for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
+            slices.push_back(DimSlice(*it));
+        }
+    }
+
+    if (parser.count("join")) {
+        join_name = parser.get_argument("join");
+    }
 }
 
 
@@ -95,46 +182,10 @@ FileWriter* SubsetterCommands::get_output() const
 }
 
 
-void SubsetterCommands::parse(int argc, char **argv)
-{
-    TIMING("SubsetterCommands::parse(int,char**)");
-
-    CommandLineParser::parse(argc,argv);
-
-    if (positional_arguments.empty()) {
-        ERR("input and output file arguments required");
-    }
-
-    if (count("output") == 0) {
-        if (positional_arguments.size() == 1) {
-            ERR("output file argument required");
-        } else if (positional_arguments.size() == 0) {
-            ERR("input and output file arguments required");
-        }
-        output_filename = positional_arguments.back();
-        input_filenames.assign(positional_arguments.begin(),
-                positional_arguments.end()-1);
-    } else if (count("output") == 1) {
-        output_filename = get_argument("output");
-        input_filenames = positional_arguments;
-    } else if (count("output") > 1) {
-        ERR("too many output file arguments");
-    }
-
-    if (count("auxiliary") == 0) {
-    } else if (count("auxiliary") == 1) {
-        //box.set(get_argument("auxiliary"));
-        box.set_auxiliary(get_argument("auxiliary"));
-    } else {
-        ERR("too many auxiliary coordinate boxes");
-    }
-}
-
-
-LatLonBox SubsetterCommands::get_box() const
+vector<LatLonBox> SubsetterCommands::get_boxes() const
 {
     TIMING("SubsetterCommands::get_box()");
-    return box;
+    return boxes;
 }
 
 
@@ -154,6 +205,18 @@ vector<string> SubsetterCommands::get_input_filenames() const
 string SubsetterCommands::get_output_filename() const
 {
     return output_filename;
+}
+
+
+vector<string> SubsetterCommands::get_variables() const
+{
+    return variables;
+}
+
+
+bool SubsetterCommands::get_exclude() const
+{
+    return exclude;
 }
 
 
