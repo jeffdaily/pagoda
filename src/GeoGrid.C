@@ -240,6 +240,32 @@ Variable* GeoGrid::get_corner_lon()
 }
 
 
+bool GeoGrid::is_radians()
+{
+    vector<Variable* (GeoGrid::*)()> funcs;
+    funcs.push_back(&GeoGrid::get_cell_lat);
+    funcs.push_back(&GeoGrid::get_cell_lon);
+    funcs.push_back(&GeoGrid::get_edge_lat);
+    funcs.push_back(&GeoGrid::get_edge_lon);
+    funcs.push_back(&GeoGrid::get_corner_lat);
+    funcs.push_back(&GeoGrid::get_corner_lon);
+
+    for (size_t i=0; i<funcs.size(); ++i) {
+        Variable *var;
+        Attribute *att;
+        Variable* (GeoGrid::*func)() = funcs[i];
+        if ((var = (this->*func)())) {
+            if ((att = var->get_att("units"))
+                    && att->get_string() == "radians") {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
 Dimension* GeoGrid::get_dim(const string &att_name, const string &dim_name)
 {
     if (grid_var) {

@@ -18,7 +18,6 @@ Aggregation::Aggregation()
 Aggregation::~Aggregation()
 {
     TIMING("Aggregation::~Aggregation()");
-    close();
 }
 
 

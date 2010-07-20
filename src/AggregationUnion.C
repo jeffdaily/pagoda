@@ -11,9 +11,11 @@
 #include "Dimension.H"
 #include "Error.H"
 #include "Timing.H"
+#include "Util.H"
 #include "Variable.H"
 
 using std::string;
+using std::transform;
 using std::vector;
 
 
@@ -31,15 +33,11 @@ AggregationUnion::AggregationUnion()
 AggregationUnion::~AggregationUnion()
 {
     // deleting the datasets should also delete their associate members
-    vector<Dataset*>::iterator it = datasets.begin();
-    vector<Dataset*>::iterator end = datasets.end();
-
+    // and close any open files
     TIMING("AggregationUnion::~AggregationUnion()");
 
-    for (; it!=end; ++it) {
-        Dataset *dataset = *it;
-        delete dataset;
-    }
+    transform(datasets.begin(), datasets.end(), datasets.begin(),
+            pagoda::ptr_deleter<Dataset*>);
 }
 
 

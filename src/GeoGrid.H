@@ -24,6 +24,7 @@ class GeoGrid : public Grid
         virtual Variable* get_edge_lon();
         virtual Variable* get_corner_lat();
         virtual Variable* get_corner_lon();
+        virtual bool is_radians();
 
         virtual Dimension* get_cell_dim();
         virtual Dimension* get_edge_dim();

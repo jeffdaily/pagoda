@@ -66,7 +66,7 @@ int main(int argc, char **argv)
         
         masks = new MaskMap(dataset);
         masks->modify(cmd.get_slices());
-        masks->modify(cmd.get_box(), grid);
+        masks->modify(cmd.get_boxes(), grid);
 
         writer = cmd.get_output();
         writer->copy_atts(dataset->get_atts());

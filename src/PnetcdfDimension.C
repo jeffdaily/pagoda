@@ -52,8 +52,8 @@ string PnetcdfDimension::get_name() const
 int64_t PnetcdfDimension::get_size() const
 {
     TIMING("PnetcdfDimension::get_size()");
-    if (get_dataset()->get_masks()) {
-        return get_dataset()->get_masks()->get_mask(this)->get_count();
+    if (get_mask()) {
+        return get_mask()->get_count();
     }
     return size;
 }

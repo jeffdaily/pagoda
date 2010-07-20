@@ -110,7 +110,7 @@ void SubsetterCommands::parse(int argc, char **argv)
     if (parser.count("box")) {
         vector<string> args = parser.get_arguments("box");
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
-            boxes.push_back(LatLonBox(*it));
+            boxes.push_back(LatLonBox(*it, false));
         }
     }
 

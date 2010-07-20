@@ -231,6 +231,19 @@ void LatLonBox::scale(double value)
 }
 
 
+LatLonBox& LatLonBox::operator*=(double value)
+{
+    scale(value);
+    return *this;
+}
+
+
+LatLonBox LatLonBox::operator*(double value) const
+{
+    return LatLonBox(*this)*=value;
+}
+
+
 LatLonBox LatLonBox::enclose(const LatLonBox &first, const LatLonBox &second)
 {
     TIMING("LatLonBox::enclose(LatLonBox,LatLonBox)");

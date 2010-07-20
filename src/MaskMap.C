@@ -13,6 +13,7 @@ using std::string;
 using std::vector;
 
 #include "Array.H"
+#include "Common.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -101,6 +102,38 @@ void MaskMap::create_masks(const vector<Dimension*> dims)
 
 
 /**
+ * Calls Mask::modify(DimSlice) for the given slice if associated Mask is
+ * found.
+ *
+ * If an associated Mask is not found for the indicated Dimension, it is
+ * reported to stderr but otherwise ignored.
+ *
+ * @param[in] slice the DimSlice to apply to associatd Masks
+ */
+void MaskMap::modify(const DimSlice &slice)
+{
+    string slice_name = slice.get_name();
+    masks_t::const_iterator mask_it = masks.find(slice_name);
+
+    TIMING("MaskMap::modify(DimSlice)");
+    TRACER("MaskMap::modify(DimSlice)\n");
+
+    if (mask_it == masks.end()) {
+        pagoda::print_zero("Sliced dimension '%s' does not exist\n",
+                slice_name.c_str());
+    } else {
+        // clear the Mask the first time only
+        if (cleared.count(slice_name) == 0) {
+            cleared.insert(slice_name);
+            mask_it->second->clear();
+        }
+        // modify the Mask based on the current Slice
+        mask_it->second->modify(slice);
+    }
+}
+
+
+/**
  * Calls Mask::modify(DimSlice) for each given slice if associated Mask is
  * found.
  *
@@ -117,28 +150,16 @@ void MaskMap::modify(const vector<DimSlice> &slices)
 
     // we're iterating over the command-line specified slices to create masks
     for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
-        DimSlice slice = *slice_it;
-        string slice_name = slice.get_name();
-        masks_t::const_iterator mask_it = masks.find(slice_name);
-
-        if (mask_it == masks.end()) {
-            pagoda::print_zero("Sliced dimension '%s' does not exist\n",
-                    slice_name.c_str());
-        } else {
-            // clear the Mask the first time only
-            if (cleared.count(slice_name) == 0) {
-                cleared.insert(slice_name);
-                mask_it->second->clear();
-            }
-            // modify the Mask based on the current Slice
-            mask_it->second->modify(slice);
-        }
+        modify(*slice_it);
     }
 }
 
 
 void MaskMap::modify(const LatLonBox &box, Grid *grid)
 {
+    TIMING("MaskMap::modify(LatLonBox,Grid)");
+    TRACER("MaskMap::modify(LatLonBox,Grid)\n");
+
     if (grid->get_type() == GridType::GEODESIC) {
         Variable *cell_lat = grid->get_cell_lat();
         Variable *cell_lon = grid->get_cell_lon();
@@ -160,7 +181,11 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
         else if (edge_lat)   edge_dim = edge_lon->get_dims().at(0);
 
         if (cell_lat && cell_lon && cell_dim) {
-            modify(box, cell_lat, cell_lon, cell_dim);
+            if (grid->is_radians()) {
+                modify(box*RAD_PER_DEG, cell_lat, cell_lon, cell_dim);
+            } else {
+                modify(box, cell_lat, cell_lon, cell_dim);
+            }
             if (corner_dim && cell_corners) {
                 modify(cell_dim, corner_dim, cell_corners);
             } else {
@@ -202,6 +227,17 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
 }
 
 
+void MaskMap::modify(const vector<LatLonBox> &boxes, Grid *grid)
+{
+    vector<LatLonBox>::const_iterator it;
+    vector<LatLonBox>::const_iterator end;
+
+    for (it=boxes.begin(),end=boxes.end(); it!=end; ++it) {
+        modify(*it, grid);
+    }
+}
+
+
 /**
  * Modify the shared mask of the given lat/lon variables.
  *
@@ -219,6 +255,9 @@ void MaskMap::modify(const LatLonBox &box,
     Mask *mask = get_mask(dim);
     Array *lat_array;
     Array *lon_array;
+
+    TIMING("MaskMap::modify(LatLonBox,Variable,Variable,Dimension)");
+    TRACER("MaskMap::modify(LatLonBox,Variable,Variable,Dimension)\n");
 
     lat->get_dataset()->push_masks(NULL);
     lat_array = lat->read();

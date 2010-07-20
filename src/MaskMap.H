@@ -52,7 +52,9 @@ class MaskMap
         void create_masks(const Dataset *dataset);
         void create_masks(const vector<Dimension*> dims);
 
+        void modify(const DimSlice &slice);
         void modify(const vector<DimSlice> &slices);
+        void modify(const vector<LatLonBox> &boxes, Grid *grid);
         void modify(const LatLonBox &box, Grid *grid);
 
         Mask* get_mask(const Dimension *dim);
