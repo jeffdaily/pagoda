@@ -272,8 +272,19 @@ void PnetcdfFileWriter::write(Array *array, const string &name)
     vector<int64_t> start(shape_to_compare.size(), 0);
 
     // verify that the given array has the same shape as the defined variable
-    if (shape_to_compare != array->get_shape()) {
-        ERR("shape mismatch");
+    // if we're dealing with an unlimited dimension, ignore that dimension
+    if (shape_to_compare.size() > 0 && shape_to_compare[0] == 0) {
+        vector<int64_t> compare_shape = shape_to_compare;
+        vector<int64_t> array_shape = array->get_shape();
+        compare_shape.erase(compare_shape.begin());
+        array_shape.erase(array_shape.begin());
+        if (compare_shape != array_shape) {
+            ERR("shape mismatch");
+        }
+    } else {
+        if (shape_to_compare != array->get_shape()) {
+            ERR("shape mismatch");
+        }
     }
 
     write(array, name, start);

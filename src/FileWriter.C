@@ -60,7 +60,11 @@ void FileWriter::def_dim(Mask *mask)
 
 void FileWriter::def_dim(Dimension *dim)
 {
-    def_dim(dim->get_name(), dim->get_size());
+    if (dim->is_unlimited()) {
+        def_dim(dim->get_name(), 0);
+    } else {
+        def_dim(dim->get_name(), dim->get_size());
+    }
 }
 
 

@@ -103,21 +103,18 @@ Grid::~Grid()
 }
 
 
-#include "Debug.H"
 bool Grid::is_coordinate(const Variable *var)
 {
     const Dataset *dataset = get_dataset();
     vector<Variable*> vars = dataset->get_vars();
 
     if (!var) {
-        pagoda::print_zero("is_coordinate false null var\n");
         return false;
     }
 
     // does this Variable have only 1 dim with same name?
     if (var->get_dims().size() == 1
             && var->get_dims()[0]->get_name() == var->get_name()) {
-        pagoda::print_zero("is_coordinate true dim name and size match\n");
         return true;
     }
     
@@ -130,8 +127,6 @@ bool Grid::is_coordinate(const Variable *var)
             vector<string>::iterator part;
             for (part=parts.begin(); part!=parts.end(); ++part) {
                 if (var->get_name() == *part) {
-                    pagoda::print_zero(
-                            "is_coordinate true coordiantes attribute\n");
                     return true;
                 }
             }
