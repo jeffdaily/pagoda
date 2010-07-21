@@ -22,18 +22,8 @@ using std::vector;
 #include "Error.H"
 #include "GeoGrid.H"
 #include "StringComparator.H"
+#include "Util.H"
 #include "Variable.H"
-
-
-static inline vector<string> split(const string &s)
-{
-    vector<string> tokens;
-    istringstream iss(s);
-    copy(istream_iterator<string>(iss),
-            istream_iterator<string>(),
-            back_inserter<vector<string> >(tokens));
-    return tokens;
-}
 
 
 /**
@@ -148,7 +138,7 @@ Variable* GeoGrid::get_coord(const string &att_name,
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
         if (att) {
-            vector<string> parts = split(att->get_string());
+            vector<string> parts = pagoda::split(att->get_string());
             if (parts.size() != 2) {
                 throw GridException("expected " + att_name + " attribute "
                         "to have two values", parts.size());
@@ -271,7 +261,7 @@ Dimension* GeoGrid::get_dim(const string &att_name, const string &dim_name)
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
         if (att) {
-            vector<string> parts = split(att->get_string());
+            vector<string> parts = pagoda::split(att->get_string());
             if (parts.size() != 2) {
                 throw GridException("expected " + att_name + " attribute "
                         "to have two values", parts.size());

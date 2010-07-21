@@ -10,9 +10,6 @@ using std::exception;
 using std::string;
 using std::vector;
 
-#include "Aggregation.H"
-#include "AggregationJoinExisting.H"
-#include "AggregationUnion.H"
 #include "Array.H"
 #include "Bootstrap.H"
 #include "Dataset.H"
@@ -38,12 +35,10 @@ int main(int argc, char **argv)
 {
     SubsetterCommands cmd;
     Dataset *dataset;
-    Aggregation *agg;
     vector<Variable*> vars;
     vector<Variable*>::iterator var_it;
     vector<Dimension*> dims;
     FileWriter *writer;
-    vector<string> infiles;
     vector<Grid*> grids;
     Grid *grid;
     MaskMap *masks;
@@ -53,9 +48,8 @@ int main(int argc, char **argv)
 
         cmd.parse(argc,argv);
         dataset = cmd.get_dataset();
-        vars = dataset->get_vars();
-
-        pagoda::calculate_required_memory(vars);
+        vars = cmd.get_variables(dataset);
+        dims = cmd.get_dimensions(dataset);
 
         grids = dataset->get_grids();
         if (grids.empty()) {
@@ -70,7 +64,7 @@ int main(int argc, char **argv)
 
         writer = cmd.get_output();
         writer->copy_atts(dataset->get_atts());
-        writer->def_dims(dataset->get_dims());
+        writer->def_dims(dims);
         writer->def_vars(vars);
 
         // read/subset and write each variable...

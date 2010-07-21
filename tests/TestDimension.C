@@ -38,8 +38,6 @@ int main(int argc, char **argv)
 
     dataset = Dataset::open(argv[1]);
 
-    pagoda::calculate_required_memory(dataset->get_vars());
-
     dims = dataset->get_dims();
     for (size_t dimid=0,limit=dims.size(); dimid<limit; ++dimid) {
         Dimension *dim = dims[dimid];

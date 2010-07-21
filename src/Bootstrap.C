@@ -15,6 +15,7 @@
 int pagoda::me = 0;
 int pagoda::npe = 0;
 
+extern "C" void pagoda_register_stack_memory();
 
 void pagoda::initialize(int *argc, char ***argv)
 {
@@ -25,6 +26,8 @@ void pagoda::initialize(int *argc, char ***argv)
 #endif
 #if HAVE_GA
     GA_Initialize();
+    // avoid using MA in GA
+    pagoda_register_stack_memory();
     pagoda::me = GA_Nodeid();
     pagoda::npe = GA_Nnodes();
 #endif

@@ -110,6 +110,7 @@ libpagoda_la_SOURCES += src/Grid.C
 libpagoda_la_SOURCES += src/LatLonBox.C
 libpagoda_la_SOURCES += src/Mask.C
 libpagoda_la_SOURCES += src/MaskMap.C
+libpagoda_la_SOURCES += src/Memory.c
 libpagoda_la_SOURCES += src/Pack.C
 libpagoda_la_SOURCES += src/PnetcdfAttribute.C
 libpagoda_la_SOURCES += src/Pnetcdf.C

@@ -1,6 +1,7 @@
 #ifndef SUBSETTERCOMMANDS_H_
 #define SUBSETTERCOMMANDS_H_
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -8,11 +9,14 @@
 #include "LatLonBox.H"
 #include "Slice.H"
 
+using std::set;
 using std::string;
 using std::vector;
 
 class Dataset;
+class Dimension;
 class FileWriter;
+class Variable;
 
 
 /**
@@ -29,13 +33,19 @@ class SubsetterCommands
 
         Dataset* get_dataset() const;
         FileWriter* get_output() const;
+        vector<Variable*> get_variables(Dataset *dataset) const;
+        vector<Dimension*> get_dimensions(Dataset *dataset) const;
+
         vector<LatLonBox> get_boxes() const;
         vector<DimSlice> get_slices() const;
         vector<string> get_input_filenames() const;
         string get_output_filename() const;
-        vector<string> get_variables() const;
+        set<string> get_variables() const;
         bool get_exclude() const;
         string get_join_name() const;
+        bool get_alphabetize() const;
+        bool get_all_coords() const;
+        bool get_process_coords() const;
 
     protected:
         void init();
@@ -43,9 +53,12 @@ class SubsetterCommands
         CommandLineParser parser;
         vector<string> input_filenames;
         string output_filename;
-        vector<string> variables;
+        set<string> variables;
         bool exclude;
         string join_name;
+        bool alphabetize;
+        bool all_coords;
+        bool process_coords;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
 };

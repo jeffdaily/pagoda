@@ -39,7 +39,6 @@ int main(int argc, char **argv)
     vector<int64_t> ahi;
 
     pagoda::initialize(&argc, &argv);
-    pagoda::calculate_required_memory();
 
     data_shape.push_back(15);
     data_shape.push_back(10);

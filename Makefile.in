@@ -121,8 +121,8 @@ am_libpagoda_la_OBJECTS = src/AbstractDataset.lo \
 	src/Debug.lo src/Dimension.lo src/FileWriter.lo src/gax.lo \
 	src/GlobalArray.lo src/GlobalMask.lo src/GeoGrid.lo \
 	src/Grid.lo src/LatLonBox.lo src/Mask.lo src/MaskMap.lo \
-	src/Pack.lo src/PnetcdfAttribute.lo src/Pnetcdf.lo \
-	src/PnetcdfDataset.lo src/PnetcdfDimension.lo \
+	src/Memory.lo src/Pack.lo src/PnetcdfAttribute.lo \
+	src/Pnetcdf.lo src/PnetcdfDataset.lo src/PnetcdfDimension.lo \
 	src/PnetcdfFileWriter.lo src/PnetcdfTiming.lo \
 	src/PnetcdfVariable.lo src/StringComparator.lo \
 	src/SubsetterCommands.lo src/Timing.lo src/Util.lo \
@@ -566,12 +566,13 @@ libpagoda_la_SOURCES = src/AbstractDataset.C src/AbstractVariable.C \
 	src/CoordinateVariable.C src/Dataset.C src/DataType.C \
 	src/Debug.C src/Dimension.C src/FileWriter.C src/gax.C \
 	src/GlobalArray.C src/GlobalMask.C src/GeoGrid.C src/Grid.C \
-	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
-	src/PnetcdfAttribute.C src/Pnetcdf.C src/PnetcdfDataset.C \
-	src/PnetcdfDimension.C src/PnetcdfFileWriter.C \
-	src/PnetcdfTiming.C src/PnetcdfVariable.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Timing.C \
-	src/Util.C src/Values.C src/Variable.C src/VariableDecorator.C
+	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Memory.c \
+	src/Pack.C src/PnetcdfAttribute.C src/Pnetcdf.C \
+	src/PnetcdfDataset.C src/PnetcdfDimension.C \
+	src/PnetcdfFileWriter.C src/PnetcdfTiming.C \
+	src/PnetcdfVariable.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
+	src/Variable.C src/VariableDecorator.C
 tests_ga_TestAttribute_SOURCES = tests/ga/TestAttribute.C
 tests_ga_TestBin_SOURCES = tests/ga/TestBin.C
 tests_ga_TestDimension_SOURCES = tests/ga/TestDimension.C
@@ -737,6 +738,7 @@ src/Grid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/LatLonBox.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Mask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/MaskMap.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Memory.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Pack.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfAttribute.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -1058,6 +1060,8 @@ mostlyclean-compile:
 	-rm -f src/Mask.lo
 	-rm -f src/MaskMap.$(OBJEXT)
 	-rm -f src/MaskMap.lo
+	-rm -f src/Memory.$(OBJEXT)
+	-rm -f src/Memory.lo
 	-rm -f src/Pack.$(OBJEXT)
 	-rm -f src/Pack.lo
 	-rm -f src/Pnetcdf.$(OBJEXT)
@@ -1156,6 +1160,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/MaskMap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pnetcdf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfAttribute.Plo@am__quote@

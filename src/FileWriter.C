@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "Dataset.H"
 #include "Dimension.H"
 #include "FileWriter.H"
 #include "Mask.H"
@@ -40,6 +41,14 @@ FileWriter::FileWriter()
 FileWriter::~FileWriter()
 {
     TIMING("FileWriter::~FileWriter()");
+}
+
+
+void FileWriter::def_dataset(Dataset *dataset)
+{
+    copy_atts(dataset->get_atts());
+    def_dims(dataset->get_dims());
+    def_vars(dataset->get_vars());
 }
 
 

@@ -38,6 +38,8 @@ class FileWriter
         virtual ~FileWriter();
         virtual void close() = 0;
 
+        virtual void def_dataset(Dataset *dataset);
+
         virtual void def_dim(const string &name, int64_t size) = 0;
         virtual void def_dim(Mask *mask);
         virtual void def_dim(Dimension *dim);

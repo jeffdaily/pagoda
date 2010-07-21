@@ -11,15 +11,20 @@
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
+#include "Attribute.H"
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
 #include "Common.H"
 #include "Dataset.H"
+#include "Dimension.H"
 #include "Error.H"
 #include "FileWriter.H"
+#include "Grid.H"
 #include "PagodaException.H"
 #include "SubsetterCommands.H"
 #include "Timing.H"
+#include "Util.H"
+#include "Variable.H"
 
 
 SubsetterCommands::SubsetterCommands()
@@ -29,6 +34,9 @@ SubsetterCommands::SubsetterCommands()
     ,   variables()
     ,   exclude(false)
     ,   join_name("")
+    ,   alphabetize(true)
+    ,   all_coords(false)
+    ,   process_coords(true)
     ,   slices()
     ,   boxes()
 {
@@ -43,6 +51,9 @@ SubsetterCommands::SubsetterCommands(int argc, char **argv)
     ,   variables()
     ,   exclude(false)
     ,   join_name("")
+    ,   alphabetize(true)
+    ,   all_coords(false)
+    ,   process_coords(true)
     ,   slices()
     ,   boxes()
 {
@@ -60,6 +71,9 @@ void SubsetterCommands::init()
     parser.push_back(&CommandLineOption::DIMENSION);
     parser.push_back(&CommandLineOption::VARIABLE);
     parser.push_back(&CommandLineOption::EXCLUDE);
+    parser.push_back(&CommandLineOption::ALPHABETIZE);
+    parser.push_back(&CommandLineOption::COORDS);
+    parser.push_back(&CommandLineOption::NO_COORDS);
     parser.push_back(&CommandLineOption::JOIN);
     parser.push_back(&CommandLineOption::UNION);
 }
@@ -127,14 +141,10 @@ void SubsetterCommands::parse(int argc, char **argv)
                 string value;
                 getline(iss, value, ',');
                 if (!value.empty()) {
-                        variables.push_back(value);
+                    variables.insert(value);
                 }
             }
         }
-        // sort and remove duplicates
-        std::sort(variables.begin(), variables.end());
-        truncate_location = std::unique(variables.begin(), variables.end());
-        variables.resize(truncate_location - variables.begin());
     }
 
     if (parser.count("dimension")) {
@@ -146,6 +156,18 @@ void SubsetterCommands::parse(int argc, char **argv)
 
     if (parser.count("join")) {
         join_name = parser.get_argument("join");
+    }
+
+    if (parser.count("alphabetize")) {
+        alphabetize = false;
+    }
+
+    if (parser.count("coords")) {
+        all_coords = true;
+    }
+
+    if (parser.count("no-coords")) {
+        process_coords = false;
     }
 }
 
@@ -182,6 +204,170 @@ FileWriter* SubsetterCommands::get_output() const
 }
 
 
+static bool var_cmp(Variable *left, Variable *right)
+{
+    return left->get_name() < right->get_name();
+}
+
+
+/**
+ * Modify the set of Variables of the given Dataset based on the command-line
+ * parameters.
+ *
+ * The user could select or exclude a set of Variables, choose to alphabetize
+ * them, or whether to exclude coordinate Variables.
+ *
+ * @param[in] dataset the Dataset
+ * @return the Variables to operate over, possibly sorted by name
+ */
+vector<Variable*> SubsetterCommands::get_variables(Dataset *dataset) const
+{
+    const vector<Variable*> vars_in = dataset->get_vars();
+    set<string> vars_to_keep;
+    vector<Variable*> vars_out;
+    vector<Variable*>::const_iterator it;
+    vector<Variable*>::const_iterator end;
+    Grid *grid = dataset->get_grid();
+
+    if (variables.empty()) {
+        if (exclude) {
+            // do nothing, keep vars_to_keep empty
+        } else if (all_coords){
+            // do nothing, keep vars_to_keep, add coords later
+        } else {
+            // we want all variables
+            for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+                vars_to_keep.insert((*it)->get_name());
+            }
+        }
+    } else {
+        if (exclude) {
+            // invert given variables
+            for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+                string name = (*it)->get_name();
+                if (variables.count(name)) {
+                    // skip
+                } else {
+                    vars_to_keep.insert(name);
+                }
+            }
+        } else {
+            // don't invert given variables
+            for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+                string name = (*it)->get_name();
+                if (variables.count(name)) {
+                    vars_to_keep.insert(name);
+                }
+            }
+        }
+    }
+
+    // next, if we want all coordinates, add them to the set of variables
+    if (grid && all_coords) {
+        for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+            Variable *var = *it;
+            if (grid->is_coordinate(var)) {
+                vars_to_keep.insert(var->get_name());
+            }
+        }
+    }
+
+    // next, if we are to process coordinate variables of selected variables,
+    // add those next
+    if (process_coords) {
+        for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+            Variable *var = *it;
+            Attribute *att;
+            vector<Dimension*> dims;
+            vector<Dimension*>::iterator dim_it;
+            // only process those variables we are already keeping
+            if (!vars_to_keep.count(var->get_name())) {
+                continue;
+            }
+            // insert parts of coordinates attribute
+            att = var->get_att("coordinates");
+            if (att) {
+                vector<string> parts = pagoda::split(att->get_string());
+                vector<string>::iterator part;
+                for (part=parts.begin(); part!=parts.end(); ++part) {
+                    vars_to_keep.insert(*part);
+                }
+            }
+            // look for Variables with same name as Dimensions of current var
+            dims = var->get_dims();
+            for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
+                string name = (*dim_it)->get_name();
+                if (dataset->get_var(name)) {
+                    vars_to_keep.insert(name);
+                }
+            }
+        }
+    }
+
+    // finally, create the final list of Variables
+    for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+        Variable *var = *it;
+        string name = var->get_name();
+        if (vars_to_keep.count(name)) {
+            vars_out.push_back(var);
+        }
+    }
+
+    if (alphabetize) {
+        sort(vars_out.begin(), vars_out.end(), var_cmp);
+    }
+    
+    return vars_out;
+}
+
+
+static bool dim_cmp(Dimension *left, Dimension *right)
+{
+    return left->get_name() < right->get_name();
+}
+
+
+/**
+ * Modify the set of Dimensions of the given Dataset based on the command-line
+ * parameters.
+ *
+ * Only Dimensions of the selected Variables are output.
+ *
+ * @param[in] dataset the Dataset
+ * @return the subset of Dimensions to operate over
+ */
+vector<Dimension*> SubsetterCommands::get_dimensions(Dataset *dataset) const
+{
+    set<string> dims_to_keep;
+    vector<Dimension*> dims_out;
+    vector<Dimension*> dims;
+    vector<Dimension*>::iterator dim_it;
+    vector<Variable*> vars = get_variables(dataset);
+    vector<Variable*>::iterator var_it;
+
+    for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+        dims = (*var_it)->get_dims();
+        for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
+            dims_to_keep.insert((*dim_it)->get_name());
+        }
+    }
+
+    dims = dataset->get_dims();
+    for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
+        Dimension *dim = *dim_it;
+        if (dims_to_keep.count(dim->get_name())) {
+            dims_out.push_back(dim);
+        }
+    }
+
+    if (alphabetize) {
+        sort(dims_out.begin(), dims_out.end(), dim_cmp);
+    }
+    
+    return dims_out;
+}
+
+
 vector<LatLonBox> SubsetterCommands::get_boxes() const
 {
     TIMING("SubsetterCommands::get_box()");
@@ -208,7 +394,7 @@ string SubsetterCommands::get_output_filename() const
 }
 
 
-vector<string> SubsetterCommands::get_variables() const
+set<string> SubsetterCommands::get_variables() const
 {
     return variables;
 }

@@ -35,7 +35,6 @@ int main(int argc, char **argv)
     int enumerate_start = 1;
 
     pagoda::initialize(&argc, &argv);
-    pagoda::calculate_required_memory();
 
     fill_value = pagoda::npe;
     array = Array::create(DataType::INT, shape);

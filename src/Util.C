@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#define TRACE
+
 #include <algorithm>
 #include <numeric>
 #include <string>
@@ -20,7 +22,10 @@
 #include "Variable.H"
 
 using std::accumulate;
+using std::back_inserter;
 using std::copy;
+using std::istream_iterator;
+using std::istringstream;
 using std::multiplies;
 using std::string;
 using std::vector;
@@ -329,6 +334,46 @@ bool pagoda::ends_with(const string &fullString, const string &ending)
 
 
 /**
+ * Split the given string on all whitespace.
+ *
+ * @param[in] s the string to split
+ * @return the split parts
+ */
+vector<string> pagoda::split(const string &s)
+{
+    vector<string> tokens;
+    istringstream iss(s);
+    copy(istream_iterator<string>(iss),
+            istream_iterator<string>(),
+            back_inserter<vector<string> >(tokens));
+    return tokens;
+}
+
+
+/**
+ * Split the given string based on the given delimiter.
+ *
+ * @param[in] s the string to split
+ * @param[in] delimiter the delimiter to use
+ * @return the split parts
+ */
+vector<string> pagoda::split(const string &s, char delimiter)
+{
+    string token;
+    vector<string> tokens;
+    istringstream iss(s);
+    getline(iss, token, delimiter);
+    while (iss) {
+        if (!token.empty()) {
+            tokens.push_back(token);
+        }
+        getline(iss, token, delimiter);
+    }
+    return tokens;
+}
+
+
+/**
  * Set a reasonable default amount of memory to use.
  *
  * This is a hack because we want to hide the need for GA's MA library, but
@@ -366,16 +411,16 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
             max_name = (*var)->get_name();
         }
     }
-    if (0 == max_size) {
-        max_size = 1000;
+    if (max_size < 4000) {
+        max_size = 4000;
         max_name = "NO VARIALBES";
     }
-
     gigabytes = 1.0 / 1073741824.0 * max_size * 8;
-
     TRACER("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
             max_name.c_str(), max_size*8, gigabytes);
-    max_size = int64_t(max_size * 0.04);
+
+    //max_size = int64_t(max_size * 0.04);
+    max_size = int64_t(max_size / pagoda::num_nodes());
     gigabytes = 1.0 / 1073741824.0 * max_size * 8;
     TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size*8, gigabytes);
 

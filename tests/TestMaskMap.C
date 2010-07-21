@@ -78,7 +78,6 @@ int main(int argc, char **argv)
     vector<DimSlice> slices;
 
     pagoda::initialize(&argc, &argv);
-    pagoda::calculate_required_memory();
 
     dims.push_back(new DummyDimension("dim10", 10));
     dims.push_back(new DummyDimension("dim50", 50));

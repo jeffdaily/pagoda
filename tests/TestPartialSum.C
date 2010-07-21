@@ -26,7 +26,6 @@ int main(int argc, char **argv)
     vector<int64_t> hi(1,size[0]-1);
 
     pagoda::initialize(&argc, &argv);
-    pagoda::calculate_required_memory();
 
     g_src = Array::create(DataType::INT, size);
     g_dst0 = Array::create(DataType::INT, size);

@@ -37,7 +37,6 @@ int main(int argc, char **argv)
     vector<int64_t> hi;
 
     pagoda::initialize(&argc, &argv);
-    pagoda::calculate_required_memory();
 
     a_src = Array::create(DataType::INT,    shape_src);
     a_enm = Array::create(DataType::DOUBLE, shape_dst);

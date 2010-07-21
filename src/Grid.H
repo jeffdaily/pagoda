@@ -67,6 +67,7 @@ class Grid
         virtual Variable* get_corner_lat() = 0;
         virtual Variable* get_corner_lon() = 0;
         virtual bool is_radians() = 0;
+        virtual bool is_coordinate(const Variable *var);
 
         virtual Dimension* get_cell_dim() = 0;
         virtual Dimension* get_edge_dim() = 0;
