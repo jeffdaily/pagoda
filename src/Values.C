@@ -29,10 +29,11 @@ Values::~Values()
 #define implement_as(TYPE) \
 void Values::as(vector<TYPE> &values) const \
 { \
-    TIMING("Values::as(vector<" #TYPE ">)"); \
-    values.clear(); \
     size_t i = 0; \
     size_t limit = size(); \
+    TIMING("Values::as(vector<" #TYPE ">)"); \
+    values.clear(); \
+    values.reserve(limit); \
     for (i=0; i<limit; ++i) { \
         TYPE val; \
         as(i, val); \
@@ -52,10 +53,11 @@ implement_as(double)
 
 void Values::as(string &values) const
 {
-    TIMING("Values::as(string)");
-    values.clear();
     size_t i = 0;
     size_t limit = size();
+    TIMING("Values::as(string)");
+    values.clear();
+    values.reserve(limit);
     for (i=0; i<limit; ++i) {
         string val;
         as(i, val);

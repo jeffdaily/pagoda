@@ -4,6 +4,8 @@
 
 #include <pnetcdf.h>
 
+#include <vector>
+
 #include "Common.H"
 #include "DataType.H"
 #include "PnetcdfAttribute.H"
@@ -15,6 +17,8 @@
 #include "Values.H"
 #include "Timing.H"
 #include "TypedValues.H"
+
+using std::vector;
 
 
 PnetcdfAttribute::PnetcdfAttribute(
@@ -31,23 +35,18 @@ PnetcdfAttribute::PnetcdfAttribute(
 {
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
-    char att_name_tmp[MAX_NAME];
     nc_type type_tmp;
     MPI_Offset len_mpi;
-    size_t len;
 
     TIMING("PnetcdfAttribute::PnetcdfAttribute(...)");
 
-    ncmpi::inq_attname(ncid, varid, attid, att_name_tmp);
-    name = string(att_name_tmp);
-    ncmpi::inq_att(ncid, varid, name.c_str(), &type_tmp, &len_mpi);
-    len = len_mpi;
-    type = type_tmp;
+    name = ncmpi::inq_attname(ncid, varid, attid);
+    type = ncmpi::inq_atttype(ncid, varid, name);
 #define get_attr_values(DATA_TYPE, C_TYPE) \
     if (type == DATA_TYPE) { \
-        C_TYPE data[len]; \
-        ncmpi::get_att(ncid, varid, name.c_str(), data); \
-        values = new TypedValues<C_TYPE>(data, len); \
+        vector<C_TYPE> data; \
+        ncmpi::get_att(ncid, varid, name, data); \
+        values = new TypedValues<C_TYPE>(data); \
     } else
     get_attr_values(DataType::CHAR,   char)
     get_attr_values(DataType::SCHAR,  signed char)

@@ -41,6 +41,7 @@ check_PROGRAMS = subsetter_old$(EXEEXT) $(am__EXEEXT_1) \
 	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
 	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
 	tests/TestGrid$(EXEEXT) tests/TestJoin$(EXEEXT) \
+	tests/TestPnetcdfAttribute$(EXEEXT) \
 	tests/TestPnetcdfDataset$(EXEEXT) tests/TestMaskMap$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScatter$(EXEEXT) \
@@ -119,14 +120,15 @@ am_libpagoda_la_OBJECTS = src/AbstractDataset.lo \
 	src/CommandLineParser.lo src/ConnectivityVariable.lo \
 	src/CoordinateVariable.lo src/Dataset.lo src/DataType.lo \
 	src/Debug.lo src/Dimension.lo src/FileWriter.lo src/gax.lo \
-	src/GlobalArray.lo src/GlobalMask.lo src/GeoGrid.lo \
-	src/Grid.lo src/LatLonBox.lo src/Mask.lo src/MaskMap.lo \
-	src/Memory.lo src/Pack.lo src/PnetcdfAttribute.lo \
-	src/Pnetcdf.lo src/PnetcdfDataset.lo src/PnetcdfDimension.lo \
-	src/PnetcdfFileWriter.lo src/PnetcdfTiming.lo \
-	src/PnetcdfVariable.lo src/StringComparator.lo \
-	src/SubsetterCommands.lo src/Timing.lo src/Util.lo \
-	src/Values.lo src/Variable.lo src/VariableDecorator.lo
+	src/GenericAttribute.lo src/GlobalArray.lo src/GlobalMask.lo \
+	src/GeoGrid.lo src/Grid.lo src/LatLonBox.lo src/Mask.lo \
+	src/MaskMap.lo src/Memory.lo src/Pack.lo \
+	src/PnetcdfAttribute.lo src/Pnetcdf.lo src/PnetcdfDataset.lo \
+	src/PnetcdfDimension.lo src/PnetcdfFileWriter.lo \
+	src/PnetcdfTiming.lo src/PnetcdfVariable.lo \
+	src/StringComparator.lo src/SubsetterCommands.lo src/Timing.lo \
+	src/Util.lo src/Values.lo src/Variable.lo \
+	src/VariableDecorator.lo
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -202,6 +204,13 @@ am_tests_TestPartialSum_OBJECTS = tests/TestPartialSum.$(OBJEXT)
 tests_TestPartialSum_OBJECTS = $(am_tests_TestPartialSum_OBJECTS)
 tests_TestPartialSum_LDADD = $(LDADD)
 tests_TestPartialSum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestPnetcdfAttribute_OBJECTS =  \
+	tests/TestPnetcdfAttribute.$(OBJEXT)
+tests_TestPnetcdfAttribute_OBJECTS =  \
+	$(am_tests_TestPnetcdfAttribute_OBJECTS)
+tests_TestPnetcdfAttribute_LDADD = $(LDADD)
+tests_TestPnetcdfAttribute_DEPENDENCIES = libpagoda.la \
+	$(am__DEPENDENCIES_1)
 am_tests_TestPnetcdfDataset_OBJECTS =  \
 	tests/TestPnetcdfDataset.$(OBJEXT)
 tests_TestPnetcdfDataset_OBJECTS =  \
@@ -354,6 +363,7 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) $(pgsub_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestGrid_SOURCES) $(tests_TestJoin_SOURCES) \
 	$(tests_TestMaskMap_SOURCES) $(tests_TestPartialSum_SOURCES) \
+	$(tests_TestPnetcdfAttribute_SOURCES) \
 	$(tests_TestPnetcdfDataset_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
 	$(tests_TestUnion_SOURCES) $(tests_TestWrite_SOURCES) \
@@ -374,6 +384,7 @@ DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestGrid_SOURCES) $(tests_TestJoin_SOURCES) \
 	$(tests_TestMaskMap_SOURCES) $(tests_TestPartialSum_SOURCES) \
+	$(tests_TestPnetcdfAttribute_SOURCES) \
 	$(tests_TestPnetcdfDataset_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
 	$(tests_TestUnion_SOURCES) $(tests_TestWrite_SOURCES) \
@@ -565,10 +576,10 @@ libpagoda_la_SOURCES = src/AbstractDataset.C src/AbstractVariable.C \
 	src/CommandLineParser.C src/ConnectivityVariable.C \
 	src/CoordinateVariable.C src/Dataset.C src/DataType.C \
 	src/Debug.C src/Dimension.C src/FileWriter.C src/gax.C \
-	src/GlobalArray.C src/GlobalMask.C src/GeoGrid.C src/Grid.C \
-	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Memory.c \
-	src/Pack.C src/PnetcdfAttribute.C src/Pnetcdf.C \
-	src/PnetcdfDataset.C src/PnetcdfDimension.C \
+	src/GenericAttribute.C src/GlobalArray.C src/GlobalMask.C \
+	src/GeoGrid.C src/Grid.C src/LatLonBox.C src/Mask.C \
+	src/MaskMap.C src/Memory.c src/Pack.C src/PnetcdfAttribute.C \
+	src/Pnetcdf.C src/PnetcdfDataset.C src/PnetcdfDimension.C \
 	src/PnetcdfFileWriter.C src/PnetcdfTiming.C \
 	src/PnetcdfVariable.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
@@ -597,6 +608,7 @@ tests_TestEnum_SOURCES = tests/TestEnum.C
 tests_TestGet_SOURCES = tests/TestGet.C
 tests_TestGrid_SOURCES = tests/TestGrid.C
 tests_TestJoin_SOURCES = tests/TestJoin.C
+tests_TestPnetcdfAttribute_SOURCES = tests/TestPnetcdfAttribute.C
 tests_TestPnetcdfDataset_SOURCES = tests/TestPnetcdfDataset.C
 tests_TestMaskMap_SOURCES = tests/TestMaskMap.C
 tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
@@ -731,6 +743,8 @@ src/Debug.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Dimension.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/FileWriter.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/gax.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/GenericAttribute.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/GlobalArray.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/GlobalMask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/GeoGrid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -886,6 +900,11 @@ tests/TestPartialSum.$(OBJEXT): tests/$(am__dirstamp) \
 tests/TestPartialSum$(EXEEXT): $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestPartialSum$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_LDADD) $(LIBS)
+tests/TestPnetcdfAttribute.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestPnetcdfAttribute$(EXEEXT): $(tests_TestPnetcdfAttribute_OBJECTS) $(tests_TestPnetcdfAttribute_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestPnetcdfAttribute$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestPnetcdfAttribute_OBJECTS) $(tests_TestPnetcdfAttribute_LDADD) $(LIBS)
 tests/TestPnetcdfDataset.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestPnetcdfDataset$(EXEEXT): $(tests_TestPnetcdfDataset_OBJECTS) $(tests_TestPnetcdfDataset_DEPENDENCIES) tests/$(am__dirstamp)
@@ -1045,6 +1064,8 @@ mostlyclean-compile:
 	-rm -f src/Dimension.lo
 	-rm -f src/FileWriter.$(OBJEXT)
 	-rm -f src/FileWriter.lo
+	-rm -f src/GenericAttribute.$(OBJEXT)
+	-rm -f src/GenericAttribute.lo
 	-rm -f src/GeoGrid.$(OBJEXT)
 	-rm -f src/GeoGrid.lo
 	-rm -f src/GlobalArray.$(OBJEXT)
@@ -1106,6 +1127,7 @@ mostlyclean-compile:
 	-rm -f tests/TestJoin.$(OBJEXT)
 	-rm -f tests/TestMaskMap.$(OBJEXT)
 	-rm -f tests/TestPartialSum.$(OBJEXT)
+	-rm -f tests/TestPnetcdfAttribute.$(OBJEXT)
 	-rm -f tests/TestPnetcdfDataset.$(OBJEXT)
 	-rm -f tests/TestRavel.$(OBJEXT)
 	-rm -f tests/TestRead.$(OBJEXT)
@@ -1152,6 +1174,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/FileWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GenericAttribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GeoGrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalMask.Plo@am__quote@
@@ -1189,6 +1212,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestJoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestMaskMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPnetcdfAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPnetcdfDataset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRead.Po@am__quote@

@@ -46,6 +46,7 @@ class SubsetterCommands
         bool get_alphabetize() const;
         bool get_all_coords() const;
         bool get_process_coords() const;
+        bool get_modify_history() const;
 
     protected:
         void init();
@@ -59,6 +60,7 @@ class SubsetterCommands
         bool alphabetize;
         bool all_coords;
         bool process_coords;
+        bool modify_history;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
 };

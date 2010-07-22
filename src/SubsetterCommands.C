@@ -37,6 +37,7 @@ SubsetterCommands::SubsetterCommands()
     ,   alphabetize(true)
     ,   all_coords(false)
     ,   process_coords(true)
+    ,   modify_history(true)
     ,   slices()
     ,   boxes()
 {
@@ -54,6 +55,7 @@ SubsetterCommands::SubsetterCommands(int argc, char **argv)
     ,   alphabetize(true)
     ,   all_coords(false)
     ,   process_coords(true)
+    ,   modify_history(true)
     ,   slices()
     ,   boxes()
 {
@@ -76,6 +78,7 @@ void SubsetterCommands::init()
     parser.push_back(&CommandLineOption::NO_COORDS);
     parser.push_back(&CommandLineOption::JOIN);
     parser.push_back(&CommandLineOption::UNION);
+    parser.push_back(&CommandLineOption::HISTORY);
 }
 
 
@@ -409,4 +412,26 @@ bool SubsetterCommands::get_exclude() const
 string SubsetterCommands::get_join_name() const
 {
     return join_name;
+}
+
+bool SubsetterCommands::get_alphabetize() const
+{
+    return alphabetize;
+}
+
+
+bool SubsetterCommands::get_all_coords() const
+{
+    return all_coords;
+}
+
+bool SubsetterCommands::get_process_coords() const
+{
+    return process_coords;
+}
+
+
+bool SubsetterCommands::get_modify_history() const
+{
+    return modify_history;
 }

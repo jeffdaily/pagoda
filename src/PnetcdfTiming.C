@@ -183,20 +183,46 @@ PnetcdfTiming::PnetcdfTiming(const string &name)
 
 PnetcdfTiming::PnetcdfTiming(
         const string &name,
-        int ndim,
-        const MPI_Offset *count,
+        MPI_Offset count,
         nc_type type)
     :   name(name)
     ,   start(0)
 {
-    MPI_Offset size = 1;
-    uint64_t new_size = 0;
-
     // calls
     ++calls[name];
 
     // bytes
-    for (int i=0; i<ndim; ++i) {
+    calc_bytes(vector<MPI_Offset>(1,count), type);
+
+    BARRIER();
+    start = get_time();
+}
+
+
+PnetcdfTiming::PnetcdfTiming(
+        const string &name,
+        const vector<MPI_Offset> &count,
+        nc_type type)
+    :   name(name)
+    ,   start(0)
+{
+    // calls
+    ++calls[name];
+
+    // bytes
+    calc_bytes(count, type);
+
+    BARRIER();
+    start = get_time();
+}
+
+
+void PnetcdfTiming::calc_bytes(const vector<MPI_Offset> &count, nc_type type)
+{
+    MPI_Offset size = 1;
+    uint64_t new_size = 0;
+
+    for (int i=0,limit=count.size(); i<limit; ++i) {
         size *= count[i];
     }
     switch (type) {
@@ -213,9 +239,6 @@ PnetcdfTiming::PnetcdfTiming(
     } else {
         bytes[name] = new_size;
     }
-
-    BARRIER();
-    start = get_time();
 }
 
 

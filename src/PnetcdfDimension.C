@@ -25,12 +25,9 @@ PnetcdfDimension::PnetcdfDimension(PnetcdfDataset *dataset, int dimid)
 {
     TIMING("PnetcdfDimension::PnetcdfDimension(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
-    int udim;
-    ncmpi::inq_unlimdim(ncid, &udim);
-    char name_tmp[MAX_NAME];
+    int udim = ncmpi::inq_unlimdim(ncid);
     MPI_Offset size_tmp;
-    ncmpi::inq_dim(ncid, dimid, name_tmp, &size_tmp);
-    name = string(name_tmp);
+    ncmpi::inq_dim(ncid, dimid, name, size_tmp);
     size = size_tmp;
     unlimited = (udim == dimid);
 }

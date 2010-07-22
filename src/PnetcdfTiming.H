@@ -15,11 +15,11 @@
 #include <pnetcdf.h>
 
 #ifdef GATHER_PNETCDF_TIMING
-#   define PNETCDF_TIMING1(A1)          PnetcdfTiming __timing_var(A1)
-#   define PNETCDF_TIMING4(A1,A2,A3,A4) PnetcdfTiming __timing_var(A1,A2,A3,A4)
+#   define PNETCDF_TIMING1(A1)       PnetcdfTiming __timing_var(A1)
+#   define PNETCDF_TIMING3(A1,A2,A3) PnetcdfTiming __timing_var(A1,A2,A3)
 #else
 #   define PNETCDF_TIMING1(A1)
-#   define PNETCDF_TIMING4(A1,A2,A3,A4)
+#   define PNETCDF_TIMING3(A1,A2,A3)
 //#   warning pnetcdf timing is turned off
 #endif
 
@@ -39,8 +39,9 @@ class PnetcdfTiming
 {
     public:
         PnetcdfTiming(const string &name);
-        PnetcdfTiming(const string &name, int ndim,
-                const MPI_Offset *count, nc_type type);
+        PnetcdfTiming(const string &name, MPI_Offset count, nc_type type);
+        PnetcdfTiming(const string &name, const vector<MPI_Offset> &count,
+                nc_type type);
         ~PnetcdfTiming();
 
         static uint64_t get_time();
@@ -51,6 +52,8 @@ class PnetcdfTiming
         static uint64_t end_global;
 
     protected:
+        void calc_bytes(const vector<MPI_Offset> &count, nc_type type);
+
         string name;
         uint64_t start;
 

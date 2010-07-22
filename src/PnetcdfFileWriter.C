@@ -44,8 +44,8 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     TIMING("PnetcdfFileWriter::PnetcdfFileWriter(string)");
     TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
-    ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
-    //ncmpi::create(MPI_COMM_WORLD, filename.c_str(), NC_64BIT_DATA, MPI_INFO_NULL, &ncid);
+    ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_OFFSET, MPI_INFO_NULL);
+    //ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_DATA, MPI_INFO_NULL);
 }
 
 
@@ -77,7 +77,7 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
         size = NC_UNLIMITED;
     }
 
-    ncmpi::def_dim(ncid, name.c_str(), size, &id);
+    id = ncmpi::def_dim(ncid, name, size);
     TRACER("PnetcdfFileWriter::def_dim %s=%lld id=%d\n", name.c_str(), size, id);
     dim_id[name] = id;
     dim_size[name] = size;
@@ -89,7 +89,6 @@ void PnetcdfFileWriter::def_var(const string &name,
         const DataType &type,
         const vector<Attribute*> &atts)
 {
-    int64_t ndim = dims.size();
     vector<int> dim_ids;
     vector<int64_t> shape;
     int id;
@@ -98,16 +97,16 @@ void PnetcdfFileWriter::def_var(const string &name,
 
     def_check();
 
-    for (int64_t i=0; i<ndim; ++i) {
+    for (int64_t i=0,limit=dims.size(); i<limit; ++i) {
         dim_ids.push_back(get_dim_id(dims.at(i)));
         shape.push_back(get_dim_size(dims.at(i)));
     }
 
-    ncmpi::def_var(ncid, name.c_str(), type.to_nc(), ndim, &dim_ids[0], &id);
+    id = ncmpi::def_var(ncid, name, type.to_nc(), dim_ids);
     var_id[name] = id;
     var_dims[name] = dim_ids;
     var_shape[name] = shape;
-    copy_atts_id(atts, id);
+    write_atts_id(atts, id);
 }
 
 
@@ -220,21 +219,21 @@ void PnetcdfFileWriter::maybe_enddef()
 }
 
 
-void PnetcdfFileWriter::copy_att(Attribute *att, const string &name)
+void PnetcdfFileWriter::write_att(Attribute *att, const string &name)
 {
-    TIMING("PnetcdfFileWriter::copy_att(Attribute*,string)");
-    copy_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
+    TIMING("PnetcdfFileWriter::write_att(Attribute*,string)");
+    write_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
 }
 
 
-void PnetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
+void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
 {
     string name = attr->get_name();
     DataType dt = attr->get_type();
     MPI_Offset len = attr->get_count();
 
-    TIMING("PnetcdfFileWriter::copy_att_id(Attribute*,int)");
-    TRACER("PnetcdfFileWriter::copy_att_id %s\n", attr->get_name().c_str());
+    TIMING("PnetcdfFileWriter::write_att_id(Attribute*,int)");
+    TRACER("PnetcdfFileWriter::write_att_id %s\n", attr->get_name().c_str());
 
     def_check();
 
@@ -242,7 +241,7 @@ void PnetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
     if (dt == DT) { \
         vector<CT> data; \
         attr->get_values()->as(data); \
-        ncmpi::put_att(ncid, varid, name.c_str(), DT.to_nc(), len, &data[0]); \
+        ncmpi::put_att(ncid, varid, name, data); \
     } else
     put_attr_values(DataType::CHAR,   char)
     put_attr_values(DataType::SHORT,  short)
@@ -256,12 +255,12 @@ void PnetcdfFileWriter::copy_att_id(Attribute *attr, int varid)
 }
 
 
-void PnetcdfFileWriter::copy_atts_id(const vector<Attribute*> &atts, int varid)
+void PnetcdfFileWriter::write_atts_id(const vector<Attribute*> &atts, int varid)
 {
-    //TIMING("PnetcdfFileWriter::copy_atts_id(vector<Attribute*>,int)");
+    //TIMING("PnetcdfFileWriter::write_atts_id(vector<Attribute*>,int)");
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
-        copy_att_id(*att_it, varid);
+        write_att_id(*att_it, varid);
     }
 }
 
@@ -333,7 +332,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
         if (array->owns_data()) { \
             ptr = (TYPE*)array->access(); \
         } \
-        ncmpi::put_vara_all(ncid, var_id, &start[0], &count[0], ptr); \
+        ncmpi::put_vara_all(ncid, var_id, start, count, ptr); \
         if (array->owns_data()) { \
             array->release(); \
         } \
@@ -388,7 +387,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
         if (array->owns_data()) { \
             ptr = (TYPE*)array->access(); \
         } \
-        ncmpi::put_vara_all(ncid, var_id, &start_copy[0], &count[0], ptr); \
+        ncmpi::put_vara_all(ncid, var_id, start_copy, count, ptr); \
         if (array->owns_data()) { \
             array->release(); \
         } \

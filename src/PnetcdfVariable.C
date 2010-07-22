@@ -31,16 +31,12 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
 {
     TIMING("PnetcdfVariable::PnetcdfVariable(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
-    int ndim;
-    ncmpi::inq_ndims(ncid, &ndim);
-    char cname[MAX_NAME];
-    int dim_ids[ndim]; // plenty big (file's ndim <= variable's ndim)
+    vector<int> dim_ids;
     nc_type type_tmp;
     int natt;
-    ncmpi::inq_var(ncid, varid, cname, &type_tmp, &ndim, dim_ids, &natt);
-    name = string(cname);
+    ncmpi::inq_var(ncid, varid, name, type_tmp, dim_ids, natt);
     type = type_tmp;
-    for (int dimidx=0; dimidx<ndim; ++dimidx) {
+    for (int dimidx=0; dimidx<dim_ids.size(); ++dimidx) {
         dims.push_back(dataset->get_dim(dim_ids[dimidx]));
     }
     for (int attid=0; attid<natt; ++attid) {
@@ -285,11 +281,11 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
         } \
         if (nonblocking) { \
             int request; \
-            request = ncmpi::iget_vara(ncid, id, &start[0], &count[0], ptr); \
+            request = ncmpi::iget_vara(ncid, id, start, count, ptr); \
             get_netcdf_dataset()->requests.push_back(request); \
             get_netcdf_dataset()->arrays_to_release.push_back(dst); \
         } else { \
-            ncmpi::get_vara_all(ncid, id, &start[0], &count[0], ptr); \
+            ncmpi::get_vara_all(ncid, id, start, count, ptr); \
         } \
         if (dst->owns_data() && found_bit && !nonblocking) { \
             dst->release_update(); \

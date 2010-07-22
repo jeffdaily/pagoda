@@ -33,7 +33,7 @@ class PnetcdfFileWriter : public FileWriter
                 const DataType &type,
                 const vector<Attribute*> &atts);
 
-        virtual void copy_att(Attribute *att, const string &name=string(""));
+        virtual void write_att(Attribute *att, const string &name=string(""));
 
         virtual void write(Array *array, const string &name);
         virtual void write(Array *array, const string &name,
@@ -53,8 +53,8 @@ class PnetcdfFileWriter : public FileWriter
         void def_check() const;
         void maybe_enddef();
 
-        void copy_att_id(Attribute *attr, int varid);
-        void copy_atts_id(const vector<Attribute*> &atts, int varid);
+        void write_att_id(Attribute *attr, int varid);
+        void write_atts_id(const vector<Attribute*> &atts, int varid);
         void write(int handle, int id, int record=-1);
 
         bool is_in_define_mode;

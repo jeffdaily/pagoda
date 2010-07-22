@@ -10,6 +10,7 @@ class Attribute;
 class DataType;
 class Dimension;
 class Mask;
+class Values;
 class Variable;
 
 using std::ostream;
@@ -61,9 +62,11 @@ class FileWriter
         virtual void def_var(Variable *var);
         virtual void def_vars(const vector<Variable*> &vars);
 
-        virtual void copy_att(Attribute *att,
+        virtual void write_att(const string &name, Values *values,
+                DataType type, const string &var_name=string(""));
+        virtual void write_att(Attribute *att,
                 const string &name=string("")) = 0;
-        virtual void copy_atts(const vector<Attribute*> &atts,
+        virtual void write_atts(const vector<Attribute*> &atts,
                 const string &name=string(""));
 
         virtual void write(Array *array, const string &name) = 0;

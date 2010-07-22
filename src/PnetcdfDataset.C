@@ -32,8 +32,8 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     int ndim;
     int nvar;
     int natt;
-    ncmpi::open(MPI_COMM_WORLD, filename.c_str(), NC_NOWRITE, MPI_INFO_NULL, &ncid);
-    ncmpi::inq(ncid, &ndim, &nvar, &natt, &udim);
+    ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_NOWRITE, MPI_INFO_NULL);
+    ncmpi::inq(ncid, ndim, nvar, natt, udim);
     for (int attid=0; attid<natt; ++attid) {
         atts.push_back(new PnetcdfAttribute(this, attid));
     }
@@ -141,7 +141,7 @@ void PnetcdfDataset::wait()
 
     if (!requests.empty()) {
         vector<int> statuses(requests.size());
-        ncmpi::wait_all(ncid, requests.size(), &requests[0], &statuses[0]);
+        ncmpi::wait_all(ncid, requests, statuses);
         for (size_t i=0; i<arrays_to_release.size(); ++i) {
             arrays_to_release[i]->release_update();
         }

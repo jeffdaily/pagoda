@@ -227,15 +227,15 @@ int main(int argc, char **argv)
     create_type();
 
     // Open the source grid file.  Create g_a's and read lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, filename_grid_source.c_str(), NC_NOWRITE,
-            MPI_INFO_NULL, &src_ncid);
+    src_ncid = ncmpi::open(MPI_COMM_WORLD, filename_grid_source,
+            NC_NOWRITE, MPI_INFO_NULL);
     g_src_lat = create_array_and_read(src_ncid, name_lat);
     g_src_lon = create_array_and_read(src_ncid, name_lon);
     NGA_Distribution64(g_src_lat, me, &src_lo, &src_hi);
 
     // Open the destination grid file.  Create g_a's and read lat/lons.
-    ncmpi::open(MPI_COMM_WORLD, filename_grid_destination.c_str(), NC_NOWRITE,
-            MPI_INFO_NULL, &dst_ncid);
+    dst_ncid = ncmpi::open(MPI_COMM_WORLD, filename_grid_destination,
+            NC_NOWRITE, MPI_INFO_NULL);
     g_dst_lat = create_array_and_read(dst_ncid, name_lat);
     g_dst_lon = create_array_and_read(dst_ncid, name_lon);
     NGA_Distribution64(g_dst_lat, me, &dst_lo, &dst_hi);
@@ -286,8 +286,8 @@ int main(int argc, char **argv)
     calc_weights(g_weights, g_indices, src_bin, dst_bin, N);
 
     // verify the weights and indices we computed
-    ncmpi::open(MPI_COMM_WORLD, filename_data.c_str(), NC_NOWRITE,
-            MPI_INFO_NULL, &data_ncid);
+    data_ncid = ncmpi::open(MPI_COMM_WORLD, filename_data,
+            NC_NOWRITE, MPI_INFO_NULL);
     g_data = create_array_and_read(data_ncid,
             (char*)variable_name.c_str(), true);
 
@@ -341,11 +341,13 @@ static void read_data(int g_a, int ncid, int varid, bool first_only)
     int64_t lo[NC_MAX_VAR_DIMS];
     int64_t hi[NC_MAX_VAR_DIMS];
     int64_t ld[NC_MAX_VAR_DIMS];
-    MPI_Offset start[NC_MAX_VAR_DIMS];
-    MPI_Offset count[NC_MAX_VAR_DIMS];
+    vector<MPI_Offset> start;
+    vector<MPI_Offset> count;
     float *data=NULL;
 
-    ncmpi::inq_varndims(ncid, varid, &ndims);
+    ndims = ncmpi::inq_varndims(ncid, varid);
+    start.assign(ndims, 0);
+    count.assign(ndims, 0);
     NGA_Distribution64(g_a, me, lo, hi);
 
     if (0 > lo && 0 > hi) {
@@ -381,17 +383,15 @@ static int create_array_and_read(int ncid, char *name, bool first_only)
     pagoda::print_zero("create_array_and_read first_only=%d name=%s\n", first_only, name);
     int varid;
     int ndim;
-    int dimids[NC_MAX_VAR_DIMS];
+    vector<int> dimids;
     int64_t shape[NC_MAX_VAR_DIMS];
     int g_a;
 
-    ncmpi::inq_varid(ncid, name, &varid);
-    ncmpi::inq_varndims(ncid, varid, &ndim);
-    ncmpi::inq_vardimid(ncid, varid, dimids);
+    varid = ncmpi::inq_varid(ncid, name);
+    ndim = ncmpi::inq_varndims(ncid, varid);
+    dimids = ncmpi::inq_vardimid(ncid, varid);
     for (int i=0; i<ndim; ++i) {
-        MPI_Offset tmp;
-        ncmpi::inq_dimlen(ncid, dimids[i], &tmp);
-        shape[i] = tmp;
+        shape[i] = ncmpi::inq_dimlen(ncid, dimids[i]);
         pagoda::print_zero("shape[%d]=%ld\n", i, (long)shape[i]);
     }
     if (first_only) {
@@ -1177,14 +1177,16 @@ static void write_results(int g_results, int ncid_orig,
     float *results = NULL;
 
     int ncid;
-    MPI_Offset start[NC_MAX_VAR_DIMS];
-    MPI_Offset count[NC_MAX_VAR_DIMS];
+    vector<MPI_Offset> start;
+    vector<MPI_Offset> count;
     MPI_Offset dims_shape[NC_MAX_VAR_DIMS];
-    int dims[NC_MAX_VAR_DIMS];
+    vector<int> dims(3);
     int varid;
-    float ZERO = 0;
+    vector<float> ZERO(1,0);
 
     NGA_Inquire64(g_results, &results_type, &results_ndim, results_shape);
+    start.resize(results_ndim);
+    count.resize(results_ndim);
     dims_shape[0] = NC_UNLIMITED;
     for (int i=1; i<results_ndim+1; ++i) {
         dims_shape[i] = results_shape[i-1];
@@ -1192,17 +1194,17 @@ static void write_results(int g_results, int ncid_orig,
     pagoda::print_zero("dims_shape={%ld,%ld,%ld,%ld}\n",
             dims_shape[0], dims_shape[1], dims_shape[2], dims_shape[3]);
 
-    ncmpi::create(MPI_COMM_WORLD, filename.c_str(),
-            NC_64BIT_OFFSET, MPI_INFO_NULL, &ncid);
-    ncmpi::def_dim(ncid, "time",       dims_shape[0], &dims[0]);
+    ncid = ncmpi::create(MPI_COMM_WORLD, filename,
+            NC_64BIT_OFFSET, MPI_INFO_NULL);
+    dims[0] = ncmpi::def_dim(ncid, "time",       dims_shape[0]);
     pagoda::print_zero("      time=%d\n", dims[0]);
-    ncmpi::def_dim(ncid, "cells",      dims_shape[1], &dims[1]);
+    dims[1] = ncmpi::def_dim(ncid, "cells",      dims_shape[1]);
     pagoda::print_zero("     cells=%d\n", dims[1]);
-    ncmpi::def_dim(ncid, "interfaces", dims_shape[2], &dims[2]);
+    dims[2] = ncmpi::def_dim(ncid, "interfaces", dims_shape[2]);
     pagoda::print_zero("interfaces=%d\n", dims[2]);
-    ncmpi::def_var(ncid, variablename.c_str(), NC_FLOAT, 3, dims, &varid);
-    pagoda::print_zero("       var=%d\n", dims[2]);
-    ncmpi::put_att(ncid, varid, "missing_value", NC_FLOAT, 1, &ZERO);
+    varid = ncmpi::def_var(ncid, variablename, NC_FLOAT, dims);
+    pagoda::print_zero("       var=%d\n", varid);
+    ncmpi::put_att(ncid, varid, "missing_value", ZERO);
     ncmpi::enddef(ncid);
 
     NGA_Distribution64(g_results, me, results_lo, results_hi);

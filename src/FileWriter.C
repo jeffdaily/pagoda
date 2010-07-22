@@ -9,6 +9,7 @@
 #include "Dataset.H"
 #include "Dimension.H"
 #include "FileWriter.H"
+#include "GenericAttribute.H"
 #include "Mask.H"
 #include "PnetcdfFileWriter.H"
 #include "Util.H"
@@ -46,7 +47,7 @@ FileWriter::~FileWriter()
 
 void FileWriter::def_dataset(Dataset *dataset)
 {
-    copy_atts(dataset->get_atts());
+    write_atts(dataset->get_atts());
     def_dims(dataset->get_dims());
     def_vars(dataset->get_vars());
 }
@@ -134,12 +135,20 @@ void FileWriter::def_vars(const vector<Variable*> &vars)
 }
 
 
-void FileWriter::copy_atts(const vector<Attribute*> &atts, const string &name)
+void FileWriter::write_att(const string &name, Values *values,
+        DataType type, const string &var_name)
 {
-    TIMING("FileWriter::copy_atts(vector<Attribute*>,string)");
+    GenericAttribute att(name, values, type);
+    write_att(&att, name);
+}
+
+
+void FileWriter::write_atts(const vector<Attribute*> &atts, const string &name)
+{
+    TIMING("FileWriter::write_atts(vector<Attribute*>,string)");
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
-        copy_att(*att_it, name);
+        write_att(*att_it, name);
     }
 }
 

@@ -33,13 +33,13 @@ int main(int argc, char **argv)
     int src_ncid = 0;
     int src_varid_lat = 0;
     int src_varid_lon = 0;
-    int src_dimid_ctr = 0;
+    vector<int> src_dimid_ctr;
     int64_t src_shape = 0;
     int64_t src_lo = 0;
     int64_t src_hi = 0;
     MPI_Offset src_dimlen = 0;
-    MPI_Offset src_start = 0;
-    MPI_Offset src_count = 0;
+    vector<MPI_Offset> src_start(1,0);
+    vector<MPI_Offset> src_count(1,0);
     int src_g_lat = 0;
     int src_g_lon = 0;
     float *src_lat = NULL;
@@ -48,13 +48,13 @@ int main(int argc, char **argv)
     int dst_ncid = 0;
     int dst_varid_lat = 0;
     int dst_varid_lon = 0;
-    int dst_dimid_ctr = 0;
+    vector<int> dst_dimid_ctr;
     int64_t dst_shape = 0;
     int64_t dst_lo = 0;
     int64_t dst_hi = 0;
     MPI_Offset dst_dimlen = 0;
-    MPI_Offset dst_start = 0;
-    MPI_Offset dst_count = 0;
+    vector<MPI_Offset> dst_start(1,0);
+    vector<MPI_Offset> dst_count(1,0);
     int dst_g_lat = 0;
     int dst_g_lon = 0;
     float *dst_lat = NULL;
@@ -79,22 +79,22 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    ncmpi::open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL, &src_ncid);
-    ncmpi::inq_varid(src_ncid, name_lat, &src_varid_lat);
-    ncmpi::inq_varid(src_ncid, name_lon, &src_varid_lon);
-    ncmpi::inq_vardimid(src_ncid, src_varid_lat, &src_dimid_ctr);
-    ncmpi::inq_dimlen(src_ncid, src_dimid_ctr, &src_dimlen);
+    src_ncid = ncmpi::open(MPI_COMM_WORLD, argv[1], NC_NOWRITE, MPI_INFO_NULL);
+    src_varid_lat = ncmpi::inq_varid(src_ncid, name_lat);
+    src_varid_lon = ncmpi::inq_varid(src_ncid, name_lon);
+    src_dimid_ctr = ncmpi::inq_vardimid(src_ncid, src_varid_lat);
+    src_dimlen = ncmpi::inq_dimlen(src_ncid, src_dimid_ctr[0]);
     src_shape = src_dimlen;
     src_g_lat = NGA_Create64(C_FLOAT, 1, &src_shape, "lat", NULL);
     src_g_lon = NGA_Create64(C_FLOAT, 1, &src_shape, "lon", NULL);
     g_distance = NGA_Create64(C_FLOAT, 1, &src_shape, "distance", NULL);
     NGA_Distribution64(src_g_lat, GA_Nodeid(), &src_lo, &src_hi);
 
-    ncmpi::open(MPI_COMM_WORLD, argv[2], NC_NOWRITE, MPI_INFO_NULL, &dst_ncid);
-    ncmpi::inq_varid(dst_ncid, name_lat, &dst_varid_lat);
-    ncmpi::inq_varid(dst_ncid, name_lon, &dst_varid_lon);
-    ncmpi::inq_vardimid(dst_ncid, dst_varid_lat, &dst_dimid_ctr);
-    ncmpi::inq_dimlen(dst_ncid, dst_dimid_ctr, &dst_dimlen);
+    dst_ncid = ncmpi::open(MPI_COMM_WORLD, argv[2], NC_NOWRITE, MPI_INFO_NULL);
+    dst_varid_lat = ncmpi::inq_varid(dst_ncid, name_lat);
+    dst_varid_lon = ncmpi::inq_varid(dst_ncid, name_lon);
+    dst_dimid_ctr = ncmpi::inq_vardimid(dst_ncid, dst_varid_lat);
+    dst_dimlen = ncmpi::inq_dimlen(dst_ncid, dst_dimid_ctr[0]);
     dst_shape = dst_dimlen;
     dst_g_lat = NGA_Create64(C_FLOAT, 1, &dst_shape, "lat", NULL);
     dst_g_lon = NGA_Create64(C_FLOAT, 1, &dst_shape, "lon", NULL);
@@ -102,34 +102,34 @@ int main(int argc, char **argv)
 
     // Read in src lat/lon.
     if (0 > src_lo && 0 > src_hi) {
-        src_start = 0;
-        src_count = 0;
-        ncmpi::get_vara_all(src_ncid, src_varid_lat, &src_start, &src_count, src_lat);
-        ncmpi::get_vara_all(src_ncid, src_varid_lon, &src_start, &src_count, src_lon);
+        src_start[0] = 0;
+        src_count[0] = 0;
+        ncmpi::get_vara_all(src_ncid, src_varid_lat, src_start, src_count, src_lat);
+        ncmpi::get_vara_all(src_ncid, src_varid_lon, src_start, src_count, src_lon);
     } else {
-        src_start = src_lo;
-        src_count = src_hi-src_lo+1;
+        src_start[0] = src_lo;
+        src_count[0] = src_hi-src_lo+1;
         NGA_Access64(src_g_lat, &src_lo, &src_hi, &src_lat, NULL);
         NGA_Access64(src_g_lon, &src_lo, &src_hi, &src_lon, NULL);
-        ncmpi::get_vara_all(src_ncid, src_varid_lat, &src_start, &src_count, src_lat);
-        ncmpi::get_vara_all(src_ncid, src_varid_lon, &src_start, &src_count, src_lon);
+        ncmpi::get_vara_all(src_ncid, src_varid_lat, src_start, src_count, src_lat);
+        ncmpi::get_vara_all(src_ncid, src_varid_lon, src_start, src_count, src_lon);
         NGA_Release_update64(src_g_lat, &src_lo, &src_hi);
         NGA_Release_update64(src_g_lon, &src_lo, &src_hi);
     }
 
     // Read in dst lat/lon.
     if (0 > dst_lo && 0 > dst_hi) {
-        dst_start = 0;
-        dst_count = 0;
-        ncmpi::get_vara_all(dst_ncid, dst_varid_lat, &dst_start, &dst_count, dst_lat);
-        ncmpi::get_vara_all(dst_ncid, dst_varid_lon, &dst_start, &dst_count, dst_lon);
+        dst_start[0] = 0;
+        dst_count[0] = 0;
+        ncmpi::get_vara_all(dst_ncid, dst_varid_lat, dst_start, dst_count, dst_lat);
+        ncmpi::get_vara_all(dst_ncid, dst_varid_lon, dst_start, dst_count, dst_lon);
     } else {
-        dst_start = dst_lo;
-        dst_count = dst_hi-dst_lo+1;
+        dst_start[0] = dst_lo;
+        dst_count[0] = dst_hi-dst_lo+1;
         NGA_Access64(dst_g_lat, &dst_lo, &dst_hi, &dst_lat, NULL);
         NGA_Access64(dst_g_lon, &dst_lo, &dst_hi, &dst_lon, NULL);
-        ncmpi::get_vara_all(dst_ncid, dst_varid_lat, &dst_start, &dst_count, dst_lat);
-        ncmpi::get_vara_all(dst_ncid, dst_varid_lon, &dst_start, &dst_count, dst_lon);
+        ncmpi::get_vara_all(dst_ncid, dst_varid_lat, dst_start, dst_count, dst_lat);
+        ncmpi::get_vara_all(dst_ncid, dst_varid_lon, dst_start, dst_count, dst_lon);
         NGA_Release_update64(dst_g_lat, &dst_lo, &dst_hi);
         NGA_Release_update64(dst_g_lon, &dst_lo, &dst_hi);
     }
