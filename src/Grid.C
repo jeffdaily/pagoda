@@ -103,6 +103,30 @@ Grid::~Grid()
 }
 
 
+/**
+ * Return the "dummy" grid Variable, if any.
+ *
+ * This is the scalar Variable meant to contain relevant grid metadata only.
+ *
+ * @return the Variable, if any
+ */
+Variable* Grid::get_grid() const
+{
+    const Dataset *dataset = get_dataset();
+    vector<Variable*> vars = dataset->get_vars();
+    vector<Variable*>::iterator var_it;
+
+    // look for a Variable with a standard_name of "grid" or cell_type att
+    for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+        Variable *var = *var_it;
+        if (var->get_standard_name() == "grid"
+                || var->get_att("cell_type")) {
+            return var;
+        }
+    }
+}
+
+
 bool Grid::is_coordinate(const Variable *var)
 {
     const Dataset *dataset = get_dataset();
@@ -168,6 +192,9 @@ bool Grid::is_topology(const Variable *var)
         return true;
     }
     if (var == get_corner_corners()) {
+        return true;
+    }
+    if (var == get_grid()) {
         return true;
     }
 

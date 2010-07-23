@@ -43,6 +43,7 @@ class CommandLineOption
         static CommandLineOption EXCLUDE;
         static CommandLineOption NO_COORDS;
         static CommandLineOption COORDS;
+        static CommandLineOption TOPOLOGY;
         static CommandLineOption DIMENSION;
         static CommandLineOption AUXILIARY;
         static CommandLineOption LATLONBOX;

@@ -60,6 +60,8 @@ class Grid
 
         virtual GridType get_type() const = 0;
 
+        virtual Variable* get_grid() const;
+
         virtual Variable* get_cell_lat() = 0;
         virtual Variable* get_cell_lon() = 0;
         virtual Variable* get_edge_lat() = 0;

@@ -29,6 +29,9 @@ CommandLineOption CommandLineOption::NO_COORDS(
 CommandLineOption CommandLineOption::COORDS(
         'c', "coords", false,
         "all coordinate variables will be processed");
+CommandLineOption CommandLineOption::TOPOLOGY(
+        'T', "topology", false,
+        "do not process toplogy variables");
 CommandLineOption CommandLineOption::DIMENSION(
         'd', "dimension", true,
         "dim[,min[,max[,stride]]]");

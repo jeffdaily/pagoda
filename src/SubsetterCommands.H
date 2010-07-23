@@ -64,6 +64,7 @@ class SubsetterCommands
         bool all_coords;
         bool process_coords;
         bool modify_history;
+        bool process_topology;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
 };

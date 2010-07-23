@@ -41,6 +41,7 @@ SubsetterCommands::SubsetterCommands()
     ,   all_coords(false)
     ,   process_coords(true)
     ,   modify_history(true)
+    ,   process_topology(true)
     ,   slices()
     ,   boxes()
 {
@@ -61,6 +62,7 @@ SubsetterCommands::SubsetterCommands(int argc, char **argv)
     ,   all_coords(false)
     ,   process_coords(true)
     ,   modify_history(true)
+    ,   process_topology(true)
     ,   slices()
     ,   boxes()
 {
@@ -187,6 +189,10 @@ void SubsetterCommands::parse(int argc, char **argv)
     if (parser.count("history")) {
         modify_history = false;
     }
+
+    if (parser.count("topology")) {
+        process_topology = false;
+    }
 }
 
 
@@ -250,7 +256,7 @@ vector<Variable*> SubsetterCommands::get_variables(Dataset *dataset) const
     if (variables.empty()) {
         if (exclude) {
             // do nothing, keep vars_to_keep empty
-        } else if (all_coords){
+        } else if (all_coords) {
             // do nothing, keep vars_to_keep, add coords later
         } else {
             // we want all variables
@@ -285,6 +291,16 @@ vector<Variable*> SubsetterCommands::get_variables(Dataset *dataset) const
         for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
             Variable *var = *it;
             if (grid->is_coordinate(var)) {
+                vars_to_keep.insert(var->get_name());
+            }
+        }
+    }
+
+    // next, if we want all topology variables, add them
+    if (grid && process_topology) {
+        for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
+            Variable *var = *it;
+            if (grid->is_topology(var)) {
                 vars_to_keep.insert(var->get_name());
             }
         }
