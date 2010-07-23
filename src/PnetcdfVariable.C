@@ -218,7 +218,11 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     found_bit = find_bit(adims, lo, hi);
 
     if (tmp->owns_data() && found_bit) {
-        start[0] = translate_record(record);
+        if (needs_subset_record()) {
+            start[0] = translate_record(record);
+        } else {
+            start[0] = record;
+        }
         count[0] = 1;
         for (int64_t dimidx=1; dimidx<ndim; ++dimidx) {
             start[dimidx] = lo[dimidx-1];

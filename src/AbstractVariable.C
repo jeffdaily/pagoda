@@ -232,6 +232,10 @@ bool AbstractVariable::needs_subset() const
     vector<Mask*> masks = get_masks();
     vector<Mask*>::iterator mask_it;
 
+    if (masks.empty()) {
+        return false;
+    }
+
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
         int64_t count = (*mask_it)->get_count();
         int64_t size = (*mask_it)->get_size();
@@ -253,6 +257,10 @@ bool AbstractVariable::needs_subset_record() const
 {
     vector<Mask*> masks = get_masks();
     vector<Mask*>::iterator mask_it;
+
+    if (masks.empty()) {
+        return false;
+    }
 
     masks.erase(masks.begin());
 

@@ -2,13 +2,10 @@
 #   include <config.h>
 #endif
 
+#include <map>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-using std::exception;
-using std::string;
-using std::vector;
 
 #include "Array.H"
 #include "Bootstrap.H"
@@ -22,6 +19,11 @@ using std::vector;
 #include "Util.H"
 #include "Variable.H"
 
+using std::exception;
+using std::string;
+using std::map;
+using std::vector;
+
 
 #ifdef F77_DUMMY_MAIN
 #   ifdef __cplusplus
@@ -32,6 +34,7 @@ int F77_DUMMY_MAIN() { return 1; }
 
 //#define READ_ALL
 #define READ_RECORD
+//#define READ_NONBLOCKING
 
 int main(int argc, char **argv)
 {
@@ -44,6 +47,10 @@ int main(int argc, char **argv)
     vector<Grid*> grids;
     Grid *grid;
     MaskMap *masks;
+#if defined(READ_NONBLOCKING)
+    map<string,Array*> arrays;
+    map<string,Array*>::iterator array;
+#endif
 
     try {
         pagoda::initialize(&argc, &argv);
@@ -92,6 +99,23 @@ int main(int argc, char **argv)
                 Array *array = var->read();
                 writer->write(array, var->get_name());
                 delete array;
+            }
+        }
+#elif defined(READ_NONBLOCKING)
+        // read all non-record variables first, non-blocking
+        for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+            Variable *var = *var_it;
+            if (!var->has_record()) {
+                arrays[var->get_name()] = var->iread();
+            }
+        }
+        dataset->wait();
+        // write all non-record variables first, TODO non-blocking
+        for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+            Variable *var = *var_it;
+            array = arrays.find(var->get_name());
+            if (array != arrays.end()) {
+                writer->write(array->second,array->first);
             }
         }
 #endif
