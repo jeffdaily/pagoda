@@ -9,21 +9,22 @@
 #include <string>
 #include <vector>
 
-using std::back_inserter;
-using std::copy;
-using std::istream_iterator;
-using std::istringstream;
-using std::string;
-using std::vector;
-
 #include "Attribute.H"
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
 #include "GeoGrid.H"
 #include "StringComparator.H"
 #include "Util.H"
 #include "Variable.H"
+
+using std::back_inserter;
+using std::copy;
+using std::istream_iterator;
+using std::istringstream;
+using std::string;
+using std::vector;
 
 
 /**
@@ -135,25 +136,44 @@ GridType GeoGrid::get_type() const
 Variable* GeoGrid::get_coord(const string &att_name,
         const string &coord_name, const string &dim_name)
 {
+    TRACER("GeoGrid::get_coord(%s,%s,%s)\n", att_name.c_str(),
+            coord_name.c_str(), dim_name.c_str());
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
         if (att) {
             vector<string> parts = pagoda::split(att->get_string());
+            vector<string>::iterator part;
             if (parts.size() != 2) {
                 throw GridException("expected " + att_name + " attribute "
                         "to have two values", parts.size());
-            } else {
-                for (size_t i=0; i<parts.size(); ++i) {
-                    Variable *var = dataset->get_var(parts[i]);
-                    StringComparator cmp(coord_name, true, true);
-                    if (!var) {
-                        throw GridException(
-                                "could not locate variable" + parts[i]);
-                    }
-                    if (cmp(var->get_standard_name())
-                            || cmp(var->get_long_name())) {
+            }
+            for (part=parts.begin(); part!=parts.end(); ++part) {
+                Variable *var = dataset->get_var(*part);
+                StringComparator cmp("", true, true);
+                string standard_name;
+                string long_name;
+                if (!var) {
+                    throw GridException("could not locate variable " + *part);
+                }
+                standard_name = var->get_standard_name();
+                long_name = var->get_long_name();
+                TRACER("\tcomparing '%s' '%s' '%s'\n",
+                        coord_name.c_str(), standard_name.c_str(),
+                        long_name.c_str());
+                if (!standard_name.empty()) {
+                    cmp.set_value(standard_name);
+                    if (cmp(coord_name)) {
+                        TRACER("\tfound\n");
                         return var;
                     }
+                } else if (!long_name.empty()) {
+                    cmp.set_value(long_name);
+                    if (cmp(coord_name)) {
+                        TRACER("\tfound\n");
+                        return var;
+                    }
+                } else {
+                    TRACER("\tNOT FOUND\n");
                 }
             }
         }

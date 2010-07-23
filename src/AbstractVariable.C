@@ -8,7 +8,9 @@
 #include "Array.H"
 #include "Attribute.H"
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
+#include "Error.H"
 #include "Grid.H"
 #include "Mask.H"
 #include "Pack.H"
@@ -35,7 +37,17 @@ AbstractVariable::~AbstractVariable()
 bool AbstractVariable::has_record() const
 {
     TIMING("AbstractVariable::has_record()");
-    return get_dims()[0]->is_unlimited();
+    vector<Dimension*> dims = get_dims();
+    if (dims.empty()) {
+        return false;
+    }
+    return dims[0]->is_unlimited();
+}
+
+
+int64_t AbstractVariable::get_nrec() const
+{
+    return get_shape().at(0);
 }
 
 
@@ -169,10 +181,80 @@ vector<Mask*> AbstractVariable::get_masks() const
 }
 
 
+/**
+ * If there is a Mask over the record Dimension, translate the given record
+ * into the index space of the subset.
+ *
+ * @param[in] record the record to translate
+ * @return the translated record
+ */
+int64_t AbstractVariable::translate_record(int64_t record) const
+{
+    Mask *mask = get_masks().at(0);
+    int64_t size = mask->get_size();
+    int *buf = (int*)mask->get(0, size-1);
+    int64_t count = -1;
+    int64_t index = 0;
+
+    TRACER("AbstractVariable::translate_record(%ld) %s\n",
+            record, get_name().c_str());
+    TRACER("size=%ld, count=%ld, index=%ld\n", size, count, index);
+
+    for ( ; index<size; ++index) {
+        if (buf[index] != 0) {
+            ++count;
+            TRACER("buf[index]=%ld, count=%ld, index=%ld\n",
+                    buf[index], count, index);
+            if (count == record) {
+                break;
+            }
+        } else {
+            TRACER("buf[index]=%ld, count=%ld, index=%ld\n",
+                    buf[index], count, index);
+        }
+    }
+    delete [] buf;
+    if (index >= size) {
+        ERR("index overrun");
+    }
+
+    return index;
+}
+
+
+/**
+ * Return true if this Variable has any active Masks.
+ *
+ * @return true if this Variable requires subsetting
+ */
 bool AbstractVariable::needs_subset() const
 {
-    vector<Mask*> masks = get_masks();;
+    vector<Mask*> masks = get_masks();
     vector<Mask*>::iterator mask_it;
+
+    for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
+        int64_t count = (*mask_it)->get_count();
+        int64_t size = (*mask_it)->get_size();
+        if (count != size) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/**
+ * Return true if this Variable has any active, non-record Masks.
+ *
+ * @return true if this Variable requires subsetting
+ */
+bool AbstractVariable::needs_subset_record() const
+{
+    vector<Mask*> masks = get_masks();
+    vector<Mask*>::iterator mask_it;
+
+    masks.erase(masks.begin());
 
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
         int64_t count = (*mask_it)->get_count();

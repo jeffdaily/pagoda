@@ -91,12 +91,18 @@ DataType PnetcdfVariable::get_type() const
 
 Array* PnetcdfVariable::read(Array *dst) const
 {
+    if (!dst) {
+        return AbstractVariable::read();
+    }
     return read(dst, false);
 }
 
 
 Array* PnetcdfVariable::iread(Array *dst)
 {
+    if (!dst) {
+        return AbstractVariable::iread();
+    }
     return read(dst, true);
 }
 
@@ -115,7 +121,7 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
     TIMING("PnetcdfVariable::read(Array*)");
 
     // if we are subsetting, then the passed in array is different than the
-    // one in which the data is read into
+    // one in which the data is read into i.e. subset occurs after the fact
     if (needs_subset()) {
         get_dataset()->push_masks(NULL);
         tmp = Array::create(type, get_shape());
@@ -160,12 +166,18 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
 
 Array* PnetcdfVariable::read(int64_t record, Array *dst) const
 {
+    if (!dst) {
+        return AbstractVariable::read(record);
+    }
     return read(record, dst, false);
 }
 
 
 Array* PnetcdfVariable::iread(int64_t record, Array *dst)
 {
+    if (!dst) {
+        return AbstractVariable::iread(record);
+    }
     return read(record, dst, true);
 }
 
@@ -185,8 +197,8 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     TIMING("PnetcdfVariable::read(int64_t,Array*)");
 
     // if we are subsetting, then the passed in array is different than the
-    // one in which the data is read into
-    if (needs_subset()) {
+    // one in which the data is read into i.e. subset occurs after the fact
+    if (needs_subset_record()) {
         vector<int64_t> shape;
         get_dataset()->push_masks(NULL);
         shape = get_shape();
@@ -206,7 +218,7 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     found_bit = find_bit(adims, lo, hi);
 
     if (tmp->owns_data() && found_bit) {
-        start[0] = record;
+        start[0] = translate_record(record);
         count[0] = 1;
         for (int64_t dimidx=1; dimidx<ndim; ++dimidx) {
             start[dimidx] = lo[dimidx-1];
@@ -221,7 +233,7 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     do_read(tmp, start, count, found_bit, nonblocking);
 
     // check whether a subset is needed
-    if (needs_subset()) {
+    if (needs_subset_record()) {
         vector<Mask*> masks = get_masks();
         masks.erase(masks.begin());
         pagoda::pack(tmp, dst, masks);

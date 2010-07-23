@@ -33,6 +33,7 @@ class Variable
 
         virtual vector<Dimension*> get_dims() const = 0;
         virtual bool has_record() const = 0;
+        virtual int64_t get_nrec() const = 0;
         virtual int64_t get_ndim() const = 0;
         virtual vector<int64_t> get_shape() const = 0;
 

@@ -14,6 +14,7 @@ using std::vector;
 
 #include "Attribute.H"
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
 #include "Grid.H"
@@ -129,76 +130,119 @@ Variable* Grid::get_grid() const
 
 bool Grid::is_coordinate(const Variable *var)
 {
-    const Dataset *dataset = get_dataset();
-    vector<Variable*> vars = dataset->get_vars();
+    bool ret = false;;
 
+    TRACER("Grid::is_coordinate %s\n", (var? var->get_name().c_str() : "NULL"));
+
+    // check grid Variables first
     if (!var) {
-        return false;
-    }
-
-    // does this Variable have only 1 dim with same name?
-    if (var->get_dims().size() == 1
+        TRACER("\tNULL\n");
+        ret = false;
+    } else if (var == get_cell_lat()) {
+        ret = true;
+    } else if (var == get_cell_lon()) {
+        ret = true;
+    } else if (var == get_edge_lat()) {
+        ret = true;
+    } else if (var == get_edge_lon()) {
+        ret = true;
+    } else if (var == get_corner_lat()) {
+        ret = true;
+    } else if (var == get_corner_lon()) {
+        ret = true;
+    } else if (var->get_dims().size() == 1
             && var->get_dims()[0]->get_name() == var->get_name()) {
-        return true;
-    }
-    
-    // does this Variable's name match any "coordinates" attribute?
-    for (vector<Variable*>::iterator it=vars.begin(); it!=vars.end(); ++it) {
-        Variable *current_var = *it;
-        Attribute *att = current_var->get_att("coordinates");
-        if (att) {
-            vector<string> parts = pagoda::split(att->get_string());
-            vector<string>::iterator part;
-            for (part=parts.begin(); part!=parts.end(); ++part) {
-                if (var->get_name() == *part) {
-                    return true;
+        // does this Variable have only 1 dim with same name?
+        TRACER("\ttruly\n");
+        ret = true;
+    } else {
+        // does this Variable's name match any "coordinates" attribute?
+        // does this Variable's name match any "bounds" attribute?
+        const Dataset *dataset = get_dataset();
+        vector<Variable*> vars = dataset->get_vars();
+        vector<Variable*>::iterator it;
+        for (it=vars.begin(); it!=vars.end(); ++it) {
+            Variable *current_var = *it;
+            Attribute *att;
+            string name = var->get_name();
+
+            if ((att = current_var->get_att("coordinates"))) {
+                vector<string> parts = pagoda::split(att->get_string());
+                vector<string>::iterator part;
+                for (part=parts.begin(); part!=parts.end(); ++part) {
+                    if (name == *part) {
+                        TRACER("\tcoordinates\n");
+                        ret = true;
+                        break;
+                    }
                 }
+            }
+            if (ret) {
+                break;
+            }
+            if ((att = current_var->get_att("bounds"))) {
+                string bounds = att->get_string();
+                vector<string> parts = pagoda::split(bounds);
+                vector<string>::iterator part;
+                for (part=parts.begin(); part!=parts.end(); ++part) {
+                    if (name == *part) {
+                        TRACER("\tbounds\n");
+                        ret = true;
+                        break;
+                    }
+                }
+            }
+            if (ret) {
+                break;
             }
         }
     }
 
-    return false;
+    TRACER("\t%s\n", ret ? "TRUE" : "FALSE");
+    return ret;
 }
 
 
 bool Grid::is_topology(const Variable *var)
 {
+    bool ret;
+
     if (!var) {
-        return false;
+        TRACER("Grid::is_topology NULL\n");
+        ret = false;
+    } else if (var == get_cell_cells()) {
+        ret = true;
+    } else if (var == get_cell_edges()) {
+        ret = true;
+    } else if (var == get_cell_corners()) {
+        ret = true;
+    } else if (var == get_edge_cells()) {
+        ret = true;
+    } else if (var == get_edge_edges()) {
+        ret = true;
+    } else if (var == get_edge_corners()) {
+        ret = true;
+    } else if (var == get_corner_cells()) {
+        ret = true;
+    } else if (var == get_corner_edges()) {
+        ret = true;
+    } else if (var == get_corner_corners()) {
+        ret = true;
+    } else if (var == get_grid()) {
+        ret = true;
+    } else {
+        ret = false;
     }
 
-    if (var == get_cell_cells()) {
-        return true;
+#ifdef TRACE
+    if (ret) {
+        TRACER("Grid::is_topology TRUE  %s\n", var->get_name().c_str());
+    } else {
+        TRACER("Grid::is_topology FALSE %s\n", var->get_name().c_str());
     }
-    if (var == get_cell_edges()) {
-        return true;
-    }
-    if (var == get_cell_corners()) {
-        return true;
-    }
-    if (var == get_edge_cells()) {
-        return true;
-    }
-    if (var == get_edge_edges()) {
-        return true;
-    }
-    if (var == get_edge_corners()) {
-        return true;
-    }
-    if (var == get_corner_cells()) {
-        return true;
-    }
-    if (var == get_corner_edges()) {
-        return true;
-    }
-    if (var == get_corner_corners()) {
-        return true;
-    }
-    if (var == get_grid()) {
-        return true;
-    }
+#endif
 
-    return false;
+    return ret;
 }
 
 

@@ -30,6 +30,8 @@ extern "C"
 int F77_DUMMY_MAIN() { return 1; }
 #endif
 
+//#define READ_ALL
+#define READ_RECORD
 
 int main(int argc, char **argv)
 {
@@ -68,11 +70,31 @@ int main(int argc, char **argv)
         writer->def_vars(vars);
 
         // read/subset and write each variable...
+#ifdef READ_ALL
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             Variable *var = *var_it;
             Array *array = var->read();
             writer->write(array, var->get_name());
+            delete array;
         }
+#elif defined(READ_RECORD)
+        // write all non-record variables first
+        for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+            Variable *var = *var_it;
+            if (var->has_record()) {
+                Array *array = NULL; // reuse allocated array each record
+                for (int64_t rec=0,limit=var->get_nrec(); rec<limit; ++rec) {
+                    array = var->read(rec, array);
+                    writer->write(array, var->get_name(), rec);
+                }
+                delete array;
+            } else {
+                Array *array = var->read();
+                writer->write(array, var->get_name());
+                delete array;
+            }
+        }
+#endif
 
         // clean up
         delete dataset;

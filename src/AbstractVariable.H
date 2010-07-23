@@ -31,6 +31,7 @@ class AbstractVariable : public Variable
 
         virtual vector<Dimension*> get_dims() const = 0;
         virtual bool has_record() const;
+        virtual int64_t get_nrec() const;
         virtual int64_t get_ndim() const;
         virtual vector<int64_t> get_shape() const;
 
@@ -63,7 +64,9 @@ class AbstractVariable : public Variable
     protected:
         AbstractVariable();
 
+        virtual int64_t translate_record(int64_t record) const;
         virtual bool needs_subset() const;
+        virtual bool needs_subset_record() const;
         virtual bool needs_renumber() const;
         virtual void renumber(Array *array) const;
 };

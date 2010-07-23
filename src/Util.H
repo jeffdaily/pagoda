@@ -47,6 +47,7 @@ int64_t shape_to_size(const vector<int64_t> &shape);
 bool ends_with(const string &str, const string &end);
 vector<string> split(const string &s);
 vector<string> split(const string &s, char delimiter);
+void trim(string &s);
 void calculate_required_memory();
 void calculate_required_memory(const vector<Variable*> &vars);
 template <class T> T ptr_deleter(T object);
