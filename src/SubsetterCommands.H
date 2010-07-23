@@ -13,6 +13,7 @@ using std::set;
 using std::string;
 using std::vector;
 
+class Attribute;
 class Dataset;
 class Dimension;
 class FileWriter;
@@ -35,6 +36,7 @@ class SubsetterCommands
         FileWriter* get_output() const;
         vector<Variable*> get_variables(Dataset *dataset) const;
         vector<Dimension*> get_dimensions(Dataset *dataset) const;
+        vector<Attribute*> get_attributes(Dataset *dataset) const;
 
         vector<LatLonBox> get_boxes() const;
         vector<DimSlice> get_slices() const;
@@ -52,6 +54,7 @@ class SubsetterCommands
         void init();
 
         CommandLineParser parser;
+        string cmdline;
         vector<string> input_filenames;
         string output_filename;
         set<string> variables;

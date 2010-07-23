@@ -19,16 +19,19 @@
 #include "Dimension.H"
 #include "Error.H"
 #include "FileWriter.H"
+#include "GenericAttribute.H"
 #include "Grid.H"
 #include "PagodaException.H"
 #include "SubsetterCommands.H"
 #include "Timing.H"
+#include "TypedValues.H"
 #include "Util.H"
 #include "Variable.H"
 
 
 SubsetterCommands::SubsetterCommands()
     :   parser()
+    ,   cmdline("")
     ,   input_filenames()
     ,   output_filename("")
     ,   variables()
@@ -47,7 +50,9 @@ SubsetterCommands::SubsetterCommands()
 
 
 SubsetterCommands::SubsetterCommands(int argc, char **argv)
-    :   input_filenames()
+    :   parser()
+    ,   cmdline("")
+    ,   input_filenames()
     ,   output_filename("")
     ,   variables()
     ,   exclude(false)
@@ -94,6 +99,12 @@ void SubsetterCommands::parse(int argc, char **argv)
 
     TIMING("SubsetterCommands::parse(int,char**)");
 
+    // copy command line
+    cmdline = argv[0];
+    for (int i=1; i<argc; ++i) {
+        cmdline.append(" ");
+        cmdline.append(argv[i]);
+    }
     parser.parse(argc,argv);
     positional_arguments = parser.get_positional_arguments();
 
@@ -171,6 +182,10 @@ void SubsetterCommands::parse(int argc, char **argv)
 
     if (parser.count("no-coords")) {
         process_coords = false;
+    }
+
+    if (parser.count("history")) {
+        modify_history = false;
     }
 }
 
@@ -368,6 +383,50 @@ vector<Dimension*> SubsetterCommands::get_dimensions(Dataset *dataset) const
     }
     
     return dims_out;
+}
+
+
+vector<Attribute*> SubsetterCommands::get_attributes(Dataset *dataset) const
+{
+    vector<Attribute*> atts = dataset->get_atts();
+
+    if (modify_history) {
+        Attribute *history;
+        size_t pos,limit;
+
+        for (pos=0,limit=atts.size(); pos<limit; ++pos) {
+            Attribute *current_att = atts[pos];
+            if (current_att->get_name() == "history") {
+                history = current_att;
+                break;
+            }
+        }
+
+        if (history) {
+            time_t time_result = time(NULL);
+            string date_cmdline = ctime(&time_result);
+            TypedValues<char> *history_complete;
+            vector<char> history_copy;
+
+            // replace newline added by ctime with colon space
+            date_cmdline.replace(date_cmdline.size()-1, 1, ": ");
+            date_cmdline += cmdline;
+            history_copy.assign(date_cmdline.begin(), date_cmdline.end());
+            if (history_copy.back() != '\n') {
+                history_copy.push_back('\n');
+            }
+            history_complete = new TypedValues<char>(history_copy);
+            (*history_complete) += history->get_values();
+            // the new Attribute replaces the original, which is still owned
+            // by its parent Dataset and will be cleaned up when the parent
+            // Dataset is deleted.  However this new Attribute will not get
+            // destroyed...
+            atts[pos] = new GenericAttribute("history",
+                    history_complete, DataType::CHAR);
+        }
+    }
+
+    return atts;
 }
 
 

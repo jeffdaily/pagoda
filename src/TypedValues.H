@@ -39,6 +39,8 @@ class TypedValues : public Values
         virtual void as(size_t n, double &val) const;
         virtual void as(size_t n, string &val) const;
 
+        virtual TypedValues<T>& operator += (const Values *values);
+
         virtual ostream& print(ostream &os) const;
 
     protected:
@@ -98,6 +100,16 @@ void TypedValues<T>::as(size_t n, string &val) const
     ostringstream os;
     os << values.at(n);
     val = os.str();
+}
+
+
+template <class T>
+TypedValues<T>& TypedValues<T>::operator += (const Values *other)
+{
+    vector<T> other_values;
+    other->as(other_values);
+    values.insert(values.end(), other_values.begin(), other_values.end());
+    return *this;
 }
 
 

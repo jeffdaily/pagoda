@@ -63,7 +63,7 @@ int main(int argc, char **argv)
         masks->modify(cmd.get_boxes(), grid);
 
         writer = cmd.get_output();
-        writer->write_atts(dataset->get_atts());
+        writer->write_atts(cmd.get_attributes(dataset));
         writer->def_dims(dims);
         writer->def_vars(vars);
 
