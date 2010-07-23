@@ -54,11 +54,18 @@ class GlobalArray : public Array
         virtual void scatter(void *buffer, vector<int64_t> &subscripts);
         virtual void* gather(vector<int64_t> &subscripts) const;
 
+        virtual Array* add(const Array *rhs) const;
+
         virtual ostream& print(ostream &os) const;
 
         virtual void dump() const;
 
         GlobalArray& operator=(const GlobalArray &that);
+
+        GlobalArray operator+(const GlobalArray &that);
+        GlobalArray operator-(const GlobalArray &that);
+        GlobalArray operator*(const GlobalArray &that);
+        GlobalArray operator/(const GlobalArray &that);
 
         GlobalArray& operator+=(const GlobalArray &that);
         GlobalArray& operator-=(const GlobalArray &that);

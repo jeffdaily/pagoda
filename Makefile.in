@@ -37,11 +37,11 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = subsetter_old$(EXEEXT) $(am__EXEEXT_1) \
-	tests/TestBin$(EXEEXT) tests/TestCommandLine$(EXEEXT) \
-	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
-	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
-	tests/TestGrid$(EXEEXT) tests/TestJoin$(EXEEXT) \
-	tests/TestPnetcdfAttribute$(EXEEXT) \
+	tests/TestArray$(EXEEXT) tests/TestBin$(EXEEXT) \
+	tests/TestCommandLine$(EXEEXT) tests/TestDimension$(EXEEXT) \
+	tests/TestDistance$(EXEEXT) tests/TestEnum$(EXEEXT) \
+	tests/TestGet$(EXEEXT) tests/TestGrid$(EXEEXT) \
+	tests/TestJoin$(EXEEXT) tests/TestPnetcdfAttribute$(EXEEXT) \
 	tests/TestPnetcdfDataset$(EXEEXT) tests/TestMaskMap$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScatter$(EXEEXT) \
@@ -163,6 +163,10 @@ am_subsetter_old_OBJECTS = src/Mainp.$(OBJEXT)
 subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
 subsetter_old_LDADD = $(LDADD)
 subsetter_old_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
+am_tests_TestArray_OBJECTS = tests/TestArray.$(OBJEXT)
+tests_TestArray_OBJECTS = $(am_tests_TestArray_OBJECTS)
+tests_TestArray_LDADD = $(LDADD)
+tests_TestArray_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestBin_OBJECTS = tests/TestBin.$(OBJEXT)
 tests_TestBin_OBJECTS = $(am_tests_TestBin_OBJECTS)
 tests_TestBin_LDADD = $(LDADD)
@@ -357,8 +361,8 @@ AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) $(pgsub_SOURCES) \
-	$(subsetter_old_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestCommandLine_SOURCES) \
+	$(subsetter_old_SOURCES) $(tests_TestArray_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestCommandLine_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestGrid_SOURCES) $(tests_TestJoin_SOURCES) \
@@ -379,7 +383,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) $(pgsub_SOURCES) \
 	$(tests_ga_TestUnion_SOURCES) $(tests_ga_TestUnpack_SOURCES)
 DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
 	$(pgsub_SOURCES) $(subsetter_old_SOURCES) \
-	$(tests_TestBin_SOURCES) $(tests_TestCommandLine_SOURCES) \
+	$(tests_TestArray_SOURCES) $(tests_TestBin_SOURCES) \
+	$(tests_TestCommandLine_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestGrid_SOURCES) $(tests_TestJoin_SOURCES) \
@@ -600,6 +605,7 @@ tests_ga_TestScanAdd_SOURCES = tests/ga/TestScanAdd.C
 tests_ga_TestSort_SOURCES = tests/ga/TestSort.C
 tests_ga_TestUnion_SOURCES = tests/ga/TestUnion.C
 tests_ga_TestUnpack_SOURCES = tests/ga/TestUnpack.c
+tests_TestArray_SOURCES = tests/TestArray.C
 tests_TestBin_SOURCES = tests/TestBin.C
 tests_TestCommandLine_SOURCES = tests/TestCommandLine.C
 tests_TestDimension_SOURCES = tests/TestDimension.C
@@ -850,6 +856,11 @@ tests/$(am__dirstamp):
 tests/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) tests/$(DEPDIR)
 	@: > tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestArray.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestArray$(EXEEXT): $(tests_TestArray_OBJECTS) $(tests_TestArray_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestArray$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestArray_OBJECTS) $(tests_TestArray_LDADD) $(LIBS)
 tests/TestBin.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestBin$(EXEEXT): $(tests_TestBin_OBJECTS) $(tests_TestBin_DEPENDENCIES) tests/$(am__dirstamp)
@@ -1117,6 +1128,7 @@ mostlyclean-compile:
 	-rm -f src/gax.lo
 	-rm -f src/pgdump.$(OBJEXT)
 	-rm -f src/pgsub.$(OBJEXT)
+	-rm -f tests/TestArray.$(OBJEXT)
 	-rm -f tests/TestBin.$(OBJEXT)
 	-rm -f tests/TestCommandLine.$(OBJEXT)
 	-rm -f tests/TestDimension.$(OBJEXT)
@@ -1202,6 +1214,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgdump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgsub.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestArray.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestBin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestCommandLine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestDimension.Po@am__quote@

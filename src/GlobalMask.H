@@ -75,6 +75,8 @@ class GlobalMask :  public Mask
         virtual void scatter(void *buffer, vector<int64_t> &subscripts);
         virtual void* gather(vector<int64_t> &subscripts) const;
 
+        virtual Array* add(const Array *rhs) const;
+
         // shared virtuals
         virtual ostream& print(ostream &os) const;
         

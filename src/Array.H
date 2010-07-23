@@ -326,6 +326,14 @@ class Array
          */
         virtual void* gather(vector<int64_t> &subscripts) const = 0;
 
+        /**
+         * Adds two Arrays.
+         *
+         * If the given Array has fewer Dimensions, but the Dimensions are the
+         * same size as this Array, the given Array is "broadcast" to fit.
+         */
+        virtual Array* add(const Array *rhs) const = 0;
+
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Array *array);
 
@@ -336,6 +344,8 @@ class Array
 
     protected:
         Array();
+
+        bool broadcast_check(const Array *rhs) const;
 };
 
 #endif /* ARRAY_H_ */

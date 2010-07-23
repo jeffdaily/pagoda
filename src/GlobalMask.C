@@ -528,6 +528,12 @@ void* GlobalMask::gather(vector<int64_t> &subscripts) const
 }
 
 
+Array* GlobalMask::add(const Array *rhs) const
+{
+    return mask->add(rhs);
+}
+
+
 ostream& GlobalMask::print(ostream &os) const
 {
     os << "GlobalMask";

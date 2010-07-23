@@ -149,6 +149,7 @@ check_PROGRAMS += tests/ga/TestSort
 check_PROGRAMS += tests/ga/TestUnion
 check_PROGRAMS += tests/ga/TestUnpack
 endif
+check_PROGRAMS += tests/TestArray
 check_PROGRAMS += tests/TestBin
 check_PROGRAMS += tests/TestCommandLine
 check_PROGRAMS += tests/TestDimension
@@ -183,6 +184,7 @@ tests_ga_TestScanAdd_SOURCES        = tests/ga/TestScanAdd.C
 tests_ga_TestSort_SOURCES           = tests/ga/TestSort.C
 tests_ga_TestUnion_SOURCES          = tests/ga/TestUnion.C
 tests_ga_TestUnpack_SOURCES         = tests/ga/TestUnpack.c
+tests_TestArray_SOURCES             = tests/TestArray.C
 tests_TestBin_SOURCES               = tests/TestBin.C
 tests_TestCommandLine_SOURCES       = tests/TestCommandLine.C
 tests_TestDimension_SOURCES         = tests/TestDimension.C

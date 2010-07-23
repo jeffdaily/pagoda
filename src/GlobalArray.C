@@ -11,7 +11,6 @@
 #include "Debug.H"
 #include "Error.H"
 #include "GlobalArray.H"
-#include "NotImplementedException.H"
 #include "Timing.H"
 #include "Util.H"
 
@@ -111,6 +110,7 @@ GlobalArray::GlobalArray(const GlobalArray &that)
 #include "DataType.def"
     } else {
         handle = GA_Duplicate(that.handle, "noname");
+        GA_Copy(that.handle,handle);
     }
 }
 
@@ -186,7 +186,7 @@ void GlobalArray::copy(const Array *src)
             GA_Copy(((GlobalArray*)src)->handle, handle);
         }
     }
-    throw NotImplementedException("GlobalArray::copy(Array*) of differing Array implementations");
+    ERR("not implemented: GlobalArray::copy(Array*) of differing Array implementations");
 }
 
 
@@ -198,7 +198,7 @@ void GlobalArray::copy(const Array *src,
 {
     if (typeid(*src) == typeid(*this)) {
         if (is_scalar()) {
-            throw NotImplementedException("GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) no implemented for scalars");
+            ERR("not implemented: GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) no implemented for scalars");
         } else {
             vector<int64_t> src_lo_copy(src_lo.begin(), src_lo.end());
             vector<int64_t> src_hi_copy(src_hi.begin(), src_hi.end());
@@ -211,7 +211,7 @@ void GlobalArray::copy(const Array *src,
                     &dst_lo_copy[0], &dst_hi_copy[0]);
         }
     }
-    throw NotImplementedException("GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
+    ERR("not implemented: GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
 }
 
 
@@ -308,6 +308,14 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
 }
 
 
+GlobalArray GlobalArray::operator+(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret += that;
+    return ret;
+}
+
+
 GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
 {
     if (type == that.type && shape == that.shape) {
@@ -327,11 +335,21 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
             GA_Add(&alpha, handle, &beta, casted.handle, handle); \
         } else
 #include "GlobalArray.def"
+    } else if (broadcast_check(&that)) {
+
     } else {
         ERR("shape mismatch");
     }
 
     return *this;
+}
+
+
+GlobalArray GlobalArray::operator-(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret -= that;
+    return ret;
 }
 
 
@@ -362,6 +380,14 @@ GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
 }
 
 
+GlobalArray GlobalArray::operator*(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret *= that;
+    return ret;
+}
+
+
 GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
 {
     if (type == that.type && shape == that.shape) {
@@ -384,6 +410,14 @@ GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
     }
 
     return *this;
+}
+
+
+GlobalArray GlobalArray::operator/(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret /= that;
+    return ret;
 }
 
 
@@ -567,6 +601,18 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
     NGA_Gather64(handle, buffer, &subs[0], n);
 
     return buffer;
+}
+
+
+Array* GlobalArray::add(const Array *rhs) const
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) += *array;
+        return self_copy;
+    }
+    ERR("not implemented GlobalArray::add(Array*) of differing Array implementations");
 }
 
 

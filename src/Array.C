@@ -132,3 +132,26 @@ ostream& operator << (ostream &os, const Array *array)
     TIMING("operator<<(ostream,Array*)");
     return array->print(os);
 }
+
+
+bool Array::broadcast_check(const Array *rhs) const
+{
+    vector<int64_t> my_shape = get_shape();
+    vector<int64_t> rhs_shape = rhs->get_shape();
+    vector<int64_t>::reverse_iterator my_it;
+    vector<int64_t>::reverse_iterator rhs_it;
+
+    // this Array must have the same or greater rank
+    if (my_shape.size() < rhs_shape.size()) {
+        return false;
+    }
+
+    for (rhs_it=rhs_shape.rbegin(),my_it=my_shape.rbegin();
+            rhs_it!=rhs_shape.rend(); ++rhs_it,++my_it) {
+        if (*my_it != *rhs_it) {
+            return false;
+        }
+    }
+
+    return true;
+}
