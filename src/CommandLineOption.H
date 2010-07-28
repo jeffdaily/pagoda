@@ -54,6 +54,7 @@ class CommandLineOption
         static CommandLineOption ALPHABETIZE;
         static CommandLineOption JOIN;
         static CommandLineOption UNION;
+        static CommandLineOption OP_TYPE;
 
     protected:
         int _value;

@@ -36,17 +36,17 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = subsetter_old$(EXEEXT) $(am__EXEEXT_1) \
-	tests/TestArray$(EXEEXT) tests/TestBin$(EXEEXT) \
-	tests/TestCommandLine$(EXEEXT) tests/TestDimension$(EXEEXT) \
-	tests/TestDistance$(EXEEXT) tests/TestEnum$(EXEEXT) \
-	tests/TestGet$(EXEEXT) tests/TestGrid$(EXEEXT) \
-	tests/TestJoin$(EXEEXT) tests/TestPnetcdfAttribute$(EXEEXT) \
+check_PROGRAMS = $(am__EXEEXT_1) tests/TestArray$(EXEEXT) \
+	tests/TestBin$(EXEEXT) tests/TestCommandLine$(EXEEXT) \
+	tests/TestDimension$(EXEEXT) tests/TestDistance$(EXEEXT) \
+	tests/TestEnum$(EXEEXT) tests/TestGet$(EXEEXT) \
+	tests/TestGrid$(EXEEXT) tests/TestJoin$(EXEEXT) \
+	tests/TestPnetcdfAttribute$(EXEEXT) \
 	tests/TestPnetcdfDataset$(EXEEXT) tests/TestMaskMap$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScatter$(EXEEXT) \
 	tests/TestUnion$(EXEEXT) tests/TestWrite$(EXEEXT)
-bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT)
+bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT)
 
 #############################################################################
 # tests
@@ -121,14 +121,14 @@ am_libpagoda_la_OBJECTS = src/AbstractDataset.lo \
 	src/CoordinateVariable.lo src/Dataset.lo src/DataType.lo \
 	src/Debug.lo src/Dimension.lo src/FileWriter.lo src/gax.lo \
 	src/GenericAttribute.lo src/GlobalArray.lo src/GlobalMask.lo \
-	src/GeoGrid.lo src/Grid.lo src/LatLonBox.lo src/Mask.lo \
-	src/MaskMap.lo src/Memory.lo src/Pack.lo \
-	src/PnetcdfAttribute.lo src/Pnetcdf.lo src/PnetcdfDataset.lo \
-	src/PnetcdfDimension.lo src/PnetcdfFileWriter.lo \
-	src/PnetcdfTiming.lo src/PnetcdfVariable.lo \
-	src/StringComparator.lo src/SubsetterCommands.lo src/Timing.lo \
-	src/Util.lo src/Values.lo src/Variable.lo \
-	src/VariableDecorator.lo
+	src/GenericCommands.lo src/GeoGrid.lo src/Grid.lo \
+	src/LatLonBox.lo src/Mask.lo src/MaskMap.lo src/Memory.lo \
+	src/Pack.lo src/PgboCommands.lo src/PnetcdfAttribute.lo \
+	src/Pnetcdf.lo src/PnetcdfDataset.lo src/PnetcdfDimension.lo \
+	src/PnetcdfFileWriter.lo src/PnetcdfTiming.lo \
+	src/PnetcdfVariable.lo src/StringComparator.lo \
+	src/SubsetterCommands.lo src/Timing.lo src/Util.lo \
+	src/Values.lo src/Variable.lo src/VariableDecorator.lo
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -150,19 +150,19 @@ am__v_lt_0 = --silent
 @ENABLE_GA_TESTS_TRUE@	tests/ga/TestUnion$(EXEEXT) \
 @ENABLE_GA_TESTS_TRUE@	tests/ga/TestUnpack$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
+am_pgbo_OBJECTS = src/pgbo.$(OBJEXT)
+pgbo_OBJECTS = $(am_pgbo_OBJECTS)
+pgbo_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
+pgbo_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_pgdump_OBJECTS = src/pgdump.$(OBJEXT)
 pgdump_OBJECTS = $(am_pgdump_OBJECTS)
 pgdump_LDADD = $(LDADD)
-am__DEPENDENCIES_1 =
 pgdump_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_pgsub_OBJECTS = src/pgsub.$(OBJEXT)
 pgsub_OBJECTS = $(am_pgsub_OBJECTS)
 pgsub_LDADD = $(LDADD)
 pgsub_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
-am_subsetter_old_OBJECTS = src/Mainp.$(OBJEXT)
-subsetter_old_OBJECTS = $(am_subsetter_old_OBJECTS)
-subsetter_old_LDADD = $(LDADD)
-subsetter_old_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1)
 am_tests_TestArray_OBJECTS = tests/TestArray.$(OBJEXT)
 tests_TestArray_OBJECTS = $(am_tests_TestArray_OBJECTS)
 tests_TestArray_LDADD = $(LDADD)
@@ -360,8 +360,8 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) $(pgsub_SOURCES) \
-	$(subsetter_old_SOURCES) $(tests_TestArray_SOURCES) \
+SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgdump_SOURCES) \
+	$(pgsub_SOURCES) $(tests_TestArray_SOURCES) \
 	$(tests_TestBin_SOURCES) $(tests_TestCommandLine_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
@@ -381,10 +381,9 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) $(pgsub_SOURCES) \
 	$(tests_ga_TestRavel_SOURCES) $(tests_ga_TestRead_SOURCES) \
 	$(tests_ga_TestScanAdd_SOURCES) $(tests_ga_TestSort_SOURCES) \
 	$(tests_ga_TestUnion_SOURCES) $(tests_ga_TestUnpack_SOURCES)
-DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgdump_SOURCES) \
-	$(pgsub_SOURCES) $(subsetter_old_SOURCES) \
-	$(tests_TestArray_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestCommandLine_SOURCES) \
+DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) \
+	$(pgdump_SOURCES) $(pgsub_SOURCES) $(tests_TestArray_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestCommandLine_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestGrid_SOURCES) $(tests_TestJoin_SOURCES) \
@@ -551,9 +550,9 @@ AM_LDFLAGS = $(PROFILE) $(pnetcdf_LDFLAGS) $(GA_LDFLAGS)
 LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 lib_LTLIBRARIES = libpagoda.la
-subsetter_old_SOURCES = src/Mainp.C
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
+pgbo_SOURCES = src/pgbo.C
 pkginclude_HEADERS = src/AbstractDataset.H src/AbstractVariable.H \
 	src/AggregationDimension.H src/Aggregation.H \
 	src/AggregationJoinExisting.H src/AggregationUnion.H \
@@ -564,9 +563,10 @@ pkginclude_HEADERS = src/AbstractDataset.H src/AbstractVariable.H \
 	src/Dataset.H src/DataType.def src/DataType.H src/Debug.H \
 	src/Dimension.H src/Error.H src/FileWriter.H src/gax.H \
 	src/GlobalArray.def src/GlobalArray.H src/GlobalMask.H \
-	src/GeoGrid.H src/Grid.H src/LatLonBox.H src/Mask.H \
-	src/MaskMap.H src/NotImplementedException.H src/pagoda.H \
-	src/Pack.H src/PagodaException.H src/PnetcdfAttribute.H \
+	src/GenericCommands.H src/GeoGrid.H src/Grid.H src/LatLonBox.H \
+	src/Mask.H src/MaskMap.H src/NotImplementedException.H \
+	src/pagoda.H src/Pack.H src/PgboCommands.H \
+	src/PagodaException.H src/PnetcdfAttribute.H \
 	src/PnetcdfDataset.H src/PnetcdfDimension.H src/PnetcdfError.H \
 	src/PnetcdfFileWriter.H src/Pnetcdf.H src/PnetcdfTiming.H \
 	src/PnetcdfVariable.H src/RangeException.H src/Slice.H \
@@ -582,9 +582,10 @@ libpagoda_la_SOURCES = src/AbstractDataset.C src/AbstractVariable.C \
 	src/CoordinateVariable.C src/Dataset.C src/DataType.C \
 	src/Debug.C src/Dimension.C src/FileWriter.C src/gax.C \
 	src/GenericAttribute.C src/GlobalArray.C src/GlobalMask.C \
-	src/GeoGrid.C src/Grid.C src/LatLonBox.C src/Mask.C \
-	src/MaskMap.C src/Memory.c src/Pack.C src/PnetcdfAttribute.C \
-	src/Pnetcdf.C src/PnetcdfDataset.C src/PnetcdfDimension.C \
+	src/GenericCommands.C src/GeoGrid.C src/Grid.C src/LatLonBox.C \
+	src/Mask.C src/MaskMap.C src/Memory.c src/Pack.C \
+	src/PgboCommands.C src/PnetcdfAttribute.C src/Pnetcdf.C \
+	src/PnetcdfDataset.C src/PnetcdfDimension.C \
 	src/PnetcdfFileWriter.C src/PnetcdfTiming.C \
 	src/PnetcdfVariable.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
@@ -753,6 +754,8 @@ src/GenericAttribute.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/GlobalArray.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/GlobalMask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/GenericCommands.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/GeoGrid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Grid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/LatLonBox.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -760,6 +763,7 @@ src/Mask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/MaskMap.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Memory.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Pack.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/PgboCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfAttribute.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/Pnetcdf.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -837,6 +841,10 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+src/pgbo.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+pgbo$(EXEEXT): $(pgbo_OBJECTS) $(pgbo_DEPENDENCIES) 
+	@rm -f pgbo$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(pgbo_OBJECTS) $(pgbo_LDADD) $(LIBS)
 src/pgdump.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 pgdump$(EXEEXT): $(pgdump_OBJECTS) $(pgdump_DEPENDENCIES) 
@@ -846,10 +854,6 @@ src/pgsub.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 pgsub$(EXEEXT): $(pgsub_OBJECTS) $(pgsub_DEPENDENCIES) 
 	@rm -f pgsub$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pgsub_OBJECTS) $(pgsub_LDADD) $(LIBS)
-src/Mainp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-subsetter_old$(EXEEXT): $(subsetter_old_OBJECTS) $(subsetter_old_DEPENDENCIES) 
-	@rm -f subsetter_old$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(subsetter_old_OBJECTS) $(subsetter_old_LDADD) $(LIBS)
 tests/$(am__dirstamp):
 	@$(MKDIR_P) tests
 	@: > tests/$(am__dirstamp)
@@ -1077,6 +1081,8 @@ mostlyclean-compile:
 	-rm -f src/FileWriter.lo
 	-rm -f src/GenericAttribute.$(OBJEXT)
 	-rm -f src/GenericAttribute.lo
+	-rm -f src/GenericCommands.$(OBJEXT)
+	-rm -f src/GenericCommands.lo
 	-rm -f src/GeoGrid.$(OBJEXT)
 	-rm -f src/GeoGrid.lo
 	-rm -f src/GlobalArray.$(OBJEXT)
@@ -1087,7 +1093,6 @@ mostlyclean-compile:
 	-rm -f src/Grid.lo
 	-rm -f src/LatLonBox.$(OBJEXT)
 	-rm -f src/LatLonBox.lo
-	-rm -f src/Mainp.$(OBJEXT)
 	-rm -f src/Mask.$(OBJEXT)
 	-rm -f src/Mask.lo
 	-rm -f src/MaskMap.$(OBJEXT)
@@ -1096,6 +1101,8 @@ mostlyclean-compile:
 	-rm -f src/Memory.lo
 	-rm -f src/Pack.$(OBJEXT)
 	-rm -f src/Pack.lo
+	-rm -f src/PgboCommands.$(OBJEXT)
+	-rm -f src/PgboCommands.lo
 	-rm -f src/Pnetcdf.$(OBJEXT)
 	-rm -f src/Pnetcdf.lo
 	-rm -f src/PnetcdfAttribute.$(OBJEXT)
@@ -1126,6 +1133,7 @@ mostlyclean-compile:
 	-rm -f src/VariableDecorator.lo
 	-rm -f src/gax.$(OBJEXT)
 	-rm -f src/gax.lo
+	-rm -f src/pgbo.$(OBJEXT)
 	-rm -f src/pgdump.$(OBJEXT)
 	-rm -f src/pgsub.$(OBJEXT)
 	-rm -f tests/TestArray.$(OBJEXT)
@@ -1187,16 +1195,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/FileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GenericAttribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GenericCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GeoGrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/LatLonBox.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mainp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/MaskMap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgboCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pnetcdf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfAttribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfDataset.Plo@am__quote@
@@ -1212,6 +1221,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Variable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/VariableDecorator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgbo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgdump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgsub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestArray.Po@am__quote@

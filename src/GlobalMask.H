@@ -76,6 +76,13 @@ class GlobalMask :  public Mask
         virtual void* gather(vector<int64_t> &subscripts) const;
 
         virtual Array* add(const Array *rhs) const;
+        virtual Array* sub(const Array *rhs) const;
+        virtual Array* mul(const Array *rhs) const;
+        virtual Array* div(const Array *rhs) const;
+        virtual Array* iadd(const Array *rhs);
+        virtual Array* isub(const Array *rhs);
+        virtual Array* imul(const Array *rhs);
+        virtual Array* idiv(const Array *rhs);
 
         // shared virtuals
         virtual ostream& print(ostream &os) const;

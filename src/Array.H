@@ -329,10 +329,90 @@ class Array
         /**
          * Adds two Arrays.
          *
-         * If the given Array has fewer Dimensions, but the Dimensions are the
-         * same size as this Array, the given Array is "broadcast" to fit.
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to add
+         * @return the result, as a new Array
          */
         virtual Array* add(const Array *rhs) const = 0;
+
+        /**
+         * Adds two Arrays, in-place.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to add
+         * @return the result, as this Array
+         */
+        virtual Array* iadd(const Array *rhs) = 0;
+
+        /**
+         * Subtracts two Arrays.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to subtract
+         * @return the result, as a new Array
+         */
+        virtual Array* sub(const Array *rhs) const = 0;
+
+        /**
+         * Subtracts two Arrays, in-place.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to subtract
+         * @return the result, as this Array
+         */
+        virtual Array* isub(const Array *rhs) = 0;
+
+        /**
+         * Multiplies two Arrays.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to multiply
+         * @return the result, as a new Array
+         */
+        virtual Array* mul(const Array *rhs) const = 0;
+
+        /**
+         * Multiplies two Arrays, in-place.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to multiply
+         * @return the result, as this Array
+         */
+        virtual Array* imul(const Array *rhs) = 0;
+
+        /**
+         * Divides two Arrays.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to divide
+         * @return the result, as a new Array
+         */
+        virtual Array* div(const Array *rhs) const = 0;
+
+        /**
+         * Divides two Arrays, in-place.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to divide
+         * @return the result, as this Array
+         */
+        virtual Array* idiv(const Array *rhs) = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Array *array);

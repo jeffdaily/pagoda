@@ -616,6 +616,86 @@ Array* GlobalArray::add(const Array *rhs) const
 }
 
 
+Array* GlobalArray::iadd(const Array *rhs)
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        (*this) += *array;
+        return this;
+    }
+    ERR("not implemented GlobalArray::iadd(Array*) of differing Array implementations");
+}
+
+
+Array* GlobalArray::sub(const Array *rhs) const
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) -= *array;
+        return self_copy;
+    }
+    ERR("not implemented GlobalArray::sub(Array*) of differing Array implementations");
+}
+
+
+Array* GlobalArray::isub(const Array *rhs)
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        (*this) -= *array;
+        return this;
+    }
+    ERR("not implemented GlobalArray::isub(Array*) of differing Array implementations");
+}
+
+
+Array* GlobalArray::mul(const Array *rhs) const
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) *= *array;
+        return self_copy;
+    }
+    ERR("not implemented GlobalArray::mul(Array*) of differing Array implementations");
+}
+
+
+Array* GlobalArray::imul(const Array *rhs)
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        (*this) *= *array;
+        return this;
+    }
+    ERR("not implemented GlobalArray::imul(Array*) of differing Array implementations");
+}
+
+
+Array* GlobalArray::div(const Array *rhs) const
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) /= *array;
+        return self_copy;
+    }
+    ERR("not implemented GlobalArray::div(Array*) of differing Array implementations");
+}
+
+
+Array* GlobalArray::idiv(const Array *rhs)
+{
+    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
+    if (array) {
+        (*this) /= *array;
+        return this;
+    }
+    ERR("not implemented GlobalArray::idiv(Array*) of differing Array implementations");
+}
+
+
 ostream& GlobalArray::print(ostream &os) const
 {
     os << "GlobalArray";

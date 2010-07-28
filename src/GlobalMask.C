@@ -534,6 +534,48 @@ Array* GlobalMask::add(const Array *rhs) const
 }
 
 
+Array* GlobalMask::iadd(const Array *rhs)
+{
+    return mask->iadd(rhs);
+}
+
+
+Array* GlobalMask::sub(const Array *rhs) const
+{
+    return mask->sub(rhs);
+}
+
+
+Array* GlobalMask::isub(const Array *rhs)
+{
+    return mask->isub(rhs);
+}
+
+
+Array* GlobalMask::mul(const Array *rhs) const
+{
+    return mask->mul(rhs);
+}
+
+
+Array* GlobalMask::imul(const Array *rhs)
+{
+    return mask->imul(rhs);
+}
+
+
+Array* GlobalMask::div(const Array *rhs) const
+{
+    return mask->div(rhs);
+}
+
+
+Array* GlobalMask::idiv(const Array *rhs)
+{
+    return mask->idiv(rhs);
+}
+
+
 ostream& GlobalMask::print(ostream &os) const
 {
     os << "GlobalMask";

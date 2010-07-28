@@ -61,7 +61,10 @@ CommandLineOption CommandLineOption::JOIN(
         "dimension   join all input files on the given dimension");
 CommandLineOption CommandLineOption::UNION(
         'u', "union", false,
-        "dimension   take the union of all input files");
+        "take the union of all input files");
+CommandLineOption CommandLineOption::OP_TYPE(
+        'y', "op_typ", true,
+        "Binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
 
 
 CommandLineOption::CommandLineOption(const int &value, const string &name,
