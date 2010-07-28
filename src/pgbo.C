@@ -58,6 +58,13 @@ int main(int argc, char **argv)
         pagoda::initialize(&argc, &argv);
 
         cmd.parse(argc,argv);
+
+        if (cmd.get_help()) {
+            pagoda::print_zero(cmd.get_usage());
+            pagoda::finalize();
+            return EXIT_SUCCESS;
+        }
+
         dataset = cmd.get_dataset();
         operand = cmd.get_operand();
         op_type = cmd.get_operator();

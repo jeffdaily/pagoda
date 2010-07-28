@@ -36,6 +36,7 @@ GenericCommands::GenericCommands()
     ,   process_coords(true)
     ,   modify_history(true)
     ,   process_topology(true)
+    ,   help(false)
     ,   slices()
     ,   boxes()
 {
@@ -57,6 +58,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   process_coords(true)
     ,   modify_history(true)
     ,   process_topology(true)
+    ,   help(false)
     ,   slices()
     ,   boxes()
 {
@@ -68,6 +70,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
 
 void GenericCommands::init()
 {
+    parser.push_back(&CommandLineOption::HELP);
     parser.push_back(&CommandLineOption::OUTPUT);
     parser.push_back(&CommandLineOption::AUXILIARY);
     parser.push_back(&CommandLineOption::LATLONBOX);
@@ -103,6 +106,11 @@ void GenericCommands::parse(int argc, char **argv)
     }
     parser.parse(argc,argv);
     positional_arguments = parser.get_positional_arguments();
+
+    if (parser.count("help")) {
+        help = true;
+        return; // stop parsing
+    }
 
     if (positional_arguments.empty()) {
         ERR("input and output file arguments required");
@@ -503,4 +511,16 @@ bool GenericCommands::get_process_coords() const
 bool GenericCommands::get_modify_history() const
 {
     return modify_history;
+}
+
+
+bool GenericCommands::get_help() const
+{
+    return help;
+}
+
+
+string GenericCommands::get_usage() const
+{
+    return parser.get_usage();
 }

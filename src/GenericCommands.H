@@ -13,8 +13,7 @@ using std::set;
 using std::string;
 using std::vector;
 
-class Attribute;
-class Dataset;
+class Attribute; class Dataset;
 class Dimension;
 class FileWriter;
 class Variable;
@@ -49,6 +48,8 @@ class GenericCommands
         bool get_all_coords() const;
         bool get_process_coords() const;
         bool get_modify_history() const;
+        bool get_help() const;
+        string get_usage()  const;
 
     protected:
         void init();
@@ -65,6 +66,7 @@ class GenericCommands
         bool process_coords;
         bool modify_history;
         bool process_topology;
+        bool help;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
 };
