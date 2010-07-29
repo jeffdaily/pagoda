@@ -146,11 +146,12 @@ bool Array::broadcast_check(const Array *rhs) const
         return false;
     }
 
-    for (rhs_it=rhs_shape.rbegin(),my_it=my_shape.rbegin();
-            rhs_it!=rhs_shape.rend(); ++rhs_it,++my_it) {
-        if (*my_it != *rhs_it) {
-            return false;
-        }
+    while (my_shape.size() != rhs_shape.size()) {
+        my_shape.erase(my_shape.begin());
+    }
+
+    if (my_shape != rhs_shape) {
+        return false;
     }
 
     return true;

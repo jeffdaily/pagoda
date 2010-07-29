@@ -64,15 +64,11 @@ string vec_to_string(
 }
 
 #if defined(DEBUG) || defined(TRACE)
-#   define     DEBUG_ZERO pagoda::print_zero
-#   define     DEBUG_SYNC pagoda::print_sync
-#   define VEC_DEBUG_ZERO pagoda::vec_print_zero
-#   define VEC_DEBUG_SYNC pagoda::vec_print_sync
+#   define DEBUG_ZERO pagoda::print_zero
+#   define DEBUG_SYNC pagoda::print_sync
 #else
-#   define     DEBUG_ZERO pagoda::print_zero_dummy
-#   define     DEBUG_SYNC pagoda::print_sync_dummy
-#   define VEC_DEBUG_ZERO pagoda::vec_print_zero_dummy
-#   define VEC_DEBUG_SYNC pagoda::vec_print_sync_dummy
+#   define DEBUG_ZERO pagoda::print_zero_dummy
+#   define DEBUG_SYNC pagoda::print_sync_dummy
 #endif
 
 #ifdef TRACE

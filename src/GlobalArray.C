@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <algorithm>
 #include <sstream>
 #include <typeinfo>
 
@@ -380,13 +381,49 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
         casted = &that;
     }
 
-    if (shape == that.shape) {
+    if (shape == casted->get_shape()) {
 #define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             t alpha = 1, beta = 1; \
             GA_Add(&alpha, handle, &beta, casted->handle, handle); \
         } else
 #include "GlobalArray.def"
+    } else if (broadcast_check(casted)) {
+        // shape mismatch, but broadcastable
+        vector<int64_t> my_shape = shape;
+        vector<int64_t> that_shape = casted->get_shape();
+        vector<int64_t> broadcast_shape(my_shape.begin(),
+                my_shape.begin()+(my_shape.size()-that_shape.size()));
+        int64_t size = pagoda::shape_to_size(broadcast_shape);
+        vector<int64_t> my_lo(my_shape.size(), 0);
+        vector<int64_t> my_hi(my_shape);
+        vector<int64_t> that_lo(that_shape.size(), 0);
+        vector<int64_t> that_hi = that_shape;
+
+        for (size_t i=0; i<my_hi.size(); ++i) {
+            my_hi[i] -= 1;
+        }
+        for (size_t i=0; i<that_hi.size(); ++i) {
+            that_hi[i] -= 1;
+        }
+        for (int64_t i=0; i<size; ++i) {
+            vector<int64_t> front = pagoda::unravel_index(i,broadcast_shape);
+            std::copy(front.begin(), front.end(), my_lo.begin());
+            std::copy(front.begin(), front.end(), my_hi.begin());
+            DEBUG_SYNC("  my_lo=" + pagoda::vec_to_string(my_lo) + "\n");
+            DEBUG_SYNC("  my_hi=" + pagoda::vec_to_string(my_hi) + "\n");
+            DEBUG_SYNC("that_lo=" + pagoda::vec_to_string(that_lo) + "\n");
+            DEBUG_SYNC("that_hi=" + pagoda::vec_to_string(that_hi) + "\n");
+#define GATYPE_EXPAND(mt,t) \
+            if (type == mt) { \
+                t alpha = 1, beta = 1; \
+                NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
+                        &beta, casted->handle, &that_lo[0], &that_hi[0], \
+                        handle, &my_lo[0], &my_hi[0]); \
+            } else
+#include "GlobalArray.def"
+        }
+
     } else {
         ERR("shape mismatch");
     }
