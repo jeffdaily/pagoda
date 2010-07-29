@@ -6,6 +6,10 @@
 #include <unistd.h>
 
 #include "CommandLineOption.H"
+#include "Util.H"
+
+
+int CommandLineOption::WIDTH(20);
 
 
 CommandLineOption CommandLineOption::HELP(
@@ -149,17 +153,40 @@ bool CommandLineOption::handle(int value, const string &arg, const string &name)
 string CommandLineOption::get_usage() const
 {
     // this needs fixing, see boost program options
-    string left;
+    string space(WIDTH, ' ');
+    string usage;
+    vector<string> parts = pagoda::split(_description);
+    int length = 0;
     if ((_value >= 'A' && _value <= 'Z')
             || (_value >= 'a' && _value <= 'z')
             || (_value >= '0' && _value <= '9')) {
-        left += '-';
-        left += char(_value);
-        left += ",";
+        usage += '-';
+        usage += char(_value);
+        usage += ", ";
     }
-    left += "--" + _name;
+    usage += "--" + _name;
 
-    return left + "\t" + _description;
+    if (usage.size() >= WIDTH) {
+        usage += "\n";
+        usage += space;
+    } else {
+        while (usage.size() < WIDTH) {
+            usage += " ";
+        }
+    }
+
+    for (size_t i=0,limit=parts.size(); i<limit; ++i) {
+        if ((parts[i].size() + length) > (80 - WIDTH)) {
+            usage += "\n";
+            usage += space;
+            length = 0;
+        }
+        usage += " ";
+        usage += parts[i];
+        length += 1 + parts[i].size();
+    }
+
+    return usage;
 }
 
 

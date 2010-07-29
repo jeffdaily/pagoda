@@ -11,6 +11,8 @@ using std::vector;
 class CommandLineOption
 {
     public:
+        static int WIDTH;
+
         CommandLineOption(const int &value, const string &name,
                 const bool &argument, const string &description);
         virtual ~CommandLineOption();
