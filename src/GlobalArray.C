@@ -29,7 +29,7 @@ static bool less_than(InputIterator1 first1, InputIterator1 last1, Value value)
 
 
 template <class InputIterator1, class InputIterator2>
-static void cast(InputIterator1 first, InputIterator1 last, InputIterator2 result)
+static void copy_cast(InputIterator1 first, InputIterator1 last, InputIterator2 result)
 {
     while (first!=last) {
         *result++ = *first++;
@@ -175,18 +175,32 @@ void GlobalArray::fill(void *value)
 
 void GlobalArray::copy(const Array *src)
 {
-    if (typeid(*src) == typeid(*this)) {
+    const GlobalArray *ga_src = dynamic_cast<const GlobalArray*>(src);
+    if (type != src->get_type()) {
+        ERR("arrays must be same type");
+    }
+    if (shape != src->get_shape()) {
+        ERR("arrays must be same shape");
+    }
+    if (ga_src && GA_Compare_distr(handle, ga_src->handle) == 0) {
         if (is_scalar()) {
 #define DATATYPE_EXPAND(DT,T) \
             if (DT == type) { \
-                *((T*)scalar) = *((T*)(((GlobalArray*)src)->scalar)); \
+                *((T*)scalar) = *((T*)(((GlobalArray*)ga_src)->scalar)); \
             } else
 #include "DataType.def"
         } else {
-            GA_Copy(((GlobalArray*)src)->handle, handle);
+            GA_Copy(((GlobalArray*)ga_src)->handle, handle);
+        }
+    } else {
+        // idea is that each process accesses local data and get()s the passed
+        // in array's data into those buffers.
+        if (owns_data()) {
+            void *data = access();
+            src->get(data, lo, hi);
+            release_update();
         }
     }
-    ERR("not implemented: GlobalArray::copy(Array*) of differing Array implementations");
 }
 
 
@@ -231,29 +245,30 @@ ostream& operator << (ostream &os, const GlobalArray &array)
 }
 
 
-GlobalArray& GlobalArray::operator=(const GlobalArray &that)
+GlobalArray* GlobalArray::cast(DataType new_type) const
 {
-    if (this == &that) {
-        return *this;
-    }
+    GlobalArray *dst_array;
 
-    if (type == that.type && shape == that.shape) {
+    if (type == new_type) {
         // distributions are assumed to be identical
-        GA_Copy(that.handle, handle);
-    } else if (shape == that.shape) {
+        dst_array = new GlobalArray(*this);
+    } else {
         // distributions are assumed to be identical
         // types are different, so this is a cast
+        dst_array = new GlobalArray(new_type, shape);
         if (owns_data()) {
+            vector<int64_t> clo = lo;
+            vector<int64_t> chi = hi;
             vector<int64_t> ld(lo.size());
-            void *this_data;
-            void *that_data;
-            NGA_Access64(handle,      &lo[0], &hi[0], &this_data, &ld[0]);
-            NGA_Access64(that.handle, &lo[0], &hi[0], &that_data, &ld[0]);
+            void *src_data;
+            void *dst_data;
+            NGA_Access64(handle,           &clo[0], &chi[0], &src_data, &ld[0]);
+            NGA_Access64(dst_array->handle,&clo[0], &chi[0], &dst_data, &ld[0]);
 #define cast_helper(src_mt,src_t,dst_mt,dst_t) \
-            if (type == dst_mt && that.type == src_mt) { \
-                dst_t *dst = (dst_t*)this_data; \
-                src_t *src = (src_t*)that_data; \
-                cast(dst,dst+get_size(),src); \
+            if (type == src_mt && dst_array->type == dst_mt) { \
+                src_t *src = (src_t*)src_data; \
+                dst_t *dst = (dst_t*)dst_data; \
+                copy_cast(src,src+get_size(),dst); \
             } else
             cast_helper(MT_C_INT,     int,        MT_C_INT,int)
             cast_helper(MT_C_LONGINT, long,       MT_C_INT,int)
@@ -295,13 +310,52 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
                 ERR("Types not recognized for cast");
             }
 #undef cast_helper
-            NGA_Release64(that.handle, &lo[0], &hi[0]);
-            NGA_Release_update64(handle, &lo[0], &hi[0]);
+            NGA_Release64(handle,                   &clo[0], &chi[0]);
+            NGA_Release_update64(dst_array->handle, &clo[0], &chi[0]);
         } else {
             // we don't own any of the data, do nothing
         }
+    }
+
+    return dst_array;
+}
+
+
+GlobalArray& GlobalArray::operator=(const GlobalArray &that)
+{
+    if (this == &that) {
+        return *this;
+    }
+
+    if (handle == 0) {
+        GA_Destroy(handle);
+    }
+
+    if (is_scalar()) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            delete ((T*)scalar); \
+        } else
+#include "DataType.def"
+    }
+
+    handle = 0;
+    type = that.type;
+    shape = that.shape;
+    lo = that.lo;
+    hi = that.hi;
+    scalar = NULL;
+
+    if (that.is_scalar()) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            scalar = (void*)(new T); \
+            *((T*)scalar) = *((T*)(that.scalar)); \
+        } else
+#include "DataType.def"
     } else {
-        ERR("shape mismatch");
+        handle = GA_Duplicate(that.handle, "noname");
+        GA_Copy(that.handle,handle);
     }
 
     return *this;
@@ -318,27 +372,27 @@ GlobalArray GlobalArray::operator+(const GlobalArray &that)
 
 GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
 {
-    if (type == that.type && shape == that.shape) {
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            t alpha = 1, beta = 1; \
-            GA_Add(&alpha, handle, &beta, that.handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else if (shape == that.shape) {
-        // we must cast to same type before operation
-        GlobalArray casted(type, shape);
-        casted = that;
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            t alpha = 1, beta = 1; \
-            GA_Add(&alpha, handle, &beta, casted.handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else if (broadcast_check(&that)) {
+    const GlobalArray *casted;
 
+    if (type != that.type) {
+        casted = that.cast(type);
+    } else {
+        casted = &that;
+    }
+
+    if (shape == that.shape) {
+#define GATYPE_EXPAND(mt,t) \
+        if (type == mt) { \
+            t alpha = 1, beta = 1; \
+            GA_Add(&alpha, handle, &beta, casted->handle, handle); \
+        } else
+#include "GlobalArray.def"
     } else {
         ERR("shape mismatch");
+    }
+
+    if (casted != &that) {
+        delete casted;
     }
 
     return *this;
@@ -355,25 +409,27 @@ GlobalArray GlobalArray::operator-(const GlobalArray &that)
 
 GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
 {
-    if (type == that.type && shape == that.shape) {
+    const GlobalArray *casted;
+
+    if (type != that.type) {
+        casted = that.cast(type);
+    } else {
+        casted = &that;
+    }
+
+    if (shape == that.shape) {
 #define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
             t alpha = 1, beta = -1; \
-            GA_Add(&alpha, handle, &beta, that.handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else if (shape == that.shape) {
-        // we must cast to same type before operation
-        GlobalArray casted(type, shape);
-        casted = that;
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            t alpha = 1, beta = -1; \
-            GA_Add(&alpha, handle, &beta, casted.handle, handle); \
+            GA_Add(&alpha, handle, &beta, casted->handle, handle); \
         } else
 #include "GlobalArray.def"
     } else {
         ERR("shape mismatch");
+    }
+
+    if (casted != &that) {
+        delete casted;
     }
 
     return *this;
@@ -390,23 +446,26 @@ GlobalArray GlobalArray::operator*(const GlobalArray &that)
 
 GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
 {
-    if (type == that.type && shape == that.shape) {
+    const GlobalArray *casted;
+
+    if (type != that.type) {
+        casted = that.cast(type);
+    } else {
+        casted = &that;
+    }
+
+    if (shape == that.shape) {
 #define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
-            GA_Elem_multiply(handle, that.handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else if (shape == that.shape) {
-        // we must cast to same type before operation
-        GlobalArray casted(type, shape);
-        casted = that;
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            GA_Elem_multiply(handle, casted.handle, handle); \
+            GA_Elem_multiply(handle, casted->handle, handle); \
         } else
 #include "GlobalArray.def"
     } else {
         ERR("shape mismatch");
+    }
+
+    if (casted != &that) {
+        delete casted;
     }
 
     return *this;
@@ -423,23 +482,26 @@ GlobalArray GlobalArray::operator/(const GlobalArray &that)
 
 GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
 {
-    if (type == that.type && shape == that.shape) {
+    const GlobalArray *casted;
+
+    if (type != that.type) {
+        casted = that.cast(type);
+    } else {
+        casted = &that;
+    }
+
+    if (shape == that.shape) {
 #define GATYPE_EXPAND(mt,t) \
         if (type == mt) { \
-            GA_Elem_divide(handle, that.handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else if (shape == that.shape) {
-        // we must cast to same type before operation
-        GlobalArray casted(type, shape);
-        casted = that;
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            GA_Elem_divide(handle, casted.handle, handle); \
+            GA_Elem_divide(handle, casted->handle, handle); \
         } else
 #include "GlobalArray.def"
     } else {
         ERR("shape mismatch");
+    }
+
+    if (casted != &that) {
+        delete casted;
     }
 
     return *this;

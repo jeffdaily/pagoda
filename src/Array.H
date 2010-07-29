@@ -105,7 +105,7 @@ class Array
         /**
          * Copies all elements from the given Array into this Array.
          * 
-         * The arrays must be the same type, shape, and identically aligned.
+         * The arrays must be the same type and shape.
          *
          * @param[in] src the Array to copy
          */

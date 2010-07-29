@@ -67,6 +67,8 @@ class GlobalArray : public Array
 
         virtual void dump() const;
 
+        GlobalArray* cast(DataType type) const;
+
         GlobalArray& operator=(const GlobalArray &that);
 
         GlobalArray operator+(const GlobalArray &that);
