@@ -1,10 +1,48 @@
-The subsetter uses autoconf/automake/libtool to build and has dependencies on Global Arrays and pnetcdf.
+PARALLEL ANALYSIS OF GEODESIC DATA
+**********************************
 
---- BUILDING GLOBAL ARRAYS ----------------------------------------------------
-If you "module load ga" on systems that use modules e.g. franklin you should see the recommended LIBS and INCLUDES variables for GA which should be used later used as GA_LIBS and GA_INCS in the configure script invocation.  Otherwise, if you were to build your own GA, the last lines output by their makefile contain the LIBS and INCLUDES that should then be saved  in your environment as GA_LIBS and GA_INCS, respectively.  I usually build my own GA on any system I'm using so that I know what I'm getting.
+FOR THE IMPATIENT
+=================
 
---- BUILDING GLOBAL ARRAYS -- franklin.nersc.gov ------------------------------
-I'm not using the provided GA on franklin.  The env vars I use to build GA are as follows:
+The command::
+
+    ./configure && make && make install
+
+should compile the static library libpagoda.a and the programs pgsub and pgbo
+and install them into /usr/local.  Please refer to the INSTALL file for
+generic build instructions.  That would be a good place to start if you are
+new to using configure scripts.  Detailed instructions are covered later in
+this file.
+
+QUESTIONS/HELP/SUPPORT/BUG-REPORTS
+==================================
+
+email: jeff.daily@pnl.gov
+
+DEPENDENCIES
+============
+
+The subsetter uses autoconf/automake/libtool to build and has dependencies on
+Global Arrays (http://www.emsl.pnl.gov/docs/global/) and parallel netcdf
+(http://trac.mcs.anl.gov/projects/parallel-netcdf/).
+
+GLOBAL ARRAYS (GA)
+------------------
+At the time of pagoda's initial releases, GA transitioned to using configure
+and a single library (libga) for version 5.0.  Prior to 5.0, building GA
+involved knowing your "TARGET" system and produced as many as five separate
+yet dependent libraries (liblinalg, libma, libglobal, libarmci, libpario,
+libtcgmsg, libtcgmsg-mpi).  pagoda's configure system attempts to locate libga
+first and then the other libraries as needed.
+
+Please refer to GA's own documentation for how to build it, usually located
+within their releases' README files.
+
+BUILDING GLOBAL ARRAYS 4.3.x on franklin.nersc.gov
+--------------------------------------------------
+I'm not using the provided GA 4.x.x on franklin (e.g. module load ga).  The
+environment variables I use to build GA 4.3.x are as follows:
+
 setenv TARGET LINUX64
 setenv MSG_COMMS MPI
 setenv ARMCI_NETWORK PORTALS
@@ -14,26 +52,87 @@ setenv F77 ftn
 setenv FC ftn
 setenv XT_SYMMETRIC_HEAP_SIZE 1G
 setenv MA_USE_ARMCI_MEM 1
-setenv COMM_LIBS /u0/m/manoj/libportals.a
 setenv CRAY_PORTALS_USE_BLOCKING_POLL 1
 
-With the above, you should be able to simply "make" GA.  The latter two env vars are important because apparently the portals version on franklin isn't up-to-date (?) so one of my colleagues pointed me to their own version of the portals library, and the last one toggles a feature of GA necessary on portals systems or else global operations within GA will crawl.
+With the above, you should be able to simply "make" GA.  The latter
+environment variable is important, apparently, because it toggles a feature of
+GA necessary on portals systems or else global operations within GA will
+crawl.
 
---- BUILDING SUBSETTER --------------------------------------------------------
-To build the "subsetter", salt to taste the following (note the "SEE_ABOVE" refers to GA_LIBS/GA_INCS talked about in the opening paragraph of this README):
-./configure GA_LIBS=$SEE_ABOVE GA_INCS=$SEE_ABOVE --with-pnetcdf=$PATH_TO_PNETCDF_DIR
+BUILDING PAGODA
+===============
 
---- RUNNING SUBSETTER ---------------------------------------------------------
-The subsetter takes command line arguments.  The usage screen is as follows:
+Salt to taste the following.  Note that I do prefer to add --prefix=`pwd` to
+my own development configurations::
 
-Usage: subsetter [options] infile1 [infile2 ...] output_filename
+    mkdir bld
+    cd bld
+    ../configure --with-pnetcdf=/path/to/pnetcdf/install --with-ga=/path/to/ga5.x/install
+    #### OR ####
+    ../configure --with-pnetcdf=/path/to/pnetcdf/install --with-ga="-L/path/to/ga4.x/lib/TARGET -I/path/to/ga4.x/include"
 
-Generic options:
--h                                 produce this usage statement
--b box north,south,east,west       limits in degrees
--d dimension,start[,stop[,step]]   as integer indices
--j name                            name of dim to join on
+By now you should be able to "make".  The "make check" target will currently
+only build all test programs.  There is currently no test suite nor are there
+any sample input files.
 
-Specify a bounding box representing the subset as indicated.  The values themselves may be in floating point or integer notation e.g. "-b 20.0,-20.0,170,150" (note the lack of spaces).  If multiple input files are placed on the command line, a "union" aggregation will occur.  If you use the "-j" argument in addition to placing multiple input files, it will perform a "join existing" aggregation.  See NcML aggregation documentation for details (http://www.unidata.ucar.edu/software/netcdf/ncml/v2.2/Aggregation.html).  The aggregation capability is not as extensively tested as running a single input file.
+RUNNING PAGODA
+==============
+
+SUBSETTER (pgsub)
+-----------------
+The subsetter (pgsub) takes command line options and filename arguments.  The
+help screen is as follows::
+    
+    Usage: pgsub [options] infile1 [infile2 ...] output
+    
+    -h, --help           print this usage information and exit
+    -o, --output         output file name (or use last positional argument)
+    -X, --auxiliary      lon_min,lon_max,lat_min,lat_max auxiliary coordinate
+                         bounding box
+    -b, --box            north,south,east,west lat/lon bounding box
+    -d, --dimension      dim[,min[,max[,stride]]]
+    -v, --variable       var1[,var2[,...]] variable(s) to process
+    -x, --exclude        extract all variables EXCEPT those specified with -v
+    -a, --alphabetize    disable alphabetization of extracted variables
+    -c, --coords         all coordinate variables will be processed
+    -C, --no-coords      associated coordinate variables should not be processed
+    -j, --join           dimension join all input files on the given dimension
+    -u, --union          take the union of all input files
+
+Specify a bounding box representing the subset as indicated.  The values
+themselves may be in floating point or integer notation e.g.
+"-b 20.0,-20.0,170,150" (note the lack of spaces).  If multiple input files are
+placed on the command line, a "union" aggregation will occur.  If you use the
+"-j" argument in addition to placing multiple input files, it will perform a
+"join existing" aggregation.  See NcML aggregation documentation for details
+(http://www.unidata.ucar.edu/software/netcdf/ncml/v2.2/Aggregation.html).  The
+aggregation capability is not as extensively tested as running a single input
+file.
 
 NOTE: The famous "MJO" region is "-b 20,-20,170,150"
+
+BINARY OPERATOR (pgbo)
+----------------------
+The binary operator (pgsub) takes command line options and filename arguments.
+The help screen is as follows::
+
+    Usage: pgsub infile1 infile2 output
+    
+    -h, --help           print this usage information and exit
+    -o, --output         output file name (or use last positional argument)
+    -X, --auxiliary      lon_min,lon_max,lat_min,lat_max auxiliary coordinate
+                         bounding box
+    -b, --box            north,south,east,west lat/lon bounding box
+    -d, --dimension      dim[,min[,max[,stride]]]
+    -v, --variable       var1[,var2[,...]] variable(s) to process
+    -x, --exclude        extract all variables EXCEPT those specified with -v
+    -a, --alphabetize    disable alphabetization of extracted variables
+    -c, --coords         all coordinate variables will be processed
+    -C, --no-coords      associated coordinate variables should not be processed
+    -j, --join           dimension join all input files on the given dimension
+    -u, --union          take the union of all input files
+    -h, --history        do not append to 'history' global attribute
+    -y, --op_typ         Binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)
+
+Notice the additional "op_typ" argument.  Also notice that aggregation is not
+supported.  Otherwise it operates similarly to the subsetter.
