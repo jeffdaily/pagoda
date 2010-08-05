@@ -363,6 +363,32 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
 }
 
 
+void GlobalArray::operate_add(int that_handle)
+{
+#define GATYPE_EXPAND(mt,t) \
+    if (type == mt) { \
+        t alpha = 1, beta = 1; \
+        GA_Add(&alpha, handle, &beta, that_handle, handle); \
+    } else
+#include "GlobalArray.def"
+}
+
+
+void GlobalArray::operate_add_patch(int that_handle,
+        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+{
+#define GATYPE_EXPAND(mt,t) \
+    if (type == mt) { \
+        t alpha = 1, beta = 1; \
+        NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
+                &beta, that_handle, &that_lo[0], &that_hi[0], \
+                handle, &my_lo[0], &my_hi[0]); \
+    } else
+#include "GlobalArray.def"
+}
+
+
 GlobalArray GlobalArray::operator+(const GlobalArray &that)
 {
     GlobalArray ret(*this);
@@ -373,6 +399,119 @@ GlobalArray GlobalArray::operator+(const GlobalArray &that)
 
 GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
 {
+    operate(that, &GlobalArray::operate_add, &GlobalArray::operate_add_patch);
+    return *this;
+}
+
+
+void GlobalArray::operate_sub(int that_handle)
+{
+#define GATYPE_EXPAND(mt,t) \
+    if (type == mt) { \
+        t alpha = 1, beta = -1; \
+        GA_Add(&alpha, handle, &beta, that_handle, handle); \
+    } else
+#include "GlobalArray.def"
+}
+
+
+void GlobalArray::operate_sub_patch(int that_handle,
+        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+{
+#define GATYPE_EXPAND(mt,t) \
+    if (type == mt) { \
+        t alpha = 1, beta = -1; \
+        NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
+                &beta, that_handle, &that_lo[0], &that_hi[0], \
+                handle, &my_lo[0], &my_hi[0]); \
+    } else
+#include "GlobalArray.def"
+}
+
+
+GlobalArray GlobalArray::operator-(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret -= that;
+    return ret;
+}
+
+
+GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
+{
+    operate(that, &GlobalArray::operate_sub, &GlobalArray::operate_sub_patch);
+    return *this;
+}
+
+
+void GlobalArray::operate_mul(int that_handle)
+{
+    GA_Elem_multiply(handle, that_handle, handle);
+}
+
+
+void GlobalArray::operate_mul_patch(int that_handle,
+        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+{
+    GA_Elem_multiply_patch64(
+            handle, &my_lo[0], &my_hi[0],
+            that_handle, &that_lo[0], &that_hi[0],
+            handle, &my_lo[0], &my_hi[0]);
+}
+
+
+GlobalArray GlobalArray::operator*(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret *= that;
+    return ret;
+}
+
+
+GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
+{
+    operate(that, &GlobalArray::operate_mul, &GlobalArray::operate_mul_patch);
+    return *this;
+}
+
+
+void GlobalArray::operate_div(int that_handle)
+{
+    GA_Elem_divide(handle, that_handle, handle);
+}
+
+
+void GlobalArray::operate_div_patch(int that_handle,
+        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+{
+    GA_Elem_divide_patch64(
+            handle, &my_lo[0], &my_hi[0],
+            that_handle, &that_lo[0], &that_hi[0],
+            handle, &my_lo[0], &my_hi[0]);
+}
+
+
+GlobalArray GlobalArray::operator/(const GlobalArray &that)
+{
+    GlobalArray ret(*this);
+    ret /= that;
+    return ret;
+}
+
+
+GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
+{
+    operate(that, &GlobalArray::operate_div, &GlobalArray::operate_div_patch);
+    return *this;
+}
+
+
+void GlobalArray::operate(const GlobalArray &that,
+        GA_op_whole op_whole, GA_op_patch op_patch)
+{
     const GlobalArray *casted;
 
     if (type != that.type) {
@@ -382,12 +521,7 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
     }
 
     if (shape == casted->get_shape()) {
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            t alpha = 1, beta = 1; \
-            GA_Add(&alpha, handle, &beta, casted->handle, handle); \
-        } else
-#include "GlobalArray.def"
+        (this->*op_whole)(casted->handle);
     } else if (broadcast_check(casted)) {
         // shape mismatch, but broadcastable
         vector<int64_t> my_shape = shape;
@@ -414,16 +548,8 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
             DEBUG_SYNC("  my_hi=" + pagoda::vec_to_string(my_hi) + "\n");
             DEBUG_SYNC("that_lo=" + pagoda::vec_to_string(that_lo) + "\n");
             DEBUG_SYNC("that_hi=" + pagoda::vec_to_string(that_hi) + "\n");
-#define GATYPE_EXPAND(mt,t) \
-            if (type == mt) { \
-                t alpha = 1, beta = 1; \
-                NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
-                        &beta, casted->handle, &that_lo[0], &that_hi[0], \
-                        handle, &my_lo[0], &my_hi[0]); \
-            } else
-#include "GlobalArray.def"
+            (this->*op_patch)(casted->handle, my_lo, my_hi, that_lo, that_hi);
         }
-
     } else {
         ERR("shape mismatch");
     }
@@ -431,117 +557,6 @@ GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
     if (casted != &that) {
         delete casted;
     }
-
-    return *this;
-}
-
-
-GlobalArray GlobalArray::operator-(const GlobalArray &that)
-{
-    GlobalArray ret(*this);
-    ret -= that;
-    return ret;
-}
-
-
-GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
-{
-    const GlobalArray *casted;
-
-    if (type != that.type) {
-        casted = that.cast(type);
-    } else {
-        casted = &that;
-    }
-
-    if (shape == that.shape) {
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            t alpha = 1, beta = -1; \
-            GA_Add(&alpha, handle, &beta, casted->handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else {
-        ERR("shape mismatch");
-    }
-
-    if (casted != &that) {
-        delete casted;
-    }
-
-    return *this;
-}
-
-
-GlobalArray GlobalArray::operator*(const GlobalArray &that)
-{
-    GlobalArray ret(*this);
-    ret *= that;
-    return ret;
-}
-
-
-GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
-{
-    const GlobalArray *casted;
-
-    if (type != that.type) {
-        casted = that.cast(type);
-    } else {
-        casted = &that;
-    }
-
-    if (shape == that.shape) {
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            GA_Elem_multiply(handle, casted->handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else {
-        ERR("shape mismatch");
-    }
-
-    if (casted != &that) {
-        delete casted;
-    }
-
-    return *this;
-}
-
-
-GlobalArray GlobalArray::operator/(const GlobalArray &that)
-{
-    GlobalArray ret(*this);
-    ret /= that;
-    return ret;
-}
-
-
-GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
-{
-    const GlobalArray *casted;
-
-    if (type != that.type) {
-        casted = that.cast(type);
-    } else {
-        casted = &that;
-    }
-
-    if (shape == that.shape) {
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            GA_Elem_divide(handle, casted->handle, handle); \
-        } else
-#include "GlobalArray.def"
-    } else {
-        ERR("shape mismatch");
-    }
-
-    if (casted != &that) {
-        delete casted;
-    }
-
-    return *this;
 }
 
 

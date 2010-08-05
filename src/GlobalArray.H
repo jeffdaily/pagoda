@@ -9,6 +9,11 @@
 
 using std::vector;
 
+class GlobalArray;
+typedef void (GlobalArray::*GA_op_whole)(int);
+typedef void (GlobalArray::*GA_op_patch)(int,
+        vector<int64_t>&,vector<int64_t>&, vector<int64_t>&,vector<int64_t>&);
+
 
 /**
  * An N-dimensional distributed Array based on the Global Arrays toolkit.
@@ -86,6 +91,23 @@ class GlobalArray : public Array
         void create_scalar();
         void set_distribution();
         bool is_scalar() const;
+        void operate(const GlobalArray &that, GA_op_whole, GA_op_patch);
+        void operate_add(int that_handle);
+        void operate_sub(int that_handle);
+        void operate_mul(int that_handle);
+        void operate_div(int that_handle);
+        void operate_add_patch(int that_handle,
+                vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                vector<int64_t> &that_lo, vector<int64_t> &that_hi);
+        void operate_sub_patch(int that_handle,
+                vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                vector<int64_t> &that_lo, vector<int64_t> &that_hi);
+        void operate_mul_patch(int that_handle,
+                vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                vector<int64_t> &that_lo, vector<int64_t> &that_hi);
+        void operate_div_patch(int that_handle,
+                vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                vector<int64_t> &that_lo, vector<int64_t> &that_hi);
 
         int handle;
         DataType type;
