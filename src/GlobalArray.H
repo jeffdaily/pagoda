@@ -6,6 +6,7 @@
 #include "Array.H"
 #include "DataType.H"
 #include "Dimension.H"
+#include "ScalarArray.H"
 
 using std::vector;
 
@@ -31,7 +32,12 @@ class GlobalArray : public Array
         virtual vector<int64_t> get_local_shape() const;
         virtual int64_t get_ndim() const;
 
-        virtual void fill(void *value);
+        virtual void fill(int value);
+        virtual void fill(long value);
+        virtual void fill(long long value);
+        virtual void fill(float value);
+        virtual void fill(double value);
+        virtual void fill(long double value);
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
@@ -63,6 +69,7 @@ class GlobalArray : public Array
         virtual Array* sub(const Array *rhs) const;
         virtual Array* mul(const Array *rhs) const;
         virtual Array* div(const Array *rhs) const;
+
         virtual Array* iadd(const Array *rhs);
         virtual Array* isub(const Array *rhs);
         virtual Array* imul(const Array *rhs);
@@ -76,21 +83,29 @@ class GlobalArray : public Array
 
         GlobalArray& operator=(const GlobalArray &that);
 
-        GlobalArray operator+(const GlobalArray &that);
-        GlobalArray operator-(const GlobalArray &that);
-        GlobalArray operator*(const GlobalArray &that);
-        GlobalArray operator/(const GlobalArray &that);
-
+        GlobalArray operator+(const GlobalArray &that) const;
+        GlobalArray operator+(const ScalarArray &that) const;
         GlobalArray& operator+=(const GlobalArray &that);
+        GlobalArray& operator+=(const ScalarArray &that);
+
+        GlobalArray operator-(const GlobalArray &that) const;
+        GlobalArray operator-(const ScalarArray &that) const;
         GlobalArray& operator-=(const GlobalArray &that);
+        GlobalArray& operator-=(const ScalarArray &that);
+
+        GlobalArray operator*(const GlobalArray &that) const;
+        GlobalArray operator*(const ScalarArray &that) const;
         GlobalArray& operator*=(const GlobalArray &that);
+        GlobalArray& operator*=(const ScalarArray &that);
+
+        GlobalArray operator/(const GlobalArray &that) const;
+        GlobalArray operator/(const ScalarArray &that) const;
         GlobalArray& operator/=(const GlobalArray &that);
+        GlobalArray& operator/=(const ScalarArray &that);
 
     protected:
         void create();
-        void create_scalar();
         void set_distribution();
-        bool is_scalar() const;
         void operate(const GlobalArray &that, GA_op_whole, GA_op_patch);
         void operate_add(int that_handle);
         void operate_sub(int that_handle);
@@ -114,8 +129,6 @@ class GlobalArray : public Array
         vector<int64_t> shape;
         vector<int64_t> lo;
         vector<int64_t> hi;
-
-        void *scalar;
 };
 
 #endif /* GLOBALARRAY_H_ */

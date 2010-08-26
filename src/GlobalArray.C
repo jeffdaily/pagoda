@@ -12,6 +12,7 @@
 #include "Debug.H"
 #include "Error.H"
 #include "GlobalArray.H"
+#include "ScalarArray.H"
 #include "Timing.H"
 #include "Util.H"
 
@@ -29,11 +30,11 @@ static bool less_than(InputIterator1 first1, InputIterator1 last1, Value value)
 }
 
 
-template <class InputIterator1, class InputIterator2>
+template <class T, class InputIterator1, class InputIterator2>
 static void copy_cast(InputIterator1 first, InputIterator1 last, InputIterator2 result)
 {
     while (first!=last) {
-        *result++ = *first++;
+        *result++ = static_cast<T>(*first++);
     }
 }
 
@@ -45,16 +46,6 @@ void GlobalArray::create()
 }
 
 
-void GlobalArray::create_scalar()
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        scalar = (void*)(new T); \
-    } else
-#include "DataType.def"
-}
-
-
 GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
     :   Array()
     ,   handle(0)
@@ -62,13 +53,8 @@ GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
     ,   shape(shape)
     ,   lo()
     ,   hi()
-    ,   scalar(NULL)
 {
-    if (is_scalar()) {
-        create_scalar();
-    } else {
-        create();
-    }
+    create();
 }
 
 
@@ -79,17 +65,12 @@ GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
     ,   shape()
     ,   lo()
     ,   hi()
-    ,   scalar(NULL)
 {
     for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
             it!=end; ++it) {
         shape.push_back((*it)->get_size());
     }
-    if (is_scalar()) {
-        create_scalar();
-    } else {
-        create();
-    }
+    create();
 }
 
 
@@ -100,33 +81,15 @@ GlobalArray::GlobalArray(const GlobalArray &that)
     ,   shape(that.shape)
     ,   lo(that.lo)
     ,   hi(that.hi)
-    ,   scalar(NULL)
 {
-    if (is_scalar()) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            scalar = (void*)(new T); \
-            *((T*)scalar) = *((T*)(that.scalar)); \
-        } else
-#include "DataType.def"
-    } else {
-        handle = GA_Duplicate(that.handle, "noname");
-        GA_Copy(that.handle,handle);
-    }
+    handle = GA_Duplicate(that.handle, "noname");
+    GA_Copy(that.handle,handle);
 }
 
 
 GlobalArray::~GlobalArray()
 {
-    if (is_scalar()) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            delete ((T*)scalar); \
-        } else
-#include "DataType.def"
-    } else {
-        GA_Destroy(handle);
-    }
+    GA_Destroy(handle);
 }
 
 
@@ -160,17 +123,69 @@ int64_t GlobalArray::get_ndim() const
 }
 
 
-void GlobalArray::fill(void *value)
+void GlobalArray::fill(int value)
 {
-    if (is_scalar()) {
 #define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            *((T*)scalar) = *((T*)value); \
-        } else
+    if (DT == type) { \
+        T cast = static_cast<T>(value); \
+        GA_Fill(handle, &cast); \
+    } else
 #include "DataType.def"
-    } else {
-        GA_Fill(handle, value);
-    }
+}
+
+
+void GlobalArray::fill(long value)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = static_cast<T>(value); \
+        GA_Fill(handle, &cast); \
+    } else
+#include "DataType.def"
+}
+
+
+void GlobalArray::fill(long long value)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = static_cast<T>(value); \
+        GA_Fill(handle, &cast); \
+    } else
+#include "DataType.def"
+}
+
+
+void GlobalArray::fill(float value)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = static_cast<T>(value); \
+        GA_Fill(handle, &cast); \
+    } else
+#include "DataType.def"
+}
+
+
+void GlobalArray::fill(double value)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = static_cast<T>(value); \
+        GA_Fill(handle, &cast); \
+    } else
+#include "DataType.def"
+}
+
+
+void GlobalArray::fill(long double value)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = static_cast<T>(value); \
+        GA_Fill(handle, &cast); \
+    } else
+#include "DataType.def"
 }
 
 
@@ -184,15 +199,7 @@ void GlobalArray::copy(const Array *src)
         ERR("arrays must be same shape");
     }
     if (ga_src && GA_Compare_distr(handle, ga_src->handle) == 0) {
-        if (is_scalar()) {
-#define DATATYPE_EXPAND(DT,T) \
-            if (DT == type) { \
-                *((T*)scalar) = *((T*)(((GlobalArray*)ga_src)->scalar)); \
-            } else
-#include "DataType.def"
-        } else {
-            GA_Copy(((GlobalArray*)ga_src)->handle, handle);
-        }
+        GA_Copy(((GlobalArray*)ga_src)->handle, handle);
     } else {
         // idea is that each process accesses local data and get()s the passed
         // in array's data into those buffers.
@@ -211,20 +218,18 @@ void GlobalArray::copy(const Array *src,
         const vector<int64_t> &dst_lo,
         const vector<int64_t> &dst_hi)
 {
-    if (typeid(*src) == typeid(*this)) {
-        if (is_scalar()) {
-            ERR("not implemented: GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) no implemented for scalars");
-        } else {
-            vector<int64_t> src_lo_copy(src_lo.begin(), src_lo.end());
-            vector<int64_t> src_hi_copy(src_hi.begin(), src_hi.end());
-            vector<int64_t> dst_lo_copy(dst_lo.begin(), dst_lo.end());
-            vector<int64_t> dst_hi_copy(dst_hi.begin(), dst_hi.end());
-            NGA_Copy_patch64('n',
-                    ((GlobalArray*)src)->handle,
-                    &src_lo_copy[0], &src_hi_copy[0],
-                    handle,
-                    &dst_lo_copy[0], &dst_hi_copy[0]);
-        }
+    const GlobalArray *ga_src = dynamic_cast<const GlobalArray*>(src);
+    if (type != src->get_type()) {
+        ERR("arrays must be same type");
+    }
+    if (ga_src) {
+        vector<int64_t> src_lo_copy(src_lo.begin(), src_lo.end());
+        vector<int64_t> src_hi_copy(src_hi.begin(), src_hi.end());
+        vector<int64_t> dst_lo_copy(dst_lo.begin(), dst_lo.end());
+        vector<int64_t> dst_hi_copy(dst_hi.begin(), dst_hi.end());
+        NGA_Copy_patch64('n',
+                ga_src->handle, &src_lo_copy[0], &src_hi_copy[0],
+                handle,         &dst_lo_copy[0], &dst_hi_copy[0]);
     }
     ERR("not implemented: GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
 }
@@ -269,7 +274,7 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
             if (type == src_mt && dst_array->type == dst_mt) { \
                 src_t *src = (src_t*)src_data; \
                 dst_t *dst = (dst_t*)dst_data; \
-                copy_cast(src,src+get_size(),dst); \
+                copy_cast<dst_t>(src,src+get_size(),dst); \
             } else
             cast_helper(MT_C_INT,     int,        MT_C_INT,int)
             cast_helper(MT_C_LONGINT, long,       MT_C_INT,int)
@@ -332,32 +337,14 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
         GA_Destroy(handle);
     }
 
-    if (is_scalar()) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            delete ((T*)scalar); \
-        } else
-#include "DataType.def"
-    }
-
     handle = 0;
     type = that.type;
     shape = that.shape;
     lo = that.lo;
     hi = that.hi;
-    scalar = NULL;
 
-    if (that.is_scalar()) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            scalar = (void*)(new T); \
-            *((T*)scalar) = *((T*)(that.scalar)); \
-        } else
-#include "DataType.def"
-    } else {
-        handle = GA_Duplicate(that.handle, "noname");
-        GA_Copy(that.handle,handle);
-    }
+    handle = GA_Duplicate(that.handle, "noname");
+    GA_Copy(that.handle,handle);
 
     return *this;
 }
@@ -389,7 +376,15 @@ void GlobalArray::operate_add_patch(int that_handle,
 }
 
 
-GlobalArray GlobalArray::operator+(const GlobalArray &that)
+GlobalArray GlobalArray::operator+(const GlobalArray &that) const
+{
+    GlobalArray ret(*this);
+    ret += that;
+    return ret;
+}
+
+
+GlobalArray GlobalArray::operator+(const ScalarArray &that) const
 {
     GlobalArray ret(*this);
     ret += that;
@@ -400,6 +395,18 @@ GlobalArray GlobalArray::operator+(const GlobalArray &that)
 GlobalArray& GlobalArray::operator+=(const GlobalArray &that)
 {
     operate(that, &GlobalArray::operate_add, &GlobalArray::operate_add_patch);
+    return *this;
+}
+
+
+GlobalArray& GlobalArray::operator+=(const ScalarArray &that)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = *((T*)that.get()); \
+        GA_Add_constant(handle, &cast); \
+    } else
+#include "DataType.def"
     return *this;
 }
 
@@ -430,7 +437,15 @@ void GlobalArray::operate_sub_patch(int that_handle,
 }
 
 
-GlobalArray GlobalArray::operator-(const GlobalArray &that)
+GlobalArray GlobalArray::operator-(const GlobalArray &that) const
+{
+    GlobalArray ret(*this);
+    ret -= that;
+    return ret;
+}
+
+
+GlobalArray GlobalArray::operator-(const ScalarArray &that) const
 {
     GlobalArray ret(*this);
     ret -= that;
@@ -441,6 +456,18 @@ GlobalArray GlobalArray::operator-(const GlobalArray &that)
 GlobalArray& GlobalArray::operator-=(const GlobalArray &that)
 {
     operate(that, &GlobalArray::operate_sub, &GlobalArray::operate_sub_patch);
+    return *this;
+}
+
+
+GlobalArray& GlobalArray::operator-=(const ScalarArray &that)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = -(*((T*)that.get())); \
+        GA_Add_constant(handle, &cast); \
+    } else
+#include "DataType.def"
     return *this;
 }
 
@@ -462,7 +489,15 @@ void GlobalArray::operate_mul_patch(int that_handle,
 }
 
 
-GlobalArray GlobalArray::operator*(const GlobalArray &that)
+GlobalArray GlobalArray::operator*(const GlobalArray &that) const
+{
+    GlobalArray ret(*this);
+    ret *= that;
+    return ret;
+}
+
+
+GlobalArray GlobalArray::operator*(const ScalarArray &that) const
 {
     GlobalArray ret(*this);
     ret *= that;
@@ -473,6 +508,18 @@ GlobalArray GlobalArray::operator*(const GlobalArray &that)
 GlobalArray& GlobalArray::operator*=(const GlobalArray &that)
 {
     operate(that, &GlobalArray::operate_mul, &GlobalArray::operate_mul_patch);
+    return *this;
+}
+
+
+GlobalArray& GlobalArray::operator*=(const ScalarArray &that)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = *((T*)that.get()); \
+        GA_Scale(handle, &cast); \
+    } else
+#include "DataType.def"
     return *this;
 }
 
@@ -494,7 +541,15 @@ void GlobalArray::operate_div_patch(int that_handle,
 }
 
 
-GlobalArray GlobalArray::operator/(const GlobalArray &that)
+GlobalArray GlobalArray::operator/(const GlobalArray &that) const
+{
+    GlobalArray ret(*this);
+    ret /= that;
+    return ret;
+}
+
+
+GlobalArray GlobalArray::operator/(const ScalarArray &that) const
 {
     GlobalArray ret(*this);
     ret /= that;
@@ -505,6 +560,19 @@ GlobalArray GlobalArray::operator/(const GlobalArray &that)
 GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
 {
     operate(that, &GlobalArray::operate_div, &GlobalArray::operate_div_patch);
+    return *this;
+}
+
+
+GlobalArray& GlobalArray::operator/=(const ScalarArray &that)
+{
+    // TODO GA_Scale won't work for integers!
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        T cast = static_cast<T>(1.0 / *((T*)that.get())); \
+        GA_Scale(handle, &cast); \
+    } else
+#include "DataType.def"
     return *this;
 }
 
@@ -569,23 +637,13 @@ void GlobalArray::set_distribution()
 }
 
 
-bool GlobalArray::is_scalar() const
-{
-    return shape.empty();
-}
-
-
 /**
  * Return true if this process owns a portion of this GlobalArray.
  */
 bool GlobalArray::owns_data() const
 {
-    if (is_scalar()) {
-        return true;
-    } else {
-        return !(less_than(lo.begin(),lo.end(),0)
-                || less_than(hi.begin(),hi.end(),0));
-    }
+    return !(less_than(lo.begin(),lo.end(),0)
+            || less_than(hi.begin(),hi.end(),0));
 }
 
 
@@ -599,49 +657,35 @@ void GlobalArray::get_distribution(
 
 void* GlobalArray::access()
 {
-    if (is_scalar()) {
-        return scalar;
-    } else {
-        void *tmp;
-        vector<int64_t> ld(lo.size());
-        NGA_Access64(handle, &lo[0], &hi[0], &tmp, &ld[0]);
-        return tmp;
-    }
+    void *tmp;
+    vector<int64_t> ld(lo.size());
+    NGA_Access64(handle, &lo[0], &hi[0], &tmp, &ld[0]);
+    return tmp;
 }
 
 
 void* GlobalArray::access() const
 {
-    if (is_scalar()) {
-        return scalar;
-    } else {
-        void *tmp;
-        vector<int64_t> ld(lo.size());
-        vector<int64_t> lo_copy(lo.begin(),lo.end());
-        vector<int64_t> hi_copy(hi.begin(),hi.end());
-        NGA_Access64(handle, &lo_copy[0], &hi_copy[0], &tmp, &ld[0]);
-        return tmp;
-    }
+    void *tmp;
+    vector<int64_t> ld(lo.size());
+    vector<int64_t> lo_copy(lo.begin(),lo.end());
+    vector<int64_t> hi_copy(hi.begin(),hi.end());
+    NGA_Access64(handle, &lo_copy[0], &hi_copy[0], &tmp, &ld[0]);
+    return tmp;
 }
 
 
 void GlobalArray::release() const
 {
-    if (is_scalar()) {
-    } else {
-        vector<int64_t> lo_copy(lo.begin(),lo.end());
-        vector<int64_t> hi_copy(hi.begin(),hi.end());
-        NGA_Release64(handle, &lo_copy[0], &hi_copy[0]);
-    }
+    vector<int64_t> lo_copy(lo.begin(),lo.end());
+    vector<int64_t> hi_copy(hi.begin(),hi.end());
+    NGA_Release64(handle, &lo_copy[0], &hi_copy[0]);
 }
 
 
 void GlobalArray::release_update()
 {
-    if (is_scalar()) {
-    } else {
-        NGA_Release_update64(handle, &lo[0], &hi[0]);
-    }
+    NGA_Release_update64(handle, &lo[0], &hi[0]);
 }
 
 
@@ -720,93 +764,149 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
 
 Array* GlobalArray::add(const Array *rhs) const
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+    GlobalArray *self_copy;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
+        self_copy = new GlobalArray(*this);
         (*self_copy) += *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) += *scalar;
+    } else {
+        ERR("GlobalArray::add(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::add(Array*) of differing Array implementations");
+
+    return self_copy;
 }
 
 
 Array* GlobalArray::iadd(const Array *rhs)
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) += *array;
-        return this;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        (*this) += *scalar;
+    } else {
+        ERR("GlobalArray::iadd(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::iadd(Array*) of differing Array implementations");
+
+    return this;
 }
 
 
 Array* GlobalArray::sub(const Array *rhs) const
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+    GlobalArray *self_copy;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
+        self_copy = new GlobalArray(*this);
         (*self_copy) -= *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) -= *scalar;
+    } else {
+        ERR("GlobalArray::sub(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::sub(Array*) of differing Array implementations");
+
+    return self_copy;
 }
 
 
 Array* GlobalArray::isub(const Array *rhs)
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) -= *array;
-        return this;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        (*this) -= *scalar;
+    } else {
+        ERR("GlobalArray::isub(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::isub(Array*) of differing Array implementations");
+
+    return this;
 }
 
 
 Array* GlobalArray::mul(const Array *rhs) const
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+    GlobalArray *self_copy;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
+        self_copy = new GlobalArray(*this);
         (*self_copy) *= *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) *= *scalar;
+    } else {
+        ERR("GlobalArray::mul(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::mul(Array*) of differing Array implementations");
+
+    return self_copy;
 }
 
 
 Array* GlobalArray::imul(const Array *rhs)
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) *= *array;
-        return this;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        (*this) *= *scalar;
+    } else {
+        ERR("GlobalArray::imul(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::imul(Array*) of differing Array implementations");
+
+    return this;
 }
 
 
 Array* GlobalArray::div(const Array *rhs) const
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+    GlobalArray *self_copy;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
+        self_copy = new GlobalArray(*this);
         (*self_copy) /= *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        GlobalArray *self_copy = new GlobalArray(*this);
+        (*self_copy) /= *scalar;
+    } else {
+        ERR("GlobalArray::div(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::div(Array*) of differing Array implementations");
+
+    return self_copy;
 }
 
 
 Array* GlobalArray::idiv(const Array *rhs)
 {
-    const GlobalArray *array = dynamic_cast<const GlobalArray*>(rhs);
-    if (array) {
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) /= *array;
-        return this;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        (*this) /= *scalar;
+    } else {
+        ERR("GlobalArray::idiv(Array*) fell through");
     }
-    ERR("not implemented GlobalArray::idiv(Array*) of differing Array implementations");
+
+    return this;
 }
 
 
@@ -819,15 +919,5 @@ ostream& GlobalArray::print(ostream &os) const
 
 void GlobalArray::dump() const
 {
-    if (is_scalar()) {
-#define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
-            std::ostringstream os; \
-            os << *((t*)scalar) << std::endl; \
-            pagoda::print_zero(os.str()); \
-        } else
-#include "GlobalArray.def"
-    } else {
-        GA_Print(handle);
-    }
+    GA_Print(handle);
 }

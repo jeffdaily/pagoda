@@ -4,6 +4,7 @@
 
 #include "Array.H"
 #include "GlobalArray.H"
+#include "ScalarArray.H"
 #include "Timing.H"
 #include "Util.H"
 
@@ -11,6 +12,9 @@
 Array* Array::create(DataType type, vector<int64_t> shape)
 {
     TIMING("Array::create(DataType,vector<int64_t>)");
+    if (shape.empty()) {
+        return new ScalarArray(type);
+    }
     return new GlobalArray(type,shape);
 }
 
@@ -18,6 +22,9 @@ Array* Array::create(DataType type, vector<int64_t> shape)
 Array* Array::create(DataType type, vector<Dimension*> dims)
 {
     TIMING("Array::create(DataType,vector<Dimension*>)");
+    if (dims.empty()) {
+        return new ScalarArray(type);
+    }
     return new GlobalArray(type,dims);
 }
 

@@ -37,4 +37,9 @@ do { \
     throw PagodaException(__where, __msg, code); \
 } while (0)
 
+#define ASSERT(e) \
+    if (e) { \
+        ERR("assertion failed"); \
+    } \
+
 #endif // ERROR_H_

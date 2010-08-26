@@ -30,9 +30,6 @@ int main(int argc, char **argv)
     vector<int64_t> shape1;
     vector<int64_t> shape2;
     vector<int64_t> shape3;
-    float ONE = 1;
-    float TWO = 2;
-    float THREE = 3;
     vector<string> dims;
     FileWriter *writer;
     vector<int64_t> start;
@@ -51,9 +48,9 @@ int main(int argc, char **argv)
     start.push_back(3);
     start.push_back(3);
 
-    array1->fill(&ONE);
-    array2->fill(&TWO);
-    array3->fill(&THREE);
+    array1->fill(1);
+    array2->fill(2);
+    array3->fill(3);
     pagoda::barrier();
 
     writer = FileWriter::create("test.nc");

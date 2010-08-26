@@ -17,12 +17,13 @@ LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 
 check_PROGRAMS = 
-bin_PROGRAMS = pgdump pgsub pgbo
+bin_PROGRAMS = pgdump pgsub pgbo pgra
 lib_LTLIBRARIES = libpagoda.la
 
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
 pgbo_SOURCES = src/pgbo.C
+pgra_SOURCES = src/pgra.C
 
 pkginclude_HEADERS =
 pkginclude_HEADERS += src/AbstractDataset.H
@@ -72,6 +73,7 @@ pkginclude_HEADERS += src/Pnetcdf.H
 pkginclude_HEADERS += src/PnetcdfTiming.H
 pkginclude_HEADERS += src/PnetcdfVariable.H
 pkginclude_HEADERS += src/RangeException.H
+pkginclude_HEADERS += src/ScalarArray.H
 pkginclude_HEADERS += src/Slice.H
 pkginclude_HEADERS += src/StringComparator.H
 pkginclude_HEADERS += src/SubsetterCommands.H
@@ -123,6 +125,7 @@ libpagoda_la_SOURCES += src/PnetcdfDimension.C
 libpagoda_la_SOURCES += src/PnetcdfFileWriter.C
 libpagoda_la_SOURCES += src/PnetcdfTiming.C
 libpagoda_la_SOURCES += src/PnetcdfVariable.C
+libpagoda_la_SOURCES += src/ScalarArray.C
 libpagoda_la_SOURCES += src/StringComparator.C
 libpagoda_la_SOURCES += src/SubsetterCommands.C
 libpagoda_la_SOURCES += src/Timing.C

@@ -14,7 +14,12 @@
 
 #include <ga.h>
 #include <macdecls.h>
-#include <message.h>
+//#include <message.h>
+extern void armci_msg_igop(int*, int, char*);
+extern void armci_msg_lgop(long*, int, char*);
+extern void armci_msg_llgop(long long*, int, char*);
+extern void armci_msg_fgop(float*, int, char*);
+extern void armci_msg_dgop(double*, int, char*);
 
 #include "gax.H"
 

@@ -1,45 +1,25 @@
-#ifndef GLOBALMASK_H_
-#define GLOBALMASK_H_
+#ifndef SCALARARRAY_H_
+#define SCALARARRAY_H_
 
-#include <string>
+#include <vector>
 
-#include "GlobalArray.H"
-#include "LatLonBox.H"
-#include "Mask.H"
-#include "Slice.H"
+#include "Array.H"
+#include "DataType.H"
+#include "Dimension.H"
 
-using std::string;
-
-class Array;
-class Dimension;
-class Variable;
+using std::vector;
 
 
 /**
- * A Dimension Mask implemented using a GlobalArray.
+ * An N-dimensional distributed Array based on the Global Arrays toolkit.
  */
-class GlobalMask :  public Mask
+class ScalarArray : public Array
 {
     public:
-        GlobalMask(const Dimension *dim);
-        GlobalMask(const GlobalMask &that);
-        virtual ~GlobalMask();
+        ScalarArray(DataType type);
+        ScalarArray(const ScalarArray &that);
+        virtual ~ScalarArray();
 
-        // Mask virtuals
-        virtual string get_name() const;
-        virtual int64_t get_count();
-        virtual void clear();
-        virtual void reset();
-
-        virtual void modify(const DimSlice &slice);
-        virtual void modify(const LatLonBox &box,
-                            const Array *lat, const Array *lon);
-        virtual void modify(double low, double hi, const Array *var);
-
-        virtual Array* reindex();
-        virtual Array* partial_sum(bool exclude);
-
-        // Array forwards and virtuals
         virtual DataType get_type() const;
         virtual vector<int64_t> get_shape() const;
         virtual vector<int64_t> get_local_shape() const;
@@ -59,8 +39,6 @@ class GlobalMask :  public Mask
                 const vector<int64_t> &dst_lo,
                 const vector<int64_t> &dst_hi);
 
-        virtual bool same_distribution(const Array *other);
-
         virtual bool owns_data() const;
         virtual void get_distribution(
                 vector<int64_t> &lo, vector<int64_t> &hi) const;
@@ -69,6 +47,7 @@ class GlobalMask :  public Mask
         virtual void release() const;
         virtual void release_update();
 
+        virtual void* get() const;
         virtual void* get(void *buffer,
                           const vector<int64_t> &lo,
                           const vector<int64_t> &hi,
@@ -88,25 +67,18 @@ class GlobalMask :  public Mask
         virtual Array* isub(const Array *rhs);
         virtual Array* imul(const Array *rhs);
         virtual Array* idiv(const Array *rhs);
+        ScalarArray& operator+=(const ScalarArray &that);
+        ScalarArray& operator-=(const ScalarArray &that);
+        ScalarArray& operator*=(const ScalarArray &that);
+        ScalarArray& operator/=(const ScalarArray &that);
 
-        // shared virtuals
         virtual ostream& print(ostream &os) const;
-        
+
         virtual void dump() const;
 
-        // non-virtuals 
-        void normalize();
-
     protected:
-        GlobalArray *mask;
-        Array *index;
-        Array *sum;
-        int64_t count;
-        bool last_excl;
-        bool dirty_index;
-        bool dirty_sum;
-        bool dirty_count;
-        string name;
+        DataType type;
+        void *value;
 };
 
-#endif /* GLOBALMASK_H_ */
+#endif /* SCALARARRAY_H_ */

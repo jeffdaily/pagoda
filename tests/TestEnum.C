@@ -28,7 +28,6 @@ int main(int argc, char **argv)
     Array *a_enm = NULL;
     Array *a_dst = NULL;
     Array *a_msk = NULL;
-    int NEG_ONE = -1;
     int TWO = 2;
     int THREE = 3;
     double START = 3.15;
@@ -53,7 +52,7 @@ int main(int argc, char **argv)
         a_msk->put(msk, ZERO, hi);
     }
 
-    a_dst->fill(&NEG_ONE);
+    a_dst->fill(-1);
     pagoda::enumerate(a_src, &TWO, &THREE);
     pagoda::enumerate(a_enm, &START, &STEP);
     pagoda::unpack1d(a_src, a_dst, a_msk);

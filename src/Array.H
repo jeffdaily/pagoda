@@ -96,11 +96,44 @@ class Array
         /**
          * Fills the array with the given value.
          *
-         * The value must point to the appropriate type.
+         * @param[in] value the value to fill with
+         */
+        virtual void fill(int value) = 0;
+
+        /**
+         * Fills the array with the given value.
          *
          * @param[in] value the value to fill with
          */
-        virtual void fill(void *value) = 0;
+        virtual void fill(long value) = 0;
+
+        /**
+         * Fills the array with the given value.
+         *
+         * @param[in] value the value to fill with
+         */
+        virtual void fill(long long value) = 0;
+
+        /**
+         * Fills the array with the given value.
+         *
+         * @param[in] value the value to fill with
+         */
+        virtual void fill(float value) = 0;
+
+        /**
+         * Fills the array with the given value.
+         *
+         * @param[in] value the value to fill with
+         */
+        virtual void fill(double value) = 0;
+
+        /**
+         * Fills the array with the given value.
+         *
+         * @param[in] value the value to fill with
+         */
+        virtual void fill(long double value) = 0;
 
         /**
          * Copies all elements from the given Array into this Array.

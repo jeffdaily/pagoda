@@ -31,14 +31,12 @@ int main(int argc, char **argv)
     vector<int64_t> shape(2,20);
     vector<int> buffer;
     vector<int64_t> subscripts;
-    int fill_value;
     int enumerate_start = 1;
 
     pagoda::initialize(&argc, &argv);
 
-    fill_value = pagoda::npe;
     array = Array::create(DataType::INT, shape);
-    array->fill(&fill_value);
+    array->fill(pagoda::npe);
 
     // each process scatters their id
     for (int64_t i=pagoda::me; i<shape[1]; i+=pagoda::npe) {

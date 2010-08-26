@@ -8,7 +8,6 @@
 
 #include <ga.h>
 #include <macdecls.h>
-#include <message.h>
 
 #include "Array.H"
 #include "Common.H"
@@ -44,13 +43,11 @@ GlobalMask::GlobalMask(const Dimension *dim)
     ,   dirty_count(true)
     ,   name(dim->get_name())
 {
-    int ONE = 1;
-
     TIMING("GlobalMask::GlobalMask(Dimension*)");
     TRACER("GlobalMask ctor size=%ld\n", dim->get_size());
 
     mask = new GlobalArray(C_INT, vector<int64_t>(1,dim->get_size()));
-    mask->fill(&ONE);
+    mask->fill(1);
 }
 
 
@@ -135,11 +132,9 @@ int64_t GlobalMask::get_count()
  */
 void GlobalMask::clear()
 {
-    int ZERO = 0;
-
     TIMING("GlobalMask::clear()");
 
-    mask->fill(&ZERO);
+    mask->fill(0);
 }
 
 
@@ -148,11 +143,9 @@ void GlobalMask::clear()
  */
 void GlobalMask::reset()
 {
-    int ONE = 1;
-
     TIMING("GlobalMask::fill()");
 
-    mask->fill(&ONE);
+    mask->fill(1);
 }
 
 
@@ -357,7 +350,6 @@ Array* GlobalMask::reindex()
     vector<int64_t> count(1, get_count());
     vector<int64_t> size(1, get_size());
     Array *tmp;
-    int NEG_ONE = -1;
 
     TIMING("GlobalMask::reindex()");
     TRACER("GlobalMask::reindex() BEGIN\n");
@@ -368,7 +360,7 @@ Array* GlobalMask::reindex()
         }
 
         if (count[0] > 0) {
-            index->fill(&NEG_ONE);
+            index->fill(-1);
             tmp = new GlobalArray(C_INT, count);
             pagoda::enumerate(tmp, NULL, NULL);
             pagoda::unpack1d(tmp, index, mask);
@@ -435,7 +427,37 @@ int64_t GlobalMask::get_ndim() const
 }
 
 
-void GlobalMask::fill(void *value)
+void GlobalMask::fill(int value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(long value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(long long value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(float value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(double value)
+{
+    mask->fill(value);
+}
+
+
+void GlobalMask::fill(long double value)
 {
     mask->fill(value);
 }
