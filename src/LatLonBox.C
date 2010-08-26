@@ -190,10 +190,14 @@ bool LatLonBox::contains(long lat, long lon) const
 bool LatLonBox::contains(long long lat, long long lon) const
 {
     TIMING("LatLonBox::contains(long long,long long)");
-    long long _n = (0 < n) ? floor(n) : ceil(n);
-    long long _s = (0 < s) ? floor(s) : ceil(s);
-    long long _e = (0 < e) ? floor(e) : ceil(e);
-    long long _w = (0 < w) ? floor(w) : ceil(w);
+    long long _n = (0 < n) ? static_cast<long long>(floor(n))
+                           : static_cast<long long>(ceil(n));
+    long long _s = (0 < s) ? static_cast<long long>(floor(s))
+                           : static_cast<long long>(ceil(s));
+    long long _e = (0 < e) ? static_cast<long long>(floor(e))
+                           : static_cast<long long>(ceil(e));
+    long long _w = (0 < w) ? static_cast<long long>(floor(w))
+                           : static_cast<long long>(ceil(w));
     return _s<lat && lat<_n && _w<lon && lon<_e;
 }
 

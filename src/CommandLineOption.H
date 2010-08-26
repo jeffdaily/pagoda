@@ -8,6 +8,20 @@ using std::string;
 using std::vector;
 
 
+static string OP_AVG("avg");
+static string OP_SQRAVG("sqravg");
+static string OP_AVGSQR("avgsqr");
+static string OP_MAX("max");
+static string OP_MIN("min");
+static string OP_RMS("rms");
+static string OP_RMSSDN("rmssdn");
+static string OP_SQRT("sqrt");
+static string OP_TTL("ttl");
+static string OP_ADD("+");
+static string OP_DIV("/");
+static string OP_MUL("*");
+static string OP_SUB("-");
+
 class CommandLineOption
 {
     public:
@@ -57,6 +71,7 @@ class CommandLineOption
         static CommandLineOption JOIN;
         static CommandLineOption UNION;
         static CommandLineOption OP_TYPE;
+        static CommandLineOption AVG_TYPE;
 
     protected:
         int _value;

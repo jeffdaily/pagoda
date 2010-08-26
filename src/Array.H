@@ -98,42 +98,22 @@ class Array
          *
          * @param[in] value the value to fill with
          */
-        virtual void fill(int value) = 0;
+        virtual void fill(void *value) = 0;
 
         /**
          * Fills the array with the given value.
          *
          * @param[in] value the value to fill with
          */
-        virtual void fill(long value) = 0;
-
-        /**
-         * Fills the array with the given value.
-         *
-         * @param[in] value the value to fill with
-         */
-        virtual void fill(long long value) = 0;
-
-        /**
-         * Fills the array with the given value.
-         *
-         * @param[in] value the value to fill with
-         */
-        virtual void fill(float value) = 0;
-
-        /**
-         * Fills the array with the given value.
-         *
-         * @param[in] value the value to fill with
-         */
-        virtual void fill(double value) = 0;
-
-        /**
-         * Fills the array with the given value.
-         *
-         * @param[in] value the value to fill with
-         */
-        virtual void fill(long double value) = 0;
+        template <class CT> void fill_value(CT value) {
+            DataType type = get_type();
+#define DATATYPE_EXPAND(DT,T) \
+            if (type == DT) { \
+                T the_value = static_cast<T>(value); \
+                fill(&the_value); \
+            } else
+#include "DataType.def"
+        }
 
         /**
          * Copies all elements from the given Array into this Array.
@@ -446,6 +426,66 @@ class Array
          * @return the result, as this Array
          */
         virtual Array* idiv(const Array *rhs) = 0;
+
+        /**
+         * Takes the element-wise maximum of two Arrays.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to consider
+         * @return the result, as a new Array
+         */
+        virtual Array* max(const Array *rhs) const = 0;
+
+        /**
+         * Takes the element-wise maximum of two Arrays, in-place.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to consider
+         * @return the result, as this Array
+         */
+        virtual Array* imax(const Array *rhs) = 0;
+
+        /**
+         * Takes the element-wise minimum of two Arrays.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to consider
+         * @return the result, as a new Array
+         */
+        virtual Array* min(const Array *rhs) const = 0;
+
+        /**
+         * Takes the element-wise minimum of two Arrays, in-place.
+         *
+         * If the given Array has fewer Dimensions, but the shape is otherwise
+         * compatible, the given Array is "broadcast" to fit.
+         *
+         * @param[in] rhs the Array to consider
+         * @return the result, as this Array
+         */
+        virtual Array* imin(const Array *rhs) = 0;
+
+        /**
+         * Computes the element-wise power of the Array.
+         *
+         * @param[in] exponent to raise each value to
+         * @return the result, as a new Array
+         */
+        virtual Array* pow(double exponent) const = 0;
+
+        /**
+         * Computes the element-wise power of the Array, in-place.
+         *
+         * @param[in] exponent to raise each value to
+         * @return the result, as this Array
+         */
+        virtual Array* ipow(double exponent) = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Array *array);

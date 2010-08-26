@@ -9,14 +9,15 @@
 
 #include "Array.H"
 #include "Bootstrap.H"
+#include "CommandLineOption.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
 #include "FileWriter.H"
 #include "Grid.H"
 #include "MaskMap.H"
+#include "PgraCommands.H"
 #include "ScalarArray.H"
-#include "SubsetterCommands.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -36,7 +37,7 @@ int F77_DUMMY_MAIN() { return 1; }
 
 int main(int argc, char **argv)
 {
-    SubsetterCommands cmd;
+    PgraCommands cmd;
     Dataset *dataset;
     vector<Variable*> vars;
     vector<Variable*>::iterator var_it;
@@ -45,10 +46,7 @@ int main(int argc, char **argv)
     vector<Grid*> grids;
     Grid *grid;
     MaskMap *masks;
-#if defined(READ_NONBLOCKING)
-    map<string,Array*> arrays;
-    map<string,Array*>::iterator array;
-#endif
+    string op;
 
     try {
         pagoda::initialize(&argc, &argv);
@@ -64,6 +62,7 @@ int main(int argc, char **argv)
         dataset = cmd.get_dataset();
         vars = cmd.get_variables(dataset);
         dims = cmd.get_dimensions(dataset);
+        op = cmd.get_operator();
 
         grids = dataset->get_grids();
         if (grids.empty()) {
@@ -87,18 +86,56 @@ int main(int argc, char **argv)
             Variable *var = *var_it;
             if (var->has_record() && var->get_nrec() > 0) {
                 int64_t nrec = var->get_nrec();
-                ScalarArray nrec_array(var->get_type());
                 Array *result = NULL;
                 Array *array = NULL; // reuse allocated array each record
 
-                nrec_array.fill(nrec);
+                // optimization: read the first record directly into result
                 result = var->read(0, result);
-                result->idiv(&nrec_array);
+                if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+                    // square the values
+                    result->imul(result);
+                }
+
+                // read the rest of the records
                 for (int64_t rec=1; rec<nrec; ++rec) {
                     array = var->read(rec, array);
-                    array->idiv(&nrec_array);
-                    result->iadd(array);
+                    if (op == OP_MAX || op == OP_MIN) {
+                        if (op == OP_MAX) {
+                            result->imax(array);
+                        } else {
+                            result->imin(array);
+                        }
+                    } else {
+                        if (op == OP_RMS
+                                || op == OP_RMSSDN
+                                || op == OP_AVGSQR) {
+                            // square the values
+                            array->imul(array);
+                        }
+                        // sum the values or squares
+                        result->iadd(array);
+                    }
                 }
+
+                // normalize, multiply, etc where necessary
+                if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
+                        || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
+                    ScalarArray scalar(result->get_type());
+                    scalar.fill_value(nrec);
+                    result->idiv(&scalar);
+                } else if (op == OP_RMSSDN) {
+                    ScalarArray scalar(result->get_type());
+                    scalar.fill_value(nrec-1);
+                    result->idiv(&scalar);
+                }
+
+                // some operations require additional process */
+                if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
+                    result->ipow(0.5);
+                } else if (op == OP_SQRAVG) {
+                    result->imul(result);
+                }
+
                 writer->write(result, var->get_name(), 0);
                 delete result;
                 delete array;

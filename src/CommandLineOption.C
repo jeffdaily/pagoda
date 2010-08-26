@@ -69,6 +69,9 @@ CommandLineOption CommandLineOption::UNION(
 CommandLineOption CommandLineOption::OP_TYPE(
         'y', "op_typ", true,
         "Binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
+CommandLineOption CommandLineOption::AVG_TYPE(
+        'y', "op_typ", true,
+        "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
 
 
 CommandLineOption::CommandLineOption(const int &value, const string &name,

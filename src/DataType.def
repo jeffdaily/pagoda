@@ -13,6 +13,6 @@ DATATYPE_EXPAND(DataType::ULONG,unsigned long)
 DATATYPE_EXPAND(DataType::ULONGLONG,unsigned long long)
 DATATYPE_EXPAND(DataType::SCHAR,signed char)
 {
-    throw DataTypeException("DataType not handled", type);
+    throw DataTypeException(string("DataType not handled"), type, __FILE__, __LINE__);
 }
 #undef DATATYPE_EXPAND

@@ -123,69 +123,9 @@ int64_t GlobalArray::get_ndim() const
 }
 
 
-void GlobalArray::fill(int value)
+void GlobalArray::fill(void *value)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = static_cast<T>(value); \
-        GA_Fill(handle, &cast); \
-    } else
-#include "DataType.def"
-}
-
-
-void GlobalArray::fill(long value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = static_cast<T>(value); \
-        GA_Fill(handle, &cast); \
-    } else
-#include "DataType.def"
-}
-
-
-void GlobalArray::fill(long long value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = static_cast<T>(value); \
-        GA_Fill(handle, &cast); \
-    } else
-#include "DataType.def"
-}
-
-
-void GlobalArray::fill(float value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = static_cast<T>(value); \
-        GA_Fill(handle, &cast); \
-    } else
-#include "DataType.def"
-}
-
-
-void GlobalArray::fill(double value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = static_cast<T>(value); \
-        GA_Fill(handle, &cast); \
-    } else
-#include "DataType.def"
-}
-
-
-void GlobalArray::fill(long double value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = static_cast<T>(value); \
-        GA_Fill(handle, &cast); \
-    } else
-#include "DataType.def"
+    GA_Fill(handle, value); \
 }
 
 
@@ -907,6 +847,134 @@ Array* GlobalArray::idiv(const Array *rhs)
     }
 
     return this;
+}
+
+
+void GlobalArray::operate_max(int that_handle)
+{
+    GA_Elem_maximum(handle, that_handle, handle);
+}
+
+
+void GlobalArray::operate_max_patch(int that_handle,
+        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+{
+    GA_Elem_maximum_patch64(
+            handle, &my_lo[0], &my_hi[0],
+            that_handle, &that_lo[0], &that_hi[0],
+            handle, &my_lo[0], &my_hi[0]);
+}
+
+
+Array* GlobalArray::max(const Array *rhs) const
+{
+    GlobalArray *self_copy = new GlobalArray(*this);
+    self_copy->imax(rhs);
+    return self_copy;
+}
+
+
+Array* GlobalArray::imax(const Array *rhs)
+{
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
+        operate(*array,
+                &GlobalArray::operate_max,
+                &GlobalArray::operate_max_patch);
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            GlobalArray array_tmp(DT, shape); \
+            array_tmp.fill_value(scalar->as<T>()); \
+            operate(array_tmp, \
+                    &GlobalArray::operate_max, \
+                    &GlobalArray::operate_max_patch); \
+        } else
+#include "DataType.def"
+    } else {
+        ERR("GlobalArray::imax(Array*) fell through");
+    }
+
+    return this;
+}
+
+
+void GlobalArray::operate_min(int that_handle)
+{
+    GA_Elem_minimum(handle, that_handle, handle);
+}
+
+
+void GlobalArray::operate_min_patch(int that_handle,
+        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+{
+    GA_Elem_minimum_patch64(
+            handle, &my_lo[0], &my_hi[0],
+            that_handle, &that_lo[0], &that_hi[0],
+            handle, &my_lo[0], &my_hi[0]);
+}
+
+
+Array* GlobalArray::min(const Array *rhs) const
+{
+    GlobalArray *self_copy = new GlobalArray(*this);
+    self_copy->imin(rhs);
+    return self_copy;
+}
+
+
+Array* GlobalArray::imin(const Array *rhs)
+{
+    const GlobalArray *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
+        operate(*array,
+                &GlobalArray::operate_min,
+                &GlobalArray::operate_min_patch);
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            GlobalArray array_tmp(DT, shape); \
+            array_tmp.fill_value(scalar->as<T>()); \
+            operate(array_tmp, \
+                    &GlobalArray::operate_min, \
+                    &GlobalArray::operate_min_patch); \
+        } else
+#include "DataType.def"
+    } else {
+        ERR("GlobalArray::imin(Array*) fell through");
+    }
+
+    return this;
+}
+
+
+Array* GlobalArray::pow(double exponent) const
+{
+    GlobalArray *self_copy = new GlobalArray(*this);
+    self_copy->ipow(exponent);
+    return self_copy;
+}
+
+
+Array* GlobalArray::ipow(double exponent)
+{
+    if (owns_data()) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            T *data = (T*)access(); \
+            for (int64_t i=0,limit=get_local_size(); i<limit; i++) { \
+                data[i] = static_cast<T>(std::pow(static_cast<double>(data[i]),exponent)); \
+            } \
+        } else
+#include "DataType.def"
+        release_update();
+    }
 }
 
 

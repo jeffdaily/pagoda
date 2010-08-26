@@ -2,6 +2,8 @@
 #   include "config.h"
 #endif
 
+#include <cmath>
+
 #include "Debug.H"
 #include "Error.H"
 #include "ScalarArray.H"
@@ -66,67 +68,11 @@ int64_t ScalarArray::get_ndim() const
 }
 
 
-void ScalarArray::fill(int new_value)
+void ScalarArray::fill(void *new_value)
 {
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        T cast = new_value; \
-        *((T*)value) = cast; \
-    } else
-#include "DataType.def"
-}
-
-
-void ScalarArray::fill(long new_value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = new_value; \
-        *((T*)value) = cast; \
-    } else
-#include "DataType.def"
-}
-
-
-void ScalarArray::fill(long long new_value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = new_value; \
-        *((T*)value) = cast; \
-    } else
-#include "DataType.def"
-}
-
-
-void ScalarArray::fill(float new_value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = new_value; \
-        *((T*)value) = cast ; \
-    } else
-#include "DataType.def"
-}
-
-
-void ScalarArray::fill(double new_value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = new_value; \
-        *((T*)value) = cast ; \
-    } else
-#include "DataType.def"
-}
-
-
-void ScalarArray::fill(long double new_value)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        T cast = new_value; \
-        *((T*)value) = cast ; \
+        *((T*)value) = *((T*)new_value); \
     } else
 #include "DataType.def"
 }
@@ -288,6 +234,30 @@ Array* ScalarArray::div(const Array *rhs) const
 }
 
 
+Array* ScalarArray::max(const Array *rhs) const
+{
+    ScalarArray *self_copy = new ScalarArray(*this);
+    self_copy->imax(rhs);
+    return self_copy;
+}
+
+
+Array* ScalarArray::min(const Array *rhs) const
+{
+    ScalarArray *self_copy = new ScalarArray(*this);
+    self_copy->imin(rhs);
+    return self_copy;
+}
+
+
+Array* ScalarArray::pow(double exponent) const
+{
+    ScalarArray *self_copy = new ScalarArray(*this);
+    self_copy->ipow(exponent);
+    return self_copy;
+}
+
+
 Array* ScalarArray::iadd(const Array *rhs)
 {
     const ScalarArray *array = dynamic_cast<const ScalarArray*>(rhs);
@@ -329,6 +299,52 @@ Array* ScalarArray::idiv(const Array *rhs)
         return this;
     }
     ERR("ScalarArray::idiv(Array*) fell through");
+}
+
+
+Array* ScalarArray::imax(const Array *rhs)
+{
+    const ScalarArray *array = dynamic_cast<const ScalarArray*>(rhs);
+    if (array) {
+#define DATATYPE_EXPAND(DT,T) \
+    if (type == DT) { \
+        T *this_value = (T*)value; \
+        T that_value = array->as<T>(); \
+        *this_value = (*this_value)>that_value ? *this_value : that_value; \
+    } else
+#include "DataType.def"
+        return this;
+    }
+    ERR("ScalarArray::idiv(Array*) fell through");
+}
+
+
+Array* ScalarArray::imin(const Array *rhs)
+{
+    const ScalarArray *array = dynamic_cast<const ScalarArray*>(rhs);
+    if (array) {
+#define DATATYPE_EXPAND(DT,T) \
+    if (type == DT) { \
+        T *this_value = (T*)value; \
+        T that_value = array->as<T>(); \
+        *this_value = (*this_value)<that_value ? *this_value : that_value; \
+    } else
+#include "DataType.def"
+        return this;
+    }
+    ERR("ScalarArray::idiv(Array*) fell through");
+}
+
+
+Array* ScalarArray::ipow(double exponent)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (type == DT) { \
+        T *this_value = (T*)value; \
+        *this_value = static_cast<T>(std::pow(static_cast<double>(*this_value),exponent)); \
+    } else
+#include "DataType.def"
+    return this;
 }
 
 

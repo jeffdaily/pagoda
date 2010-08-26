@@ -45,12 +45,7 @@ class GlobalMask :  public Mask
         virtual vector<int64_t> get_local_shape() const;
         virtual int64_t get_ndim() const;
 
-        virtual void fill(int value);
-        virtual void fill(long value);
-        virtual void fill(long long value);
-        virtual void fill(float value);
-        virtual void fill(double value);
-        virtual void fill(long double value);
+        virtual void fill(void *value);
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
@@ -84,10 +79,16 @@ class GlobalMask :  public Mask
         virtual Array* sub(const Array *rhs) const;
         virtual Array* mul(const Array *rhs) const;
         virtual Array* div(const Array *rhs) const;
+        virtual Array* max(const Array *rhs) const;
+        virtual Array* min(const Array *rhs) const;
+        virtual Array* pow(double exponent) const;
         virtual Array* iadd(const Array *rhs);
         virtual Array* isub(const Array *rhs);
         virtual Array* imul(const Array *rhs);
         virtual Array* idiv(const Array *rhs);
+        virtual Array* imax(const Array *rhs);
+        virtual Array* imin(const Array *rhs);
+        virtual Array* ipow(double exponent);
 
         // shared virtuals
         virtual ostream& print(ostream &os) const;

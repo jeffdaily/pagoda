@@ -85,10 +85,26 @@ class DataTypeException : public runtime_error
             :   runtime_error(what)
         {}
         explicit DataTypeException(const string &what, int value)
-            :   runtime_error(what+string(" :: ")+to_string(value))
+            :   runtime_error(what
+                    +string(" :: ")+to_string(value))
+        {}
+        explicit DataTypeException(const string &what, int value,
+                const char *file, int line)
+            :   runtime_error(what
+                    +string(" :: ")+to_string(value)
+                    +string(" :: ")+string(file)
+                    +string(" :: ")+to_string(line))
         {}
         explicit DataTypeException(const string &what, const DataType &type)
-            :   runtime_error(what+string(" :: ")+type.get_name())
+            :   runtime_error(what
+                    +string(" :: ")+type.get_name())
+        {}
+        explicit DataTypeException(const string &what, const DataType &type,
+                const char *file, int line)
+            :   runtime_error(what
+                    +string(" :: ")+type.get_name()
+                    +string(" :: ")+string(file)
+                    +string(" :: ")+to_string(line))
         {}
 };
 

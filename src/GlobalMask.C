@@ -47,7 +47,7 @@ GlobalMask::GlobalMask(const Dimension *dim)
     TRACER("GlobalMask ctor size=%ld\n", dim->get_size());
 
     mask = new GlobalArray(C_INT, vector<int64_t>(1,dim->get_size()));
-    mask->fill(1);
+    mask->fill_value(1);
 }
 
 
@@ -145,7 +145,7 @@ void GlobalMask::reset()
 {
     TIMING("GlobalMask::fill()");
 
-    mask->fill(1);
+    mask->fill_value(1);
 }
 
 
@@ -360,7 +360,7 @@ Array* GlobalMask::reindex()
         }
 
         if (count[0] > 0) {
-            index->fill(-1);
+            index->fill_value(-1);
             tmp = new GlobalArray(C_INT, count);
             pagoda::enumerate(tmp, NULL, NULL);
             pagoda::unpack1d(tmp, index, mask);
@@ -427,37 +427,7 @@ int64_t GlobalMask::get_ndim() const
 }
 
 
-void GlobalMask::fill(int value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(long value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(long long value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(float value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(double value)
-{
-    mask->fill(value);
-}
-
-
-void GlobalMask::fill(long double value)
+void GlobalMask::fill(void *value)
 {
     mask->fill(value);
 }
@@ -595,6 +565,42 @@ Array* GlobalMask::div(const Array *rhs) const
 Array* GlobalMask::idiv(const Array *rhs)
 {
     return mask->idiv(rhs);
+}
+
+
+Array* GlobalMask::max(const Array *rhs) const
+{
+    return mask->max(rhs);
+}
+
+
+Array* GlobalMask::imax(const Array *rhs)
+{
+    return mask->imax(rhs);
+}
+
+
+Array* GlobalMask::min(const Array *rhs) const
+{
+    return mask->min(rhs);
+}
+
+
+Array* GlobalMask::imin(const Array *rhs)
+{
+    return mask->imin(rhs);
+}
+
+
+Array* GlobalMask::pow(double exponent) const
+{
+    return mask->pow(exponent);
+}
+
+
+Array* GlobalMask::ipow(double exponent)
+{
+    return mask->ipow(exponent);
 }
 
 

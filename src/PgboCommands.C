@@ -96,13 +96,13 @@ string PgboCommands::get_operator() const
 {
     // normalize the possible results
     if (find(ADD.begin(),ADD.end(),op_type) != ADD.end()) {
-        return "+";
+        return OP_ADD;
     } else if (find(SUB.begin(),SUB.end(),op_type) != SUB.end()) {
-        return "-";
+        return OP_SUB;
     } else if (find(MUL.begin(),MUL.end(),op_type) != MUL.end()) {
-        return "*";
+        return OP_MUL;
     } else if (find(DIV.begin(),DIV.end(),op_type) != DIV.end()) {
-        return "/";
+        return OP_DIV;
     } else {
         ERR("could not normalize operator");
     }

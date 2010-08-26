@@ -32,12 +32,7 @@ class GlobalArray : public Array
         virtual vector<int64_t> get_local_shape() const;
         virtual int64_t get_ndim() const;
 
-        virtual void fill(int value);
-        virtual void fill(long value);
-        virtual void fill(long long value);
-        virtual void fill(float value);
-        virtual void fill(double value);
-        virtual void fill(long double value);
+        virtual void fill(void *value);
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
@@ -69,11 +64,17 @@ class GlobalArray : public Array
         virtual Array* sub(const Array *rhs) const;
         virtual Array* mul(const Array *rhs) const;
         virtual Array* div(const Array *rhs) const;
+        virtual Array* max(const Array *rhs) const;
+        virtual Array* min(const Array *rhs) const;
+        virtual Array* pow(double exponent) const;
 
         virtual Array* iadd(const Array *rhs);
         virtual Array* isub(const Array *rhs);
         virtual Array* imul(const Array *rhs);
         virtual Array* idiv(const Array *rhs);
+        virtual Array* imax(const Array *rhs);
+        virtual Array* imin(const Array *rhs);
+        virtual Array* ipow(double exponent);
 
         virtual ostream& print(ostream &os) const;
 
@@ -111,6 +112,8 @@ class GlobalArray : public Array
         void operate_sub(int that_handle);
         void operate_mul(int that_handle);
         void operate_div(int that_handle);
+        void operate_max(int that_handle);
+        void operate_min(int that_handle);
         void operate_add_patch(int that_handle,
                 vector<int64_t> &my_lo, vector<int64_t> &my_hi,
                 vector<int64_t> &that_lo, vector<int64_t> &that_hi);
@@ -121,6 +124,12 @@ class GlobalArray : public Array
                 vector<int64_t> &my_lo, vector<int64_t> &my_hi,
                 vector<int64_t> &that_lo, vector<int64_t> &that_hi);
         void operate_div_patch(int that_handle,
+                vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                vector<int64_t> &that_lo, vector<int64_t> &that_hi);
+        void operate_max_patch(int that_handle,
+                vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                vector<int64_t> &that_lo, vector<int64_t> &that_hi);
+        void operate_min_patch(int that_handle,
                 vector<int64_t> &my_lo, vector<int64_t> &my_hi,
                 vector<int64_t> &that_lo, vector<int64_t> &that_hi);
 
