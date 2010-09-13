@@ -4,6 +4,7 @@
 
 #if HAVE_GA
 #   include <ga.h>
+#   include <macommon.h>
 #endif
 
 #if HAVE_PNETCDF

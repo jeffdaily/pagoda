@@ -50,7 +50,7 @@ Dimension* ConnectivityVariable::get_to_dim() const
  * index location to another.
  *
  * TODO ARG!!  The whole int vs Integer vs int64 vs nc_int is frustrating!
- * nc_int is 4-bytes in netcdf 3.6.x, right? Which correspondes to MT_INT on
+ * nc_int is 4-bytes in netcdf 3.6.x, right? Which correspondes to C_INT on
  * a 4-byte integer platform (i.e. linux). I doubt I got this interplay
  * correct...
 void ConnectivityVariable::reindex()

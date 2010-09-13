@@ -288,7 +288,7 @@ int main(int argc, char **argv)
         int64_t max_size = max / GA_Nnodes();
         DEBUG_ZERO("MA max memory %llu bytes\n", max_size*8);
         DEBUG_ZERO("MA max variable %s\n", max_name.c_str());
-        if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
+        if (MA_init(C_DBL, max_size, max_size) == MA_FALSE) {
             char msg[] = "MA_init failed";
             GA_Error(msg, 0);
         };
@@ -567,17 +567,17 @@ int nc_to_mt(nc_type type)
 {
     switch (type) {
         case NC_CHAR:
-            return MT_CHAR;
+            return C_CHAR;
         case NC_BYTE:
             break;
         case NC_SHORT:
-            return MT_INT;
+            return C_INT;
         case NC_INT:
-            return MT_LONGINT;
+            return C_LONGINT;
         case NC_FLOAT:
-            return MT_REAL;
+            return C_REAL;
         case NC_DOUBLE:
-            return MT_DBL;
+            return C_DBL;
         default:
             break;
     }
@@ -610,7 +610,7 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
                 fill(mask.data, mask.data+size, ONE);
             }
         } else {
-            mask.handle = NGA_Create64(MT_INT, 1, &size, (char*)name.c_str(), NULL);
+            mask.handle = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), NULL);
             mask.data = NULL;
             NGA_Distribution64(mask.handle, ME, &mask.lo, &mask.hi);
             if (slices.count(name) > 0) {
@@ -858,7 +858,7 @@ Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
     string name = composite_name(dims);
     int64_t size = dims[0].size * dims[1].size;
     int64_t chunk = dims[1].size;
-    int g_the_mask = NGA_Create64(MT_INT, 1, &size, (char*)name.c_str(), &chunk);
+    int g_the_mask = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), &chunk);
     int64_t the_mask_lo;
     int64_t the_mask_hi;
     int *the_mask;
@@ -916,7 +916,7 @@ Mask create_composite_mask3d(MaskMap &masks, DimInfoVec dims)
        string name = composite_name(dims);
        MPI_Offset size = dims[0].size * dims[1].size * dims[2].size;
        MPI_Offset chunk = dims[1].size * dims[2].size;
-       int g_a = NGA_Create64(MT_INT, 1, &size, (char*)name.c_str(), &chunk);
+       int g_a = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), &chunk);
        return g_a;
        */
 }

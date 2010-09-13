@@ -437,7 +437,7 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
     gigabytes = 1.0 / 1073741824.0 * max_size * 8;
     TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size*8, gigabytes);
 
-    if (MA_init(MT_DBL, max_size, max_size) == MA_FALSE) {
+    if (MA_init(C_DBL, max_size, max_size) == MA_FALSE) {
         char msg[] = "MA_init failed";
         GA_Error(msg, 0);
     }
