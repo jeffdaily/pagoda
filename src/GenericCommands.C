@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <algorithm>
+
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
@@ -21,6 +23,8 @@
 #include "TypedValues.H"
 #include "Util.H"
 #include "Variable.H"
+
+using std::sort;
 
 
 GenericCommands::GenericCommands()

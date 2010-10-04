@@ -4,6 +4,8 @@
 
 #include <pnetcdf.h>
 
+#include <algorithm>
+
 #include "Array.H"
 #include "Attribute.H"
 #include "Common.H"
@@ -18,6 +20,8 @@
 #include "Pnetcdf.H"
 #include "Timing.H"
 #include "Util.H"
+
+using std::fill;
 
 
 PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)

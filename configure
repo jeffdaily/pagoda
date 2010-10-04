@@ -4147,6 +4147,95 @@ ac_link='$F77 -o conftest$ac_exeext $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_f77_compiler_gnu
 
 
+
+    wrapped="$F77"
+    case $wrapped in #(
+  *_r) :
+    compilers="bgxlf95_r xlf95_r bgxlf90_r xlf90_r bgxlf_r xlf_r" ;; #(
+  *) :
+    compilers="gfortran g95 bgxlf95 xlf95 f95 fort ifort ifc efc pgf95 pathf95 lf95 bgxlf90 xlf90 f90 pgf90 pathf90 pghpf epcf90 g77 bgxlf xlf f77 frt pgf77 pathf77 cf77 fort77 fl32 af77" ;; #(
+  *) :
+     ;;
+esac
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for base $wrapped compiler" >&5
+$as_echo_n "checking for base $wrapped compiler... " >&6; }
+if test "${ga_cv_mpif77_naked+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+versions="--version -v -V -qversion"
+inside="$srcdir/build-aux/inside.pl"
+# Try separating stdout and stderr. Only compare stdout.
+if test "x$ga_cv_mpif77_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt mpi.err naked.txt naked.err
+        if $wrapped $version 1>mpi.txt 2>mpi.err; then :
+  if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpif77_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+else
+  echo "$wrapped $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpif77_naked" != x; then :
+  break
+fi
+done
+
+fi
+# Try by combining stdout/err into one file.
+if test "x$ga_cv_mpif77_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt naked.txt
+        if $wrapped $version 1>mpi.txt 2>&1; then :
+  if $naked_compiler $version 1>naked.txt 2>&1; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpif77_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+else
+  echo "$wrapped $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpif77_naked" != x; then :
+  break
+fi
+done
+
+fi
+rm -f mpi.txt mpi.err naked.txt naked.err
+if test "x$ga_cv_mpif77_naked" = x; then :
+  ga_cv_mpif77_naked=error
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ga_cv_mpif77_naked" >&5
+$as_echo "$ga_cv_mpif77_naked" >&6; }
+
+if test "x$ga_cv_mpi_naked" = xerror; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not determine the Fortran compiler wrapped by MPI" >&5
+$as_echo "$as_me: WARNING: Could not determine the Fortran compiler wrapped by MPI" >&2;}
+     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This is usually okay" >&5
+$as_echo "$as_me: WARNING: This is usually okay" >&2;}
+fi
+
+
 # Checks for Fortran 77 header files.
 
 # Checks for Fortran 77 typedefs, structures, and compiler characteristics.
@@ -4711,6 +4800,95 @@ else
   am__fastdepCC_FALSE=
 fi
 
+
+
+
+    wrapped="$CC"
+    case $wrapped in #(
+  *_r) :
+    compilers="bgxlc_r xlc_r" ;; #(
+  *) :
+    compilers="bgxlc xlc gcc pgcc pathcc icc ecc cl ccc cc" ;; #(
+  *) :
+     ;;
+esac
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for base $wrapped compiler" >&5
+$as_echo_n "checking for base $wrapped compiler... " >&6; }
+if test "${ga_cv_mpic_naked+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+versions="--version -v -V -qversion"
+inside="$srcdir/build-aux/inside.pl"
+# Try separating stdout and stderr. Only compare stdout.
+if test "x$ga_cv_mpic_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt mpi.err naked.txt naked.err
+        if $wrapped $version 1>mpi.txt 2>mpi.err; then :
+  if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpic_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+else
+  echo "$wrapped $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpic_naked" != x; then :
+  break
+fi
+done
+
+fi
+# Try by combining stdout/err into one file.
+if test "x$ga_cv_mpic_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt naked.txt
+        if $wrapped $version 1>mpi.txt 2>&1; then :
+  if $naked_compiler $version 1>naked.txt 2>&1; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpic_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+else
+  echo "$wrapped $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpic_naked" != x; then :
+  break
+fi
+done
+
+fi
+rm -f mpi.txt mpi.err naked.txt naked.err
+if test "x$ga_cv_mpic_naked" = x; then :
+  ga_cv_mpic_naked=error
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ga_cv_mpic_naked" >&5
+$as_echo "$ga_cv_mpic_naked" >&6; }
+
+if test "x$ga_cv_mpi_naked" = xerror; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not determine the Fortran compiler wrapped by MPI" >&5
+$as_echo "$as_me: WARNING: Could not determine the Fortran compiler wrapped by MPI" >&2;}
+     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This is usually okay" >&5
+$as_echo "$as_me: WARNING: This is usually okay" >&2;}
+fi
 
 
 # Needed so that _GNU_SOURCE is defined thus enabling getopt_long.
@@ -5754,9 +5932,116 @@ fi
 
 
 
+
+    wrapped="$CXX"
+    case $wrapped in #(
+  *_r) :
+    compilers="bgxlC_r" ;; #(
+  *) :
+    compilers="g++ c++ icpc pgCC pathCC gpp aCC cxx cc++ cl.exe FCC KCC RCC bgxlC_r bgxlC xlC_r xlC CC" ;; #(
+  *) :
+     ;;
+esac
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for base $wrapped compiler" >&5
+$as_echo_n "checking for base $wrapped compiler... " >&6; }
+if test "${ga_cv_mpicxx_naked+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+
+versions="--version -v -V -qversion"
+inside="$srcdir/build-aux/inside.pl"
+# Try separating stdout and stderr. Only compare stdout.
+if test "x$ga_cv_mpicxx_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt mpi.err naked.txt naked.err
+        if $wrapped $version 1>mpi.txt 2>mpi.err; then :
+  if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpicxx_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+else
+  echo "$wrapped $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpicxx_naked" != x; then :
+  break
+fi
+done
+
+fi
+# Try by combining stdout/err into one file.
+if test "x$ga_cv_mpicxx_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt naked.txt
+        if $wrapped $version 1>mpi.txt 2>&1; then :
+  if $naked_compiler $version 1>naked.txt 2>&1; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpicxx_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+else
+  echo "$wrapped $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpicxx_naked" != x; then :
+  break
+fi
+done
+
+fi
+rm -f mpi.txt mpi.err naked.txt naked.err
+if test "x$ga_cv_mpicxx_naked" = x; then :
+  ga_cv_mpicxx_naked=error
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ga_cv_mpicxx_naked" >&5
+$as_echo "$ga_cv_mpicxx_naked" >&6; }
+
+if test "x$ga_cv_mpi_naked" = xerror; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not determine the Fortran compiler wrapped by MPI" >&5
+$as_echo "$as_me: WARNING: Could not determine the Fortran compiler wrapped by MPI" >&2;}
+     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This is usually okay" >&5
+$as_echo "$as_me: WARNING: This is usually okay" >&2;}
+fi
+
+
 # Checks for C++ header files.
 
 # Checks for C++ typedefs, structures, and compiler characteristics.
+
+pagoda_mpi_unwrap_push_save_CC="$CC"
+pagoda_mpi_unwrap_push_save_CXX="$CXX"
+pagoda_mpi_unwrap_push_save_F77="$F77"
+pagoda_mpi_unwrap_push_save_FC="$FC"
+if test "x$ga_cv_mpic_naked"   != xerror; then :
+   CC="$ga_cv_mpic_naked"
+fi
+if test "x$ga_cv_mpicxx_naked" != xerror; then :
+  CXX="$ga_cv_mpicxx_naked"
+fi
+if test "x$ga_cv_mpif77_naked" != xerror; then :
+  F77="$ga_cv_mpif77_naked"
+fi
+if test "x$ga_cv_mpifc_naked"  != xerror; then :
+   FC="$ga_cv_mpifc_naked"
+fi
+
 
 ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
@@ -6064,6 +6349,12 @@ ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+ CC="$pagoda_mpi_unwrap_push_save_CC"
+CXX="$pagoda_mpi_unwrap_push_save_CXX"
+F77="$pagoda_mpi_unwrap_push_save_F77"
+ FC="$pagoda_mpi_unwrap_push_save_FC"
 
 ac_ext=f
 ac_compile='$F77 -c $FFLAGS conftest.$ac_ext >&5'
