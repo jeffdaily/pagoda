@@ -170,7 +170,11 @@ int DataType::to_ga() const
     } else if (operator==(DataType::DOUBLE)) {
         return C_DBL;
     } else if (operator==(DataType::LONGDOUBLE)) {
+#ifdef C_LDBL
         return C_LDBL;
+#else
+        throw DataTypeException("GA does not support C long double");
+#endif
     } else if (operator==(DataType::UCHAR)) {
         throw DataTypeException("GA does not support C unsigned char");
     } else if (operator==(DataType::USHORT)) {
@@ -448,8 +452,10 @@ DataType DataType::to_dt(int type)
         return DataType::FLOAT;
     } else if (C_DBL == type) {
         return DataType::DOUBLE;
+#ifdef C_LDBL
     } else if (C_LDBL == type) {
         return DataType::LONGDOUBLE;
+#endif
     }
     throw DataTypeException("could not determine DataType from int");
 }

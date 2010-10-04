@@ -638,9 +638,15 @@ build
 LIBTOOL
 ENABLE_GA_TESTS_FALSE
 ENABLE_GA_TESTS_TRUE
-PKG_CPPFLAGS
-PKG_LDFLAGS
-PKG_LIBS
+MPI_CPPFLAGS
+MPI_LDFLAGS
+MPI_LIBS
+GA_CPPFLAGS
+GA_LDFLAGS
+GA_LIBS
+PNETCDF_CPPFLAGS
+PNETCDF_LDFLAGS
+PNETCDF_LIBS
 CXXCPP
 FLIBS
 am__fastdepCXX_FALSE
@@ -4167,14 +4173,17 @@ else
 
 versions="--version -v -V -qversion"
 inside="$srcdir/build-aux/inside.pl"
+found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$ga_cv_mpif77_naked" = x; then :
 
+echo "only comparing stdout" >&5
 for version in $versions; do
     for naked_compiler in $compilers; do
         rm -f mpi.txt mpi.err naked.txt naked.err
         if $wrapped $version 1>mpi.txt 2>mpi.err; then :
-  if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  found_wrapped_version=1
+             if $naked_compiler $version 1>naked.txt 2>naked.err; then :
   if $inside mpi.txt naked.txt >/dev/null; then :
   ga_cv_mpif77_naked=$naked_compiler; break
 else
@@ -4193,9 +4202,38 @@ fi
 done
 
 fi
+# Perhaps none of the MPI compilers had a zero exit status (this is wrong).
+if test "x$found_wrapped_version" = x0; then :
+
+echo "no zero exit status found for MPI compilers" >&5
+if test "x$ga_cv_mpif77_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt mpi.err naked.txt naked.err
+        $wrapped $version 1>mpi.txt 2>mpi.err
+        if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpif77_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpif77_naked" != x; then :
+  break
+fi
+done
+
+fi
+
+fi
 # Try by combining stdout/err into one file.
 if test "x$ga_cv_mpif77_naked" = x; then :
 
+echo "try combining stdout and stderr into one file" >&5
 for version in $versions; do
     for naked_compiler in $compilers; do
         rm -f mpi.txt naked.txt
@@ -4822,14 +4860,17 @@ else
 
 versions="--version -v -V -qversion"
 inside="$srcdir/build-aux/inside.pl"
+found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$ga_cv_mpic_naked" = x; then :
 
+echo "only comparing stdout" >&5
 for version in $versions; do
     for naked_compiler in $compilers; do
         rm -f mpi.txt mpi.err naked.txt naked.err
         if $wrapped $version 1>mpi.txt 2>mpi.err; then :
-  if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  found_wrapped_version=1
+             if $naked_compiler $version 1>naked.txt 2>naked.err; then :
   if $inside mpi.txt naked.txt >/dev/null; then :
   ga_cv_mpic_naked=$naked_compiler; break
 else
@@ -4848,9 +4889,38 @@ fi
 done
 
 fi
+# Perhaps none of the MPI compilers had a zero exit status (this is wrong).
+if test "x$found_wrapped_version" = x0; then :
+
+echo "no zero exit status found for MPI compilers" >&5
+if test "x$ga_cv_mpic_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt mpi.err naked.txt naked.err
+        $wrapped $version 1>mpi.txt 2>mpi.err
+        if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpic_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpic_naked" != x; then :
+  break
+fi
+done
+
+fi
+
+fi
 # Try by combining stdout/err into one file.
 if test "x$ga_cv_mpic_naked" = x; then :
 
+echo "try combining stdout and stderr into one file" >&5
 for version in $versions; do
     for naked_compiler in $compilers; do
         rm -f mpi.txt naked.txt
@@ -5952,14 +6022,17 @@ else
 
 versions="--version -v -V -qversion"
 inside="$srcdir/build-aux/inside.pl"
+found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$ga_cv_mpicxx_naked" = x; then :
 
+echo "only comparing stdout" >&5
 for version in $versions; do
     for naked_compiler in $compilers; do
         rm -f mpi.txt mpi.err naked.txt naked.err
         if $wrapped $version 1>mpi.txt 2>mpi.err; then :
-  if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  found_wrapped_version=1
+             if $naked_compiler $version 1>naked.txt 2>naked.err; then :
   if $inside mpi.txt naked.txt >/dev/null; then :
   ga_cv_mpicxx_naked=$naked_compiler; break
 else
@@ -5978,9 +6051,38 @@ fi
 done
 
 fi
+# Perhaps none of the MPI compilers had a zero exit status (this is wrong).
+if test "x$found_wrapped_version" = x0; then :
+
+echo "no zero exit status found for MPI compilers" >&5
+if test "x$ga_cv_mpicxx_naked" = x; then :
+
+for version in $versions; do
+    for naked_compiler in $compilers; do
+        rm -f mpi.txt mpi.err naked.txt naked.err
+        $wrapped $version 1>mpi.txt 2>mpi.err
+        if $naked_compiler $version 1>naked.txt 2>naked.err; then :
+  if $inside mpi.txt naked.txt >/dev/null; then :
+  ga_cv_mpicxx_naked=$naked_compiler; break
+else
+  echo "inside.pl failed, skipping" >&5
+fi
+else
+  echo "$naked_compiler $version failed, skipping" >&5
+fi
+    done
+    if test "x$ga_cv_mpicxx_naked" != x; then :
+  break
+fi
+done
+
+fi
+
+fi
 # Try by combining stdout/err into one file.
 if test "x$ga_cv_mpicxx_naked" = x; then :
 
+echo "try combining stdout and stderr into one file" >&5
 for version in $versions; do
     for naked_compiler in $compilers; do
         rm -f mpi.txt naked.txt

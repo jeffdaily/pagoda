@@ -3,7 +3,9 @@ GATYPE_EXPAND(C_LONG,    long)
 GATYPE_EXPAND(C_LONGLONG,long long)
 GATYPE_EXPAND(C_FLOAT,   float)
 GATYPE_EXPAND(C_DBL,     double)
+#ifdef C_LDBL
 GATYPE_EXPAND(C_LDBL,    long double)
+#endif
 {
     throw DataTypeException("GA type not handled", type);
 }

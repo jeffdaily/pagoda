@@ -222,30 +222,39 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
             cast_helper(C_LONGLONG,long long,  C_INT,int)
             cast_helper(C_FLOAT,   float,      C_INT,int)
             cast_helper(C_DBL,     double,     C_INT,int)
+#ifdef C_LDBL
             cast_helper(C_LDBL,    long double,C_INT,int)
+#endif
             cast_helper(C_INT,     int,        C_LONG,long)
             cast_helper(C_LONG,    long,       C_LONG,long)
             cast_helper(C_LONGLONG,long long,  C_LONG,long)
             cast_helper(C_FLOAT,   float,      C_LONG,long)
             cast_helper(C_DBL,     double,     C_LONG,long)
+#ifdef C_LDBL
             cast_helper(C_LDBL,    long double,C_LONG,long)
+#endif
             cast_helper(C_INT,     int,        C_LONGLONG,long long)
             cast_helper(C_LONG,    long,       C_LONGLONG,long long)
             cast_helper(C_LONGLONG,long long,  C_LONGLONG,long long)
             cast_helper(C_FLOAT,   float,      C_LONGLONG,long long)
             cast_helper(C_DBL,     double,     C_LONGLONG,long long)
+#ifdef C_LDBL
             cast_helper(C_LDBL,    long double,C_LONGLONG,long long)
+#endif
             cast_helper(C_INT,     int,        C_FLOAT,float)
             cast_helper(C_LONG,    long,       C_FLOAT,float)
             cast_helper(C_LONGLONG,long long,  C_FLOAT,float)
             cast_helper(C_FLOAT,   float,      C_FLOAT,float)
             cast_helper(C_DBL,     double,     C_FLOAT,float)
+#ifdef C_LDBL
             cast_helper(C_LDBL,    long double,C_FLOAT,float)
+#endif
             cast_helper(C_INT,     int,        C_DBL,double)
             cast_helper(C_LONG,    long,       C_DBL,double)
             cast_helper(C_LONGLONG,long long,  C_DBL,double)
             cast_helper(C_FLOAT,   float,      C_DBL,double)
             cast_helper(C_DBL,     double,     C_DBL,double)
+#ifdef C_LDBL
             cast_helper(C_LDBL,    long double,C_DBL,double)
             cast_helper(C_INT,     int,        C_LDBL,long double)
             cast_helper(C_LONG,    long,       C_LDBL,long double)
@@ -253,6 +262,7 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
             cast_helper(C_FLOAT,   float,      C_LDBL,long double)
             cast_helper(C_DBL,     double,     C_LDBL,long double)
             cast_helper(C_LDBL,    long double,C_LDBL,long double)
+#endif
             {
                 ERR("Types not recognized for cast");
             }
