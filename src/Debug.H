@@ -18,20 +18,40 @@ void print_zero(const string &str);
 void print_zero(FILE *stream, const char *fmt, ...);
 void print_zero(FILE *stream, const string &str);
 
+void println_zero(const char *fmt, ...);
+void println_zero(const string &str);
+void println_zero(FILE *stream, const char *fmt, ...);
+void println_zero(FILE *stream, const string &str);
+
 void print_zero_dummy(const char *fmt, ...);
 void print_zero_dummy(const string &str);
 void print_zero_dummy(FILE *stream, const char *fmt, ...);
 void print_zero_dummy(FILE *stream, const string &str);
+
+void println_zero_dummy(const char *fmt, ...);
+void println_zero_dummy(const string &str);
+void println_zero_dummy(FILE *stream, const char *fmt, ...);
+void println_zero_dummy(FILE *stream, const string &str);
 
 void print_sync(const char *fmt, ...);
 void print_sync(const string &str);
 void print_sync(FILE *stream, const char *fmt, ...);
 void print_sync(FILE *stream, const string &str);
 
+void println_sync(const char *fmt, ...);
+void println_sync(const string &str);
+void println_sync(FILE *stream, const char *fmt, ...);
+void println_sync(FILE *stream, const string &str);
+
 void print_sync_dummy(const char *fmt, ...);
 void print_sync_dummy(const string &str);
 void print_sync_dummy(FILE *stream, const char *fmt, ...);
 void print_sync_dummy(FILE *stream, const string &str);
+
+void println_sync_dummy(const char *fmt, ...);
+void println_sync_dummy(const string &str);
+void println_sync_dummy(FILE *stream, const char *fmt, ...);
+void println_sync_dummy(FILE *stream, const string &str);
 
 template <class Collection>
 string vec_to_string(

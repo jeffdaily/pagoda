@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include "CommandException.H"
 #include "CommandLineOption.H"
 #include "Error.H"
 #include "GenericCommands.H"
@@ -52,7 +53,7 @@ void PgraCommands::parse(int argc, char **argv)
     if (parser.count("op_typ")) {
         op_type = parser.get_argument("op_typ");
         if (find(VALID.begin(),VALID.end(),op_type) == VALID.end()) {
-            ERR("operator '" + op_type + "' not recognized");
+            throw CommandException("operator '" + op_type + "' not recognized");
         }
     } else {
         op_type = OP_AVG;

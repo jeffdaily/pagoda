@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 
     if (argc != 2) {
         cerr << "Usage: pgdump <filename>" << endl;
+        pagoda::finalize();
         return EXIT_FAILURE;
     }
 

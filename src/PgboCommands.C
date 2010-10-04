@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include "CommandException.H"
 #include "CommandLineOption.H"
 #include "Dataset.H"
 #include "Error.H"
@@ -55,7 +56,7 @@ void PgboCommands::parse(int argc, char **argv)
     }
 
     if (input_filenames.size() != 2) {
-        ERR("two and only input files required");
+        throw CommandException("two and only input files required");
     }
 
     if (parser.count("op_typ")) {
@@ -66,10 +67,10 @@ void PgboCommands::parse(int argc, char **argv)
         valid.insert(valid.end(), DIV.begin(), DIV.end());
         op_type = parser.get_argument("op_typ");
         if (find(valid.begin(),valid.end(),op_type) == valid.end()) {
-            ERR("operator '" + op_type + "' not recognized");
+            throw CommandException("operator '" + op_type + "' not recognized");
         }
     } else {
-        ERR("operator is required");
+        throw CommandException("operator is required");
     }
 }
 
@@ -77,7 +78,7 @@ void PgboCommands::parse(int argc, char **argv)
 Dataset* PgboCommands::get_dataset() const
 {
     if (input_filenames.size() != 2) {
-        ERR("two and only input files required");
+        throw CommandException("two and only input files required");
     }
     return Dataset::open(input_filenames[0]);
 }
@@ -86,7 +87,7 @@ Dataset* PgboCommands::get_dataset() const
 Dataset* PgboCommands::get_operand() const
 {
     if (input_filenames.size() != 2) {
-        ERR("two and only input files required");
+        throw CommandException("two and only input files required");
     }
     return Dataset::open(input_filenames[1]);
 }
@@ -104,7 +105,7 @@ string PgboCommands::get_operator() const
     } else if (find(DIV.begin(),DIV.end(),op_type) != DIV.end()) {
         return OP_DIV;
     } else {
-        ERR("could not normalize operator");
+        throw CommandException("could not normalize operator");
     }
 }
 

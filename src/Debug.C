@@ -101,10 +101,47 @@ void pagoda::print_zero(FILE *stream, const string &str)
 }
 
 
+void pagoda::println_zero(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    println_zero(stderr, to_string(fmt, ap));
+    va_end(ap);
+}
+
+
+void pagoda::println_zero(const string &str)
+{
+    println_zero(stderr, str);
+}
+
+
+void pagoda::println_zero(FILE *stream, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    println_zero(stream, to_string(fmt, ap));
+    va_end(ap);
+}
+
+
+void pagoda::println_zero(FILE *stream, const string &str)
+{
+    print_zero(stream, str+"\n");
+}
+
+
 void pagoda::print_zero_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
 void pagoda::print_zero_dummy(const string &str) { }
 void pagoda::print_zero_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
 void pagoda::print_zero_dummy(FILE *stream, const string &str) { }
+
+void pagoda::println_zero_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_zero_dummy(const string &str) { }
+void pagoda::println_zero_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_zero_dummy(FILE *stream, const string &str) { }
 
 
 void pagoda::print_sync(const char *fmt, ...)
@@ -163,7 +200,44 @@ void pagoda::print_sync(FILE *stream, const string &str)
 }
 
 
+void pagoda::println_sync(const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    println_sync(stderr, to_string(fmt, ap));
+    va_end(ap);
+}
+
+
+void pagoda::println_sync(const string &str)
+{
+    println_sync(stderr, str);
+}
+
+
+void pagoda::println_sync(FILE *stream, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    println_sync(stream, to_string(fmt, ap));
+    va_end(ap);
+}
+
+
+void pagoda::println_sync(FILE *stream, const string &str)
+{
+    print_sync(stream, str+"\n");
+}
+
+
 void pagoda::print_sync_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
 void pagoda::print_sync_dummy(const string &str) { }
 void pagoda::print_sync_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
 void pagoda::print_sync_dummy(FILE *stream, const string &str) { }
+
+void pagoda::println_sync_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_sync_dummy(const string &str) { }
+void pagoda::println_sync_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_sync_dummy(FILE *stream, const string &str) { }

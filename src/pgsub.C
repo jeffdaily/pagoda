@@ -9,6 +9,7 @@
 
 #include "Array.H"
 #include "Bootstrap.H"
+#include "CommandException.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -134,6 +135,10 @@ int main(int argc, char **argv)
 
         pagoda::finalize();
 
+    } catch (CommandException &ex) {
+        pagoda::println_zero(ex.what());
+        pagoda::finalize();
+        return EXIT_FAILURE;
     } catch (exception &ex) {
         pagoda::abort(ex.what());
     }

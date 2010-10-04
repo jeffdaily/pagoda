@@ -8,6 +8,7 @@
 #include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
 #include "Attribute.H"
+#include "CommandException.H"
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
 #include "Common.H"
@@ -117,14 +118,14 @@ void GenericCommands::parse(int argc, char **argv)
     }
 
     if (positional_arguments.empty()) {
-        ERR("input and output file arguments required");
+        throw CommandException("input and output file arguments required");
     }
 
     if (parser.count("output") == 0) {
         if (positional_arguments.size() == 1) {
-            ERR("output file argument required");
+            throw CommandException("output file argument required");
         } else if (positional_arguments.size() == 0) {
-            ERR("input and output file arguments required");
+            throw CommandException("input and output file arguments required");
         }
         output_filename = positional_arguments.back();
         input_filenames.assign(positional_arguments.begin(),
@@ -133,7 +134,7 @@ void GenericCommands::parse(int argc, char **argv)
         output_filename = parser.get_argument("output");
         input_filenames = positional_arguments;
     } else if (parser.count("output") > 1) {
-        ERR("too many output file arguments");
+        throw CommandException("too many output file arguments");
     }
 
     if (parser.count("auxiliary")) {
@@ -208,7 +209,7 @@ Dataset* GenericCommands::get_dataset() const
     Aggregation *agg;
 
     if (input_filenames.empty()) {
-        ERR("Missing input files");
+        throw CommandException("Missing input files");
     }
 
     if (input_filenames.size() == 1) {

@@ -2,8 +2,10 @@
 #define PAGODAEXCEPTION_H_
 
 #include <stdexcept>
+#include <sstream>
 #include <string>
 
+using std::ostringstream;
 using std::runtime_error;
 using std::string;
 
