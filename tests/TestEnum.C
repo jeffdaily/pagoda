@@ -52,7 +52,7 @@ int main(int argc, char **argv)
         a_msk->put(msk, ZERO, hi);
     }
 
-    a_dst->fill(-1);
+    a_dst->fill_value(-1);
     pagoda::enumerate(a_src, &TWO, &THREE);
     pagoda::enumerate(a_enm, &START, &STEP);
     pagoda::unpack1d(a_src, a_dst, a_msk);

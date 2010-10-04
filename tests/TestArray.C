@@ -117,8 +117,8 @@ int main(int argc, char **argv)
 
     array1 = Array::create(DataType::INT, shape1);
     array2 = Array::create(DataType::INT, shape2);
-    array1->fill(1);
-    array2->fill(2);
+    array1->fill_value(1);
+    array2->fill_value(2);
 
     array3 = array1->add(array1);
     array3->dump();

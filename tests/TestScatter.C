@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     pagoda::initialize(&argc, &argv);
 
     array = Array::create(DataType::INT, shape);
-    array->fill(pagoda::npe);
+    array->fill_value(pagoda::npe);
 
     // each process scatters their id
     for (int64_t i=pagoda::me; i<shape[1]; i+=pagoda::npe) {

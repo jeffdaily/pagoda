@@ -48,9 +48,9 @@ int main(int argc, char **argv)
     start.push_back(3);
     start.push_back(3);
 
-    array1->fill(1);
-    array2->fill(2);
-    array3->fill(3);
+    array1->fill_value(1);
+    array2->fill_value(2);
+    array3->fill_value(3);
     pagoda::barrier();
 
     writer = FileWriter::create("test.nc");
