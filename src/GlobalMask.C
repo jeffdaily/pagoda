@@ -134,7 +134,7 @@ void GlobalMask::clear()
 {
     TIMING("GlobalMask::clear()");
 
-    mask->fill(0);
+    mask->fill_value(0);
 }
 
 
@@ -143,7 +143,7 @@ void GlobalMask::clear()
  */
 void GlobalMask::reset()
 {
-    TIMING("GlobalMask::fill()");
+    TIMING("GlobalMask::reset()");
 
     mask->fill_value(1);
 }
