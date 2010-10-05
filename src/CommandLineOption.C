@@ -5,84 +5,107 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include <cassert>
+
 #include "CommandLineOption.H"
 #include "Util.H"
 
 
 int CommandLineOption::WIDTH(20);
 
-
-CommandLineOption CommandLineOption::HELP(
-        'h', "help", false,
-        "print this usage information and exit");
-CommandLineOption CommandLineOption::INPUT_PATH(
-        'p', "path", true,
-        "path prefix for all input filenames");
-CommandLineOption CommandLineOption::OUTPUT(
-        'o', "output", true,
-        "output file name (or use last positional argument)");
-CommandLineOption CommandLineOption::VARIABLE(
-        'v', "variable", true,
-        "var1[,var2[,...]] variable(s) to process");
-CommandLineOption CommandLineOption::EXCLUDE(
-        'x', "exclude", false,
-        "extract all variables EXCEPT those specified with -v");
-CommandLineOption CommandLineOption::NO_COORDS(
-        'C', "no-coords", false,
-        "associated coordinate variables should not be processed");
-CommandLineOption CommandLineOption::COORDS(
-        'c', "coords", false,
-        "all coordinate variables will be processed");
-CommandLineOption CommandLineOption::TOPOLOGY(
-        'T', "topology", false,
-        "do not process toplogy variables");
-CommandLineOption CommandLineOption::DIMENSION(
-        'd', "dimension", true,
-        "dim[,min[,max[,stride]]]");
-CommandLineOption CommandLineOption::AUXILIARY(
-        'X', "auxiliary", true,
-        "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");
-CommandLineOption CommandLineOption::LATLONBOX(
-        'b', "box", true,
-        "north,south,east,west lat/lon bounding box");
-CommandLineOption CommandLineOption::OPERATION(
-        'y', "operation", true,
-        "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");
-CommandLineOption CommandLineOption::OVERWRITE(
-        'O', "overwrite", false,
-        "overwrite existing output file, if any");
-CommandLineOption CommandLineOption::APPEND(
-        'A', "append", false,
-        "append to existing output file, if any");
-CommandLineOption CommandLineOption::HISTORY(
-        'h', "history", false,
-        "do not append to 'history' global attribute");
 CommandLineOption CommandLineOption::ALPHABETIZE(
         'a', "alphabetize", false,
         "disable alphabetization of extracted variables");
-CommandLineOption CommandLineOption::JOIN(
-        'j', "join", true,
-        "dimension   join all input files on the given dimension");
-CommandLineOption CommandLineOption::UNION(
-        'u', "union", false,
-        "take the union of all input files");
-CommandLineOption CommandLineOption::OP_TYPE(
-        'y', "op_typ", true,
-        "Binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
+CommandLineOption CommandLineOption::APPEND(
+        'A', "append", false,
+        "append to existing output file, if any");
+CommandLineOption CommandLineOption::AUXILIARY(
+        'X', "auxiliary", true,
+        "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");
 CommandLineOption CommandLineOption::AVG_TYPE(
         'y', "op_typ", true,
         "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
+CommandLineOption CommandLineOption::CDF3(
+        '3', "3", false,
+        "output file in netCDF3 CLASSIC (32-bit offset) storage format");
+CommandLineOption CommandLineOption::CDF4(
+        '6', "64", false,
+        "output file in netCDF3 64-bit offset storage format");
+CommandLineOption CommandLineOption::CDF5(
+        '5', "5", false,
+        "output file in parallel netCDF 64-bit data format");
+CommandLineOption CommandLineOption::COORDS(
+        'c', "coords", false,
+        "all coordinate variables will be processed");
+CommandLineOption CommandLineOption::DIMENSION(
+        'd', "dimension", true,
+        "dim[,min[,max[,stride]]]");
+CommandLineOption CommandLineOption::EXCLUDE(
+        'x', "exclude", false,
+        "extract all variables EXCEPT those specified with -v");
+CommandLineOption CommandLineOption::FILE_FORMAT(
+        0, "file_format", true,
+        "=classic same as -3* =64bit same as -6* =64data same as -5",
+        "fl_fmt");
+CommandLineOption CommandLineOption::HELP(
+        'h', "help", false,
+        "print this usage information and exit");
+CommandLineOption CommandLineOption::HISTORY(
+        'h', "history", false,
+        "do not append to 'history' global attribute");
+CommandLineOption CommandLineOption::INPUT_PATH(
+        'p', "path", true,
+        "path prefix for all input filenames");
+CommandLineOption CommandLineOption::JOIN(
+        'j', "join", true,
+        "join all input files on the given dimension");
+CommandLineOption CommandLineOption::LATLONBOX(
+        'b', "box", true,
+        "north,south,east,west lat/lon bounding box");
+CommandLineOption CommandLineOption::NO_COORDS(
+        'C', "no-coords", false,
+        "associated coordinate variables should not be processed");
+CommandLineOption CommandLineOption::OPERATION(
+        'y', "operation", true,
+        "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");
+CommandLineOption CommandLineOption::OP_TYPE(
+        'y', "op_typ", true,
+        "binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
+CommandLineOption CommandLineOption::OUTPUT(
+        'o', "output", true,
+        "output file name (or use last positional argument)");
+CommandLineOption CommandLineOption::OVERWRITE(
+        'O', "overwrite", false,
+        "overwrite existing output file, if any");
+CommandLineOption CommandLineOption::TOPOLOGY(
+        'T', "topology", false,
+        "do not process toplogy variables");
+CommandLineOption CommandLineOption::UNION(
+        'u', "union", false,
+        "take the union of all input files");
+CommandLineOption CommandLineOption::VARIABLE(
+        'v', "variable", true,
+        "var1[,var2[,...]] variable(s) to process");
 
 
 CommandLineOption::CommandLineOption(const int &value, const string &name,
-        const bool &argument, const string &description)
+        const bool &argument, const string &description,
+        const string &extra_name1, const string &extra_name2)
     :   _value(value)
-    ,   _name(name)
+    ,   _names()
     ,   _has_argument(argument)
     ,   _description(description)
     ,   _count(0)
     ,   _arguments()
 {
+    assert(!name.empty());
+    _names.push_back(name);
+    if (!extra_name1.empty()) {
+        _names.push_back(extra_name1);
+    }
+    if (!extra_name2.empty()) {
+        _names.push_back(extra_name2);
+    }
 }
 
 
@@ -91,49 +114,62 @@ CommandLineOption::~CommandLineOption()
 }
 
 
-void inline CommandLineOption::set_value(const int &value)
+void CommandLineOption::set_value(const int &value)
 {
     _value = value;
 }
 
 
-void inline CommandLineOption::set_name(const string &name)
+void CommandLineOption::set_name(const string &name)
 {
-    _name = name;
+    _names.clear();
+    _names.push_back(name);
 }
 
 
-void inline CommandLineOption::has_argument(const bool &argument)
+void CommandLineOption::set_names(const vector<string> &names)
+{
+    _names = names;
+}
+
+
+void CommandLineOption::has_argument(const bool &argument)
 {
     _has_argument = argument;
 }
 
 
-void inline CommandLineOption::set_description(const string &description)
+void CommandLineOption::set_description(const string &description)
 {
     _description = description;
 }
 
 
-int inline CommandLineOption::get_value() const
+int CommandLineOption::get_value() const
 {
     return _value;
 }
 
 
-string inline CommandLineOption::get_name() const
+string CommandLineOption::get_name() const
 {
-    return _name;
+    return _names.front();
 }
 
 
-bool inline CommandLineOption::has_argument() const
+vector<string> CommandLineOption::get_names() const
+{
+    return _names;
+}
+
+
+bool CommandLineOption::has_argument() const
 {
     return _has_argument;
 }
 
 
-string inline CommandLineOption::get_description() const
+string CommandLineOption::get_description() const
 {
     return _description;
 }
@@ -141,7 +177,9 @@ string inline CommandLineOption::get_description() const
 
 bool CommandLineOption::handle(int value, const string &arg, const string &name)
 {
-    if (_value == value || (0 == value && _name == name)) {
+    if (_value == value
+            || (0 == value
+                && find(_names.begin(), _names.end(), name) != _names.end())) {
         ++_count;
         if (_has_argument) {
             _arguments.push_back(arg);
@@ -167,7 +205,11 @@ string CommandLineOption::get_usage() const
         usage += char(_value);
         usage += ", ";
     }
-    usage += "--" + _name;
+    usage += "--" + _names.front();
+    for (vector<string>::const_iterator it=_names.begin()+1;
+            it!=_names.end(); ++it) {
+        usage += ", --" + *it;
+    }
 
     if (usage.size() >= WIDTH) {
         usage += "\n";
@@ -179,14 +221,24 @@ string CommandLineOption::get_usage() const
     }
 
     for (size_t i=0,limit=parts.size(); i<limit; ++i) {
+        assert(!parts[i].empty());
         if ((parts[i].size() + length) > (80 - WIDTH)) {
             usage += "\n";
             usage += space;
             length = 0;
         }
-        usage += " ";
-        usage += parts[i];
-        length += 1 + parts[i].size();
+        if (parts[i][parts[i].size()-1] == '*') {
+            usage += " ";
+            usage += parts[i].substr(0, parts[i].size()-1);
+            length += 1 + parts[i].size()-1;
+            usage += "\n";
+            usage += space;
+            length = 0;
+        } else {
+            usage += " ";
+            usage += parts[i];
+            length += 1 + parts[i].size();
+        }
     }
 
     return usage;
@@ -204,11 +256,11 @@ string CommandLineOption::get_option() const
 }
 
 
-struct option CommandLineOption::get_option_long() const
+struct option CommandLineOption::get_long_option() const
 {
     struct option ret;
 
-    ret.name = _name.c_str();
+    ret.name = _names.front().c_str();
     ret.has_arg = _has_argument;
     ret.flag = NULL;
     ret.val = _value;
@@ -217,13 +269,31 @@ struct option CommandLineOption::get_option_long() const
 }
 
 
-int inline CommandLineOption::get_count() const
+vector<struct option> CommandLineOption::get_long_options() const
+{
+    vector<struct option> ret;
+
+    for (vector<string>::const_iterator it=_names.begin();
+            it!=_names.end(); ++it) {
+        struct option current_option;
+        current_option.name = it->c_str();
+        current_option.has_arg = _has_argument;
+        current_option.flag = NULL;
+        current_option.val = _value;
+        ret.push_back(current_option);
+    }
+
+    return ret;
+}
+
+
+int CommandLineOption::get_count() const
 {
     return _count;
 }
 
 
-string inline CommandLineOption::get_argument() const
+string CommandLineOption::get_argument() const
 {
     if (!_arguments.empty()) {
         return _arguments.front();
@@ -232,7 +302,7 @@ string inline CommandLineOption::get_argument() const
 }
 
 
-vector<string> inline CommandLineOption::get_arguments() const
+vector<string> CommandLineOption::get_arguments() const
 {
     return _arguments;
 }

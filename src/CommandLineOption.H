@@ -28,57 +28,63 @@ class CommandLineOption
         static int WIDTH;
 
         CommandLineOption(const int &value, const string &name,
-                const bool &argument, const string &description);
-        virtual ~CommandLineOption();
+                const bool &argument, const string &description,
+                const string &extra_name1="", const string &extra_name2="");
+        ~CommandLineOption();
 
-        virtual void set_value(const int &value);
-        virtual void set_name(const string &name);
-        virtual void has_argument(const bool &argument);
-        virtual void set_description(const string &description);
+        void set_value(const int &value);
+        void set_name(const string &name);
+        void set_names(const vector<string> &names);
+        void has_argument(const bool &argument);
+        void set_description(const string &description);
 
-        virtual int get_value() const;
-        virtual string get_name() const;
-        virtual bool has_argument() const;
-        virtual string get_description() const;
+        int get_value() const;
+        string get_name() const;
+        vector<string> get_names() const;
+        bool has_argument() const;
+        string get_description() const;
 
-        virtual bool handle(int value, const string &arg,
-                const string &name="");
-        virtual string get_usage() const;
-        virtual string get_option() const;
-        virtual struct option get_option_long() const;
-        virtual int get_count() const;
-        virtual string get_argument() const;
-        virtual vector<string> get_arguments() const;
+        bool handle(int value, const string &arg, const string &name="");
+        string get_usage() const;
+        string get_option() const;
+        struct option get_long_option() const;
+        vector<struct option> get_long_options() const;
+        int get_count() const;
+        string get_argument() const;
+        vector<string> get_arguments() const;
 
         static struct option get_long_opt_null();
 
-        static CommandLineOption HELP;
-        static CommandLineOption INPUT_PATH;
-        static CommandLineOption OUTPUT;
-        static CommandLineOption VARIABLE;
-        static CommandLineOption EXCLUDE;
-        static CommandLineOption NO_COORDS;
-        static CommandLineOption COORDS;
-        static CommandLineOption TOPOLOGY;
-        static CommandLineOption DIMENSION;
-        static CommandLineOption AUXILIARY;
-        static CommandLineOption LATLONBOX;
-        static CommandLineOption OPERATION;
-        static CommandLineOption OVERWRITE;
-        static CommandLineOption APPEND;
-        static CommandLineOption HISTORY;
         static CommandLineOption ALPHABETIZE;
-        static CommandLineOption JOIN;
-        static CommandLineOption UNION;
-        static CommandLineOption OP_TYPE;
+        static CommandLineOption APPEND;
+        static CommandLineOption AUXILIARY;
         static CommandLineOption AVG_TYPE;
+        static CommandLineOption CDF3;
+        static CommandLineOption CDF4;
+        static CommandLineOption CDF5;
+        static CommandLineOption COORDS;
+        static CommandLineOption DIMENSION;
+        static CommandLineOption EXCLUDE;
+        static CommandLineOption FILE_FORMAT;
+        static CommandLineOption HELP;
+        static CommandLineOption HISTORY;
+        static CommandLineOption INPUT_PATH;
+        static CommandLineOption JOIN;
+        static CommandLineOption LATLONBOX;
+        static CommandLineOption NO_COORDS;
+        static CommandLineOption OPERATION;
+        static CommandLineOption OP_TYPE;
+        static CommandLineOption OUTPUT;
+        static CommandLineOption OVERWRITE;
+        static CommandLineOption TOPOLOGY;
+        static CommandLineOption UNION;
+        static CommandLineOption VARIABLE;
 
     protected:
         int _value;
-        string _name;
+        vector<string> _names;
         bool _has_argument;
         string _description;
-
         int _count;
         vector<string> _arguments;
 };

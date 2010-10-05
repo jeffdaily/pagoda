@@ -75,19 +75,23 @@ GenericCommands::GenericCommands(int argc, char **argv)
 
 void GenericCommands::init()
 {
-    parser.push_back(&CommandLineOption::HELP);
-    parser.push_back(&CommandLineOption::OUTPUT);
-    parser.push_back(&CommandLineOption::AUXILIARY);
-    parser.push_back(&CommandLineOption::LATLONBOX);
-    parser.push_back(&CommandLineOption::DIMENSION);
-    parser.push_back(&CommandLineOption::VARIABLE);
-    parser.push_back(&CommandLineOption::EXCLUDE);
     parser.push_back(&CommandLineOption::ALPHABETIZE);
+    parser.push_back(&CommandLineOption::AUXILIARY);
+    parser.push_back(&CommandLineOption::CDF3);
+    parser.push_back(&CommandLineOption::CDF4);
+    parser.push_back(&CommandLineOption::CDF5);
     parser.push_back(&CommandLineOption::COORDS);
-    parser.push_back(&CommandLineOption::NO_COORDS);
-    parser.push_back(&CommandLineOption::JOIN);
-    parser.push_back(&CommandLineOption::UNION);
+    parser.push_back(&CommandLineOption::DIMENSION);
+    parser.push_back(&CommandLineOption::FILE_FORMAT);
+    parser.push_back(&CommandLineOption::EXCLUDE);
+    parser.push_back(&CommandLineOption::HELP);
     parser.push_back(&CommandLineOption::HISTORY);
+    parser.push_back(&CommandLineOption::JOIN);
+    parser.push_back(&CommandLineOption::LATLONBOX);
+    parser.push_back(&CommandLineOption::NO_COORDS);
+    parser.push_back(&CommandLineOption::OUTPUT);
+    parser.push_back(&CommandLineOption::UNION);
+    parser.push_back(&CommandLineOption::VARIABLE);
 }
 
 
@@ -199,6 +203,38 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("topology")) {
         process_topology = false;
+    }
+
+    if (parser.count("file_format")) {
+        vector<string> args = parser.get_arguments("file_format");
+        string val;
+        if (args.empty()) {
+            throw CommandException("file format requires an argument");
+        } else if (args.size() > 1) {
+            throw CommandException("file format given more than one argument");
+        }
+        val = args.front();
+        if (val == "classic") {
+            //file_format = "cdf3";
+        } else if (val == "64bit") {
+            //file_format = "cdf4";
+        } else if (val == "64data") {
+            //file_format = "cdf5";
+        } else {
+            throw CommandException("file format string not recognized");
+        }
+    }
+
+    if (parser.count("3")) {
+        //file_format = "cdf3";
+    }
+
+    if (parser.count("64")) {
+        //file_format = "cdf4";
+    }
+
+    if (parser.count("5")) {
+        //file_format = "cdf5";
     }
 }
 

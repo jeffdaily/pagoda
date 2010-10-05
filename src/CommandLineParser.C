@@ -44,8 +44,11 @@ void CommandLineParser::parse(int argc, char **argv)
     opt_string.reserve(options.size()*2);
     long_opts.reserve(options.size());
     for (it=options.begin(); it!=options.end(); ++it) {
+        vector<struct option> current_long_opts = (*it)->get_long_options();
         opt_string += (*it)->get_option();
-        long_opts.push_back((*it)->get_option_long());
+        //long_opts.push_back((*it)->get_option_long());
+        long_opts.insert(long_opts.end(),
+                current_long_opts.begin(), current_long_opts.end());
     }
 
     // do the parsing
