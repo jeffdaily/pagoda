@@ -5,9 +5,10 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include "CommandException.H"
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
-#include "Error.H"
+//#include "Error.H"
 
 
 CommandLineParser::CommandLineParser()
@@ -56,7 +57,7 @@ void CommandLineParser::parse(int argc, char **argv)
                     &long_opts[0], &long_index)) != -1) {
         if (opt == '?') {
             // getopt prints a warning
-            throw PagodaException("see --help for details");
+            throw CommandException("see --help for details");
         }
         for (it=options.begin(); it!=options.end(); ++it) {
             string name = long_index >= 0 ? long_opts[long_index].name : "";
