@@ -10,6 +10,7 @@ using std::string;
 using std::vector;
 
 #include "AbstractDataset.H"
+#include "FileFormat.H"
 
 class Array;
 class Attribute;
@@ -35,6 +36,8 @@ class PnetcdfDataset : public AbstractDataset
         virtual vector<Variable*> get_vars() const;
 
         virtual void wait();
+
+        virtual FileFormat get_file_format() const;
 
         virtual ostream& print(ostream &os) const;
 

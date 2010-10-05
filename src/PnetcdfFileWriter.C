@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <cassert>
 #include <exception>
 #include <string>
 #include <vector>
@@ -29,6 +30,19 @@ using std::string;
 using std::vector;
 
 
+static int file_format_to_nc_format(FileFormat format)
+{
+    assert(FF_PNETCDF_CDF1 <= format && format <= FF_PNETCDF_CDF5);
+    if (format == FF_PNETCDF_CDF1) {
+        return 0; /* NC_FORMAT_CLASSIC is default */
+    } else if (format == FF_PNETCDF_CDF2) {
+        return NC_64BIT_OFFSET;
+    } else if (format == FF_PNETCDF_CDF5) {
+        return NC_64BIT_DATA;
+    }
+}
+
+
 PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     :   FileWriter()
     ,   is_in_define_mode(true)
@@ -45,7 +59,26 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
     ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_OFFSET, MPI_INFO_NULL);
-    //ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_DATA, MPI_INFO_NULL);
+}
+
+
+PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, FileFormat format)
+    :   FileWriter()
+    ,   is_in_define_mode(true)
+    ,   filename(filename)
+    ,   ncid(-1)
+    ,   dim_id()
+    ,   dim_size()
+    ,   var_id()
+    ,   var_dims()
+    ,   var_shape()
+    ,   open(true)
+{
+    TIMING("PnetcdfFileWriter::PnetcdfFileWriter(string,FileFormat)");
+    TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
+    // create the output file
+    int ncformat = file_format_to_nc_format(format);
+    ncid = ncmpi::create(MPI_COMM_WORLD, filename, ncformat, MPI_INFO_NULL);
 }
 
 

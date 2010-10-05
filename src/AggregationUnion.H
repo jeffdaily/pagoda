@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Aggregation.H"
+#include "FileFormat.H"
 
 using std::string;
 using std::vector;
@@ -33,6 +34,8 @@ class AggregationUnion : public Aggregation
         virtual vector<Dataset*> get_datasets() const;
 
         virtual void wait();
+
+        virtual FileFormat get_file_format() const;
 
         virtual ostream& print(ostream &os) const;
 

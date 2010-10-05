@@ -138,6 +138,9 @@ AM_CONDITIONAL([ENABLE_GA_TESTS], [test "x$enable_ga_tests" = xyes])
 # Does pnetcdf have the new nonblocking interface?
 PAGODA_PNETCDF_NB_INT
 
+# Does pnetcdf have ncmpi_inq_format function?
+PAGODA_PNETCDF_INQ_FORMAT
+
 # Checks for GA functionality.
 AC_CHECK_FUNCS([GA_Llgop GA_Ldgop])
 

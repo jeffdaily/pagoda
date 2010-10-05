@@ -2,12 +2,14 @@
 #   include <config.h>
 #endif
 
+#include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "Dataset.H"
 #include "Dimension.H"
+#include "FileFormat.H"
 #include "FileWriter.H"
 #include "GenericAttribute.H"
 #include "Mask.H"
@@ -27,8 +29,24 @@ FileWriter* FileWriter::create(const string &filename)
     FileWriter *writer = NULL;
     string EXT_NC(".nc");
     if (pagoda::ends_with(filename, EXT_NC)) {
-        writer = new PnetcdfFileWriter(filename);
+        writer = create(filename, FF_PNETCDF_CDF2);
     }
+    return writer;
+}
+
+
+FileWriter* FileWriter::create(const string &filename, FileFormat format)
+{
+    //TIMING("FileWriter::create(string)");
+    FileWriter *writer = NULL;
+    switch (format) {
+        case FF_PNETCDF_CDF1:
+        case FF_PNETCDF_CDF2:
+        case FF_PNETCDF_CDF5:
+            writer = new PnetcdfFileWriter(filename, format);
+            break;
+    }
+    assert(writer);
     return writer;
 }
 

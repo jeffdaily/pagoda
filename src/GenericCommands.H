@@ -5,7 +5,9 @@
 #include <string>
 #include <vector>
 
+#include "CommandLineOption.H"
 #include "CommandLineParser.H"
+#include "FileFormat.H"
 #include "LatLonBox.H"
 #include "Slice.H"
 
@@ -31,7 +33,7 @@ class GenericCommands
 
         void parse(int argc, char **argv);
 
-        Dataset* get_dataset() const;
+        Dataset* get_dataset();
         FileWriter* get_output() const;
         vector<Variable*> get_variables(Dataset *dataset) const;
         vector<Dimension*> get_dimensions(Dataset *dataset) const;
@@ -49,7 +51,8 @@ class GenericCommands
         bool get_process_coords() const;
         bool get_modify_history() const;
         bool get_help() const;
-        string get_usage()  const;
+        string get_usage() const;
+        FileFormat get_file_format() const;
 
     protected:
         void init();
@@ -69,6 +72,7 @@ class GenericCommands
         bool help;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
+        FileFormat file_format;
 };
 
 #endif // GENERICCOMMANDS_H_

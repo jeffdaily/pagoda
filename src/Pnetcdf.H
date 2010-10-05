@@ -35,6 +35,7 @@ namespace ncmpi
     void rename_dim(int ncid, int dimid, const string &name);
     void rename_var(int ncid, int varid, const string &name);
 
+    int         inq_format(int ncid);
     void        inq(int ncid, int &ndims, int &nvars, int &ngatts, int &unlimdimid);
     int         inq_ndims(int ncid);
     int         inq_nvars(int ncid);

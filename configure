@@ -2675,6 +2675,53 @@ fi
 
 } # ac_fn_cxx_check_header_mongrel
 
+# ac_fn_cxx_check_decl LINENO SYMBOL VAR
+# --------------------------------------
+# Tests whether SYMBOL is declared, setting cache variable VAR accordingly.
+ac_fn_cxx_check_decl ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $2 is declared" >&5
+$as_echo_n "checking whether $2 is declared... " >&6; }
+if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+#ifndef $2
+  (void) $2;
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; test "x$as_lineno_stack" = x && { as_lineno=; unset as_lineno;}
+
+} # ac_fn_cxx_check_decl
+
 # ac_fn_c_check_func LINENO FUNC VAR
 # ----------------------------------
 # Tests whether FUNC exists, setting the cache variable VAR accordingly
@@ -8498,6 +8545,38 @@ if test $pagoda_cv_pnetcdf_nb_int = yes; then :
 $as_echo "#define HAVE_PNETCDF_NEW_NB 1" >>confdefs.h
 
 fi
+
+
+# Does pnetcdf have ncmpi_inq_format function?
+save_CPPFLAGS="$CPPFLAGS"; CPPFLAGS="$CPPFLAGS $PNETCDF_CPPFLAGS"
+ac_fn_cxx_check_decl "$LINENO" "ncmpi_inq_format" "ac_cv_have_decl_ncmpi_inq_format" "#include <pnetcdf.h>
+"
+if test "x$ac_cv_have_decl_ncmpi_inq_format" = x""yes; then :
+  ac_have_decl=1
+else
+  ac_have_decl=0
+fi
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_DECL_NCMPI_INQ_FORMAT $ac_have_decl
+_ACEOF
+
+CPPFLAGS="$save_CPPFLAGS"
+save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS"
+save_LIBS="$LIBS"; LIBS="$PNETCDF_LIBS $LIBS"
+for ac_func in ncmpi_inq_format
+do :
+  ac_fn_cxx_check_func "$LINENO" "ncmpi_inq_format" "ac_cv_func_ncmpi_inq_format"
+if test "x$ac_cv_func_ncmpi_inq_format" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_NCMPI_INQ_FORMAT 1
+_ACEOF
+
+fi
+done
+
+LDFLAGS="$save_LDFLAGS"
+LIBS="$save_LIBS"
 
 
 # Checks for GA functionality.

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "FileFormat.H"
 #include "LatLonBox.H"
 #include "Slice.H"
 
@@ -55,6 +56,8 @@ class Dataset
         virtual MaskMap* get_masks() const = 0;
 
         virtual void wait() = 0;
+
+        virtual FileFormat get_file_format() const = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Dataset *dataset);

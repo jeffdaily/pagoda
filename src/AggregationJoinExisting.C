@@ -159,6 +159,16 @@ void AggregationJoinExisting::wait()
 }
 
 
+FileFormat AggregationJoinExisting::get_file_format() const
+{
+    if (datasets.empty()) {
+        return FF_UNKNOWN;
+    } else {
+        return datasets.front()->get_file_format();
+    }
+}
+
+
 ostream& AggregationJoinExisting::print(ostream &os) const
 {
     TIMING("AggregationJoinExisting::print(ostream)");

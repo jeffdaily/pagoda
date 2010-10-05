@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Aggregation.H"
+#include "FileFormat.H"
 
 using std::ostream;
 using std::map;
@@ -40,6 +41,8 @@ class AggregationJoinExisting : public Aggregation
         virtual vector<Dataset*> get_datasets() const;
 
         virtual void wait();
+
+        virtual FileFormat get_file_format() const;
 
         virtual ostream& print(ostream &os) const;
 

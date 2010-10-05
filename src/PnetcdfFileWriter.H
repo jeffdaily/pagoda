@@ -23,6 +23,7 @@ class PnetcdfFileWriter : public FileWriter
 {
     public:
         PnetcdfFileWriter(const string &filename);
+        PnetcdfFileWriter(const string &filename, FileFormat format);
         virtual ~PnetcdfFileWriter();
         virtual void close();
 

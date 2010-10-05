@@ -122,6 +122,16 @@ void AggregationUnion::wait()
 }
 
 
+FileFormat AggregationUnion::get_file_format() const
+{
+    if (datasets.empty()) {
+        return FF_UNKNOWN;
+    } else {
+        return datasets.front()->get_file_format();
+    }
+}
+
+
 ostream& AggregationUnion::print(ostream &os) const
 {
     TIMING("AggregationUnion::print(ostream)");

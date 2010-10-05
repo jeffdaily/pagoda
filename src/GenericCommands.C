@@ -44,6 +44,7 @@ GenericCommands::GenericCommands()
     ,   help(false)
     ,   slices()
     ,   boxes()
+    ,   file_format(FF_UNKNOWN)
 {
     TIMING("GenericCommands::GenericCommands()");
     init();
@@ -215,31 +216,38 @@ void GenericCommands::parse(int argc, char **argv)
         }
         val = args.front();
         if (val == "classic") {
-            //file_format = "cdf3";
+            file_format = FF_PNETCDF_CDF1;
         } else if (val == "64bit") {
-            //file_format = "cdf4";
+            file_format = FF_PNETCDF_CDF2;
         } else if (val == "64data") {
-            //file_format = "cdf5";
+            file_format = FF_PNETCDF_CDF5;
         } else {
             throw CommandException("file format string not recognized");
         }
     }
 
     if (parser.count("3")) {
-        //file_format = "cdf3";
+        file_format = FF_PNETCDF_CDF1;
     }
 
     if (parser.count("64")) {
-        //file_format = "cdf4";
+        file_format = FF_PNETCDF_CDF2;
     }
 
     if (parser.count("5")) {
-        //file_format = "cdf5";
+        file_format = FF_PNETCDF_CDF5;
     }
 }
 
 
-Dataset* GenericCommands::get_dataset() const
+/**
+ * Creates and returns a new Dataset.
+ *
+ * Interprets the command-line parameters for union and join aggregations.
+ * Determines the file format and stores locally (otherwise this method would
+ * be const like the rest).
+ */
+Dataset* GenericCommands::get_dataset()
 {
     Dataset *dataset;
     Aggregation *agg;
@@ -261,13 +269,17 @@ Dataset* GenericCommands::get_dataset() const
         }
     }
 
+    if (file_format == FF_UNKNOWN) {
+        file_format = dataset->get_file_format();
+    }
+
     return dataset;
 }
 
 
 FileWriter* GenericCommands::get_output() const
 {
-    return FileWriter::create(output_filename);
+    return FileWriter::create(output_filename, file_format);
 }
 
 
@@ -564,4 +576,10 @@ bool GenericCommands::get_help() const
 string GenericCommands::get_usage() const
 {
     return parser.get_usage();
+}
+
+
+FileFormat GenericCommands::get_file_format() const
+{
+    return file_format;
 }

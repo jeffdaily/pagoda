@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Dataset.H"
+#include "FileFormat.H"
 #include "LatLonBox.H"
 #include "Slice.H"
 
@@ -56,6 +57,8 @@ class AbstractDataset : public Dataset
         virtual MaskMap* get_masks() const;
 
         virtual void wait() = 0;
+
+        virtual FileFormat get_file_format() const = 0;
 
         virtual ostream& print(ostream &os) const = 0;
 

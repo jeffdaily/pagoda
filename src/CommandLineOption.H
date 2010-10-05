@@ -22,6 +22,25 @@ static string OP_DIV("/");
 static string OP_MUL("*");
 static string OP_SUB("-");
 
+enum AverageOperator {
+    AO_AVG,
+    AO_SQRAVG,
+    AO_AVGSQR,
+    AO_MAX,
+    AO_MIN,
+    AO_RMS,
+    AO_RMSSDN,
+    AO_SQRT,
+    AO_TTL,
+};
+
+enum BinaryOperator {
+    BO_ADD,
+    BO_DIV,
+    BO_MUL,
+    BO_SUB,
+};
+
 class CommandLineOption
 {
     public:

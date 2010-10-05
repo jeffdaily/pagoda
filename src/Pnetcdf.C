@@ -126,6 +126,18 @@ void ncmpi::rename_var(int ncid, int varid, const string &name)
 }
 
 
+int ncmpi::inq_format(int ncid)
+{
+#if HAVE_NCMPI_INQ_FORMAT
+    int format;
+    PNETCDF_TIMING1("ncmpi_inq_format");
+    ERRNO_CHECK(ncmpi_inq_format(ncid, &format));
+    return format;
+#else
+    return NC_FORMAT_64BIT;
+#endif
+}
+
 void ncmpi::inq(int ncid, int &ndims, int &nvars, int &ngatts,
         int &unlimdimid)
 {

@@ -34,6 +34,7 @@ class FileWriter
 {
     public:
         static FileWriter* create(const string &filename);
+        static FileWriter* create(const string &filename, FileFormat format);
 
         FileWriter();
         virtual ~FileWriter();
