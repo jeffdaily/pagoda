@@ -45,7 +45,7 @@ void check(DataType type)
     g_a = Array::create(type, vector<int64_t>(2,n));
 
     // zero the array
-    g_a->fill(0);
+    g_a->fill_value(0);
     
     // check that it is indeed zero
     b = (T*)g_a->get(b, lo, hi);

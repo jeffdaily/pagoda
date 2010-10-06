@@ -1,0 +1,15 @@
+#ifndef FILEFORMAT_H_
+#define FILEFORMAT_H_
+
+enum FileFormat {
+    FF_NETCDF3_CDF1,
+    FF_NETCDF3_CDF2,
+    FF_NETCDF4_CDF1,
+    FF_NETCDF4_CDF2,
+    FF_PNETCDF_CDF1,
+    FF_PNETCDF_CDF2,
+    FF_PNETCDF_CDF5,
+    FF_UNKNOWN,
+};
+
+#endif /* FILEFORMAT_H_ */

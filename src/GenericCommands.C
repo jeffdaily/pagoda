@@ -337,6 +337,7 @@ FileWriter* GenericCommands::get_output() const
     writer->append(append)
         ->overwrite(overwrite)
         ->fixed_record_dimension(record_dimension_size)
+        ->header_pad(header_pad)
         ->create();
 
     return writer;
@@ -650,6 +651,12 @@ bool GenericCommands::is_overwriting() const
 bool GenericCommands::is_fixing_record_dimension() const
 {
     return fix_record_dimension;
+}
+
+
+int GenericCommands::get_header_pad() const
+{
+    return header_pad;
 }
 
 

@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     array3->fill_value(3);
     pagoda::barrier();
 
-    writer = FileWriter::create("test.nc");
+    writer = FileWriter::open("test.nc")->create();
     writer->def_dim("dim1", 10);
     writer->def_dim("dim2", 20);
     dims.push_back("dim1");
