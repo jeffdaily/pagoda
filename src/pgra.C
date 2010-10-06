@@ -77,11 +77,9 @@ int main(int argc, char **argv)
         masks->modify(cmd.get_boxes(), grid);
 
         writer = cmd.get_output();
-        if (!cmd.is_appending()) {
-            writer->write_atts(cmd.get_attributes(dataset));
-            writer->def_dims(dims);
-            writer->def_vars(vars);
-        }
+        writer->write_atts(cmd.get_attributes(dataset));
+        writer->def_dims(dims);
+        writer->def_vars(vars);
 
         // read each variable in order
         // for record variables, read one record at a time

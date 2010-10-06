@@ -64,6 +64,8 @@ class PnetcdfFileWriter : public FileWriter
         bool is_in_define_mode;
         string filename;
         int ncid;
+        int unlimdimid;
+        bool append;
 
         map<string,int>     dim_id;
         map<string,int64_t> dim_size;
