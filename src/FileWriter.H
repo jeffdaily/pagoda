@@ -36,15 +36,19 @@ using std::vector;
 class FileWriter
 {
     public:
-        static FileWriter* append(const string &filename);
-        static FileWriter* create(const string &filename);
-        static FileWriter* create(const string &filename, FileFormat format);
+        static FileWriter* open(const string &filename);
 
         FileWriter();
         virtual ~FileWriter();
         virtual void close() = 0;
 
-        virtual void set_fixed_record_dimension(int size) = 0;
+        // named parameter idiom, but using virtuals
+        virtual FileWriter* create() = 0; // finalizes parameters
+        virtual FileWriter* fixed_record_dimension(int value) = 0;
+        virtual FileWriter* header_pad(int value) = 0;
+        virtual FileWriter* file_format(FileFormat value) = 0;
+        virtual FileWriter* append(bool value) = 0;
+        virtual FileWriter* overwrite(bool value) = 0;
 
         virtual void def_dataset(Dataset *dataset);
 

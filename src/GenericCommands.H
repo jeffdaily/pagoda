@@ -54,6 +54,7 @@ class GenericCommands
         bool is_appending() const;
         bool is_overwriting() const;
         bool is_fixing_record_dimension() const;
+        int get_header_pad() const;
         string get_usage() const;
         FileFormat get_file_format() const;
 
@@ -78,6 +79,7 @@ class GenericCommands
         bool overwrite;
         bool fix_record_dimension;
         int record_dimension_size;
+        int header_pad;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
         FileFormat file_format;

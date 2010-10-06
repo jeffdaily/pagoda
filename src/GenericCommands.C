@@ -47,6 +47,7 @@ GenericCommands::GenericCommands()
     ,   overwrite(false)
     ,   fix_record_dimension(false)
     ,   record_dimension_size(-1)
+    ,   header_pad(-1)
     ,   slices()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -75,6 +76,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
     ,   record_dimension_size(-1)
+    ,   header_pad(-1)
     ,   slices()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -98,6 +100,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::COORDS);
     parser.push_back(&CommandLineOption::DIMENSION);
     parser.push_back(&CommandLineOption::FIX_RECORD_DIMENSION);
+    parser.push_back(&CommandLineOption::HEADER_PAD);
     parser.push_back(&CommandLineOption::HISTORY);
     parser.push_back(&CommandLineOption::OUTPUT);
     parser.push_back(&CommandLineOption::OVERWRITE);
@@ -271,6 +274,15 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("path")) {
         input_path = parser.get_argument("path");
     }
+
+    if (parser.count("header_pad")) {
+        string arg = parser.get_argument("header_pad");
+        istringstream s(arg);
+        s >> header_pad;
+        if (s.fail()) {
+            throw CommandException("invalid header pad argument: " + arg);
+        }
+    }
 }
 
 
@@ -320,23 +332,12 @@ Dataset* GenericCommands::get_dataset()
 
 FileWriter* GenericCommands::get_output() const
 {
-    FileWriter *writer = NULL;
+    FileWriter *writer = FileWriter::open(output_filename);
 
-    if (pagoda::file_exists(output_filename)) {
-        if (append) {
-            writer = FileWriter::append(output_filename);
-        } else if (overwrite) {
-            writer = FileWriter::create(output_filename, file_format);
-        } else {
-            throw CommandException("output file exists");
-        }
-    } else {
-        writer = FileWriter::create(output_filename, file_format);
-    }
-
-    if (fix_record_dimension && record_dimension_size >= 0) {
-        writer->set_fixed_record_dimension(record_dimension_size);
-    }
+    writer->append(append)
+        ->overwrite(overwrite)
+        ->fixed_record_dimension(record_dimension_size)
+        ->create();
 
     return writer;
 }

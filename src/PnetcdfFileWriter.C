@@ -43,80 +43,24 @@ static int file_format_to_nc_format(FileFormat format)
 }
 
 
-PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, bool _append)
+PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     :   FileWriter()
     ,   is_in_define_mode(true)
     ,   filename(filename)
     ,   ncid(-1)
     ,   unlimdimid(-1)
-    ,   append(_append)
-    ,   fixed_record_dimension_size(0)
+    ,   _fixed_record_dimension(-1)
+    ,   _header_pad(-1)
+    ,   _file_format(FF_PNETCDF_CDF2)
+    ,   _append(false)
+    ,   _overwrite(false)
     ,   dim_id()
     ,   dim_size()
     ,   var_id()
     ,   var_dims()
     ,   var_shape()
-    ,   open(true)
+    ,   open(false)
 {
-    TIMING("PnetcdfFileWriter::PnetcdfFileWriter(string)");
-    TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
-    // create the output file
-    if (append) {
-        int ndims, nvars, ngatts;
-        string name;
-        MPI_Offset len;
-        nc_type xtype;
-        vector<int> dimids;
-        int varnatts;
-
-        ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_WRITE, MPI_INFO_NULL);
-        is_in_define_mode = false;
-        // we are appending so we must learn all we can about this file
-        // since later calls depend on knowledge of various IDs
-        ncmpi::inq(ncid, ndims, nvars, ngatts, unlimdimid);
-        for (int dimid=0; dimid<ndims; ++dimid) {
-            ncmpi::inq_dim(ncid, dimid, name, len);
-            dim_id[name] = dimid;
-            dim_size[name] = len;
-        }
-        for (int varid=0; varid<nvars; ++varid) {
-            vector<int64_t> shape;
-            ncmpi::inq_var(ncid, varid, name, xtype, dimids, varnatts);
-            var_id[name] = varid;
-            var_dims[name] = dimids;
-            for (int dimidx=0; dimidx<dimids.size(); ++dimidx) {
-                string dim_name = ncmpi::inq_dimname(ncid, dimids[dimidx]);
-                shape.push_back(get_dim_size(dim_name));
-            }
-            var_shape[name] = shape;
-        }
-    } else {
-        ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_OFFSET,
-                MPI_INFO_NULL);
-    }
-}
-
-
-PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, FileFormat format)
-    :   FileWriter()
-    ,   is_in_define_mode(true)
-    ,   filename(filename)
-    ,   ncid(-1)
-    ,   unlimdimid(-1)
-    ,   append(false)
-    ,   fixed_record_dimension_size(0)
-    ,   dim_id()
-    ,   dim_size()
-    ,   var_id()
-    ,   var_dims()
-    ,   var_shape()
-    ,   open(true)
-{
-    TIMING("PnetcdfFileWriter::PnetcdfFileWriter(string,FileFormat)");
-    TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
-    // create the output file
-    int ncformat = file_format_to_nc_format(format);
-    ncid = ncmpi::create(MPI_COMM_WORLD, filename, ncformat, MPI_INFO_NULL);
 }
 
 
@@ -136,9 +80,99 @@ void PnetcdfFileWriter::close()
 }
 
 
-void PnetcdfFileWriter::set_fixed_record_dimension(int size)
+FileWriter* PnetcdfFileWriter::create()
 {
-    fixed_record_dimension_size = size;
+    MPI_Info info;
+
+    TIMING("PnetcdfFileWriter::create()");
+    TRACER("PnetcdfFileWriter create %s\n", filename.c_str());
+
+    MPI_Info_create(&info);
+    if (_header_pad > 0) {
+        ostringstream value;
+        value << _header_pad;
+        MPI_Info_set(info, "nc_header_align_size",
+                const_cast<char*>(value.str().c_str()));
+    }
+
+    // create the output file
+    if (pagoda::file_exists(filename)) {
+        if (_append) {
+            int ndims, nvars, ngatts;
+            string name;
+            MPI_Offset len;
+            nc_type xtype;
+            vector<int> dimids;
+            int varnatts;
+
+            ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_WRITE, info);
+            is_in_define_mode = false;
+            // we are appending so we must learn all we can about this file
+            // since later calls depend on knowledge of various IDs
+            ncmpi::inq(ncid, ndims, nvars, ngatts, unlimdimid);
+            for (int dimid=0; dimid<ndims; ++dimid) {
+                ncmpi::inq_dim(ncid, dimid, name, len);
+                dim_id[name] = dimid;
+                dim_size[name] = len;
+            }
+            for (int varid=0; varid<nvars; ++varid) {
+                vector<int64_t> shape;
+                ncmpi::inq_var(ncid, varid, name, xtype, dimids, varnatts);
+                var_id[name] = varid;
+                var_dims[name] = dimids;
+                for (int dimidx=0; dimidx<dimids.size(); ++dimidx) {
+                    string dim_name = ncmpi::inq_dimname(ncid, dimids[dimidx]);
+                    shape.push_back(get_dim_size(dim_name));
+                }
+                var_shape[name] = shape;
+            }
+        } else if (_overwrite){
+            ncid = ncmpi::create(MPI_COMM_WORLD, filename,
+                    file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
+        } else {
+            throw PagodaException("file exists");
+        }
+    } else {
+        ncid = ncmpi::create(MPI_COMM_WORLD, filename, _file_format, info);
+    }
+
+    open = true;
+    MPI_Info_free(&info);
+}
+
+
+FileWriter* PnetcdfFileWriter::fixed_record_dimension(int value)
+{
+    _fixed_record_dimension = value;
+    return this;
+}
+
+
+FileWriter* PnetcdfFileWriter::header_pad(int value)
+{
+    _header_pad = value;
+    return this;
+}
+
+
+FileWriter* PnetcdfFileWriter::file_format(FileFormat value)
+{
+    _file_format = value;
+    return this;
+}
+
+
+FileWriter* PnetcdfFileWriter::append(bool value)
+{
+    _append = value;
+    return this;
+}
+
+
+FileWriter* PnetcdfFileWriter::overwrite(bool value)
+{
+    _overwrite = value;
+    return this;
 }
 
 
@@ -151,14 +185,14 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
     maybe_redef();
 
     if (size <= 0) {
-        if (fixed_record_dimension_size) {
-            size = fixed_record_dimension_size;
+        if (_fixed_record_dimension > 0) {
+            size = _fixed_record_dimension;
         } else {
             size = NC_UNLIMITED;
         }
     }
     // if appending then ignore dim of same size if one already exists
-    if (append && (dim_id.find(name) != dim_id.end())) {
+    if (_append && (dim_id.find(name) != dim_id.end())) {
         // verify the new and old dim sizes match
         if (dim_id[name] != unlimdimid && size != dim_size[name]) {
             ostringstream strerr;
@@ -192,7 +226,7 @@ void PnetcdfFileWriter::def_var(const string &name,
 
     maybe_redef();
 
-    if (append && (var_id.find(name) != var_id.end())) {
+    if (_append && (var_id.find(name) != var_id.end())) {
         // if appending and variable exists, overwrite attributes only
         write_atts_id(atts, var_id[name]);
     } else {

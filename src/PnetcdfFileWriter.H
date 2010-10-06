@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 
+#include "FileFormat.H"
 #include "FileWriter.H"
 
 class Dataset;
@@ -22,12 +23,17 @@ using std::vector;
 class PnetcdfFileWriter : public FileWriter
 {
     public:
-        PnetcdfFileWriter(const string &filename, bool append=false);
-        PnetcdfFileWriter(const string &filename, FileFormat format);
+        PnetcdfFileWriter(const string &filename);
         virtual ~PnetcdfFileWriter();
         virtual void close();
 
-        virtual void set_fixed_record_dimension(int size);
+        // named parameter idiom, but using virtuals
+        virtual FileWriter* create();
+        virtual FileWriter* fixed_record_dimension(int size);
+        virtual FileWriter* header_pad(int size);
+        virtual FileWriter* file_format(FileFormat format);
+        virtual FileWriter* append(bool value);
+        virtual FileWriter* overwrite(bool value);
 
         virtual void def_dim(const string &name, int64_t size);
 
@@ -67,8 +73,12 @@ class PnetcdfFileWriter : public FileWriter
         string filename;
         int ncid;
         int unlimdimid;
-        bool append;
-        int fixed_record_dimension_size;
+
+        int _fixed_record_dimension;
+        int _header_pad;
+        FileFormat _file_format;
+        bool _append;
+        bool _overwrite;
 
         map<string,int>     dim_id;
         map<string,int64_t> dim_size;

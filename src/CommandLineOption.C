@@ -53,6 +53,10 @@ CommandLineOption CommandLineOption::FILE_FORMAT(
 CommandLineOption CommandLineOption::FIX_RECORD_DIMENSION(
         0, "fix_rec_dmn", false,
         "change record dimension into fixed dimension in output file");
+CommandLineOption CommandLineOption::HEADER_PAD(
+        0, "header_pad", true,
+        "pad output header with indicated number of bytes",
+        "hdr_pad");
 CommandLineOption CommandLineOption::HELP(
         'h', "help", false,
         "print this usage information and exit");

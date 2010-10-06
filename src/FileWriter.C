@@ -23,42 +23,16 @@ using std::string;
 using std::vector;
 
 
-FileWriter* FileWriter::append(const string &filename)
+FileWriter* FileWriter::open(const string &filename)
 {
-    //TIMING("FileWriter::append(string)");
     FileWriter *writer = NULL;
+
+    //TIMING("FileWriter::open(string)");
     string EXT_NC(".nc");
     if (pagoda::ends_with(filename, EXT_NC)) {
-        writer = new PnetcdfFileWriter(filename, true);
+        writer = new PnetcdfFileWriter(filename);
     }
-    return writer;
-}
 
-
-FileWriter* FileWriter::create(const string &filename)
-{
-    //TIMING("FileWriter::create(string)");
-    FileWriter *writer = NULL;
-    string EXT_NC(".nc");
-    if (pagoda::ends_with(filename, EXT_NC)) {
-        writer = create(filename, FF_PNETCDF_CDF2);
-    }
-    return writer;
-}
-
-
-FileWriter* FileWriter::create(const string &filename, FileFormat format)
-{
-    //TIMING("FileWriter::create(string)");
-    FileWriter *writer = NULL;
-    switch (format) {
-        case FF_PNETCDF_CDF1:
-        case FF_PNETCDF_CDF2:
-        case FF_PNETCDF_CDF5:
-            writer = new PnetcdfFileWriter(filename, format);
-            break;
-    }
-    assert(writer);
     return writer;
 }
 

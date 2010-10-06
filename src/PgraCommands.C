@@ -67,7 +67,7 @@ FileWriter* PgraCommands::get_output() const
     FileWriter *writer = GenericCommands::get_output();
 
     if (is_fixing_record_dimension()) {
-        writer->set_fixed_record_dimension(1);
+        writer->fixed_record_dimension(1);
     }
 
 
