@@ -121,6 +121,22 @@ Dimension* AbstractDataset::get_dim(
 }
 
 
+Dimension* AbstractDataset::get_udim() const
+{
+    vector<Dimension*> dims = get_dims();
+    vector<Dimension*>::const_iterator it = dims.begin();
+    vector<Dimension*>::const_iterator end = dims.end();
+
+    for (; it!=end; ++it) {
+        if ((*it)->is_unlimited()) {
+            return *it;
+        }
+    }
+
+    return NULL;
+}
+
+
 Variable* AbstractDataset::get_var(
         const string &name, bool ignore_case, bool within) const
 {

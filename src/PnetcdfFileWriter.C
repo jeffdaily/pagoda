@@ -50,6 +50,7 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, bool _append)
     ,   ncid(-1)
     ,   unlimdimid(-1)
     ,   append(_append)
+    ,   fixed_record_dimension_size(0)
     ,   dim_id()
     ,   dim_size()
     ,   var_id()
@@ -103,6 +104,7 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, FileFormat format)
     ,   ncid(-1)
     ,   unlimdimid(-1)
     ,   append(false)
+    ,   fixed_record_dimension_size(0)
     ,   dim_id()
     ,   dim_size()
     ,   var_id()
@@ -134,6 +136,12 @@ void PnetcdfFileWriter::close()
 }
 
 
+void PnetcdfFileWriter::set_fixed_record_dimension(int size)
+{
+    fixed_record_dimension_size = size;
+}
+
+
 void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 {
     int id;
@@ -143,7 +151,11 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
     maybe_redef();
 
     if (size <= 0) {
-        size = NC_UNLIMITED;
+        if (fixed_record_dimension_size) {
+            size = fixed_record_dimension_size;
+        } else {
+            size = NC_UNLIMITED;
+        }
     }
     // if appending then ignore dim of same size if one already exists
     if (append && (dim_id.find(name) != dim_id.end())) {

@@ -27,6 +27,8 @@ class PnetcdfFileWriter : public FileWriter
         virtual ~PnetcdfFileWriter();
         virtual void close();
 
+        virtual void set_fixed_record_dimension(int size);
+
         virtual void def_dim(const string &name, int64_t size);
 
         virtual void def_var(const string &name,
@@ -66,6 +68,7 @@ class PnetcdfFileWriter : public FileWriter
         int ncid;
         int unlimdimid;
         bool append;
+        int fixed_record_dimension_size;
 
         map<string,int>     dim_id;
         map<string,int64_t> dim_size;

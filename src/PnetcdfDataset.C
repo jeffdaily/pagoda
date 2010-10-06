@@ -186,10 +186,3 @@ int PnetcdfDataset::get_id() const
     TIMING("PnetcdfDataset::get_id()");
     return ncid;
 }
-
-
-PnetcdfDimension* PnetcdfDataset::get_udim() const
-{
-    TIMING("PnetcdfDataset::get_udim()");
-    return dims.at(udim);
-}

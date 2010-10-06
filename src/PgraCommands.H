@@ -16,6 +16,8 @@ class PgraCommands : public GenericCommands
 
         void parse(int argc, char **argv);
 
+        FileWriter* get_output() const;
+
         string get_operator() const;
 
     protected:

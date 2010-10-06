@@ -47,6 +47,7 @@ class AbstractDataset : public Dataset
 
         virtual Dimension* get_dim(const string &name,
                 bool ignore_case=false, bool within=false) const;
+        virtual Dimension* get_udim() const;
 
         virtual Variable* get_var(const string &name,
                 bool ignore_case=false, bool within=false) const;

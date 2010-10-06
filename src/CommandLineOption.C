@@ -187,7 +187,7 @@ string CommandLineOption::get_description() const
 
 bool CommandLineOption::handle(int value, const string &arg, const string &name)
 {
-    if (_value == value
+    if ((0 != value && _value == value)
             || (0 == value
                 && find(_names.begin(), _names.end(), name) != _names.end())) {
         ++_count;
@@ -330,4 +330,37 @@ struct option CommandLineOption::get_long_opt_null()
     ret.val = 0;
 
     return ret;
+}
+
+
+ostream& operator<<(ostream &os, const CommandLineOption &op)
+{
+    vector<struct option> long_opts = op.get_long_options();
+    vector<struct option>::iterator it=long_opts.begin();
+
+    assert(!long_opts.empty());
+    os << it->name << ", ";
+    os << it->has_arg << ", ";
+    os << it->flag << ", ";
+    os << it->val;
+    ++it;
+    for (; it!=long_opts.end(); ++it) {
+        os << endl;
+        os << it->name << ", ";
+        os << it->has_arg << ", ";
+        os << it->flag << ", ";
+        os << it->val;
+    }
+
+    return os;
+}
+
+
+ostream& operator<<(ostream &os, const struct option &op)
+{
+    os << op.name << ", ";
+    os << op.has_arg << ", ";
+    os << op.flag << ", ";
+    os << op.val;
+    return os;
 }

@@ -46,6 +46,7 @@ class Dataset
 
         virtual Dimension* get_dim(const string &name,
                 bool ignore_case=false, bool within=false) const = 0;
+        virtual Dimension* get_udim() const = 0;
 
         virtual Variable* get_var(const string &name,
                 bool ignore_case=false, bool within=false) const = 0;

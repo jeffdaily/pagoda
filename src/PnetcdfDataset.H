@@ -47,7 +47,6 @@ class PnetcdfDataset : public AbstractDataset
 
         string get_filename() const;
         int get_id() const;
-        PnetcdfDimension* get_udim() const;
 
         friend class PnetcdfVariable;
 

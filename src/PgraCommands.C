@@ -7,6 +7,7 @@
 #include "CommandException.H"
 #include "CommandLineOption.H"
 #include "Error.H"
+#include "FileWriter.H"
 #include "GenericCommands.H"
 #include "PgraCommands.H"
 #include "Timing.H"
@@ -58,6 +59,19 @@ void PgraCommands::parse(int argc, char **argv)
     } else {
         op_type = OP_AVG;
     }
+}
+
+
+FileWriter* PgraCommands::get_output() const
+{
+    FileWriter *writer = GenericCommands::get_output();
+
+    if (is_fixing_record_dimension()) {
+        writer->set_fixed_record_dimension(1);
+    }
+
+
+    return writer;
 }
 
 

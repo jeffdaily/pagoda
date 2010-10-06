@@ -35,7 +35,6 @@ void CommandLineParser::push_back(CommandLineOption *option)
 }
 
 
-#include "Debug.H"
 void CommandLineParser::parse(int argc, char **argv)
 {
     int opt;
@@ -46,7 +45,7 @@ void CommandLineParser::parse(int argc, char **argv)
 
     // build the opt_string and long_opts
     opt_string.reserve(options.size()*2);
-    long_opts.reserve(options.size());
+    long_opts.reserve(options.size()*2);
     for (it=options.begin(); it!=options.end(); ++it) {
         vector<struct option> current_long_opts = (*it)->get_long_options();
         opt_string += (*it)->get_option();
@@ -58,18 +57,19 @@ void CommandLineParser::parse(int argc, char **argv)
     // do the parsing
     while ((opt = getopt_long(argc, argv, opt_string.c_str(),
                     &long_opts[0], &long_index)) != -1) {
+        string name = long_index >= 0 ? long_opts[long_index].name : "";
+        string arg = optarg ? optarg : "";
         if (opt == '?') {
             // getopt prints a warning
             throw CommandException("see --help for details");
         }
         for (it=options.begin(); it!=options.end(); ++it) {
-            string name = long_index >= 0 ? long_opts[long_index].name : "";
-            string arg = optarg ? optarg : "";
             if ((*it)->handle(opt, arg, name)) {
                 break;
             }
         }
-        long_index = -1;
+        // reset long_index since getopt_long won't necessarily
+        long_index = -1; 
     }
     
     // the positional arguments are left, put them in a vector<string>

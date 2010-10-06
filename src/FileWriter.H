@@ -5,9 +5,12 @@
 #include <string>
 #include <vector>
 
+#include "FileFormat.H"
+
 class Array;
 class Attribute;
 class DataType;
+class Dataset;
 class Dimension;
 class Mask;
 class Values;
@@ -40,6 +43,8 @@ class FileWriter
         FileWriter();
         virtual ~FileWriter();
         virtual void close() = 0;
+
+        virtual void set_fixed_record_dimension(int size) = 0;
 
         virtual void def_dataset(Dataset *dataset);
 

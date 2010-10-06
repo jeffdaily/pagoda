@@ -46,6 +46,7 @@ GenericCommands::GenericCommands()
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
+    ,   record_dimension_size(-1)
     ,   slices()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -73,6 +74,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
+    ,   record_dimension_size(-1)
     ,   slices()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -276,8 +278,8 @@ void GenericCommands::parse(int argc, char **argv)
  * Creates and returns a new Dataset.
  *
  * Interprets the command-line parameters for union and join aggregations.
- * Determines the file format and stores locally (otherwise this method would
- * be const like the rest).
+ * Determines the file format and record size and stores locally (otherwise
+ * this method would be const like the rest).
  */
 Dataset* GenericCommands::get_dataset()
 {
@@ -305,23 +307,38 @@ Dataset* GenericCommands::get_dataset()
         file_format = dataset->get_file_format();
     }
 
+    if (fix_record_dimension && record_dimension_size < 0) {
+        Dimension *udim = dataset->get_udim();
+        if (udim) {
+            record_dimension_size = udim->get_size();
+        }
+    }
+
     return dataset;
 }
 
 
 FileWriter* GenericCommands::get_output() const
 {
+    FileWriter *writer = NULL;
+
     if (pagoda::file_exists(output_filename)) {
         if (append) {
-            return FileWriter::append(output_filename);
+            writer = FileWriter::append(output_filename);
         } else if (overwrite) {
-            return FileWriter::create(output_filename, file_format);
+            writer = FileWriter::create(output_filename, file_format);
         } else {
             throw CommandException("output file exists");
         }
     } else {
-        return FileWriter::create(output_filename, file_format);
+        writer = FileWriter::create(output_filename, file_format);
     }
+
+    if (fix_record_dimension && record_dimension_size >= 0) {
+        writer->set_fixed_record_dimension(record_dimension_size);
+    }
+
+    return writer;
 }
 
 

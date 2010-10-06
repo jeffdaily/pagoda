@@ -1,9 +1,12 @@
 #ifndef COMMANDLINEOPTION_H_
 #define COMMANDLINEOPTION_H_
 
+#include <iostream>
 #include <string>
 #include <vector>
 
+using std::endl;
+using std::ostream;
 using std::string;
 using std::vector;
 
@@ -74,6 +77,8 @@ class CommandLineOption
 
         static struct option get_long_opt_null();
 
+        friend ostream& operator<<(ostream &os, const CommandLineOption &op);
+
         static CommandLineOption ALPHABETIZE;
         static CommandLineOption APPEND;
         static CommandLineOption AUXILIARY;
@@ -108,5 +113,7 @@ class CommandLineOption
         int _count;
         vector<string> _arguments;
 };
+
+ostream& operator<<(ostream &os, const struct option &op);
 
 #endif // COMMANDLINEOPTION_H_

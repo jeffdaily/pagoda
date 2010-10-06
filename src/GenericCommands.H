@@ -77,6 +77,7 @@ class GenericCommands
         bool append;
         bool overwrite;
         bool fix_record_dimension;
+        int record_dimension_size;
         vector<DimSlice> slices;
         vector<LatLonBox> boxes;
         FileFormat file_format;
