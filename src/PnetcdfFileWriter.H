@@ -22,7 +22,7 @@ using std::vector;
 class PnetcdfFileWriter : public FileWriter
 {
     public:
-        PnetcdfFileWriter(const string &filename);
+        PnetcdfFileWriter(const string &filename, bool append=false);
         PnetcdfFileWriter(const string &filename, FileFormat format);
         virtual ~PnetcdfFileWriter();
         virtual void close();
@@ -51,7 +51,10 @@ class PnetcdfFileWriter : public FileWriter
         vector<int> get_var_dims(const string &name) const;
         vector<int64_t> get_var_shape(const string &name) const;
 
+#if 0
         void def_check() const;
+#endif
+        void maybe_redef();
         void maybe_enddef();
 
         void write_att_id(Attribute *attr, int varid);

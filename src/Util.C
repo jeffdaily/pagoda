@@ -3,6 +3,7 @@
 #endif
 
 #include <algorithm>
+#include <fstream>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -22,6 +23,7 @@
 using std::accumulate;
 using std::back_inserter;
 using std::copy;
+using std::ifstream;
 using std::istream_iterator;
 using std::istringstream;
 using std::multiplies;
@@ -443,4 +445,28 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
     }
     TRACER("pagoda::calculate_required_memory END\n");
 #endif
+}
+
+
+bool pagoda::file_exists(const string &filename)
+{
+    vector<long> values;
+
+    // we don't want all processors hammering the file system simply to test
+    // if the file exists, so we let process 0 do it
+    if (pagoda::nodeid() == 0) {
+        // this statement should cast the file object to a boolean which is
+        // true if the file exists; the file is automatically closed at the
+        // end of its scope
+        if ((ifstream(filename.c_str()))) {
+            values.push_back(1);
+        } else {
+            values.push_back(0);
+        }
+    } else {
+        values.push_back(0);
+    }
+    pagoda::gop_sum(values);
+
+    return values.front() == 1;
 }

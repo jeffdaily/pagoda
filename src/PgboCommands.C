@@ -51,7 +51,7 @@ void PgboCommands::parse(int argc, char **argv)
 {
     GenericCommands::parse(argc,argv);
 
-    if (get_help()) {
+    if (is_helping()) {
         return;
     }
 

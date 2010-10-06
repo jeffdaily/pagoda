@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
         cmd.parse(argc,argv);
 
-        if (cmd.get_help()) {
+        if (cmd.is_helping()) {
             pagoda::print_zero(cmd.get_usage());
             pagoda::finalize();
             return EXIT_SUCCESS;

@@ -39,14 +39,14 @@ int F77_DUMMY_MAIN() { return 1; }
 int main(int argc, char **argv)
 {
     PgraCommands cmd;
-    Dataset *dataset;
+    Dataset *dataset = NULL;
     vector<Variable*> vars;
     vector<Variable*>::iterator var_it;
     vector<Dimension*> dims;
-    FileWriter *writer;
+    FileWriter *writer = NULL;
     vector<Grid*> grids;
-    Grid *grid;
-    MaskMap *masks;
+    Grid *grid = NULL;
+    MaskMap *masks = NULL;
     string op;
 
     try {
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
         cmd.parse(argc,argv);
 
-        if (cmd.get_help()) {
+        if (cmd.is_helping()) {
             pagoda::print_zero(cmd.get_usage());
             pagoda::finalize();
             return EXIT_SUCCESS;
@@ -77,9 +77,11 @@ int main(int argc, char **argv)
         masks->modify(cmd.get_boxes(), grid);
 
         writer = cmd.get_output();
-        writer->write_atts(cmd.get_attributes(dataset));
-        writer->def_dims(dims);
-        writer->def_vars(vars);
+        if (!cmd.is_appending()) {
+            writer->write_atts(cmd.get_attributes(dataset));
+            writer->def_dims(dims);
+            writer->def_vars(vars);
+        }
 
         // read each variable in order
         // for record variables, read one record at a time
@@ -155,6 +157,15 @@ int main(int argc, char **argv)
         pagoda::finalize();
 
     } catch (CommandException &ex) {
+        if (dataset) {
+            delete dataset;
+        }
+        if (masks) {
+            delete masks;
+        }
+        if (writer) {
+            delete writer;
+        }
         pagoda::println_zero(ex.what());
         pagoda::finalize();
         return EXIT_FAILURE;

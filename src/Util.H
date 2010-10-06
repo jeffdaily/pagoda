@@ -54,6 +54,7 @@ template <class T> T ptr_deleter(T object);
 template <class T> bool same_name(const T *first, const T *second);
 template <class T> vector<T> unravel_index(T x, const vector<T> &dims);
 template <class T> T ravel_index(vector<T> indices, const vector<T> &dims);
+bool file_exists(const string &filename);
 
 
 /**

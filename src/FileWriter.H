@@ -33,6 +33,7 @@ using std::vector;
 class FileWriter
 {
     public:
+        static FileWriter* append(const string &filename);
         static FileWriter* create(const string &filename);
         static FileWriter* create(const string &filename, FileFormat format);
 

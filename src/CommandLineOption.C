@@ -36,26 +36,34 @@ CommandLineOption CommandLineOption::CDF5(
         "output file in parallel netCDF 64-bit data format");
 CommandLineOption CommandLineOption::COORDS(
         'c', "coords", false,
-        "all coordinate variables will be processed");
+        "all coordinate variables will be processed",
+        "crd");
 CommandLineOption CommandLineOption::DIMENSION(
         'd', "dimension", true,
-        "dim[,min[,max[,stride]]]");
+        "dim[,min[,max[,stride]]]",
+        "dmn");
 CommandLineOption CommandLineOption::EXCLUDE(
         'x', "exclude", false,
-        "extract all variables EXCEPT those specified with -v");
+        "extract all variables EXCEPT those specified with -v",
+        "xcl");
 CommandLineOption CommandLineOption::FILE_FORMAT(
         0, "file_format", true,
         "=classic same as -3* =64bit same as -6* =64data same as -5",
         "fl_fmt");
+CommandLineOption CommandLineOption::FIX_RECORD_DIMENSION(
+        0, "fix_rec_dmn", false,
+        "change record dimension into fixed dimension in output file");
 CommandLineOption CommandLineOption::HELP(
         'h', "help", false,
         "print this usage information and exit");
 CommandLineOption CommandLineOption::HISTORY(
         'h', "history", false,
-        "do not append to 'history' global attribute");
+        "do not append to 'history' global attribute",
+        "hst");
 CommandLineOption CommandLineOption::INPUT_PATH(
         'p', "path", true,
-        "path prefix for all input filenames");
+        "path prefix for all input filenames",
+        "pth");
 CommandLineOption CommandLineOption::JOIN(
         'j', "join", true,
         "join all input files on the given dimension");
@@ -73,10 +81,12 @@ CommandLineOption CommandLineOption::OP_TYPE(
         "binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
 CommandLineOption CommandLineOption::OUTPUT(
         'o', "output", true,
-        "output file name (or use last positional argument)");
+        "output file name (or use last positional argument)",
+        "fl_out");
 CommandLineOption CommandLineOption::OVERWRITE(
         'O', "overwrite", false,
-        "overwrite existing output file, if any");
+        "overwrite existing output file, if any",
+        "ovr");
 CommandLineOption CommandLineOption::TOPOLOGY(
         'T', "topology", false,
         "do not process toplogy variables");
@@ -248,9 +258,11 @@ string CommandLineOption::get_usage() const
 string CommandLineOption::get_option() const
 {
     string ret;
-    ret += char(_value);
-    if (_has_argument) {
-        return ret + ':';
+    if (_value != 0) {
+        ret += char(_value);
+        if (_has_argument) {
+            return ret + ':';
+        }
     }
     return ret;
 }

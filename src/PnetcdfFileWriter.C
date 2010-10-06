@@ -43,7 +43,7 @@ static int file_format_to_nc_format(FileFormat format)
 }
 
 
-PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
+PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, bool append)
     :   FileWriter()
     ,   is_in_define_mode(true)
     ,   filename(filename)
@@ -58,7 +58,39 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     TIMING("PnetcdfFileWriter::PnetcdfFileWriter(string)");
     TRACER("PnetcdfFileWriter ctor(%s)\n", filename.c_str());
     // create the output file
-    ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_OFFSET, MPI_INFO_NULL);
+    if (append) {
+        int ndims, nvars, ngatts, unlimdimid;
+        string name;
+        MPI_Offset len;
+        nc_type xtype;
+        vector<int> dimids;
+        int varnatts;
+
+        ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_WRITE, MPI_INFO_NULL);
+        is_in_define_mode = false;
+        // we are appending so we must learn all we can about this file
+        // since later calls depend on knowledge of various IDs
+        ncmpi::inq(ncid, ndims, nvars, ngatts, unlimdimid);
+        for (int dimid=0; dimid<ndims; ++dimid) {
+            ncmpi::inq_dim(ncid, dimid, name, len);
+            dim_id[name] = dimid;
+            dim_size[name] = len;
+        }
+        for (int varid=0; varid<nvars; ++varid) {
+            vector<int64_t> shape;
+            ncmpi::inq_var(ncid, varid, name, xtype, dimids, varnatts);
+            var_id[name] = varid;
+            var_dims[name] = dimids;
+            for (int dimidx=0; dimidx<dimids.size(); ++dimidx) {
+                string dim_name = ncmpi::inq_dimname(ncid, dimids[dimidx]);
+                shape.push_back(get_dim_size(dim_name));
+            }
+            var_shape[name] = shape;
+        }
+    } else {
+        ncid = ncmpi::create(MPI_COMM_WORLD, filename, NC_64BIT_OFFSET,
+                MPI_INFO_NULL);
+    }
 }
 
 
@@ -104,7 +136,7 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 
     TIMING("PnetcdfFileWriter::def_dim(Dimension*)");
 
-    def_check();
+    maybe_redef();
 
     if (size <= 0) {
         size = NC_UNLIMITED;
@@ -128,7 +160,7 @@ void PnetcdfFileWriter::def_var(const string &name,
 
     TIMING("PnetcdfFileWriter::def_var(string,vector<string>)");
 
-    def_check();
+    maybe_redef();
 
     for (int64_t i=0,limit=dims.size(); i<limit; ++i) {
         dim_ids.push_back(get_dim_id(dims.at(i)));
@@ -230,6 +262,7 @@ vector<int64_t> PnetcdfFileWriter::get_var_shape(const string &name) const
 }
 
 
+#if 0
 void PnetcdfFileWriter::def_check() const
 {
     TIMING("PnetcdfFileWriter::def_check()");
@@ -237,6 +270,18 @@ void PnetcdfFileWriter::def_check() const
         ostringstream strerr;
         strerr << "cannot (re)define output file after writing begins";
         ERR(strerr.str());
+    }
+}
+#endif
+
+
+void PnetcdfFileWriter::maybe_redef()
+{
+    TIMING("PnetcdfFileWriter::maybe_redef()");
+    if (!is_in_define_mode) {
+        is_in_define_mode = true;
+        ncmpi::redef(ncid);
+        TRACER("PnetcdfFileWriter::maybe_redef BEGIN DEF\n");
     }
 }
 
@@ -268,7 +313,7 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
     TIMING("PnetcdfFileWriter::write_att_id(Attribute*,int)");
     TRACER("PnetcdfFileWriter::write_att_id %s\n", attr->get_name().c_str());
 
-    def_check();
+    maybe_redef();
 
 #define put_attr_values(DT, CT) \
     if (dt == DT) { \

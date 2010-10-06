@@ -32,16 +32,20 @@ GenericCommands::GenericCommands()
     :   parser()
     ,   cmdline("")
     ,   input_filenames()
+    ,   input_path("")
     ,   output_filename("")
     ,   variables()
-    ,   exclude(false)
+    ,   exclude_variables(false)
     ,   join_name("")
     ,   alphabetize(true)
-    ,   all_coords(false)
+    ,   process_all_coords(false)
     ,   process_coords(true)
     ,   modify_history(true)
     ,   process_topology(true)
     ,   help(false)
+    ,   append(false)
+    ,   overwrite(false)
+    ,   fix_record_dimension(false)
     ,   slices()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -55,18 +59,23 @@ GenericCommands::GenericCommands(int argc, char **argv)
     :   parser()
     ,   cmdline("")
     ,   input_filenames()
+    ,   input_path("")
     ,   output_filename("")
     ,   variables()
-    ,   exclude(false)
+    ,   exclude_variables(false)
     ,   join_name("")
     ,   alphabetize(true)
-    ,   all_coords(false)
+    ,   process_all_coords(false)
     ,   process_coords(true)
     ,   modify_history(true)
     ,   process_topology(true)
     ,   help(false)
+    ,   append(false)
+    ,   overwrite(false)
+    ,   fix_record_dimension(false)
     ,   slices()
     ,   boxes()
+    ,   file_format(FF_UNKNOWN)
 {
     TIMING("GenericCommands::GenericCommands(int,char**)");
     init();
@@ -76,23 +85,27 @@ GenericCommands::GenericCommands(int argc, char **argv)
 
 void GenericCommands::init()
 {
-    parser.push_back(&CommandLineOption::ALPHABETIZE);
-    parser.push_back(&CommandLineOption::AUXILIARY);
+    parser.push_back(&CommandLineOption::HELP);
     parser.push_back(&CommandLineOption::CDF3);
     parser.push_back(&CommandLineOption::CDF4);
     parser.push_back(&CommandLineOption::CDF5);
+    parser.push_back(&CommandLineOption::FILE_FORMAT);
+    parser.push_back(&CommandLineOption::APPEND);
+    parser.push_back(&CommandLineOption::ALPHABETIZE);
+    parser.push_back(&CommandLineOption::NO_COORDS);
     parser.push_back(&CommandLineOption::COORDS);
     parser.push_back(&CommandLineOption::DIMENSION);
-    parser.push_back(&CommandLineOption::FILE_FORMAT);
-    parser.push_back(&CommandLineOption::EXCLUDE);
-    parser.push_back(&CommandLineOption::HELP);
+    parser.push_back(&CommandLineOption::FIX_RECORD_DIMENSION);
     parser.push_back(&CommandLineOption::HISTORY);
-    parser.push_back(&CommandLineOption::JOIN);
-    parser.push_back(&CommandLineOption::LATLONBOX);
-    parser.push_back(&CommandLineOption::NO_COORDS);
     parser.push_back(&CommandLineOption::OUTPUT);
-    parser.push_back(&CommandLineOption::UNION);
+    parser.push_back(&CommandLineOption::OVERWRITE);
+    parser.push_back(&CommandLineOption::INPUT_PATH);
     parser.push_back(&CommandLineOption::VARIABLE);
+    parser.push_back(&CommandLineOption::AUXILIARY);
+    parser.push_back(&CommandLineOption::EXCLUDE);
+    parser.push_back(&CommandLineOption::JOIN);
+    parser.push_back(&CommandLineOption::UNION);
+    parser.push_back(&CommandLineOption::LATLONBOX);
 }
 
 
@@ -157,7 +170,7 @@ void GenericCommands::parse(int argc, char **argv)
     }
 
     if (parser.count("exclude")) {
-        exclude = true;
+        exclude_variables = true;
     }
 
     if (parser.count("variable")) {
@@ -186,12 +199,15 @@ void GenericCommands::parse(int argc, char **argv)
         join_name = parser.get_argument("join");
     }
 
+    if (parser.count("union")) {
+    }
+
     if (parser.count("alphabetize")) {
         alphabetize = false;
     }
 
     if (parser.count("coords")) {
-        all_coords = true;
+        process_all_coords = true;
     }
 
     if (parser.count("no-coords")) {
@@ -237,6 +253,22 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("5")) {
         file_format = FF_PNETCDF_CDF5;
     }
+
+    if (parser.count("append")) {
+        append = true;
+    }
+
+    if (parser.count("overwrite")) {
+        overwrite = true;
+    }
+
+    if (parser.count("fix_rec_dmn")) {
+        fix_record_dimension = true;
+    }
+
+    if (parser.count("path")) {
+        input_path = parser.get_argument("path");
+    }
 }
 
 
@@ -279,7 +311,17 @@ Dataset* GenericCommands::get_dataset()
 
 FileWriter* GenericCommands::get_output() const
 {
-    return FileWriter::create(output_filename, file_format);
+    if (pagoda::file_exists(output_filename)) {
+        if (append) {
+            return FileWriter::append(output_filename);
+        } else if (overwrite) {
+            return FileWriter::create(output_filename, file_format);
+        } else {
+            throw CommandException("output file exists");
+        }
+    } else {
+        return FileWriter::create(output_filename, file_format);
+    }
 }
 
 
@@ -309,9 +351,9 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset) const
     Grid *grid = dataset->get_grid();
 
     if (variables.empty()) {
-        if (exclude) {
+        if (exclude_variables) {
             // do nothing, keep vars_to_keep empty
-        } else if (all_coords) {
+        } else if (process_all_coords) {
             // do nothing, keep vars_to_keep, add coords later
         } else {
             // we want all variables
@@ -320,7 +362,7 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset) const
             }
         }
     } else {
-        if (exclude) {
+        if (exclude_variables) {
             // invert given variables
             for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
                 string name = (*it)->get_name();
@@ -342,7 +384,7 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset) const
     }
 
     // next, if we want all coordinates, add them to the set of variables
-    if (grid && all_coords) {
+    if (grid && process_all_coords) {
         for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
             Variable *var = *it;
             if (grid->is_coordinate(var)) {
@@ -533,43 +575,63 @@ set<string> GenericCommands::get_variables() const
 }
 
 
-bool GenericCommands::get_exclude() const
-{
-    return exclude;
-}
-
-
 string GenericCommands::get_join_name() const
 {
     return join_name;
 }
 
-bool GenericCommands::get_alphabetize() const
+
+bool GenericCommands::is_excluding_variables() const
+{
+    return exclude_variables;
+}
+
+
+bool GenericCommands::is_alphabetizing() const
 {
     return alphabetize;
 }
 
 
-bool GenericCommands::get_all_coords() const
+bool GenericCommands::is_processing_all_coords() const
 {
-    return all_coords;
+    return process_all_coords;
 }
 
-bool GenericCommands::get_process_coords() const
+
+bool GenericCommands::is_processing_coords() const
 {
     return process_coords;
 }
 
 
-bool GenericCommands::get_modify_history() const
+bool GenericCommands::is_modifying_history() const
 {
     return modify_history;
 }
 
 
-bool GenericCommands::get_help() const
+bool GenericCommands::is_helping() const
 {
     return help;
+}
+
+
+bool GenericCommands::is_appending() const
+{
+    return append;
+}
+
+
+bool GenericCommands::is_overwriting() const
+{
+    return overwrite;
+}
+
+
+bool GenericCommands::is_fixing_record_dimension() const
+{
+    return fix_record_dimension;
 }
 
 

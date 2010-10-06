@@ -27,12 +27,15 @@ CommandLineParser::~CommandLineParser()
 void CommandLineParser::push_back(CommandLineOption *option)
 {
     options.push_back(option);
-    if (!option->get_name().empty()) {
-        options_map[option->get_name()] = option;
+    vector<string> names = option->get_names();
+    for (vector<string>::iterator name_it=names.begin();
+            name_it!=names.end(); ++name_it) {
+        options_map[*name_it] = option;
     }
 }
 
 
+#include "Debug.H"
 void CommandLineParser::parse(int argc, char **argv)
 {
     int opt;

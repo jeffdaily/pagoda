@@ -23,6 +23,18 @@ using std::string;
 using std::vector;
 
 
+FileWriter* FileWriter::append(const string &filename)
+{
+    //TIMING("FileWriter::append(string)");
+    FileWriter *writer = NULL;
+    string EXT_NC(".nc");
+    if (pagoda::ends_with(filename, EXT_NC)) {
+        writer = new PnetcdfFileWriter(filename, true);
+    }
+    return writer;
+}
+
+
 FileWriter* FileWriter::create(const string &filename)
 {
     //TIMING("FileWriter::create(string)");

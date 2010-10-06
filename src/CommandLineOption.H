@@ -85,6 +85,7 @@ class CommandLineOption
         static CommandLineOption DIMENSION;
         static CommandLineOption EXCLUDE;
         static CommandLineOption FILE_FORMAT;
+        static CommandLineOption FIX_RECORD_DIMENSION;
         static CommandLineOption HELP;
         static CommandLineOption HISTORY;
         static CommandLineOption INPUT_PATH;
