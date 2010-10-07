@@ -183,16 +183,20 @@ vector<Mask*> AbstractVariable::get_masks() const
 
 /**
  * If there is a Mask over the record Dimension, translate the given record
- * into the index space of the subset.
+ * from the index space of the mask into the index space of the whole data.
+ *
+ * It is safe to call even if no masks are set in which case the record is
+ * returned unchanged.
  *
  * @param[in] record the record to translate
  * @return the translated record
  */
 int64_t AbstractVariable::translate_record(int64_t record) const
 {
-    Mask *mask = get_masks().at(0);
-    int64_t size = mask->get_size();
-    int *buf = (int*)mask->get(0, size-1);
+    vector<Mask*> masks = get_masks();
+    Mask *mask = NULL;
+    int64_t size = -1;
+    int *buf = NULL;
     int64_t count = -1;
     int64_t index = 0;
 
@@ -200,7 +204,15 @@ int64_t AbstractVariable::translate_record(int64_t record) const
             record, get_name().c_str());
     TRACER("size=%ld, count=%ld, index=%ld\n", size, count, index);
 
-    for ( ; index<size; ++index) {
+    if (masks.empty()) {
+        return record;
+    } 
+
+    mask = masks.at(0);
+    size = mask->get_size();
+    buf = (int*)mask->get(0, size-1);
+
+    for (index=0; index<size; ++index) {
         if (buf[index] != 0) {
             ++count;
             TRACER("buf[index]=%ld, count=%ld, index=%ld\n",

@@ -35,6 +35,8 @@ GenericCommands::GenericCommands()
     ,   input_path("")
     ,   output_filename("")
     ,   variables()
+    ,   variables_cache()
+    ,   dimensions_cache()
     ,   exclude_variables(false)
     ,   join_name("")
     ,   alphabetize(true)
@@ -63,7 +65,8 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   input_filenames()
     ,   input_path("")
     ,   output_filename("")
-    ,   variables()
+    ,   variables_cache()
+    ,   dimensions_cache()
     ,   exclude_variables(false)
     ,   join_name("")
     ,   alphabetize(true)
@@ -360,14 +363,21 @@ static bool var_cmp(Variable *left, Variable *right)
  * @param[in] dataset the Dataset
  * @return the Variables to operate over, possibly sorted by name
  */
-vector<Variable*> GenericCommands::get_variables(Dataset *dataset) const
+vector<Variable*> GenericCommands::get_variables(Dataset *dataset)
 {
-    const vector<Variable*> vars_in = dataset->get_vars();
+    vector<Variable*> vars_in;
     set<string> vars_to_keep;
     vector<Variable*> vars_out;
     vector<Variable*>::const_iterator it;
     vector<Variable*>::const_iterator end;
-    Grid *grid = dataset->get_grid();
+    Grid *grid = NULL;
+
+    if (variables_cache.find(dataset) != variables_cache.end()) {
+        return variables_cache[dataset];
+    }
+
+    vars_in = dataset->get_vars();
+    grid = dataset->get_grid();
 
     if (variables.empty()) {
         if (exclude_variables) {
@@ -467,6 +477,8 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset) const
         sort(vars_out.begin(), vars_out.end(), var_cmp);
     }
     
+    variables_cache[dataset] = vars_out;
+
     return vars_out;
 }
 
@@ -486,14 +498,20 @@ static bool dim_cmp(Dimension *left, Dimension *right)
  * @param[in] dataset the Dataset
  * @return the subset of Dimensions to operate over
  */
-vector<Dimension*> GenericCommands::get_dimensions(Dataset *dataset) const
+vector<Dimension*> GenericCommands::get_dimensions(Dataset *dataset)
 {
     set<string> dims_to_keep;
     vector<Dimension*> dims_out;
     vector<Dimension*> dims;
     vector<Dimension*>::iterator dim_it;
-    vector<Variable*> vars = get_variables(dataset);
+    vector<Variable*> vars;
     vector<Variable*>::iterator var_it;
+
+    if (dimensions_cache.find(dataset) != dimensions_cache.end()) {
+        return dimensions_cache[dataset];
+    }
+
+    vars = get_variables(dataset);
 
     for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
         dims = (*var_it)->get_dims();
@@ -514,6 +532,8 @@ vector<Dimension*> GenericCommands::get_dimensions(Dataset *dataset) const
         sort(dims_out.begin(), dims_out.end(), dim_cmp);
     }
     
+    dimensions_cache[dataset] = dims_out;
+
     return dims_out;
 }
 

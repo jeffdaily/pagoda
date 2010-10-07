@@ -12,6 +12,8 @@
 #   include <netcdf.h>
 #endif
 
+#include "Util.H"
+
 using std::ostringstream;
 using std::ostream;
 using std::runtime_error;
@@ -75,25 +77,19 @@ class DataType
 class DataTypeException : public runtime_error
 {
     public:
-        static string to_string(int value) {
-            ostringstream os;
-            os << value;
-            return os.str();
-        }
-
         explicit DataTypeException(const string &what)
             :   runtime_error(what)
         {}
         explicit DataTypeException(const string &what, int value)
             :   runtime_error(what
-                    +string(" :: ")+to_string(value))
+                    +string(" :: ")+pagoda::to_string(value))
         {}
         explicit DataTypeException(const string &what, int value,
                 const char *file, int line)
             :   runtime_error(what
-                    +string(" :: ")+to_string(value)
+                    +string(" :: ")+pagoda::to_string(value)
                     +string(" :: ")+string(file)
-                    +string(" :: ")+to_string(line))
+                    +string(" :: ")+pagoda::to_string(line))
         {}
         explicit DataTypeException(const string &what, const DataType &type)
             :   runtime_error(what
@@ -104,7 +100,7 @@ class DataTypeException : public runtime_error
             :   runtime_error(what
                     +string(" :: ")+type.get_name()
                     +string(" :: ")+string(file)
-                    +string(" :: ")+to_string(line))
+                    +string(" :: ")+pagoda::to_string(line))
         {}
 };
 

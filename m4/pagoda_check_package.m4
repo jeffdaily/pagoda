@@ -23,15 +23,28 @@ AS_CASE([$with_$1],
                 [PKG_LIBS],
                 [PKG_LDFLAGS],
                 [PKG_CPPFLAGS])])
+# Save user variables.
+pagoda_save_CPPFLAGS="$CPPFLAGS"
+pagoda_save_LDFLAGS="$LDFLAGS"
+pagoda_save_LIBS="$LIBS"
 # Check for header.
 # Always add user-supplied PKG_CPPFLAGS to CPPFLAGS first.
 CPPFLAGS="$CPPFLAGS $PKG_CPPFLAGS"
 AC_CHECK_HEADER([$2], [], [$7])
+# Restore user variable.
+CPPFLAGS="$pagoda_save_CPPFLAGS"
 # Check for library.
 # Always add user-supplied PKG_LDFLAGS and PKG_LIBS.
 LDFLAGS="$LDFLAGS $PKG_LDFLAGS"
 LIBS="$PKG_LIBS $LIBS"
 AC_SEARCH_LIBS([$4], [$3], [], [], [$5])
+# If a library was required and found, ac_res is set appropriately.
+AS_IF([test "x$ac_res" != xno],
+    [AS_IF([test "x$ac_res" != "none required"],
+        [PKG_LIBS="$ac_res"])])
+# Restore user variables.
+LDFLAGS="$pagoda_save_LDFLAGS"
+LIBS="$pagoda_save_LIBS"
 AC_SUBST(PKG_LIBS)
 AC_SUBST(PKG_LDFLAGS)
 AC_SUBST(PKG_CPPFLAGS)

@@ -144,7 +144,8 @@ Variable* GeoGrid::get_coord(const string &att_name,
             vector<string> parts = pagoda::split(att->get_string());
             vector<string>::iterator part;
             if (parts.size() != 2) {
-                throw GridException("expected " + att_name + " attribute "
+                EXCEPT(GridException,
+                        "expected " + att_name + " attribute "
                         "to have two values", parts.size());
             }
             for (part=parts.begin(); part!=parts.end(); ++part) {
@@ -153,7 +154,8 @@ Variable* GeoGrid::get_coord(const string &att_name,
                 string standard_name;
                 string long_name;
                 if (!var) {
-                    throw GridException("could not locate variable " + *part);
+                    EXCEPT(GridException,
+                            "could not locate variable " + *part, 0);
                 }
                 standard_name = var->get_standard_name();
                 long_name = var->get_long_name();
@@ -283,14 +285,15 @@ Dimension* GeoGrid::get_dim(const string &att_name, const string &dim_name)
         if (att) {
             vector<string> parts = pagoda::split(att->get_string());
             if (parts.size() != 2) {
-                throw GridException("expected " + att_name + " attribute "
+                EXCEPT(GridException,
+                        "expected " + att_name + " attribute "
                         "to have two values", parts.size());
             } else {
                 for (size_t i=0; i<parts.size(); ++i) {
                     Variable *var = dataset->get_var(parts[i]);
                     if (!var) {
-                        throw GridException(
-                                "could not locate variable" + parts[i]);
+                        EXCEPT(GridException,
+                                "could not locate variable" + parts[i], 0);
                     }
                     return var->get_dims().at(0);
                 }
@@ -329,7 +332,8 @@ Variable* GeoGrid::get_topology(const string &att_name, const string &var_name)
             string var_name = att->get_string();
             Variable *var = dataset->get_var(var_name);
             if (!var) {
-                throw GridException("could not locate variable " + var_name);
+                EXCEPT(GridException,
+                        "could not locate variable " + var_name, 0);
             }
             return var;
         }

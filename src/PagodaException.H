@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 
+#include "Util.H"
+
 using std::ostringstream;
 using std::runtime_error;
 using std::string;
@@ -16,12 +18,6 @@ using std::string;
 class PagodaException : public runtime_error
 {
   public:
-      static string to_string(int value) {
-          ostringstream os;
-          os << value;
-          return os.str();
-      }
-
       explicit PagodaException(const string &what)
           : runtime_error(what) {}
 
@@ -30,7 +26,8 @@ class PagodaException : public runtime_error
 
       explicit PagodaException(const string &where, const string &what,
               int value)
-          : runtime_error(where + ": " + what + " :: " + to_string(value)) {}
+          : runtime_error(where + ": " + what + " :: "
+                  + pagoda::to_string(value)) {}
 };
 
 #endif // PAGODAEXCEPTION_H_

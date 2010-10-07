@@ -5,12 +5,14 @@
 #include <cmath>
 #include <functional>
 #include <numeric>
+#include <sstream>
 #include <string>
 #include <vector>
 
 using std::divides;
 using std::modulus;
 using std::multiplies;
+using std::ostringstream;
 using std::partial_sum;
 using std::ptr_fun;
 using std::reverse;
@@ -54,7 +56,9 @@ template <class T> T ptr_deleter(T object);
 template <class T> bool same_name(const T *first, const T *second);
 template <class T> vector<T> unravel_index(T x, const vector<T> &dims);
 template <class T> T ravel_index(vector<T> indices, const vector<T> &dims);
+template <class T> string to_string(const T &value);
 bool file_exists(const string &filename);
+void print_backtrace();
 
 
 /**
@@ -146,6 +150,21 @@ T ravel_index(vector<T> indices, const vector<T> &dims)
     // [wd,xcd,ybcd,z]
     return accumulate(indices.begin(), indices.end()-1, 0) + indices.back();
 }
+
+
+/**
+ * Conveniently return stringified object using streams.
+ *
+ * @param[in] value what we are converting to a string
+ * @return the stringified object
+ */
+template <class T> string to_string(const T &value)
+{
+    ostringstream os;
+    os << value;
+    return os.str();
+}
+
 
 } // namespace pagoda
 

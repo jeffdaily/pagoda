@@ -35,8 +35,8 @@ class GenericCommands
 
         Dataset* get_dataset();
         FileWriter* get_output() const;
-        vector<Variable*> get_variables(Dataset *dataset) const;
-        vector<Dimension*> get_dimensions(Dataset *dataset) const;
+        vector<Variable*> get_variables(Dataset *dataset);
+        vector<Dimension*> get_dimensions(Dataset *dataset);
         vector<Attribute*> get_attributes(Dataset *dataset) const;
 
         vector<LatLonBox> get_boxes() const;
@@ -67,6 +67,8 @@ class GenericCommands
         string input_path;
         string output_filename;
         set<string> variables;
+        map<Dataset*,vector<Variable*> > variables_cache;
+        map<Dataset*,vector<Dimension*> > dimensions_cache;
         bool exclude_variables;
         string join_name;
         bool alphabetize;

@@ -100,16 +100,13 @@ int main(int argc, char **argv)
                 // read the rest of the records
                 for (int64_t rec=1; rec<nrec; ++rec) {
                     array = var->read(rec, array);
-                    if (op == OP_MAX || op == OP_MIN) {
-                        if (op == OP_MAX) {
-                            result->imax(array);
-                        } else {
-                            result->imin(array);
-                        }
+                    if (op == OP_MAX) {
+                        result->imax(array);
+                    } else if (op == OP_MIN) {
+                        result->imin(array);
                     } else {
-                        if (op == OP_RMS
-                                || op == OP_RMSSDN
-                                || op == OP_AVGSQR) {
+                        if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR)
+                        {
                             // square the values
                             array->imul(array);
                         }
@@ -167,6 +164,8 @@ int main(int argc, char **argv)
         pagoda::println_zero(ex.what());
         pagoda::finalize();
         return EXIT_FAILURE;
+    } catch (PagodaException &ex) {
+        pagoda::abort(ex.what());
     } catch (exception &ex) {
         pagoda::abort(ex.what());
     }

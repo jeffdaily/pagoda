@@ -16,6 +16,7 @@ class PgraCommands : public GenericCommands
 
         void parse(int argc, char **argv);
 
+        Dataset* get_dataset();
         FileWriter* get_output() const;
 
         string get_operator() const;

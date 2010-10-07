@@ -17,6 +17,7 @@ do { \
     __os << __prefix << __errstr << endl; \
     const string __msg(__os.str()); \
     const string __where(AT); \
+    pagoda::print_backtrace(); \
     throw PagodaException(__where, __msg); \
 } while (0)
 

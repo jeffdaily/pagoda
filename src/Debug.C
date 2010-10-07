@@ -39,7 +39,7 @@ static inline int get_precision()
 
 
 /* not used, but perhaps in the future
-static inline string to_string(const char *fmt, ...)
+static inline string va_to_string(const char *fmt, ...)
 {
     size_t size = 200;
     char result[size];
@@ -54,7 +54,7 @@ static inline string to_string(const char *fmt, ...)
 */
 
 
-static inline string to_string(const char *fmt, va_list ap)
+static inline string va_to_string(const char *fmt, va_list ap)
 {
     size_t size = 200;
     char result[size];
@@ -70,7 +70,7 @@ void pagoda::print_zero(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    print_zero(stderr, to_string(fmt, ap));
+    print_zero(stderr, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -86,7 +86,7 @@ void pagoda::print_zero(FILE *stream, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    print_zero(stream, to_string(fmt, ap));
+    print_zero(stream, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -106,7 +106,7 @@ void pagoda::println_zero(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    println_zero(stderr, to_string(fmt, ap));
+    println_zero(stderr, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -122,7 +122,7 @@ void pagoda::println_zero(FILE *stream, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    println_zero(stream, to_string(fmt, ap));
+    println_zero(stream, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -149,7 +149,7 @@ void pagoda::print_sync(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    print_sync(stderr, to_string(fmt, ap));
+    print_sync(stderr, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -165,7 +165,7 @@ void pagoda::print_sync(FILE *stream, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    print_sync(stream, to_string(fmt, ap));
+    print_sync(stream, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -205,7 +205,7 @@ void pagoda::println_sync(const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    println_sync(stderr, to_string(fmt, ap));
+    println_sync(stderr, va_to_string(fmt, ap));
     va_end(ap);
 }
 
@@ -221,7 +221,7 @@ void pagoda::println_sync(FILE *stream, const char *fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    println_sync(stream, to_string(fmt, ap));
+    println_sync(stream, va_to_string(fmt, ap));
     va_end(ap);
 }
 

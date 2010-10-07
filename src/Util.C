@@ -470,3 +470,51 @@ bool pagoda::file_exists(const string &filename)
 
     return values.front() == 1;
 }
+
+
+#if ENABLE_BACKTRACE
+#   include <execinfo.h>
+#   include <stdio.h>
+#   include <stdlib.h>
+#   if CPP_DEMANGLE
+#       include <cxxabi.h>
+#   endif
+#endif
+void pagoda::print_backtrace()
+{
+#if ENABLE_BACKTRACE
+    void *array[10];
+    size_t size;
+    char **strings;
+    size_t i;
+
+    size = backtrace (array, 10);
+    strings = backtrace_symbols (array, size);
+
+    printf ("Obtained %zd stack frames.\n", size);
+
+    for (i = 0; i < size; i++) {
+#   if CPP_DEMANGLE
+        string s = strings[i];
+        size_t open_paren_loc = s.find_first_of('(');
+        size_t plus_loc = s.find_first_of('+');
+        if (open_paren_loc != string::npos && plus_loc != string::npos) {
+            char *tmp;
+            int status;
+            string pre  = s.substr(0,open_paren_loc+1);
+            string name = s.substr(open_paren_loc+1,plus_loc-open_paren_loc-1);
+            string post = s.substr(plus_loc);
+            tmp = abi::__cxa_demangle(name.c_str(), NULL, 0, &status);
+            printf("%s%s%s\n", pre.c_str(), tmp, post.c_str());
+            free(tmp);
+        } else {
+            printf ("%s\n", strings[i]);
+        }
+#   else
+        printf ("%s\n", strings[i]);
+#   endif
+    }
+
+    free (strings);
+#endif
+}

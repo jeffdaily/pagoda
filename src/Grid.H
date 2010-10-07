@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "PagodaException.H"
+
 using std::ostream;
 using std::ostringstream;
 using std::runtime_error;
@@ -98,23 +100,24 @@ class Grid
 /**
  * GridType-based exceptions.
  */
-class GridTypeException : public runtime_error
+class GridTypeException : public PagodaException
 {
     public:
-        static string to_string(int value) {
-            ostringstream os;
-            os << value;
-            return os.str();
-        }
-
         explicit GridTypeException(const string &what)
-            :   runtime_error(what)
+            :   PagodaException(what)
+        {}
+        explicit GridTypeException(const string &where, const string &what)
+            :   PagodaException(where,what)
+        {}
+        explicit GridTypeException(const string &where, const string &what,
+                int value)
+            :   PagodaException(where,what,value)
         {}
         explicit GridTypeException(const string &what, int value)
-            :   runtime_error(what+string(" :: ")+to_string(value))
+            :   PagodaException("",what,value)
         {}
         explicit GridTypeException(const string &what, const GridType &type)
-            :   runtime_error(what+string(" :: ")+type.get_name())
+            :   PagodaException(what+string(" :: ")+type.get_name())
         {}
 };
 
@@ -122,20 +125,18 @@ class GridTypeException : public runtime_error
 /**
  * Grid-based exceptions.
  */
-class GridException : public runtime_error
+class GridException : public PagodaException
 {
     public:
-        static string to_string(int value) {
-            ostringstream os;
-            os << value;
-            return os.str();
-        }
-
         explicit GridException(const string &what)
-            :   runtime_error(what)
+            :   PagodaException(what)
         {}
-        explicit GridException(const string &what, int value)
-            :   runtime_error(what+string(" :: ")+to_string(value))
+        explicit GridException(const string &where, const string &what)
+            :   PagodaException(where,what)
+        {}
+        explicit GridException(const string &where, const string &what,
+                int value)
+            :   PagodaException(where,what,value)
         {}
 };
 

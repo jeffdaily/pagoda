@@ -177,14 +177,19 @@ Array* AggregationVariable::read(Array *dst) const
 
 Array* AggregationVariable::read(int64_t record, Array *dst) const
 {
-    int64_t index_within_var = record;
+    int64_t index_within_var = translate_record(record);
 
     if (record < 0 || record > get_shape().at(0)) {
         throw IndexOutOfBoundsException("AggregationVariable::read");
     }
 
     for (int64_t index_var=0; index_var<vars.size(); ++index_var) {
-        int64_t num_records = vars.at(index_var)->get_shape().at(0);
+        Variable *var = vars.at(index_var);
+        int64_t num_records;
+        // we want the non-masked size of this variable
+        get_dataset()->push_masks(NULL);
+        num_records = var->get_shape().at(0);
+        get_dataset()->pop_masks();
         if (index_within_var < num_records) {
             return vars.at(index_var)->read(index_within_var, dst);
         } else {
