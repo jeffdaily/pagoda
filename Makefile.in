@@ -45,7 +45,8 @@ check_PROGRAMS = $(am__EXEEXT_1) tests/TestArray$(EXEEXT) \
 	tests/TestPnetcdfDataset$(EXEEXT) tests/TestMaskMap$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) tests/TestRavel$(EXEEXT) \
 	tests/TestRead$(EXEEXT) tests/TestScatter$(EXEEXT) \
-	tests/TestUnion$(EXEEXT) tests/TestWrite$(EXEEXT)
+	tests/TestSlice$(EXEEXT) tests/TestUnion$(EXEEXT) \
+	tests/TestWrite$(EXEEXT)
 bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT) \
 	pgra$(EXEEXT)
 
@@ -262,6 +263,11 @@ tests_TestScatter_OBJECTS = $(am_tests_TestScatter_OBJECTS)
 tests_TestScatter_LDADD = $(LDADD)
 tests_TestScatter_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_tests_TestSlice_OBJECTS = tests/TestSlice.$(OBJEXT)
+tests_TestSlice_OBJECTS = $(am_tests_TestSlice_OBJECTS)
+tests_TestSlice_LDADD = $(LDADD)
+tests_TestSlice_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_tests_TestUnion_OBJECTS = tests/TestUnion.$(OBJEXT)
 tests_TestUnion_OBJECTS = $(am_tests_TestUnion_OBJECTS)
 tests_TestUnion_LDADD = $(LDADD)
@@ -416,9 +422,9 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgdump_SOURCES) \
 	$(tests_TestPnetcdfAttribute_SOURCES) \
 	$(tests_TestPnetcdfDataset_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
-	$(tests_TestUnion_SOURCES) $(tests_TestWrite_SOURCES) \
-	$(tests_ga_TestAttribute_SOURCES) $(tests_ga_TestBin_SOURCES) \
-	$(tests_ga_TestDimension_SOURCES) \
+	$(tests_TestSlice_SOURCES) $(tests_TestUnion_SOURCES) \
+	$(tests_TestWrite_SOURCES) $(tests_ga_TestAttribute_SOURCES) \
+	$(tests_ga_TestBin_SOURCES) $(tests_ga_TestDimension_SOURCES) \
 	$(tests_ga_TestDistance_SOURCES) $(tests_ga_TestEnum_SOURCES) \
 	$(tests_ga_TestGet_SOURCES) $(tests_ga_TestJoin_SOURCES) \
 	$(tests_ga_TestLocateRegion_SOURCES) \
@@ -438,9 +444,9 @@ DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) \
 	$(tests_TestPnetcdfAttribute_SOURCES) \
 	$(tests_TestPnetcdfDataset_SOURCES) $(tests_TestRavel_SOURCES) \
 	$(tests_TestRead_SOURCES) $(tests_TestScatter_SOURCES) \
-	$(tests_TestUnion_SOURCES) $(tests_TestWrite_SOURCES) \
-	$(tests_ga_TestAttribute_SOURCES) $(tests_ga_TestBin_SOURCES) \
-	$(tests_ga_TestDimension_SOURCES) \
+	$(tests_TestSlice_SOURCES) $(tests_TestUnion_SOURCES) \
+	$(tests_TestWrite_SOURCES) $(tests_ga_TestAttribute_SOURCES) \
+	$(tests_ga_TestBin_SOURCES) $(tests_ga_TestDimension_SOURCES) \
 	$(tests_ga_TestDistance_SOURCES) $(tests_ga_TestEnum_SOURCES) \
 	$(tests_ga_TestGet_SOURCES) $(tests_ga_TestJoin_SOURCES) \
 	$(tests_ga_TestLocateRegion_SOURCES) \
@@ -676,6 +682,7 @@ tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 tests_TestRavel_SOURCES = tests/TestRavel.C
 tests_TestRead_SOURCES = tests/TestRead.C
 tests_TestScatter_SOURCES = tests/TestScatter.C
+tests_TestSlice_SOURCES = tests/TestSlice.C
 tests_TestUnion_SOURCES = tests/TestUnion.C
 tests_TestWrite_SOURCES = tests/TestWrite.C
 tests_ga_TestGet_LDADD = $(LDADD_STANDALONE)
@@ -1000,6 +1007,11 @@ tests/TestScatter.$(OBJEXT): tests/$(am__dirstamp) \
 tests/TestScatter$(EXEEXT): $(tests_TestScatter_OBJECTS) $(tests_TestScatter_DEPENDENCIES) tests/$(am__dirstamp)
 	@rm -f tests/TestScatter$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestScatter_OBJECTS) $(tests_TestScatter_LDADD) $(LIBS)
+tests/TestSlice.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestSlice$(EXEEXT): $(tests_TestSlice_OBJECTS) $(tests_TestSlice_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestSlice$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestSlice_OBJECTS) $(tests_TestSlice_LDADD) $(LIBS)
 tests/TestUnion.$(OBJEXT): tests/$(am__dirstamp) \
 	tests/$(DEPDIR)/$(am__dirstamp)
 tests/TestUnion$(EXEEXT): $(tests_TestUnion_OBJECTS) $(tests_TestUnion_DEPENDENCIES) tests/$(am__dirstamp)
@@ -1217,6 +1229,7 @@ mostlyclean-compile:
 	-rm -f tests/TestRavel.$(OBJEXT)
 	-rm -f tests/TestRead.$(OBJEXT)
 	-rm -f tests/TestScatter.$(OBJEXT)
+	-rm -f tests/TestSlice.$(OBJEXT)
 	-rm -f tests/TestUnion.$(OBJEXT)
 	-rm -f tests/TestWrite.$(OBJEXT)
 	-rm -f tests/ga/TestAttribute.$(OBJEXT)
@@ -1308,6 +1321,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestRead.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestScatter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestSlice.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestUnion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestWrite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/ga/$(DEPDIR)/TestAttribute.Po@am__quote@

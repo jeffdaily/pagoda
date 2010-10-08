@@ -23,6 +23,7 @@ using std::ostringstream;
 
 AbstractVariable::AbstractVariable()
     :   Variable()
+    ,   enable_record_translation(true)
 {
     TIMING("AbstractVariable::AbstractVariable()");
 }
@@ -204,7 +205,7 @@ int64_t AbstractVariable::translate_record(int64_t record) const
             record, get_name().c_str());
     TRACER("size=%ld, count=%ld, index=%ld\n", size, count, index);
 
-    if (masks.empty()) {
+    if (masks.empty() || !enable_record_translation) {
         return record;
     } 
 
@@ -231,6 +232,17 @@ int64_t AbstractVariable::translate_record(int64_t record) const
     }
 
     return index;
+}
+
+
+/**
+ * Enables whether record translation takes place.
+ *
+ * @see translate_record
+ */
+void AbstractVariable::set_translate_record(bool value)
+{
+    enable_record_translation = value;
 }
 
 

@@ -178,11 +178,11 @@ void GlobalMask::modify(const DimSlice &slice)
     if (lo[0] <= slo) {
         int64_t start = slo-lo[0];
         if (hi[0] >= shi) {
-            for (int64_t i=start,limit=(shi-lo[0]); i<limit; i+=step) {
+            for (int64_t i=start,limit=(shi-lo[0]); i<=limit; i+=step) {
                 data[i] = 1;
             }
         } else { // hi < shi
-            for (int64_t i=start,limit=(hi[0]-lo[0]+1); i<limit; i+=step) {
+            for (int64_t i=start,limit=(hi[0]-lo[0]+1); i<=limit; i+=step) {
                 data[i] = 1;
             }
         }
@@ -190,11 +190,11 @@ void GlobalMask::modify(const DimSlice &slice)
         int64_t start = slo-lo[0];
         while (start < 0) start+=step;
         if (hi[0] >= shi) {
-            for (int64_t i=start,limit=(shi-lo[0]); i<limit; i+=step) {
+            for (int64_t i=start,limit=(shi-lo[0]); i<=limit; i+=step) {
                 data[i] = 1;
             }
         } else { // hi < shi
-            for (int64_t i=start,limit=(hi[0]-lo[0]+1); i<limit; i+=step) {
+            for (int64_t i=start,limit=(hi[0]-lo[0]+1); i<=limit; i+=step) {
                 data[i] = 1;
             }
         }

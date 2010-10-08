@@ -28,6 +28,8 @@ template <class T> ostream& operator<< (ostream &os, const Slice<T> &other);
  * values are allowed to be negative. The indices function is useful for
  * calculating the real index values for each of start, stop, and step given
  * the size of the dimension being sliced.
+ *
+ * The value for start is inclusive while the value for stop is exclusive.
  */
 template <class T>
 class Slice
@@ -44,6 +46,7 @@ class Slice
 
         string get_name() const;
         void indices(T size, T &start, T &stop, T &step) const;
+        void indices_exclusive(T size, T &start, T &stop, T &step) const;
 
         friend ostream& operator<< <>(ostream &os, const Slice<T> &other);
 
@@ -202,12 +205,14 @@ string Slice<T>::get_name() const
  * and convert negative values into positive values although "step" should be
  * unchanged.
  *
+ * The returned value for stop is inclusive.
+ *
  * Examples:
  * "dim,1,5,2", size 20 --> 1,5,2
  * "dim,1,2", size 20 --> 1,2,1
- * "dim,7", size 20 --> 7,8,1
+ * "dim,7", size 20 --> 7,7,1
  * "dim,-10,-20,-1", size 20 --> 10,0,-1
- * "dim,-1", size 20 --> 19,20,1
+ * "dim,-1", size 20 --> 19,19,1
  */
 template <class T>
 void Slice<T>::indices(T size, T &_start, T &_stop, T &_step) const
@@ -216,8 +221,58 @@ void Slice<T>::indices(T size, T &_start, T &_stop, T &_step) const
 
     _start = this->start;
     if (_start < 0) _start += size;
-    if (_start < 0 || _start > size)
-        throw RangeException(string("start < 0 || start > size"));
+    if (_start < 0 || _start >= size)
+        throw RangeException(string("start < 0 || start >= size"));
+
+    if (this->stop) {
+        _stop = *(this->stop);
+        if (_stop < 0) _stop += size;
+        if (_stop < 0 || _stop > size)
+            throw RangeException(string("stop < 0 || stop > size"));
+    } else {
+        _stop = _start;
+    }
+
+    if (this->step) {
+        _step = *(this->step);
+    } else {
+        _step = 1;
+    }
+
+    if (_start > _stop && _step > 0)
+        throw RangeException(
+                string("start > stop && step > 0 (causes no-op loop)"));
+    if (_start < _stop && _step < 0)
+        throw RangeException(
+                string("start < stop && step < 0 (causes infinite loop)"));
+}
+
+
+/**
+ * Calculate and return the real values for start, stop, and step given size.
+ *
+ * This will convert any missing stop or step value to an appropriate T
+ * and convert negative values into positive values although "step" should be
+ * unchanged.
+ *
+ * The returned value for stop is exclusive.
+ *
+ * Examples:
+ * "dim,1,5,2", size 20 --> 1,5,2
+ * "dim,1,2", size 20 --> 1,2,1
+ * "dim,7", size 20 --> 7,8,1
+ * "dim,-10,-20,-1", size 20 --> 10,0,-1
+ * "dim,-1", size 20 --> 19,20,1
+ */
+template <class T>
+void Slice<T>::indices_exclusive(T size, T &_start, T &_stop, T &_step) const
+{
+    if (size < 0) throw RangeException(string("size must be positive"));
+
+    _start = this->start;
+    if (_start < 0) _start += size;
+    if (_start < 0 || _start >= size)
+        throw RangeException(string("start < 0 || start >= size"));
 
     if (this->stop) {
         _stop = *(this->stop);

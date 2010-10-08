@@ -173,6 +173,7 @@ check_PROGRAMS += tests/TestPartialSum
 check_PROGRAMS += tests/TestRavel
 check_PROGRAMS += tests/TestRead
 check_PROGRAMS += tests/TestScatter
+check_PROGRAMS += tests/TestSlice
 check_PROGRAMS += tests/TestUnion
 check_PROGRAMS += tests/TestWrite
 
@@ -208,6 +209,7 @@ tests_TestPartialSum_SOURCES        = tests/TestPartialSum.C
 tests_TestRavel_SOURCES             = tests/TestRavel.C
 tests_TestRead_SOURCES              = tests/TestRead.C
 tests_TestScatter_SOURCES           = tests/TestScatter.C
+tests_TestSlice_SOURCES             = tests/TestSlice.C
 tests_TestUnion_SOURCES             = tests/TestUnion.C
 tests_TestWrite_SOURCES             = tests/TestWrite.C
 

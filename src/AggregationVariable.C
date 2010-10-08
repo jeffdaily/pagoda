@@ -132,7 +132,7 @@ Array* AggregationVariable::read(Array *dst) const
     return dst;
 }
 
-#else /* AGGREGATION_VARIABLE_READ_LOMEM */
+#else /* ! AGGREGATION_VARIABLE_READ_LOMEM */
 
 Array* AggregationVariable::read(Array *dst) const
 {    /* Reads one aggregated Variable at a time and copies to dst Array */
@@ -191,7 +191,11 @@ Array* AggregationVariable::read(int64_t record, Array *dst) const
         num_records = var->get_shape().at(0);
         get_dataset()->pop_masks();
         if (index_within_var < num_records) {
-            return vars.at(index_var)->read(index_within_var, dst);
+            Array *result;
+            var->set_translate_record(false);
+            result = var->read(index_within_var, dst);
+            var->set_translate_record(true);
+            return result;
         } else {
             index_within_var -= num_records;
         }
@@ -219,16 +223,25 @@ Array* AggregationVariable::iread(Array *dst)
 
 Array* AggregationVariable::iread(int64_t record, Array *dst)
 {
-    int64_t index_within_var = record;
+    int64_t index_within_var = translate_record(record);
 
     if (record < 0 || record > get_shape().at(0)) {
-        throw IndexOutOfBoundsException("AggregationVariable::read");
+        throw IndexOutOfBoundsException("AggregationVariable::iread");
     }
 
     for (int64_t index_var=0; index_var<vars.size(); ++index_var) {
-        int64_t num_records = vars.at(index_var)->get_shape().at(0);
+        Variable *var = vars.at(index_var);
+        int64_t num_records;
+        // we want the non-masked size of this variable
+        get_dataset()->push_masks(NULL);
+        num_records = var->get_shape().at(0);
+        get_dataset()->pop_masks();
         if (index_within_var < num_records) {
-            return vars.at(index_var)->iread(index_within_var, dst);
+            Array *result;
+            var->set_translate_record(false);
+            result = var->read(index_within_var, dst);
+            var->set_translate_record(true);
+            return result;
         } else {
             index_within_var -= num_records;
         }
