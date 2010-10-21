@@ -11,7 +11,7 @@
 #include "Util.H"
 
 
-int CommandLineOption::WIDTH(20);
+unsigned int CommandLineOption::WIDTH(20);
 
 CommandLineOption CommandLineOption::ALPHABETIZE(
         'a', "alphabetize", false,

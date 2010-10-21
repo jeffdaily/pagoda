@@ -137,7 +137,7 @@ static inline void reverse_info(
         uint64_t data = it->second;
 
         iomap_reverse.insert(make_pair(data,name));
-        if (name.size() > name_width) {
+        if (static_cast<int>(name.size()) > name_width) {
             name_width = name.size();
         }
         if (data > max) {
@@ -232,6 +232,7 @@ void PnetcdfTiming::calc_bytes(const vector<MPI_Offset> &count, nc_type type)
         case NC_INT:    size *= 4; break;
         case NC_FLOAT:  size *= 4; break;
         case NC_DOUBLE: size *= 8; break;
+        default: ERR("type not recognized");
     }
     new_size = bytes[name] + size;
     if (new_size < bytes[name]) {

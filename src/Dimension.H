@@ -3,9 +3,11 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using std::ostream;
 using std::string;
+using std::vector;
 
 class Dataset;
 class Mask;
@@ -73,6 +75,19 @@ class Dimension
         virtual ostream& print(ostream &os) const = 0;
 
         friend ostream& operator << (ostream &os, const Dimension *other);
+
+        /**
+         * Compares to another Dimension.
+         *
+         * Sizes and names are compared.
+         */
+        static bool equal(const Dimension *left, const Dimension *right);
+
+        /**
+         * Compares two sets of  Dimensions.
+         */
+        static bool equal(const vector<Dimension*> &left,
+                          const vector<Dimension*> &right);
 
     protected:
         /**

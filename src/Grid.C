@@ -115,7 +115,7 @@ Grid::~Grid()
  *
  * This is the scalar Variable meant to contain relevant grid metadata only.
  *
- * @return the Variable, if any
+ * @return the Variable, NULL if not found
  */
 Variable* Grid::get_grid() const
 {
@@ -131,6 +131,8 @@ Variable* Grid::get_grid() const
             return var;
         }
     }
+
+    return NULL;
 }
 
 

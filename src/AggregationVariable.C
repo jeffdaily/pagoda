@@ -136,7 +136,6 @@ Array* AggregationVariable::read(Array *dst) const
 
 Array* AggregationVariable::read(Array *dst) const
 {    /* Reads one aggregated Variable at a time and copies to dst Array */
-    int count = 0;
     int ndim = get_ndim();
     vector<int64_t> dst_lo(ndim, 0);
     vector<int64_t> dst_hi = get_shape();
@@ -183,7 +182,7 @@ Array* AggregationVariable::read(int64_t record, Array *dst) const
         throw IndexOutOfBoundsException("AggregationVariable::read");
     }
 
-    for (int64_t index_var=0; index_var<vars.size(); ++index_var) {
+    for (size_t index_var=0; index_var<vars.size(); ++index_var) {
         Variable *var = vars.at(index_var);
         int64_t num_records;
         // we want the non-masked size of this variable
@@ -229,7 +228,7 @@ Array* AggregationVariable::iread(int64_t record, Array *dst)
         throw IndexOutOfBoundsException("AggregationVariable::iread");
     }
 
-    for (int64_t index_var=0; index_var<vars.size(); ++index_var) {
+    for (size_t index_var=0; index_var<vars.size(); ++index_var) {
         Variable *var = vars.at(index_var);
         int64_t num_records;
         // we want the non-masked size of this variable

@@ -3,9 +3,11 @@
 #endif
 
 #include "Dataset.H"
+#include "Dimension.H"
 #include "PnetcdfDataset.H"
 #include "Timing.H"
 #include "Util.H"
+#include "Variable.H"
 
 
 Dataset* Dataset::open(const string &filename)
@@ -35,4 +37,25 @@ Dataset::~Dataset()
 ostream& operator << (ostream &os, const Dataset *dataset)
 {
     return dataset->print(os);
+}
+
+
+/**
+ * Datasets are equal if set of Dimensions and Variables match.
+ *
+ * Dimensions and Variables need not be in the same order.
+ */
+bool Dataset::equal(const Dataset *left, const Dataset *right)
+{
+    vector<Dimension*> left_dims = left->get_dims();
+    vector<Dimension*> right_dims = right->get_dims();
+    vector<Variable*> left_vars = left->get_vars();
+    vector<Variable*> right_vars = right->get_vars();
+
+    if (Dimension::equal(left_dims,right_dims)
+            && Variable::equal(left_vars,right_vars)) {
+        return true;
+    }
+
+    return false;
 }

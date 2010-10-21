@@ -355,6 +355,7 @@ ScalarArray& ScalarArray::operator+=(const ScalarArray &that)
         *((T*)value) += *((T*)that.value); \
     } else
 #include "DataType.def"
+    return *this;
 }
 
 
@@ -365,6 +366,7 @@ ScalarArray& ScalarArray::operator-=(const ScalarArray &that)
         *((T*)value) -= *((T*)that.value); \
     } else
 #include "DataType.def"
+    return *this;
 }
 
 
@@ -375,6 +377,7 @@ ScalarArray& ScalarArray::operator*=(const ScalarArray &that)
         *((T*)value) *= *((T*)that.value); \
     } else
 #include "DataType.def"
+    return *this;
 }
 
 
@@ -385,6 +388,7 @@ ScalarArray& ScalarArray::operator/=(const ScalarArray &that)
         *((T*)value) /= *((T*)that.value); \
     } else
 #include "DataType.def"
+    return *this;
 }
 
 

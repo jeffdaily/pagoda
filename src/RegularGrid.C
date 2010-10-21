@@ -40,19 +40,16 @@ static set<string> LONGITUDE_UNITS;
 vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
 {
     vector<Grid*> results;
-    int count = 0;
     vector<Variable*> vars = dataset->get_vars();
     vector<Variable*>::const_iterator var_it = vars.begin();
     vector<Variable*>::const_iterator var_end = vars.end();
     vector<Attribute*> atts;
     vector<Attribute*>::iterator att_it;
     vector<Attribute*>::iterator att_end;
-    Variable *grid_center_lat;
-    Variable *grid_center_lon;
     bool found_lat = false;
     bool found_lon = false;
 
-    pagoda::println_zero("RegularGrid::get_grids");
+    //pagoda::println_zero("RegularGrid::get_grids");
 
     // initialize unit sets first time only
     if (LATITUDE_UNITS.empty()) {
@@ -98,10 +95,10 @@ vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
     var_it = vars.begin();
     for ( ; var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
-        pagoda::println_zero("looking at %s", var->get_name().c_str());
+        //pagoda::println_zero("looking at %s", var->get_name().c_str());
         if (var->get_ndim() == 1
                 && var->get_dims()[0]->get_name() == var->get_name()) {
-            pagoda::println_zero("\tcoordinate var");
+            //pagoda::println_zero("\tcoordinate var");
             atts = var->get_atts();
             att_end = atts.end();
             // look for latitude
@@ -111,13 +108,13 @@ vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
                 if (att->get_name() == "standard_name") {
                     if (att->get_string() == "latitude") {
                         found_lat = true;
-                        pagoda::println_zero("\tstandard_name latitude");
+                        //pagoda::println_zero("\tstandard_name latitude");
                         break;
                     }
                 } else if (att->get_name() == "units") {
                     if (LATITUDE_UNITS.count(att->get_string())) {
                         found_lat = true;
-                        pagoda::println_zero("\tunits latitude");
+                        //pagoda::println_zero("\tunits latitude");
                         break;
                     }
                 }
@@ -129,13 +126,13 @@ vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
                 if (att->get_name() == "standard_name") {
                     if (att->get_string() == "longitude") {
                         found_lon = true;
-                        pagoda::println_zero("\tstandard_name longitude");
+                        //pagoda::println_zero("\tstandard_name longitude");
                         break;
                     }
                 } else if (att->get_name() == "units") {
                     if (LONGITUDE_UNITS.count(att->get_string())) {
                         found_lon = true;
-                        pagoda::println_zero("\tunits longitude");
+                        //pagoda::println_zero("\tunits longitude");
                         break;
                     }
                 }

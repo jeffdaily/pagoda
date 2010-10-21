@@ -161,7 +161,7 @@ string Timing::get_stats_calls(bool descending)
         }
         counts_total += counts_it->second;
     }
-    if (name_width > g_name_width) {
+    if (static_cast<int>(name_width) > g_name_width) {
         g_name_width = name_width;
     }
     counts_width = (int)(ceil(log10((double)counts_max))) + g_log10_adjustment;
@@ -222,7 +222,7 @@ string Timing::get_stats_total_time(bool descending)
     int times_width = 0;
     CountsMap::iterator counts_it = counts.begin();
     CountsMap::iterator counts_end = counts.end();
-    int64_t counts_max = 0;
+    unsigned long counts_max = 0;
     int64_t counts_total = 0;
     int counts_width = 0;
 
@@ -234,7 +234,7 @@ string Timing::get_stats_total_time(bool descending)
         if (times_it->first.size() > name_width) {
             name_width = times_it->first.size();
         }
-        if (times_it->second > times_max) {
+        if (times_it->second > static_cast<int64_t>(times_max)) {
             times_max = times_it->second;
         }
         times_total += times_it->second;

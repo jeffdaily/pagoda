@@ -49,6 +49,36 @@ Mask* Dimension::get_mask() const
 }
 
 
+bool Dimension::equal(const Dimension *left, const Dimension *right)
+{
+    return left->get_size() == right->get_size()
+        && left->get_name() == right->get_name();
+}
+
+
+bool Dimension::equal(
+        const vector<Dimension*> &left, const vector<Dimension*> &right)
+{
+    if (left.size() != right.size()) {
+        return false;
+    }
+    for (size_t i=0; i<left.size(); ++i) {
+        size_t j;
+        Dimension *left_dim = left[i];
+        for (j=0; j<right.size(); j++) {
+            if (Dimension::equal(left_dim, right[j])) {
+                break;
+            }
+        }
+        if (j >= right.size()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 ostream& operator << (ostream &os, const Dimension *other)
 {
     TIMING("operator<<(ostream,Dimension*)");

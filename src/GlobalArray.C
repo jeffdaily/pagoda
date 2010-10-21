@@ -679,7 +679,7 @@ void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
 
     TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
 
-    for (size_t i=0; i<n; ++i) {
+    for (int64_t i=0; i<n; ++i) {
         subs[i] = &subscripts[i*ndim];
     }
 
@@ -697,7 +697,7 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
 
     TIMING("GlobalArray::gather(void*,vector<int64_t>)");
 
-    for (size_t i=0; i<n; ++i) {
+    for (int64_t i=0; i<n; ++i) {
         subs[i] = &subscripts[i*ndim];
     }
 
@@ -986,6 +986,8 @@ Array* GlobalArray::ipow(double exponent)
 #include "DataType.def"
         release_update();
     }
+
+    return this;
 }
 
 

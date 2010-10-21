@@ -35,8 +35,6 @@ PnetcdfAttribute::PnetcdfAttribute(
 {
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
-    nc_type type_tmp;
-    MPI_Offset len_mpi;
 
     TIMING("PnetcdfAttribute::PnetcdfAttribute(...)");
 

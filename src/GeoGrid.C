@@ -35,7 +35,6 @@ using std::vector;
 vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
 {
     vector<Grid*> results;
-    int count = 0;
     vector<Variable*> vars = dataset->get_vars();
     vector<Variable*>::const_iterator var_it = vars.begin();
     vector<Variable*>::const_iterator var_end = vars.end();

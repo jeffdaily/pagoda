@@ -88,7 +88,6 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     int me = pagoda::nodeid();
     DataType type_src = g_src->get_type();
     DataType type_dst = g_dst->get_type();
-    int64_t dims;
     void *ptr_src;
     void *ptr_dst;
     int64_t elems;
@@ -200,8 +199,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
 void pagoda::pack(const Array *g_src, Array *g_dst,
         const vector<Array*> &g_masks, const vector<Array*> &g_masksums)
 {
-    int me = pagoda::nodeid();
-
     DataType type_src = g_src->get_type();
     int ndim_src = g_src->get_ndim();
     vector<int64_t> lo_src(ndim_src,0);

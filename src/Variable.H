@@ -64,6 +64,12 @@ class Variable
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Variable *other);
 
+        static bool equal(const Variable *left, const Variable *right);
+        static bool equal(const vector<Variable*> &left,
+                          const vector<Variable*> &right);
+        static Variable* find(const vector<Variable*> &vars,
+                              const Variable *var);
+
         virtual int64_t translate_record(int64_t record) const = 0;
         virtual void set_translate_record(bool value) = 0;
 

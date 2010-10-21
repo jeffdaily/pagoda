@@ -17,13 +17,14 @@ LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 
 check_PROGRAMS = 
-bin_PROGRAMS = pgdump pgsub pgbo pgra
+bin_PROGRAMS = pgdump pgsub pgbo pgra pgea
 lib_LTLIBRARIES = libpagoda.la
 
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
 pgbo_SOURCES = src/pgbo.C
 pgra_SOURCES = src/pgra.C
+pgea_SOURCES = src/pgea.C
 
 pkginclude_HEADERS =
 pkginclude_HEADERS += src/AbstractDataset.H
@@ -65,6 +66,7 @@ pkginclude_HEADERS += src/NotImplementedException.H
 pkginclude_HEADERS += src/pagoda.H
 pkginclude_HEADERS += src/Pack.H
 pkginclude_HEADERS += src/PgboCommands.H
+pkginclude_HEADERS += src/PgeaCommands.H
 pkginclude_HEADERS += src/PgraCommands.H
 pkginclude_HEADERS += src/PagodaException.H
 pkginclude_HEADERS += src/PnetcdfAttribute.H
@@ -122,6 +124,7 @@ libpagoda_la_SOURCES += src/MaskMap.C
 libpagoda_la_SOURCES += src/Memory.c
 libpagoda_la_SOURCES += src/Pack.C
 libpagoda_la_SOURCES += src/PgboCommands.C
+libpagoda_la_SOURCES += src/PgeaCommands.C
 libpagoda_la_SOURCES += src/PgraCommands.C
 libpagoda_la_SOURCES += src/PnetcdfAttribute.C
 libpagoda_la_SOURCES += src/Pnetcdf.C

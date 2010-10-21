@@ -40,7 +40,7 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     int natt;
     ncmpi::inq_var(ncid, varid, name, type_tmp, dim_ids, natt);
     type = type_tmp;
-    for (int dimidx=0; dimidx<dim_ids.size(); ++dimidx) {
+    for (size_t dimidx=0; dimidx<dim_ids.size(); ++dimidx) {
         dims.push_back(dataset->get_dim(dim_ids[dimidx]));
     }
     for (int attid=0; attid<natt; ++attid) {

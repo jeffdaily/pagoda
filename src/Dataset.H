@@ -63,6 +63,8 @@ class Dataset
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Dataset *dataset);
 
+        static bool equal(const Dataset *left, const Dataset *right);
+
     protected:
         Dataset();
 };

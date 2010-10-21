@@ -47,7 +47,7 @@ enum BinaryOperator {
 class CommandLineOption
 {
     public:
-        static int WIDTH;
+        static unsigned int WIDTH;
 
         CommandLineOption(const int &value, const string &name,
                 const bool &argument, const string &description,

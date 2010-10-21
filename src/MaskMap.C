@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <cassert>
 #include <iostream>
 #include <map>
 #include <string>
@@ -97,6 +98,7 @@ void MaskMap::create_masks(const vector<Dimension*> dims)
     for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
         Dimension *dim = *dim_it;
         Mask *mask = get_mask(dim);
+        assert(mask != NULL);
     }
 }
 

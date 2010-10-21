@@ -39,6 +39,8 @@ static int file_format_to_nc_format(FileFormat format)
         return NC_64BIT_OFFSET;
     } else if (format == FF_PNETCDF_CDF5) {
         return NC_64BIT_DATA;
+    } else {
+        ERR("FileFormat not recognized");
     }
 }
 
@@ -120,7 +122,7 @@ FileWriter* PnetcdfFileWriter::create()
                 ncmpi::inq_var(ncid, varid, name, xtype, dimids, varnatts);
                 var_id[name] = varid;
                 var_dims[name] = dimids;
-                for (int dimidx=0; dimidx<dimids.size(); ++dimidx) {
+                for (size_t dimidx=0; dimidx<dimids.size(); ++dimidx) {
                     string dim_name = ncmpi::inq_dimname(ncid, dimids[dimidx]);
                     shape.push_back(get_dim_size(dim_name));
                 }
@@ -138,6 +140,7 @@ FileWriter* PnetcdfFileWriter::create()
 
     open = true;
     MPI_Info_free(&info);
+    return this;
 }
 
 
@@ -377,7 +380,6 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
 {
     string name = attr->get_name();
     DataType dt = attr->get_type();
-    MPI_Offset len = attr->get_count();
 
     TIMING("PnetcdfFileWriter::write_att_id(Attribute*,int)");
     TRACER("PnetcdfFileWriter::write_att_id %s\n", attr->get_name().c_str());
