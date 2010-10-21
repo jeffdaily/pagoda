@@ -278,7 +278,7 @@ void MaskMap::modify(const LatLonBox &box,
 /**
  * Modifiy the masks of the given lat/lon variables.
  *
- * This is usefulf when the lat/lon dimensions are unique.  In other words,
+ * This is useful when the lat/lon dimensions are unique.  In other words,
  * assumes lat_dim and lon_dim are two different dimensions.
  *
  * @param[in] box the lat/lon specification
@@ -291,7 +291,29 @@ void MaskMap::modify(
         const LatLonBox &box, const Variable *lat, const Variable *lon,
         Dimension *lat_dim, Dimension *lon_dim)
 {
-    throw NotImplementedException("MaskMap::modify(LatLonBox,Variable*,Variable*,Dimension*,Dimension*)");
+    Mask *lat_mask = get_mask(lat_dim);
+    Mask *lon_mask = get_mask(lon_dim);
+    Array *lat_array;
+    Array *lon_array;
+
+    lat->get_dataset()->push_masks(NULL);
+    lat_array = lat->read();
+    lon_array = lon->read();
+    lat->get_dataset()->pop_masks();
+
+    // clear the Mask the first time only
+    if (cleared.count(lat_dim->get_name()) == 0) {
+        cleared.insert(lat_dim->get_name());
+        lat_mask->clear();
+    }
+    if (cleared.count(lon_dim->get_name()) == 0) {
+        cleared.insert(lon_dim->get_name());
+        lon_mask->clear();
+    }
+    lat_mask->modify(box.s, box.n, lat_array);
+    lon_mask->modify(box.w, box.e, lon_array);
+    delete lat_array;
+    delete lon_array;
 }
 
 

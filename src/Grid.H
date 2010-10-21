@@ -27,6 +27,7 @@ class GridType
 {
     public:
         static const GridType GEODESIC;
+        static const GridType REGULAR;
 
         GridType(const GridType &type);
         GridType& operator = (const GridType &type);

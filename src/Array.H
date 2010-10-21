@@ -7,6 +7,7 @@ using std::vector;
 
 #include "DataType.H"
 #include "Dimension.H"
+#include "Error.H"
 
 
 /**

@@ -3,6 +3,7 @@
 #endif
 
 #include "Array.H"
+#include "AllNodeArray.H"
 #include "GlobalArray.H"
 #include "ScalarArray.H"
 #include "Timing.H"
@@ -14,18 +15,30 @@ Array* Array::create(DataType type, vector<int64_t> shape)
     TIMING("Array::create(DataType,vector<int64_t>)");
     if (shape.empty()) {
         return new ScalarArray(type);
+    } else if (type == DataType::CHAR) {
+        return new AllNodeArray<char>(type, shape);
     }
-    return new GlobalArray(type,shape);
+    return new GlobalArray(type, shape);
 }
 
 
 Array* Array::create(DataType type, vector<Dimension*> dims)
 {
+    vector<int64_t> shape;
+
     TIMING("Array::create(DataType,vector<Dimension*>)");
+
+    for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
+            it!=end; ++it) {
+        shape.push_back((*it)->get_size());
+    }
+
     if (dims.empty()) {
         return new ScalarArray(type);
+    } else if (type == DataType::CHAR) {
+        return new AllNodeArray<char>(type, shape);
     }
-    return new GlobalArray(type,dims);
+    return new GlobalArray(type, shape);
 }
 
 

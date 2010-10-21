@@ -169,7 +169,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
         partial_sum_op(DataType::DOUBLE,    double)
         partial_sum_op(DataType::LONGDOUBLE,long double)
         {
-            throw DataTypeException("DataType not handled", type_dst);
+            EXCEPT(DataTypeException, "DataType not handled", type_dst);
         }
 #undef partial_sum_op
     }
@@ -305,7 +305,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
             pack_bit_copy(DataType::DOUBLE,double,%f)
             pack_bit_copy(DataType::LONGDOUBLE,long double,%f)
             {
-                throw DataTypeException("DataType not handled", type_src);
+                EXCEPT(DataTypeException, "DataType not handled", type_src);
             }
 #undef pack_bit_copy
         }
@@ -385,7 +385,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
         enumerate_op(DataType::DOUBLE,    double)
         enumerate_op(DataType::LONGDOUBLE,long double)
         {
-            throw DataTypeException("DataType not handled", type);
+            EXCEPT(DataTypeException, "DataType not handled", type);
         }
 #undef enumerate_op
     }
@@ -476,7 +476,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     unpack1d_op(DataType::DOUBLE,double)
     unpack1d_op(DataType::LONGDOUBLE,long double)
     {
-        throw DataTypeException("DataType not handled", type_src);
+        EXCEPT(DataTypeException, "DataType not handled", type_src);
     }
 #undef unpack1d_op
     TRACER("unpack1d END\n");

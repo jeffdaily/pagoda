@@ -251,7 +251,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     adjust_op(DataType::DOUBLE,double)
     adjust_op(DataType::LONGDOUBLE,long double)
     {
-        throw DataTypeException("DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef adjust_op
 
@@ -301,7 +301,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
     adjust_op(DataType::DOUBLE,double)
     adjust_op(DataType::LONGDOUBLE,long double)
     {
-        throw DataTypeException("DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef adjust_op
 

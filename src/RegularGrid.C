@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -14,7 +15,7 @@
 #include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
-#include "GeoGrid.H"
+#include "RegularGrid.H"
 #include "StringComparator.H"
 #include "Util.H"
 #include "Variable.H"
@@ -23,8 +24,12 @@ using std::back_inserter;
 using std::copy;
 using std::istream_iterator;
 using std::istringstream;
+using std::set;
 using std::string;
 using std::vector;
+
+static set<string> LATITUDE_UNITS;
+static set<string> LONGITUDE_UNITS;
 
 
 /**
@@ -32,7 +37,7 @@ using std::vector;
  *
  * @param[in] dataset where to look
  */
-vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
+vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
 {
     vector<Grid*> results;
     int count = 0;
@@ -44,9 +49,31 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
     vector<Attribute*>::iterator att_end;
     Variable *grid_center_lat;
     Variable *grid_center_lon;
+    bool found_lat = false;
+    bool found_lon = false;
+
+    pagoda::println_zero("RegularGrid::get_grids");
+
+    // initialize unit sets first time only
+    if (LATITUDE_UNITS.empty()) {
+        LATITUDE_UNITS.insert("degrees_north");
+        LATITUDE_UNITS.insert("degree_north");
+        LATITUDE_UNITS.insert("degrees_N");
+        LATITUDE_UNITS.insert("degree_N");
+        LATITUDE_UNITS.insert("degreesN");
+        LATITUDE_UNITS.insert("degreeN");
+    }
+    if (LONGITUDE_UNITS.empty()) {
+        LONGITUDE_UNITS.insert("degrees_east");
+        LONGITUDE_UNITS.insert("degree_east");
+        LONGITUDE_UNITS.insert("degrees_E");
+        LONGITUDE_UNITS.insert("degree_E");
+        LONGITUDE_UNITS.insert("degreesE");
+        LONGITUDE_UNITS.insert("degreeE");
+    }
 
     // first, look for one or more special "grid" variable(s)
-    // it is dimensionless with a cell_type attribute of "hex"
+    // it is dimensionless with a cell_type attribute of "rect"
     for ( ; var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
         if (var->get_ndim() == 0) {
@@ -56,8 +83,8 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
             for ( ; att_it!=att_end; ++att_it) {
                 Attribute *att = *att_it;
                 if (att->get_name() == "cell_type") {
-                    if (att->get_string() == "hex") {
-                        results.push_back(new GeoGrid(dataset, var));
+                    if (att->get_string() == "rect") {
+                        results.push_back(new RegularGrid(dataset, var));
                         break;
                     }
                 }
@@ -65,30 +92,58 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
         }
     }
 
-    // all else failed, look for well known variables/attributes
+    // all else failed, look for 1-dimensional lat and lon coordinate
+    // variables
     // also at this point assume a single Grid in the Dataset
-
-    // look for "grid" global attribute with value "geodesic"
-    atts = dataset->get_atts();
-    att_it = atts.begin();
-    att_end = atts.end();
-    for ( ; att_it!=att_end; ++att_it) {
-        Attribute *att = *att_it;
-        if (att->get_name() == "grid") {
-            if (att->get_string() == "geodesic") {
-                results.push_back(new GeoGrid(dataset));
-                break;
+    var_it = vars.begin();
+    for ( ; var_it!=var_end; ++var_it) {
+        Variable *var = *var_it;
+        pagoda::println_zero("looking at %s", var->get_name().c_str());
+        if (var->get_ndim() == 1
+                && var->get_dims()[0]->get_name() == var->get_name()) {
+            pagoda::println_zero("\tcoordinate var");
+            atts = var->get_atts();
+            att_end = atts.end();
+            // look for latitude
+            att_it = atts.begin();
+            for ( ; att_it!=att_end; ++att_it) {
+                Attribute *att = *att_it;
+                if (att->get_name() == "standard_name") {
+                    if (att->get_string() == "latitude") {
+                        found_lat = true;
+                        pagoda::println_zero("\tstandard_name latitude");
+                        break;
+                    }
+                } else if (att->get_name() == "units") {
+                    if (LATITUDE_UNITS.count(att->get_string())) {
+                        found_lat = true;
+                        pagoda::println_zero("\tunits latitude");
+                        break;
+                    }
+                }
+            }
+            // look for longitude
+            att_it = atts.begin();
+            for ( ; att_it!=att_end; ++att_it) {
+                Attribute *att = *att_it;
+                if (att->get_name() == "standard_name") {
+                    if (att->get_string() == "longitude") {
+                        found_lon = true;
+                        pagoda::println_zero("\tstandard_name longitude");
+                        break;
+                    }
+                } else if (att->get_name() == "units") {
+                    if (LONGITUDE_UNITS.count(att->get_string())) {
+                        found_lon = true;
+                        pagoda::println_zero("\tunits longitude");
+                        break;
+                    }
+                }
             }
         }
-    }
-
-    // look for "grid_center_lat" and "grid_center_lon" Variables which share
-    // the same Dimension
-    grid_center_lat = dataset->get_var("grid_center_lat");
-    grid_center_lon = dataset->get_var("grid_center_lon");
-    if (grid_center_lat && grid_center_lon) {
-        if (grid_center_lat->get_dims() == grid_center_lon->get_dims()) {
-            results.push_back(new GeoGrid(dataset));
+        if (found_lat && found_lon) {
+            results.push_back(new RegularGrid(dataset));
+            break;
         }
     }
 
@@ -96,46 +151,46 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
 }
 
 
-GeoGrid::GeoGrid()
+RegularGrid::RegularGrid()
     :   dataset(NULL)
 {
-    ERR("GeoGrid::GeoGrid() ctor not supported");
+    ERR("RegularGrid::RegularGrid() ctor not supported");
 }
 
 
-GeoGrid::GeoGrid(const GeoGrid &that)
+RegularGrid::RegularGrid(const RegularGrid &that)
     :   dataset(that.dataset)
 {
-    ERR("GeoGrid::GeoGrid() copy ctor not supported");
+    ERR("RegularGrid::RegularGrid() copy ctor not supported");
 }
 
 
 /**
  * Constructor given a "grid" Variable.
  */
-GeoGrid::GeoGrid(const Dataset *dataset, const Variable *grid_var)
+RegularGrid::RegularGrid(const Dataset *dataset, const Variable *grid_var)
     :   dataset(dataset)
     ,   grid_var(grid_var)
 {
 }
 
 
-GeoGrid::~GeoGrid()
+RegularGrid::~RegularGrid()
 {
     dataset = NULL;
 }
 
 
-GridType GeoGrid::get_type() const
+GridType RegularGrid::get_type() const
 {
-    return GridType::GEODESIC;
+    return GridType::REGULAR;
 }
 
 
-Variable* GeoGrid::get_coord(const string &att_name,
+Variable* RegularGrid::get_coord(const string &att_name,
         const string &coord_name, const string &dim_name)
 {
-    TRACER("GeoGrid::get_coord(%s,%s,%s)\n", att_name.c_str(),
+    TRACER("RegularGrid::get_coord(%s,%s,%s)\n", att_name.c_str(),
             coord_name.c_str(), dim_name.c_str());
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
@@ -215,56 +270,56 @@ Variable* GeoGrid::get_coord(const string &att_name,
 }
 
 
-Variable* GeoGrid::get_cell_lat()
+Variable* RegularGrid::get_cell_lat()
 {
     return get_coord("coordinates_cells", "latitude", "cells");
 }
 
 
-Variable* GeoGrid::get_cell_lon()
+Variable* RegularGrid::get_cell_lon()
 {
     return get_coord("coordinates_cells", "longitude", "cells");
 }
 
 
-Variable* GeoGrid::get_edge_lat()
+Variable* RegularGrid::get_edge_lat()
 {
     return get_coord("coordinates_edges", "latitude", "edges");
 }
 
 
-Variable* GeoGrid::get_edge_lon()
+Variable* RegularGrid::get_edge_lon()
 {
     return get_coord("coordinates_edges", "longitude", "edges");
 }
 
 
-Variable* GeoGrid::get_corner_lat()
+Variable* RegularGrid::get_corner_lat()
 {
     return get_coord("coordinates_corners", "latitude", "corners");
 }
 
 
-Variable* GeoGrid::get_corner_lon()
+Variable* RegularGrid::get_corner_lon()
 {
     return get_coord("coordinates_corners", "longitude", "corners");
 }
 
 
-bool GeoGrid::is_radians()
+bool RegularGrid::is_radians()
 {
-    vector<Variable* (GeoGrid::*)()> funcs;
-    funcs.push_back(&GeoGrid::get_cell_lat);
-    funcs.push_back(&GeoGrid::get_cell_lon);
-    funcs.push_back(&GeoGrid::get_edge_lat);
-    funcs.push_back(&GeoGrid::get_edge_lon);
-    funcs.push_back(&GeoGrid::get_corner_lat);
-    funcs.push_back(&GeoGrid::get_corner_lon);
+    vector<Variable* (RegularGrid::*)()> funcs;
+    funcs.push_back(&RegularGrid::get_cell_lat);
+    funcs.push_back(&RegularGrid::get_cell_lon);
+    funcs.push_back(&RegularGrid::get_edge_lat);
+    funcs.push_back(&RegularGrid::get_edge_lon);
+    funcs.push_back(&RegularGrid::get_corner_lat);
+    funcs.push_back(&RegularGrid::get_corner_lon);
 
     for (size_t i=0; i<funcs.size(); ++i) {
         Variable *var;
         Attribute *att;
-        Variable* (GeoGrid::*func)() = funcs[i];
+        Variable* (RegularGrid::*func)() = funcs[i];
         if ((var = (this->*func)())) {
             if ((att = var->get_att("units"))
                     && att->get_string() == "radians") {
@@ -277,7 +332,7 @@ bool GeoGrid::is_radians()
 }
 
 
-Dimension* GeoGrid::get_dim(const string &att_name, const string &dim_name)
+Dimension* RegularGrid::get_dim(const string &att_name, const string &dim_name)
 {
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
@@ -305,25 +360,25 @@ Dimension* GeoGrid::get_dim(const string &att_name, const string &dim_name)
 }
 
 
-Dimension* GeoGrid::get_cell_dim()
+Dimension* RegularGrid::get_cell_dim()
 {
     return get_dim("coordinates_cells", "cells");
 }
 
 
-Dimension* GeoGrid::get_edge_dim()
+Dimension* RegularGrid::get_edge_dim()
 {
     return get_dim("coordinates_edges", "edges");
 }
 
 
-Dimension* GeoGrid::get_corner_dim()
+Dimension* RegularGrid::get_corner_dim()
 {
     return get_dim("coordinates_corners", "corners");
 }
 
 
-Variable* GeoGrid::get_topology(const string &att_name, const string &var_name)
+Variable* RegularGrid::get_topology(const string &att_name, const string &var_name)
 {
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
@@ -343,37 +398,37 @@ Variable* GeoGrid::get_topology(const string &att_name, const string &var_name)
 }
 
 
-Variable* GeoGrid::get_cell_cells()
+Variable* RegularGrid::get_cell_cells()
 {
     return get_topology("cell_cells", "cell_neighbors");
 }
 
 
-Variable* GeoGrid::get_cell_edges()
+Variable* RegularGrid::get_cell_edges()
 {
     return get_topology("cell_edges", "cell_edges");
 }
 
 
-Variable* GeoGrid::get_cell_corners()
+Variable* RegularGrid::get_cell_corners()
 {
     return get_topology("cell_corners", "cell_corners");
 }
 
 
-Variable* GeoGrid::get_edge_cells()
+Variable* RegularGrid::get_edge_cells()
 {
     return NULL;
 }
 
 
-Variable* GeoGrid::get_edge_edges()
+Variable* RegularGrid::get_edge_edges()
 {
     return NULL;
 }
 
 
-Variable* GeoGrid::get_edge_corners()
+Variable* RegularGrid::get_edge_corners()
 {
     Variable *var = get_topology("edge_corners", "edgecorners");
     if (!var) {
@@ -383,25 +438,25 @@ Variable* GeoGrid::get_edge_corners()
 }
 
 
-Variable* GeoGrid::get_corner_cells()
+Variable* RegularGrid::get_corner_cells()
 {
     return NULL;
 }
 
 
-Variable* GeoGrid::get_corner_edges()
+Variable* RegularGrid::get_corner_edges()
 {
     return NULL;
 }
 
 
-Variable* GeoGrid::get_corner_corners()
+Variable* RegularGrid::get_corner_corners()
 {
     return NULL;
 }
 
 
-const Dataset* GeoGrid::get_dataset() const
+const Dataset* RegularGrid::get_dataset() const
 {
     return dataset;
 }

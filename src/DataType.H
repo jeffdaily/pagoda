@@ -91,6 +91,11 @@ class DataTypeException : public runtime_error
                     +string(" :: ")+string(file)
                     +string(" :: ")+pagoda::to_string(line))
         {}
+        explicit DataTypeException(const string &where,
+                const string &what, const DataType &type)
+            :   runtime_error(where + ": " + what
+                    +string(" :: ")+type.get_name())
+        {}
         explicit DataTypeException(const string &what, const DataType &type)
             :   runtime_error(what
                     +string(" :: ")+type.get_name())

@@ -19,12 +19,14 @@ using std::vector;
 #include "Error.H"
 #include "Grid.H"
 #include "GeoGrid.H"
+#include "RegularGrid.H"
 #include "Util.H"
 #include "Variable.H"
 
 
-const GridType GridType::GEODESIC("geodesic");
 int GridType::next_id(1);
+const GridType GridType::GEODESIC("geodesic");
+const GridType GridType::REGULAR("regular");
 
 
 GridType::GridType(const string &name)
@@ -86,6 +88,10 @@ vector<Grid*> Grid::get_grids(const Dataset *dataset)
     vector<Grid*>::iterator grid_it;
 
     grids = GeoGrid::get_grids(dataset);
+    for (grid_it=grids.begin(); grid_it!=grids.end(); ++grid_it) {
+        ret.push_back(*grid_it);
+    }
+    grids = RegularGrid::get_grids(dataset);
     for (grid_it=grids.begin(); grid_it!=grids.end(); ++grid_it) {
         ret.push_back(*grid_it);
     }

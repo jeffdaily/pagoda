@@ -130,7 +130,7 @@ FileWriter* PnetcdfFileWriter::create()
             ncid = ncmpi::create(MPI_COMM_WORLD, filename,
                     file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
         } else {
-            throw PagodaException("file exists");
+            ERR("file exists");
         }
     } else {
         ncid = ncmpi::create(MPI_COMM_WORLD, filename, _file_format, info);
@@ -198,7 +198,7 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
             ostringstream strerr;
             strerr << "redef dim size mismatch: " << name;
             strerr << " old=" << dim_size[name] << " new=" << size;
-            throw PagodaException(strerr.str());
+            ERR(strerr.str());
         }
     } else {
         id = ncmpi::def_dim(ncid, name, size);
@@ -396,7 +396,7 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
     put_attr_values(DataType::FLOAT,  float)
     put_attr_values(DataType::DOUBLE, double)
     {
-        throw DataTypeException("DataType not handled", dt);
+        EXCEPT(DataTypeException, "DataType not handled", dt);
     }
 #undef put_attr_values
 }
@@ -488,7 +488,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
     write_var_all(float,  DataType::FLOAT)
     write_var_all(double, DataType::DOUBLE)
     {
-        throw DataTypeException("DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef write_var_all
 }
@@ -543,7 +543,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
     write_var_all(float,  DataType::FLOAT)
     write_var_all(double, DataType::DOUBLE)
     {
-        throw DataTypeException("DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef write_var_all
 }

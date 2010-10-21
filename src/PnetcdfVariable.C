@@ -315,7 +315,7 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
     read_var_all(float,  DataType::FLOAT)
     read_var_all(double, DataType::DOUBLE)
     {
-        throw DataTypeException("DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef read_var_all
 }

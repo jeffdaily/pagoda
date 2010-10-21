@@ -23,7 +23,7 @@ do { \
     const string __msg(__os.str()); \
     const string __where(AT); \
     pagoda::print_backtrace(); \
-    throw __exception(__where, __msg, __code); \
+    throw __exception(__where, __msg, (__code)); \
 } while (0)
 
 #define ERR(e) EXCEPT(PagodaException,e,0)

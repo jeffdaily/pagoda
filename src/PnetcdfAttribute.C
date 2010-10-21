@@ -56,7 +56,7 @@ PnetcdfAttribute::PnetcdfAttribute(
     get_attr_values(DataType::FLOAT,  float)
     get_attr_values(DataType::DOUBLE, double)
     {
-        throw DataTypeException("DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef get_attr_values
 }

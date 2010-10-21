@@ -543,7 +543,7 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
     vector<Attribute*> atts = dataset->get_atts();
 
     if (modify_history) {
-        Attribute *history;
+        Attribute *history = NULL;
         size_t pos,limit;
 
         for (pos=0,limit=atts.size(); pos<limit; ++pos) {
