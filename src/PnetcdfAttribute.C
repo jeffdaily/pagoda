@@ -51,6 +51,7 @@ PnetcdfAttribute::PnetcdfAttribute(
     get_attr_values(DataType::UCHAR,  unsigned char)
     get_attr_values(DataType::SHORT,  short)
     get_attr_values(DataType::INT,    int)
+    get_attr_values(DataType::LONG,   long)
     get_attr_values(DataType::FLOAT,  float)
     get_attr_values(DataType::DOUBLE, double)
     {
