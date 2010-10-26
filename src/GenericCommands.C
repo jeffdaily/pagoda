@@ -550,7 +550,17 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
 
     if (modify_history) {
         Attribute *history = NULL;
-        size_t pos,limit;
+        size_t pos;
+        size_t limit;
+        time_t time_result = time(NULL);
+        string date_cmdline = ctime(&time_result);
+        TypedValues<char> *history_complete;
+        vector<char> history_copy;
+
+        // replace newline added by ctime with colon space
+        date_cmdline.replace(date_cmdline.size()-1, 1, ": ");
+        date_cmdline += cmdline;
+        history_copy.assign(date_cmdline.begin(), date_cmdline.end());
 
         for (pos=0,limit=atts.size(); pos<limit; ++pos) {
             Attribute *current_att = atts[pos];
@@ -561,15 +571,6 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
         }
 
         if (history) {
-            time_t time_result = time(NULL);
-            string date_cmdline = ctime(&time_result);
-            TypedValues<char> *history_complete;
-            vector<char> history_copy;
-
-            // replace newline added by ctime with colon space
-            date_cmdline.replace(date_cmdline.size()-1, 1, ": ");
-            date_cmdline += cmdline;
-            history_copy.assign(date_cmdline.begin(), date_cmdline.end());
             if (history_copy.back() != '\n') {
                 history_copy.push_back('\n');
             }
@@ -578,9 +579,14 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
             // the new Attribute replaces the original, which is still owned
             // by its parent Dataset and will be cleaned up when the parent
             // Dataset is deleted.  However this new Attribute will not get
-            // destroyed...
+            // destroyed which is a memory leak.
+            // TODO cache Attribute in this GenericCommands instance
             atts[pos] = new GenericAttribute("history",
                     history_complete, DataType::CHAR);
+        } else {
+            history_complete = new TypedValues<char>(history_copy);
+            atts.push_back(new GenericAttribute("history",
+                    history_complete, DataType::CHAR));
         }
     }
 

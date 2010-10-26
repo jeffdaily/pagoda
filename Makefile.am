@@ -17,7 +17,7 @@ LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 
 check_PROGRAMS = 
-bin_PROGRAMS = pgdump pgsub pgbo pgra pgea
+bin_PROGRAMS = pgdump pgsub pgbo pgra pgea pgcmp
 lib_LTLIBRARIES = libpagoda.la
 
 pgdump_SOURCES = src/pgdump.C
@@ -25,6 +25,7 @@ pgsub_SOURCES = src/pgsub.C
 pgbo_SOURCES = src/pgbo.C
 pgra_SOURCES = src/pgra.C
 pgea_SOURCES = src/pgea.C
+pgcmp_SOURCES = src/pgcmp.C
 
 pkginclude_HEADERS =
 pkginclude_HEADERS += src/AbstractDataset.H

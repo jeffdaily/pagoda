@@ -48,7 +48,7 @@ check_PROGRAMS = $(am__EXEEXT_1) tests/TestArray$(EXEEXT) \
 	tests/TestSlice$(EXEEXT) tests/TestUnion$(EXEEXT) \
 	tests/TestWrite$(EXEEXT)
 bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT) \
-	pgra$(EXEEXT) pgea$(EXEEXT)
+	pgra$(EXEEXT) pgea$(EXEEXT) pgcmp$(EXEEXT)
 
 #############################################################################
 # tests
@@ -161,6 +161,11 @@ pgbo_OBJECTS = $(am_pgbo_OBJECTS)
 pgbo_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
 pgbo_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_pgcmp_OBJECTS = src/pgcmp.$(OBJEXT)
+pgcmp_OBJECTS = $(am_pgcmp_OBJECTS)
+pgcmp_LDADD = $(LDADD)
+pgcmp_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_pgdump_OBJECTS = src/pgdump.$(OBJEXT)
 pgdump_OBJECTS = $(am_pgdump_OBJECTS)
@@ -418,10 +423,10 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgdump_SOURCES) \
-	$(pgea_SOURCES) $(pgra_SOURCES) $(pgsub_SOURCES) \
-	$(tests_TestArray_SOURCES) $(tests_TestBin_SOURCES) \
-	$(tests_TestCommandLine_SOURCES) \
+SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
+	$(pgdump_SOURCES) $(pgea_SOURCES) $(pgra_SOURCES) \
+	$(pgsub_SOURCES) $(tests_TestArray_SOURCES) \
+	$(tests_TestBin_SOURCES) $(tests_TestCommandLine_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
 	$(tests_TestGrid_SOURCES) $(tests_TestJoin_SOURCES) \
@@ -441,8 +446,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgdump_SOURCES) \
 	$(tests_ga_TestScanAdd_SOURCES) $(tests_ga_TestSort_SOURCES) \
 	$(tests_ga_TestUnion_SOURCES) $(tests_ga_TestUnpack_SOURCES)
 DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) \
-	$(pgdump_SOURCES) $(pgea_SOURCES) $(pgra_SOURCES) \
-	$(pgsub_SOURCES) $(tests_TestArray_SOURCES) \
+	$(pgcmp_SOURCES) $(pgdump_SOURCES) $(pgea_SOURCES) \
+	$(pgra_SOURCES) $(pgsub_SOURCES) $(tests_TestArray_SOURCES) \
 	$(tests_TestBin_SOURCES) $(tests_TestCommandLine_SOURCES) \
 	$(tests_TestDimension_SOURCES) $(tests_TestDistance_SOURCES) \
 	$(tests_TestEnum_SOURCES) $(tests_TestGet_SOURCES) \
@@ -621,6 +626,7 @@ pgsub_SOURCES = src/pgsub.C
 pgbo_SOURCES = src/pgbo.C
 pgra_SOURCES = src/pgra.C
 pgea_SOURCES = src/pgea.C
+pgcmp_SOURCES = src/pgcmp.C
 pkginclude_HEADERS = src/AbstractDataset.H src/AbstractVariable.H \
 	src/AggregationDimension.H src/Aggregation.H \
 	src/AggregationJoinExisting.H src/AggregationUnion.H \
@@ -920,6 +926,10 @@ src/pgbo.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 pgbo$(EXEEXT): $(pgbo_OBJECTS) $(pgbo_DEPENDENCIES) 
 	@rm -f pgbo$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pgbo_OBJECTS) $(pgbo_LDADD) $(LIBS)
+src/pgcmp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+pgcmp$(EXEEXT): $(pgcmp_OBJECTS) $(pgcmp_DEPENDENCIES) 
+	@rm -f pgcmp$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(pgcmp_OBJECTS) $(pgcmp_LDADD) $(LIBS)
 src/pgdump.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 pgdump$(EXEEXT): $(pgdump_OBJECTS) $(pgdump_DEPENDENCIES) 
@@ -1230,6 +1240,7 @@ mostlyclean-compile:
 	-rm -f src/gax.$(OBJEXT)
 	-rm -f src/gax.lo
 	-rm -f src/pgbo.$(OBJEXT)
+	-rm -f src/pgcmp.$(OBJEXT)
 	-rm -f src/pgdump.$(OBJEXT)
 	-rm -f src/pgea.$(OBJEXT)
 	-rm -f src/pgra.$(OBJEXT)
@@ -1325,6 +1336,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/VariableDecorator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgbo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgcmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgdump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgra.Po@am__quote@

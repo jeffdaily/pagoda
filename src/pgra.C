@@ -92,6 +92,14 @@ int main(int argc, char **argv)
 
                 // optimization: read the first record directly into result
                 result = var->read(0, result);
+
+                // ignore character data
+                if (result->get_type() == DataType::CHAR) {
+                    writer->write(result, var->get_name(), 0);
+                    delete result;
+                    continue;
+                }
+               
                 if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
                     // square the values
                     result->imul(result);
