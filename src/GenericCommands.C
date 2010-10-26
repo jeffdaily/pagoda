@@ -143,8 +143,12 @@ void GenericCommands::parse(int argc, char **argv)
         return; // stop parsing
     }
 
-    if (positional_arguments.empty()) {
-        throw CommandException("input and output file arguments required");
+    // "path" must come before input filename handling
+    if (parser.count("path")) {
+        input_path = parser.get_argument("path");
+        if (!input_path.empty() && !pagoda::ends_with(input_path, "/")) {
+            input_path += "/";
+        }
     }
 
     if (parser.count("output") == 0) {
@@ -154,8 +158,14 @@ void GenericCommands::parse(int argc, char **argv)
             throw CommandException("input and output file arguments required");
         }
         output_filename = positional_arguments.back();
-        input_filenames.assign(positional_arguments.begin(),
-                positional_arguments.end()-1);
+        if (input_path.empty()) {
+            input_filenames.assign(positional_arguments.begin(),
+                    positional_arguments.end()-1);
+        } else {
+            for (size_t i=0; i<positional_arguments.size()-1; ++i) {
+                input_filenames.push_back(input_path + positional_arguments[i]);
+            }
+        }
     } else if (parser.count("output") == 1) {
         output_filename = parser.get_argument("output");
         input_filenames = positional_arguments;
@@ -272,10 +282,6 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("fix_rec_dmn")) {
         fix_record_dimension = true;
-    }
-
-    if (parser.count("path")) {
-        input_path = parser.get_argument("path");
     }
 
     if (parser.count("header_pad")) {
@@ -689,4 +695,10 @@ string GenericCommands::get_usage() const
 FileFormat GenericCommands::get_file_format() const
 {
     return file_format;
+}
+
+
+string GenericCommands::get_input_path() const
+{
+    return input_path;
 }

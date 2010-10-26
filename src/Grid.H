@@ -52,7 +52,22 @@ class GridType
  * Unstructured grid abstraction.
  *
  * Most grids can be represented in an unstructured way with explicit topology
- * and related geometry.
+ * and related geometry.  Implementing this interface will allow certain
+ * operations between grids, whether the underlying grids are unstructured or
+ * not.
+ *
+ * The cell, edge, and corner methods may return Variables and Dimensions not
+ * found in the underlying Dataset.  In other words, the Grid interface is
+ * allowed to create the missing pieces.  For example, a regular grid is
+ * represented using separate latitude and longitude Dimensions.  Calling
+ * get_cell_dim() should then return a new Dimension (not found in the
+ * original Dataset) with a length of the product of the lengths of the
+ * latitude and longitude Dimensions.  This new Dimension represents the
+ * Dimension shared between the latitude and longitude coordinate Variables
+ * in an unstructured representation of the regular grid.  Likewise,
+ * get_cell_lat would not return the lat(lat) coordinate Variable, but rather
+ * the lat(cell) auxiliary coordinate Variable in terms of the unstructured
+ * representation.
  */
 class Grid
 {

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Array.H"
+#include "Bootstrap.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -19,8 +20,8 @@ template <class T>
 class NodeZeroArray : public Array
 {
     public:
-        NodeZeroArray(DataType type);
-        NodeZeroArray(const NodeZeroArray &that);
+        NodeZeroArray(const vector<int64_t> &shape);
+        NodeZeroArray(const NodeZeroArray<T> &that);
         virtual ~NodeZeroArray();
 
         virtual DataType get_type() const;
@@ -64,6 +65,7 @@ class NodeZeroArray : public Array
         virtual Array* max(const Array *rhs) const;
         virtual Array* min(const Array *rhs) const;
         virtual Array* pow(double exponent) const;
+
         virtual Array* iadd(const Array *rhs);
         virtual Array* isub(const Array *rhs);
         virtual Array* imul(const Array *rhs);
@@ -71,111 +73,122 @@ class NodeZeroArray : public Array
         virtual Array* imax(const Array *rhs);
         virtual Array* imin(const Array *rhs);
         virtual Array* ipow(double exponent);
-        NodeZeroArray& operator+=(const NodeZeroArray &that);
-        NodeZeroArray& operator-=(const NodeZeroArray &that);
-        NodeZeroArray& operator*=(const NodeZeroArray &that);
-        NodeZeroArray& operator/=(const NodeZeroArray &that);
+
+        NodeZeroArray<T>& operator+=(const NodeZeroArray<T> &that);
+        NodeZeroArray<T>& operator+=(const ScalarArray &that);
+        NodeZeroArray<T>& operator-=(const NodeZeroArray<T> &that);
+        NodeZeroArray<T>& operator-=(const ScalarArray &that);
+        NodeZeroArray<T>& operator*=(const NodeZeroArray<T> &that);
+        NodeZeroArray<T>& operator*=(const ScalarArray &that);
+        NodeZeroArray<T>& operator/=(const NodeZeroArray<T> &that);
+        NodeZeroArray<T>& operator/=(const ScalarArray &that);
 
         virtual ostream& print(ostream &os) const;
 
         virtual void dump() const;
 
-        template <class cast_type> cast_type as() const {
-#define DATATYPE_EXPAND(DT,T) \
-            if (DT == type) { \
-                T the_value = *((T*)(value)); \
-                return static_cast<cast_type>(the_value); \
-            } else
-#include "DataType.def"
-        }
-
     protected:
         DataType type;
         T *data;
+        vector<int64_t> shape;
+        vector<int64_t> lo;
+        vector<int64_t> hi;
+        int64_t size;
 };
 
 
 template <class T>
-NodeZeroArray::NodeZeroArray(DataType type)
-    :   type(type)
-    ,   value(NULL)
+NodeZeroArray<T>::NodeZeroArray(const vector<int64_t> &shape)
+    :   Array()
+    ,   type(DataType::ctype<T>())
+    ,   data(NULL)
+    ,   shape(shape)
+    ,   lo()
+    ,   hi()
+    ,   size(pagoda::shape_to_size(shape))
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        value = (void*)(new T); \
-    } else
-#include "DataType.def"
+    if (0 == pagoda::me) {
+        data = new T[size];
+        lo.assign(shape.size(), 0);
+        hi = shape;
+        // hi is really shape -1
+        for (size_t i=0; i<hi.size(); ++i) {
+            hi[i] -= 1;
+        }
+    } else {
+        lo.assign(shape.size(), -1);
+        hi.assign(shape.size(), -2);
+    }
 }
 
 
 template <class T>
-NodeZeroArray::NodeZeroArray(const NodeZeroArray &that)
-    :   type(that.type)
-    ,   value(NULL)
+NodeZeroArray<T>::NodeZeroArray(const NodeZeroArray<T> &that)
+    :   Array()
+    ,   type(that.type)
+    ,   data(NULL)
+    ,   shape(that.shape)
+    ,   lo(that.lo)
+    ,   hi(that.hi)
+    ,   size(that.size)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        value = (void*)(new T); \
-        *((T*)value) = *((T*)(that.value)); \
-    } else
-#include "DataType.def"
+    if (0 == pagoda::me) {
+        data = new T[size];
+        std::copy(that.data, that.data+size, data);
+    }
 }
 
 
 template <class T>
-NodeZeroArray::~NodeZeroArray()
+NodeZeroArray<T>::~NodeZeroArray()
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        delete ((T*)value); \
-    } else
-#include "DataType.def"
+    if (0 == pagoda::me) {
+        delete [] data;
+        data = NULL;
+    }
 }
 
 
 template <class T>
-DataType NodeZeroArray::get_type() const
+DataType NodeZeroArray<T>::get_type() const
 {
     return type;
 }
 
 
 template <class T>
-vector<int64_t> NodeZeroArray::get_shape() const
+vector<int64_t> NodeZeroArray<T>::get_shape() const
 {
-    return vector<int64_t>();
+    return shape;
 }
 
 
 template <class T>
-vector<int64_t> NodeZeroArray::get_local_shape() const
+vector<int64_t> NodeZeroArray<T>::get_local_shape() const
 {
-    return vector<int64_t>();
+    return shape;
 }
 
 
 template <class T>
-int64_t NodeZeroArray::get_ndim() const
+int64_t NodeZeroArray<T>::get_ndim() const
 {
-    return 0;
+    return shape.size();
 }
 
 
 template <class T>
-void NodeZeroArray::fill(void *new_value)
+void NodeZeroArray<T>::fill(void *new_value)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        *((T*)value) = *((T*)new_value); \
-    } else
-#include "DataType.def"
+    T value = *(static_cast<T*>(new_value));
+    std::fill(data, data+size, value);
 }
 
 
 template <class T>
-void NodeZeroArray::copy(const Array *src)
+void NodeZeroArray<T>::copy(const Array *src)
 {
-    const NodeZeroArray *sa_src = dynamic_cast<const NodeZeroArray*>(src);
+    const NodeZeroArray<T> *sa_src = dynamic_cast<const NodeZeroArray<T>*>(src);
     if (type != src->get_type()) {
         ERR("arrays must be same type");
     }
@@ -183,24 +196,33 @@ void NodeZeroArray::copy(const Array *src)
         ERR("arrays must be same shape");
     }
     if (sa_src) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            *((T*)value) = *((T*)(sa_src->value)); \
-        } else
-#include "DataType.def"
+        // optimized local copy
+        if (0 == pagoda::me) {
+            std::copy(sa_src->data, sa_src->data+size, data);
+        }
+    } else {
+        // passed Array is not a NodeZeroArray -- this is a full copy to node
+        // zero which could be expensive in terms of memory on that node
+        if (0 == pagoda::me) {
+            if (data) {
+                delete [] data;
+                data = NULL;
+            }
+            data = static_cast<T*>(src->get(lo, hi));
+        }
     }
 }
 
 
 template <class T>
-void NodeZeroArray::copy(const Array *src, const vector<int64_t> &src_lo, const vector<int64_t> &src_hi, const vector<int64_t> &dst_lo, const vector<int64_t> &dst_hi)
+void NodeZeroArray<T>::copy(const Array *src, const vector<int64_t> &src_lo, const vector<int64_t> &src_hi, const vector<int64_t> &dst_lo, const vector<int64_t> &dst_hi)
 {
-    ERR("not implemented NodeZeroArray::copy");
+    ERR("not implemented NodeZeroArray<T>::copy");
 }
 
 
 template <class T>
-bool NodeZeroArray::owns_data() const
+bool NodeZeroArray<T>::owns_data() const
 {
     if (pagoda::nodeid() == 0){
         return true;
@@ -211,314 +233,399 @@ bool NodeZeroArray::owns_data() const
 
 
 template <class T>
-void NodeZeroArray::get_distribution(vector<int64_t> &lo, vector<int64_t> &hi) const
+void NodeZeroArray<T>::get_distribution(vector<int64_t> &lo, vector<int64_t> &hi) const
 {
-    lo.clear();
-    hi.clear();
+    lo = this->lo;
+    hi = this->hi;
 }
 
 
 template <class T>
-void* NodeZeroArray::access()
+void* NodeZeroArray<T>::access()
 {
-    return value;
+    return data;
 }
 
 
 template <class T>
-void* NodeZeroArray::access() const
+void* NodeZeroArray<T>::access() const
 {
-    return value;
+    return data;
 }
 
 
 template <class T>
-void NodeZeroArray::release() const
+void NodeZeroArray<T>::release() const
 {
-    // TODO could verify at this point that all values are the same
 }
 
 
 template <class T>
-void NodeZeroArray::release_update()
+void NodeZeroArray<T>::release_update()
 {
-    // TODO could verify at this point that all values are the same
 }
 
 
 template <class T>
-void* NodeZeroArray::get() const
+void* NodeZeroArray<T>::get() const
 {
-    return value;
+    return data;
 }
 
 
 template <class T>
-void* NodeZeroArray::get(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld) const
+void* NodeZeroArray<T>::get(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld) const
 {
-    ASSERT(lo.empty());
-    ASSERT(hi.empty());
-    ASSERT(ld.empty());
-    return value;
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::get");
 }
 
 
 template <class T>
-void NodeZeroArray::put(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld)
+void NodeZeroArray<T>::put(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld)
 {
-    ASSERT(lo.empty());
-    ASSERT(hi.empty());
-    ASSERT(ld.empty());
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        *((T*)value) = *((T*)(buffer)); \
-    } else
-#include "DataType.def"
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::put");
 }
 
 
 template <class T>
-void NodeZeroArray::scatter(void *buffer, vector<int64_t> &subscripts)
+void NodeZeroArray<T>::scatter(void *buffer, vector<int64_t> &subscripts)
 {
-    ASSERT(subscripts.empty());
-#define DATATYPE_EXPAND(DT,T) \
-    if (DT == type) { \
-        *((T*)value) = *((T*)(buffer)); \
-    } else
-#include "DataType.def"
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::scatter");
 }
 
 
 template <class T>
-void* NodeZeroArray::gather(vector<int64_t> &subscripts) const
+void* NodeZeroArray<T>::gather(vector<int64_t> &subscripts) const
 {
-    ASSERT(subscripts.empty());
-    return value;
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::gather");
 }
 
 
 template <class T>
-Array* NodeZeroArray::add(const Array *rhs) const
+Array* NodeZeroArray<T>::add(const Array *rhs) const
 {
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+    NodeZeroArray<T> *self_copy;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) += *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
+        (*self_copy) += *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::add(Array*) fell through");
     }
-    ERR("NodeZeroArray::add(Array*) fell through");
+
+    return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::sub(const Array *rhs) const
+Array* NodeZeroArray<T>::sub(const Array *rhs) const
 {
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+    NodeZeroArray<T> *self_copy;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) -= *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
+        (*self_copy) -= *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::sub(Array*) fell through");
     }
-    ERR("NodeZeroArray::sub(Array*) fell through");
+
+    return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::mul(const Array *rhs) const
+Array* NodeZeroArray<T>::mul(const Array *rhs) const
 {
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+    NodeZeroArray<T> *self_copy;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) *= *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
+        (*self_copy) *= *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::mul(Array*) fell through");
     }
-    ERR("NodeZeroArray::mul(Array*) fell through");
+
+    return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::div(const Array *rhs) const
+Array* NodeZeroArray<T>::div(const Array *rhs) const
 {
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+    NodeZeroArray<T> *self_copy;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) /= *array;
-        return self_copy;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        self_copy = new NodeZeroArray<T>(*this);
+        (*self_copy) /= *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::div(Array*) fell through");
     }
-    ERR("NodeZeroArray::div(Array*) fell through");
+
+    return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::max(const Array *rhs) const
+Array* NodeZeroArray<T>::max(const Array *rhs) const
 {
-    NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    NodeZeroArray<T> *self_copy = new NodeZeroArray<T>(*this);
     self_copy->imax(rhs);
     return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::min(const Array *rhs) const
+Array* NodeZeroArray<T>::min(const Array *rhs) const
 {
-    NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    NodeZeroArray<T> *self_copy = new NodeZeroArray<T>(*this);
     self_copy->imin(rhs);
     return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::pow(double exponent) const
+Array* NodeZeroArray<T>::pow(double exponent) const
 {
-    NodeZeroArray *self_copy = new NodeZeroArray(*this);
+    NodeZeroArray<T> *self_copy = new NodeZeroArray<T>(*this);
     self_copy->ipow(exponent);
     return self_copy;
 }
 
 
 template <class T>
-Array* NodeZeroArray::iadd(const Array *rhs)
+Array* NodeZeroArray<T>::iadd(const Array *rhs)
 {
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        (*this) += *array;
-        return this;
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        *this += *array;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        *this += *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::iadd(Array*) fell through");
     }
-    ERR("NodeZeroArray::iadd(Array*) fell through");
-}
 
-
-template <class T>
-Array* NodeZeroArray::isub(const Array *rhs)
-{
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        (*this) -= *array;
-        return this;
-    }
-    ERR("NodeZeroArray::isub(Array*) fell through");
-}
-
-
-template <class T>
-Array* NodeZeroArray::imul(const Array *rhs)
-{
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        (*this) *= *array;
-        return this;
-    }
-    ERR("NodeZeroArray::imul(Array*) fell through");
-}
-
-
-template <class T>
-Array* NodeZeroArray::idiv(const Array *rhs)
-{
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-        (*this) /= *array;
-        return this;
-    }
-    ERR("NodeZeroArray::idiv(Array*) fell through");
-}
-
-
-template <class T>
-Array* NodeZeroArray::imax(const Array *rhs)
-{
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        T *this_value = (T*)value; \
-        T that_value = array->as<T>(); \
-        *this_value = (*this_value)>that_value ? *this_value : that_value; \
-    } else
-#include "DataType.def"
-        return this;
-    }
-    ERR("NodeZeroArray::idiv(Array*) fell through");
-}
-
-
-template <class T>
-Array* NodeZeroArray::imin(const Array *rhs)
-{
-    const NodeZeroArray *array = dynamic_cast<const NodeZeroArray*>(rhs);
-    if (array) {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        T *this_value = (T*)value; \
-        T that_value = array->as<T>(); \
-        *this_value = (*this_value)<that_value ? *this_value : that_value; \
-    } else
-#include "DataType.def"
-        return this;
-    }
-    ERR("NodeZeroArray::idiv(Array*) fell through");
-}
-
-
-template <class T>
-Array* NodeZeroArray::ipow(double exponent)
-{
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        T *this_value = (T*)value; \
-        *this_value = static_cast<T>(std::pow(static_cast<double>(*this_value),exponent)); \
-    } else
-#include "DataType.def"
     return this;
 }
 
 
 template <class T>
-NodeZeroArray& NodeZeroArray::operator+=(const NodeZeroArray &that)
+Array* NodeZeroArray<T>::isub(const Array *rhs)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        *((T*)value) += *((T*)that.value); \
-    } else
-#include "DataType.def"
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        *this -= *array;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        *this -= *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::isub(Array*) fell through");
+    }
+
+    return this;
 }
 
 
 template <class T>
-NodeZeroArray& NodeZeroArray::operator-=(const NodeZeroArray &that)
+Array* NodeZeroArray<T>::imul(const Array *rhs)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        *((T*)value) -= *((T*)that.value); \
-    } else
-#include "DataType.def"
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        *this *= *array;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        *this *= *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::imul(Array*) fell through");
+    }
+
+    return this;
 }
 
 
 template <class T>
-NodeZeroArray& NodeZeroArray::operator*=(const NodeZeroArray &that)
+Array* NodeZeroArray<T>::idiv(const Array *rhs)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        *((T*)value) *= *((T*)that.value); \
-    } else
-#include "DataType.def"
+    const NodeZeroArray<T> *array;
+    const ScalarArray *scalar;
+
+    if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
+        *this /= *array;
+    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+        *this /= *scalar;
+    } else {
+        ERR("NodeZeroArray<T>::idiv(Array*) fell through");
+    }
+
+    return this;
 }
 
 
 template <class T>
-NodeZeroArray& NodeZeroArray::operator/=(const NodeZeroArray &that)
+Array* NodeZeroArray<T>::imax(const Array *rhs)
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        *((T*)value) /= *((T*)that.value); \
-    } else
-#include "DataType.def"
+    const NodeZeroArray<T> *array = dynamic_cast<const NodeZeroArray<T>*>(rhs);
+    if (array) {
+        // TODO
+        ERR("not implemented NodeZeroArray<T>::imax");
+    }
+    ERR("NodeZeroArray<T>::idiv(Array*) fell through");
 }
 
 
 template <class T>
-ostream& NodeZeroArray::print(ostream &os) const
+Array* NodeZeroArray<T>::imin(const Array *rhs)
+{
+    const NodeZeroArray<T> *array = dynamic_cast<const NodeZeroArray<T>*>(rhs);
+    if (array) {
+        // TODO
+        ERR("not implemented NodeZeroArray<T>::imin");
+    }
+    ERR("NodeZeroArray<T>::idiv(Array*) fell through");
+}
+
+
+template <class T>
+Array* NodeZeroArray<T>::ipow(double exponent)
+{
+    if (0 == pagoda::me) {
+        for (size_t i=0; i<size; ++i) {
+            data[i] = static_cast<T>(std::pow(data[i], exponent));
+        }
+    }
+    return this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator+=(const NodeZeroArray<T> &that)
+{
+    if (0 == pagoda::me) {
+        for (size_t i=0; i<size; ++i) {
+            data[i] += that.data[i];
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator+=(const ScalarArray &that)
+{
+    if (0 == pagoda::me) {
+        T value = that.as<T>();
+        for (size_t i=0; i<size; ++i) {
+            data[i] += value;
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator-=(const NodeZeroArray<T> &that)
+{
+    if (0 == pagoda::me) {
+        for (size_t i=0; i<size; ++i) {
+            data[i] -= that.data[i];
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator-=(const ScalarArray &that)
+{
+    if (0 == pagoda::me) {
+        T value = that.as<T>();
+        for (size_t i=0; i<size; ++i) {
+            data[i] -= value;
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator*=(const NodeZeroArray<T> &that)
+{
+    if (0 == pagoda::me) {
+        for (size_t i=0; i<size; ++i) {
+            data[i] *= that.data[i];
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator*=(const ScalarArray &that)
+{
+    if (0 == pagoda::me) {
+        T value = that.as<T>();
+        for (size_t i=0; i<size; ++i) {
+            data[i] *= value;
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator/=(const NodeZeroArray<T> &that)
+{
+    if (0 == pagoda::me) {
+        for (size_t i=0; i<size; ++i) {
+            data[i] /= that.data[i];
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+NodeZeroArray<T>& NodeZeroArray<T>::operator/=(const ScalarArray &that)
+{
+    if (0 == pagoda::me) {
+        T value = that.as<T>();
+        for (size_t i=0; i<size; ++i) {
+            data[i] /= value;
+        }
+    }
+    return *this;
+}
+
+
+template <class T>
+ostream& NodeZeroArray<T>::print(ostream &os) const
 {
     os << "NodeZeroArray";
     return os;
@@ -526,15 +633,10 @@ ostream& NodeZeroArray::print(ostream &os) const
 
 
 template <class T>
-void NodeZeroArray::dump() const
+void NodeZeroArray<T>::dump() const
 {
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        std::ostringstream os; \
-        os << *((T*)value) << std::endl; \
-        pagoda::print_zero(os.str()); \
-    } else
-#include "DataType.def"
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::dump");
 }
 
 #endif /* NODEZEROARRAY_H_ */

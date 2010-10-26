@@ -392,9 +392,12 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
         attr->get_values()->as(data); \
         ncmpi::put_att(ncid, varid, name, data); \
     } else
+    put_attr_values(DataType::UCHAR,  unsigned char)
+    put_attr_values(DataType::SCHAR,  signed char)
     put_attr_values(DataType::CHAR,   char)
     put_attr_values(DataType::SHORT,  short)
     put_attr_values(DataType::INT,    int)
+    put_attr_values(DataType::LONG,   long)
     put_attr_values(DataType::FLOAT,  float)
     put_attr_values(DataType::DOUBLE, double)
     {
@@ -486,9 +489,13 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
             array->release(); \
         } \
     } else
-    write_var_all(int,    DataType::INT)
-    write_var_all(float,  DataType::FLOAT)
-    write_var_all(double, DataType::DOUBLE)
+    write_var_all(unsigned char, DataType::UCHAR)
+    write_var_all(signed char,   DataType::SCHAR)
+    write_var_all(char,          DataType::CHAR)
+    write_var_all(int,           DataType::INT)
+    write_var_all(long,          DataType::LONG)
+    write_var_all(float,         DataType::FLOAT)
+    write_var_all(double,        DataType::DOUBLE)
     {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
@@ -541,9 +548,13 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
             array->release(); \
         } \
     } else
-    write_var_all(int,    DataType::INT)
-    write_var_all(float,  DataType::FLOAT)
-    write_var_all(double, DataType::DOUBLE)
+    write_var_all(unsigned char, DataType::UCHAR)
+    write_var_all(signed char,   DataType::SCHAR)
+    write_var_all(char,          DataType::CHAR)
+    write_var_all(int,           DataType::INT)
+    write_var_all(long,          DataType::LONG)
+    write_var_all(float,         DataType::FLOAT)
+    write_var_all(double,        DataType::DOUBLE)
     {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }

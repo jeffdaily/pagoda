@@ -723,7 +723,7 @@ Array* GlobalArray::add(const Array *rhs) const
         self_copy = new GlobalArray(*this);
         (*self_copy) += *array;
     } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+        self_copy = new GlobalArray(*this);
         (*self_copy) += *scalar;
     } else {
         ERR("GlobalArray::add(Array*) fell through");
@@ -760,7 +760,7 @@ Array* GlobalArray::sub(const Array *rhs) const
         self_copy = new GlobalArray(*this);
         (*self_copy) -= *array;
     } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+        self_copy = new GlobalArray(*this);
         (*self_copy) -= *scalar;
     } else {
         ERR("GlobalArray::sub(Array*) fell through");
@@ -797,7 +797,7 @@ Array* GlobalArray::mul(const Array *rhs) const
         self_copy = new GlobalArray(*this);
         (*self_copy) *= *array;
     } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+        self_copy = new GlobalArray(*this);
         (*self_copy) *= *scalar;
     } else {
         ERR("GlobalArray::mul(Array*) fell through");
@@ -834,7 +834,7 @@ Array* GlobalArray::div(const Array *rhs) const
         self_copy = new GlobalArray(*this);
         (*self_copy) /= *array;
     } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
-        GlobalArray *self_copy = new GlobalArray(*this);
+        self_copy = new GlobalArray(*this);
         (*self_copy) /= *scalar;
     } else {
         ERR("GlobalArray::div(Array*) fell through");

@@ -459,3 +459,20 @@ DataType DataType::to_dt(int type)
     }
     throw DataTypeException("could not determine DataType from int");
 }
+
+
+template <> DataType DataType::ctype<char>() { return DataType::CHAR; }
+template <> DataType DataType::ctype<short>() { return DataType::SHORT; }
+template <> DataType DataType::ctype<int>() { return DataType::INT; }
+template <> DataType DataType::ctype<long>() { return DataType::LONG; }
+template <> DataType DataType::ctype<long long>() { return DataType::LONGLONG; }
+template <> DataType DataType::ctype<float>() { return DataType::FLOAT; }
+template <> DataType DataType::ctype<double>() { return DataType::DOUBLE; }
+template <> DataType DataType::ctype<long double>() { return DataType::LONGDOUBLE; }
+template <> DataType DataType::ctype<unsigned char>() { return DataType::UCHAR; }
+template <> DataType DataType::ctype<unsigned short>() { return DataType::USHORT; }
+template <> DataType DataType::ctype<unsigned int>() { return DataType::UINT; }
+template <> DataType DataType::ctype<unsigned long>() { return DataType::ULONG; }
+template <> DataType DataType::ctype<unsigned long long>() { return DataType::ULONGLONG; }
+template <> DataType DataType::ctype<signed char>() { return DataType::SCHAR; }
+template <> DataType DataType::ctype<std::string>() { return DataType::STRING; }

@@ -57,6 +57,7 @@ class GenericCommands
         int get_header_pad() const;
         string get_usage() const;
         FileFormat get_file_format() const;
+        string get_input_path() const;
 
     protected:
         void init();

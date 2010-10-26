@@ -63,6 +63,8 @@ class DataType
         int get_id() const { return id; }
         string get_name() const { return name; }
 
+        template <class T> static DataType ctype();
+
     protected:
         static DataType to_dt(int type);
         DataType();
@@ -92,8 +94,7 @@ class DataTypeException : public runtime_error
                     +string(" :: ")+pagoda::to_string(line))
         {}
         explicit DataTypeException(const string &where,
-                const string &what, const DataType &type)
-            :   runtime_error(where + ": " + what
+                const string &what, const DataType &type) :   runtime_error(where + ": " + what
                     +string(" :: ")+type.get_name())
         {}
         explicit DataTypeException(const string &what, const DataType &type)
@@ -108,5 +109,12 @@ class DataTypeException : public runtime_error
                     +string(" :: ")+pagoda::to_string(line))
         {}
 };
+
+
+template <class T> DataType DataType::ctype()
+{
+    throw DataTypeException("invalid C type in translate_type");
+}
+
 
 #endif // DATATYPE_H_
