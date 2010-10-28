@@ -39,12 +39,9 @@ pkginclude_HEADERS += src/AllNodeArray.H
 pkginclude_HEADERS += src/Array.H
 pkginclude_HEADERS += src/Attribute.H
 pkginclude_HEADERS += src/Bootstrap.H
-pkginclude_HEADERS += src/BoundaryVariable.H
 pkginclude_HEADERS += src/CommandLineOption.H
 pkginclude_HEADERS += src/CommandLineParser.H
 pkginclude_HEADERS += src/Common.H
-pkginclude_HEADERS += src/ConnectivityVariable.H
-pkginclude_HEADERS += src/CoordinateVariable.H
 pkginclude_HEADERS += src/Dataset.H
 pkginclude_HEADERS += src/DataType.def
 pkginclude_HEADERS += src/DataType.H
@@ -88,7 +85,6 @@ pkginclude_HEADERS += src/Timing.H
 pkginclude_HEADERS += src/TypedValues.H
 pkginclude_HEADERS += src/Util.H
 pkginclude_HEADERS += src/Values.H
-pkginclude_HEADERS += src/VariableDecorator.H
 pkginclude_HEADERS += src/Variable.H
 
 libpagoda_la_SOURCES =
@@ -102,11 +98,8 @@ libpagoda_la_SOURCES += src/AggregationVariable.C
 libpagoda_la_SOURCES += src/Array.C
 libpagoda_la_SOURCES += src/Attribute.C
 libpagoda_la_SOURCES += src/Bootstrap.C
-libpagoda_la_SOURCES += src/BoundaryVariable.C
 libpagoda_la_SOURCES += src/CommandLineOption.C
 libpagoda_la_SOURCES += src/CommandLineParser.C
-libpagoda_la_SOURCES += src/ConnectivityVariable.C
-libpagoda_la_SOURCES += src/CoordinateVariable.C
 libpagoda_la_SOURCES += src/Dataset.C
 libpagoda_la_SOURCES += src/DataType.C
 libpagoda_la_SOURCES += src/Debug.C
@@ -142,7 +135,6 @@ libpagoda_la_SOURCES += src/Timing.C
 libpagoda_la_SOURCES += src/Util.C
 libpagoda_la_SOURCES += src/Values.C
 libpagoda_la_SOURCES += src/Variable.C
-libpagoda_la_SOURCES += src/VariableDecorator.C
 
 #############################################################################
 # tests
