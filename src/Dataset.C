@@ -40,11 +40,6 @@ ostream& operator << (ostream &os, const Dataset *dataset)
 }
 
 
-/**
- * Datasets are equal if set of Dimensions and Variables match.
- *
- * Dimensions and Variables need not be in the same order.
- */
 bool Dataset::equal(const Dataset *left, const Dataset *right)
 {
     vector<Dimension*> left_dims = left->get_dims();

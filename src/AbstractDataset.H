@@ -22,13 +22,18 @@ class Variable;
 
 
 /**
- * Open a file and access the Attributes, Variables, and Dimensions within.
+ * Open a file and access the Attribute, Variable, and Dimension instances
+ * within.
  *
  * As much as can be implemented abstractly is done here.
+ * Some state is stored.
  */
 class AbstractDataset : public Dataset
 {
     public:
+        /**
+         * Destructs the AbstractDataset.
+         */
         virtual ~AbstractDataset();
 
         virtual void close() = 0;
@@ -41,16 +46,20 @@ class AbstractDataset : public Dataset
         virtual Grid* get_grid();
 
         virtual Attribute* get_att(const string &name,
-                                   bool ignore_case=false, bool within=false) const;
+                                   bool ignore_case=false,
+                                   bool within=false) const;
         virtual Attribute* get_att(const vector<string> &names,
-                                   bool ignore_case=false, bool within=false) const;
+                                   bool ignore_case=false,
+                                   bool within=false) const;
 
         virtual Dimension* get_dim(const string &name,
-                                   bool ignore_case=false, bool within=false) const;
+                                   bool ignore_case=false,
+                                   bool within=false) const;
         virtual Dimension* get_udim() const;
 
         virtual Variable* get_var(const string &name,
-                                  bool ignore_case=false, bool within=false) const;
+                                  bool ignore_case=false,
+                                  bool within=false) const;
 
         virtual void set_masks(MaskMap *masks);
         virtual void push_masks(MaskMap *masks);
@@ -66,8 +75,8 @@ class AbstractDataset : public Dataset
     protected:
         AbstractDataset();
 
-        vector<Grid*> grids;
-        vector<MaskMap*> masks;
+        vector<Grid*> grids; /**< cache of grids found in this Dataset */
+        vector<MaskMap*> masks; /**< stack of masks (top-most is used) */
 };
 
 #endif // ABSTRACTDATASET_H_

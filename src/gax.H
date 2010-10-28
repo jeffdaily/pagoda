@@ -1,6 +1,9 @@
 #ifndef GAX_H_
 #define GAX_H_
 
+/**
+ * Extensions to the Global Arrays toolkit.
+ */
 namespace gax
 {
 
