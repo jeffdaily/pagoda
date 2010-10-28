@@ -133,14 +133,26 @@ void pagoda::println_zero(FILE *stream, const string &str)
 }
 
 
-void pagoda::print_zero_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_zero_dummy(const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::print_zero_dummy(const string &str) { }
-void pagoda::print_zero_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_zero_dummy(FILE *stream, const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::print_zero_dummy(FILE *stream, const string &str) { }
 
-void pagoda::println_zero_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_zero_dummy(const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::println_zero_dummy(const string &str) { }
-void pagoda::println_zero_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_zero_dummy(FILE *stream, const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::println_zero_dummy(FILE *stream, const string &str) { }
 
 
@@ -179,23 +191,24 @@ void pagoda::print_sync(FILE *stream, const string &str)
             MPI_Status stat;
             int count;
             char *msg;
-           
+
             MPI_Recv(&count, 1, MPI_INT, proc, TAG_DEBUG, MPI_COMM_WORLD,
-                    &stat);
+                     &stat);
             msg = new char[count];
             MPI_Recv(msg, count, MPI_CHAR, proc, TAG_DEBUG, MPI_COMM_WORLD,
-                    &stat);
+                     &stat);
             fprintf(stream, "[%*d] ", get_precision(), proc);
             fprintf(stream, msg);
             delete [] msg;
         }
         fflush(stream);
-    } else {
+    }
+    else {
         int count = str.size() + 1;
-       
+
         MPI_Send(&count, 1, MPI_INT, 0, TAG_DEBUG, MPI_COMM_WORLD);
         MPI_Send((void*)str.c_str(), count, MPI_CHAR, 0, TAG_DEBUG,
-                MPI_COMM_WORLD);
+                 MPI_COMM_WORLD);
     }
 }
 
@@ -232,12 +245,24 @@ void pagoda::println_sync(FILE *stream, const string &str)
 }
 
 
-void pagoda::print_sync_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_sync_dummy(const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::print_sync_dummy(const string &str) { }
-void pagoda::print_sync_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::print_sync_dummy(FILE *stream, const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::print_sync_dummy(FILE *stream, const string &str) { }
 
-void pagoda::println_sync_dummy(const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_sync_dummy(const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::println_sync_dummy(const string &str) { }
-void pagoda::println_sync_dummy(FILE *stream, const char *fmt, ...) { DUMMY_AP(fmt); }
+void pagoda::println_sync_dummy(FILE *stream, const char *fmt, ...)
+{
+    DUMMY_AP(fmt);
+}
 void pagoda::println_sync_dummy(FILE *stream, const string &str) { }

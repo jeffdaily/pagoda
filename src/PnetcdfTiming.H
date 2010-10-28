@@ -41,7 +41,7 @@ class PnetcdfTiming
         PnetcdfTiming(const string &name);
         PnetcdfTiming(const string &name, MPI_Offset count, nc_type type);
         PnetcdfTiming(const string &name, const vector<MPI_Offset> &count,
-                nc_type type);
+                      nc_type type);
         ~PnetcdfTiming();
 
         static uint64_t get_time();

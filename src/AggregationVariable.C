@@ -25,9 +25,9 @@ using std::vector;
 
 
 AggregationVariable::AggregationVariable(
-        Aggregation *agg,
-        AggregationDimension *agg_dim,
-        Variable *var)
+    Aggregation *agg,
+    AggregationDimension *agg_dim,
+    Variable *var)
     :   AbstractVariable()
     ,   agg(agg)
     ,   agg_dim(agg_dim)
@@ -135,7 +135,8 @@ Array* AggregationVariable::read(Array *dst) const
 #else /* ! AGGREGATION_VARIABLE_READ_LOMEM */
 
 Array* AggregationVariable::read(Array *dst) const
-{    /* Reads one aggregated Variable at a time and copies to dst Array */
+{
+    /* Reads one aggregated Variable at a time and copies to dst Array */
     int ndim = get_ndim();
     vector<int64_t> dst_lo(ndim, 0);
     vector<int64_t> dst_hi = get_shape();
@@ -195,7 +196,8 @@ Array* AggregationVariable::read(int64_t record, Array *dst) const
             result = var->read(index_within_var, dst);
             var->set_translate_record(true);
             return result;
-        } else {
+        }
+        else {
             index_within_var -= num_records;
         }
     }
@@ -210,7 +212,7 @@ Array* AggregationVariable::iread(Array *dst)
     vector<Variable*>::const_iterator var_end;
 
     array_to_fill = dst;
-    
+
     for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
         arrays_to_copy.push_back(var->iread());
@@ -241,7 +243,8 @@ Array* AggregationVariable::iread(int64_t record, Array *dst)
             result = var->read(index_within_var, dst);
             var->set_translate_record(true);
             return result;
-        } else {
+        }
+        else {
             index_within_var -= num_records;
         }
     }

@@ -35,9 +35,9 @@ class VariableDecorator : public Variable
         virtual string get_standard_name() const;
         virtual string get_long_name() const;
         virtual Attribute* get_att(const string &name,
-                bool ignore_case=false) const;
+                                   bool ignore_case=false) const;
         virtual Attribute* get_att(const vector<string> &names,
-                bool ignore_case=false) const;
+                                   bool ignore_case=false) const;
 
         virtual Dataset* get_dataset() const;
 
@@ -55,7 +55,9 @@ class VariableDecorator : public Variable
 
         virtual ostream& print(ostream &os) const;
 
-        Variable* get_var() const { return var; }
+        Variable* get_var() const {
+            return var;
+        }
     protected:
         Variable *var;
 };

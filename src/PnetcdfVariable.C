@@ -54,7 +54,7 @@ PnetcdfVariable::~PnetcdfVariable()
     TIMING("PnetcdfVariable::~PnetcdfVariable()");
 
     transform(atts.begin(), atts.end(), atts.begin(),
-            pagoda::ptr_deleter<PnetcdfAttribute*>);
+              pagoda::ptr_deleter<PnetcdfAttribute*>);
 }
 
 
@@ -130,10 +130,11 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
         get_dataset()->push_masks(NULL);
         tmp = Array::create(type, get_shape());
         get_dataset()->pop_masks();
-    } else {
+    }
+    else {
         tmp = dst;
     }
-    
+
     tmp->get_distribution(lo,hi);
 
     if (tmp->get_ndim() != ndim) {
@@ -147,7 +148,8 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
             start[dimidx] = lo[dimidx];
             count[dimidx] = hi[dimidx] - lo[dimidx] + 1;
         }
-    } else {
+    }
+    else {
         // make a non-participating process a no-op
         fill(start.begin(), start.end(), 0);
         fill(count.begin(), count.end(), 0);
@@ -209,10 +211,11 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
         get_dataset()->pop_masks();
         shape.erase(shape.begin());
         tmp = Array::create(type, shape);
-    } else {
+    }
+    else {
         tmp = dst;
     }
-    
+
     tmp->get_distribution(lo,hi);
 
     if (tmp->get_ndim()+1 != ndim) {
@@ -224,7 +227,8 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
     if (tmp->owns_data() && found_bit) {
         if (needs_subset_record()) {
             start[0] = translate_record(record);
-        } else {
+        }
+        else {
             start[0] = record;
         }
         count[0] = 1;
@@ -232,7 +236,8 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
             start[dimidx] = lo[dimidx-1];
             count[dimidx] = hi[dimidx-1] - lo[dimidx-1] + 1;
         }
-    } else {
+    }
+    else {
         // make a non-participating process a no-op
         fill(start.begin(), start.end(), 0);
         fill(count.begin(), count.end(), 0);
@@ -256,7 +261,7 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
 
 
 bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
-        const vector<int64_t> &lo, const vector<int64_t> &hi) const
+                               const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
     bool found_bit = true;
 
@@ -288,7 +293,7 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 
 
 void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, bool found_bit, bool nonblocking) const
+                              const vector<MPI_Offset> &count, bool found_bit, bool nonblocking) const
 {
     int ncid = get_netcdf_dataset()->get_id();
     DataType type = dst->get_type();
@@ -317,8 +322,7 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
     read_var_all(int,           DataType::INT)
     read_var_all(long,          DataType::LONG)
     read_var_all(float,         DataType::FLOAT)
-    read_var_all(double,        DataType::DOUBLE)
-    {
+    read_var_all(double,        DataType::DOUBLE) {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef read_var_all

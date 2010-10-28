@@ -68,7 +68,7 @@ class Dimension
 
         /**
          * Write this Dimension to the given stream.
-         * 
+         *
          * @param[in,out] os the stream
          * @return the stream
          */

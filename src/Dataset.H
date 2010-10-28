@@ -40,16 +40,16 @@ class Dataset
         virtual Grid* get_grid() = 0;
 
         virtual Attribute* get_att(const string &name,
-                bool ignore_case=false, bool within=false) const = 0;
+                                   bool ignore_case=false, bool within=false) const = 0;
         virtual Attribute* get_att(const vector<string> &names,
-                bool ignore_case=false, bool within=false) const = 0;
+                                   bool ignore_case=false, bool within=false) const = 0;
 
         virtual Dimension* get_dim(const string &name,
-                bool ignore_case=false, bool within=false) const = 0;
+                                   bool ignore_case=false, bool within=false) const = 0;
         virtual Dimension* get_udim() const = 0;
 
         virtual Variable* get_var(const string &name,
-                bool ignore_case=false, bool within=false) const = 0;
+                                  bool ignore_case=false, bool within=false) const = 0;
 
         virtual void set_masks(MaskMap *masks) = 0;
         virtual void push_masks(MaskMap *masks) = 0;

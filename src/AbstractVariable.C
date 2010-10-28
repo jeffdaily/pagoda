@@ -69,15 +69,16 @@ vector<int64_t> AbstractVariable::get_shape() const
         vector<Mask*> masks = get_masks();
         vector<Mask*>::const_iterator it = masks.begin();
         vector<Mask*>::const_iterator end = masks.end();
-        for ( ; it!=end; ++it) {
+        for (; it!=end; ++it) {
             shape.push_back((*it)->get_count());
         }
-    } else {
+    }
+    else {
         vector<Dimension*> dims = get_dims();
         vector<Dimension*>::const_iterator it = dims.begin();
         vector<Dimension*>::const_iterator end = dims.end();
 
-        for ( ; it!=end; ++it) {
+        for (; it!=end; ++it) {
             shape.push_back((*it)->get_size());
         }
     }
@@ -122,8 +123,8 @@ string AbstractVariable::get_long_name() const
 
 
 Attribute* AbstractVariable::get_att(
-        const string &name,
-        bool ignore_case) const
+    const string &name,
+    bool ignore_case) const
 {
     TIMING("AbstractVariable::get_att(string,bool)");
     vector<Attribute*> atts = get_atts();
@@ -144,8 +145,8 @@ Attribute* AbstractVariable::get_att(
 
 
 Attribute* AbstractVariable::get_att(
-        const vector<string> &names,
-        bool ignore_case) const
+    const vector<string> &names,
+    bool ignore_case) const
 {
     TIMING("AbstractVariable::get_att(vector<string>,bool)");
     vector<Attribute*> atts = get_atts();
@@ -173,7 +174,7 @@ vector<Mask*> AbstractVariable::get_masks() const
         vector<Dimension*> dims = get_dims();
         vector<Dimension*>::iterator dim_it = dims.begin();
 
-        for ( ; dim_it!=dims.end(); ++dim_it) {
+        for (; dim_it!=dims.end(); ++dim_it) {
             ret.push_back((*dim_it)->get_mask());
         }
     }
@@ -202,12 +203,12 @@ int64_t AbstractVariable::translate_record(int64_t record) const
     int64_t index = 0;
 
     TRACER("AbstractVariable::translate_record(%ld) %s\n",
-            record, get_name().c_str());
+           record, get_name().c_str());
     TRACER("size=%ld, count=%ld, index=%ld\n", size, count, index);
 
     if (masks.empty() || !enable_record_translation) {
         return record;
-    } 
+    }
 
     mask = masks.at(0);
     size = mask->get_size();
@@ -217,13 +218,14 @@ int64_t AbstractVariable::translate_record(int64_t record) const
         if (buf[index] != 0) {
             ++count;
             TRACER("buf[index]=%ld, count=%ld, index=%ld\n",
-                    buf[index], count, index);
+                   buf[index], count, index);
             if (count == record) {
                 break;
             }
-        } else {
+        }
+        else {
             TRACER("buf[index]=%ld, count=%ld, index=%ld\n",
-                    buf[index], count, index);
+                   buf[index], count, index);
         }
     }
     delete [] buf;

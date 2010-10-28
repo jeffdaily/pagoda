@@ -64,7 +64,10 @@ char NAME_VAR_OUT[] = "var_out";
 #  ifdef __cplusplus
 extern "C"
 #  endif
-int F77_DUMMY_MAIN() { return 1; }
+int F77_DUMMY_MAIN()
+{
+    return 1;
+}
 #endif
 
 
@@ -174,14 +177,14 @@ int main(int argc, char **argv)
     opterr = 0;
 
     string usage = ""
-        "Usage: subsetter [options] input_filename output_filename\n"
-        "\n"
-        "Generic options:\n"
-        "-h                                 produce this usage statement\n"
-        "-g path/to/gridfile.nc             points to external grid file\n"
-        "-b box north,south,east,west       limits in degrees\n"
-        "-d dimension,start[,stop[,step]]   as integer indices\n"
-        ;
+                   "Usage: subsetter [options] input_filename output_filename\n"
+                   "\n"
+                   "Generic options:\n"
+                   "-h                                 produce this usage statement\n"
+                   "-g path/to/gridfile.nc             points to external grid file\n"
+                   "-b box north,south,east,west       limits in degrees\n"
+                   "-d dimension,start[,stop[,step]]   as integer indices\n"
+                   ;
 
     try {
 
@@ -206,7 +209,8 @@ int main(int argc, char **argv)
                     try {
                         DimSlice slice(optarg);
                         slices.insert(make_pair(slice.get_name(),slice));
-                    } catch (RangeException &ex) {
+                    }
+                    catch (RangeException &ex) {
                         ERR("Bad dimension slice");
                     }
                     break;
@@ -223,15 +227,18 @@ int main(int argc, char **argv)
             os << "ERROR: Input and output file arguments required" << endl;
             os << usage << endl;
             throw PagodaException(AT, os.str());
-        } else if (optind+1 == argc) {
+        }
+        else if (optind+1 == argc) {
             ostringstream os;
             os << "ERROR: Output file argument required" << endl;
             os << usage << endl;
             throw PagodaException(AT, os.str());
-        } else if (optind+2 == argc) {
+        }
+        else if (optind+2 == argc) {
             input_filename = argv[optind];
             output_filename = argv[optind+1];
-        } else {
+        }
+        else {
             ostringstream os;
             os << "ERROR: Too many files specified" << endl;
             os << usage << endl;
@@ -242,7 +249,7 @@ int main(int argc, char **argv)
         DEBUG_ZERO("Before first file open, attempting to open\n");
         DEBUG_ZERO("%s\n", input_filename.c_str());
         error = ncmpi_open(MPI_COMM_WORLD, input_filename.c_str(), NC_NOWRITE,
-                MPI_INFO_NULL, &ncid_in);
+                           MPI_INFO_NULL, &ncid_in);
         ERRNO_CHECK(error);
         infile = create_file_info(ncid_in);
         ncid_grid = ncid_in;
@@ -253,7 +260,7 @@ int main(int argc, char **argv)
         if (!grid_filename.empty() && grid_filename != input_filename) {
             DEBUG_ZERO("Before open grid file\n");
             error = ncmpi_open(MPI_COMM_WORLD, grid_filename.c_str(), NC_NOWRITE,
-                    MPI_INFO_NULL, &ncid_grid);
+                               MPI_INFO_NULL, &ncid_grid);
             ERRNO_CHECK(error);
             gridfile = create_file_info(ncid_grid);
         }
@@ -262,7 +269,7 @@ int main(int argc, char **argv)
         // only to find out this step failed.
         DEBUG_ZERO("Before output file open\n");
         error = ncmpi_create(MPI_COMM_WORLD, output_filename.c_str(), NC_WRITE,
-                MPI_INFO_NULL, &ncid_out);
+                             MPI_INFO_NULL, &ncid_out);
         ERRNO_CHECK(error);
 
         // Attempt to calculate the largest amount of memory needed per-process.
@@ -371,11 +378,15 @@ int main(int argc, char **argv)
         DimInfoMap out_dims;
         for (MaskMap::iterator it=masks.begin(); it!=masks.end(); ++it) {
             string name = it->first;
-            if (name.find(COMPOSITE_PREFIX) == 0) continue; // skip composites
+            if (name.find(COMPOSITE_PREFIX) == 0) {
+                continue;    // skip composites
+            }
             Mask mask = it->second;
             MPI_Offset size = mask.global_count;
             DEBUG_ZERO("Defining dimension '%s'\n", name.c_str());
-            if (mask.dim.is_unlimited) size = NC_UNLIMITED;
+            if (mask.dim.is_unlimited) {
+                size = NC_UNLIMITED;
+            }
             int idp;
             error = ncmpi_def_dim(ncid_out, name.c_str(), size, &idp);
             ERRNO_CHECK(error);
@@ -407,15 +418,19 @@ int main(int argc, char **argv)
             int dims[var_in.ndim];
             bool skip = false;
             for (int dimidx=0; dimidx<var_in.ndim; ++dimidx) {
-                // protect against degenerate dimensions (of zero size) that were 
+                // protect against degenerate dimensions (of zero size) that were
                 // removed during earlier processing
                 skip |= (out_dims.find(var_in.dims[dimidx].name) == out_dims.end());
-                if (skip) break;
+                if (skip) {
+                    break;
+                }
                 dims[dimidx] = out_dims[var_in.dims[dimidx].name].id;
                 DEBUG_ZERO("%s,", var_in.dims[dimidx].name.c_str());
             }
             DEBUG_ZERO(skip ? ", skipping due to degenerate dimension\n" : "\n");
-            if (skip) continue; // see note above
+            if (skip) {
+                continue;    // see note above
+            }
             error = ncmpi_def_var(ncid_out, var_name.c_str(), var_in.type, var_in.ndim, dims, &varidp);
             ERRNO_CHECK(error);
 
@@ -460,15 +475,25 @@ int main(int argc, char **argv)
             bool is_cell_edges = (name == "cell_edges");
             if (var_out.dims[0].is_unlimited && var_out.dims.size() == 1) {
                 // record coordinate variable
-            } else if (var_out.dims[0].is_unlimited) {
+            }
+            else if (var_out.dims[0].is_unlimited) {
                 // record variable
                 copy_record_var(var_in, var_out, masks);
-            } else {
+            }
+            else {
                 // all other (non-record) variables
-                if (is_cell_neighbors)    copy_var(var_in, var_out, masks,&cells_map);
-                else if (is_cell_corners) copy_var(var_in, var_out, masks,&corners_map);
-                else if (is_cell_edges)   copy_var(var_in, var_out, masks,&edges_map);
-                else                      copy_var(var_in, var_out, masks,NULL);
+                if (is_cell_neighbors) {
+                    copy_var(var_in, var_out, masks,&cells_map);
+                }
+                else if (is_cell_corners) {
+                    copy_var(var_in, var_out, masks,&corners_map);
+                }
+                else if (is_cell_edges) {
+                    copy_var(var_in, var_out, masks,&edges_map);
+                }
+                else {
+                    copy_var(var_in, var_out, masks,NULL);
+                }
             }
 
         }
@@ -486,8 +511,11 @@ int main(int argc, char **argv)
         error = ncmpi_close(ncid_out);
         ERRNO_CHECK(error);
 
-    } catch (PagodaException &ex) {
-        if (ME == 0) cout << ex.what() << endl;
+    }
+    catch (PagodaException &ex) {
+        if (ME == 0) {
+            cout << ex.what() << endl;
+        }
     }
 
     // Must always call these to exit cleanly.
@@ -593,7 +621,9 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
         string name = dim->first;
         DimInfo info = dim->second;
         int64_t size = info.size;
-        if (size == 0) continue; // protect against a time.size == 0
+        if (size == 0) {
+            continue;    // protect against a time.size == 0
+        }
         Mask mask;
         mask.dim = info;
         mask.name = info.name;
@@ -605,18 +635,21 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
             if (slices.count(name) > 0) {
                 // command line had a subset specified, so default the mask to false
                 fill(mask.data, mask.data+size, ZERO);
-            } else {
+            }
+            else {
                 // no subset on command line, so we want the entire dimension
                 fill(mask.data, mask.data+size, ONE);
             }
-        } else {
+        }
+        else {
             mask.handle = NGA_Create64(C_INT, 1, &size, (char*)name.c_str(), NULL);
             mask.data = NULL;
             NGA_Distribution64(mask.handle, ME, &mask.lo, &mask.hi);
             if (slices.count(name) > 0) {
                 // command line had a subset specified, so default the mask to false
                 GA_Fill(mask.handle, &ZERO);
-            } else {
+            }
+            else {
                 // no subset on command line, so we want the entire dimension
                 GA_Fill(mask.handle, &ONE);
             }
@@ -641,7 +674,8 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
             for (int idx=lo; idx<=hi; idx+=step) {
                 mask.data[idx] = ONE;
             }
-        } else {
+        }
+        else {
             // determine which processes own the data specified by the slice
             // that way they can operate on their local portions
             int64_t mapping[2*1*GA_Nnodes()];
@@ -657,7 +691,9 @@ MaskMap create_masks(DimInfoMap dims, DimSliceMMap slices)
                     offset = (offset == 0) ? 0 : step - offset;
                     lo += offset;
                     cout << ME << " offset=" << offset << ", new lo=" << lo << endl;
-                    if (lo > hi) continue;
+                    if (lo > hi) {
+                        continue;
+                    }
                     int *local;
                     NGA_Access64(mask.handle, &lo, &hi, &local, NULL);
                     for (int jdx=0; jdx<=(hi-lo); jdx+=step) {
@@ -683,22 +719,22 @@ void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile)
 
     Mask cells_mask = masks["cells"]; // Mask object for cells
     NGA_Access64(cells_mask.handle, &cells_mask.lo, &cells_mask.hi,
-            &cells_mask.data, NULL);
+                 &cells_mask.data, NULL);
 
     // read local portion of the grid_center_lon variable
     MPI_Offset cells_mask_lo = cells_mask.lo;
     MPI_Offset cells_mask_local_size = cells_mask.local_size;
     lon = new float[cells_mask.local_size];
     error = ncmpi_get_vara_float_all(gridfile.id,
-            gridfile.vars_map["grid_center_lon"].id,
-            &cells_mask_lo, &cells_mask_local_size, &lon[0]);
+                                     gridfile.vars_map["grid_center_lon"].id,
+                                     &cells_mask_lo, &cells_mask_local_size, &lon[0]);
     ERRNO_CHECK(error);
 
     // read local portion of the grid_center_lat variable
     lat = new float[cells_mask.local_size];
     error = ncmpi_get_vara_float_all(gridfile.id,
-            gridfile.vars_map["grid_center_lat"].id,
-            &cells_mask_lo, &cells_mask_local_size, &lat[0]);
+                                     gridfile.vars_map["grid_center_lat"].id,
+                                     &cells_mask_lo, &cells_mask_local_size, &lat[0]);
     ERRNO_CHECK(error);
 
     // the actual cells mask construction
@@ -720,8 +756,8 @@ void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile)
         MPI_Offset corners_count[] = {cells_mask.local_size, corners_per_cell};
         int *cell_corners = new int[local_size];
         error = ncmpi_get_vara_int_all(gridfile.id,
-                gridfile.vars_map["cell_corners"].id,
-                corners_lo, corners_count, &cell_corners[0]);
+                                       gridfile.vars_map["cell_corners"].id,
+                                       corners_lo, corners_count, &cell_corners[0]);
         ERRNO_CHECK(error);
 
         // Create mask over local portion of cell_corners.
@@ -763,8 +799,8 @@ void adjust_cell_masks(MaskMap &masks, LatLonBox box, FileInfo gridfile)
         MPI_Offset edges_count[] = {cells_mask.local_size, edges_per_cell};
         int *cell_edges = new int[local_size];
         error = ncmpi_get_vara_int_all(gridfile.id,
-                gridfile.vars_map["cell_edges"].id,
-                edges_lo, edges_count, &cell_edges[0]);
+                                       gridfile.vars_map["cell_edges"].id,
+                                       edges_lo, edges_count, &cell_edges[0]);
         ERRNO_CHECK(error);
 
         // Create mask over local portion of cell_edges.
@@ -806,7 +842,8 @@ int* mask_get_data_local(Mask mask)
 {
     if (mask.data) {
         return mask.data;
-    } else {
+    }
+    else {
         int *data;
         NGA_Access64(mask.handle, &mask.lo, &mask.hi, &data, NULL);
         return data;
@@ -820,7 +857,8 @@ int* mask_get_data_all(Mask mask)
     int *data = new int[size];
     if (mask.data) {
         copy(mask.data, mask.data+size, data);
-    } else {
+    }
+    else {
         int64_t hi = size - 1;
         NGA_Get64(mask.handle, &ZERO64, &hi, data, NULL);
     }
@@ -832,7 +870,9 @@ string composite_name(DimInfoVec dims)
 {
     string name = COMPOSITE_PREFIX;
     size_t idx = 0;
-    if (dims[0].is_unlimited) idx = 1;
+    if (dims[0].is_unlimited) {
+        idx = 1;
+    }
     for (; idx<dims.size(); ++idx) {
         name += '_' + dims[idx].name;
     }
@@ -844,7 +884,8 @@ string get_mask_name(DimInfoVec dims)
 {
     if (dims.size() == 1) {
         return dims[0].name;
-    } else {
+    }
+    else {
         return composite_name(dims);
     }
 }
@@ -884,7 +925,8 @@ Mask create_composite_mask2d(MaskMap &masks, DimInfoVec dims)
             for (MPI_Offset jdx=0; jdx<mask2_size; ++jdx) {
                 the_mask[idx*mask2_size + jdx] = mask2[jdx];
             }
-        } else {
+        }
+        else {
             for (MPI_Offset jdx=0; jdx<mask2_size; ++jdx) {
                 the_mask[idx*mask2_size + jdx] = 0;
             }
@@ -931,27 +973,33 @@ void create_composite_mask(MaskMap &masks, VarInfo varInfo)
     }
     if (dims.size() == 0) {
         DEBUG_ZERO("dims.size() == 0, skipping\n");
-    } else if (dims.size() == 1) {
+    }
+    else if (dims.size() == 1) {
         DEBUG_ZERO("dims.size() == 1, skipping\n");
-    } else if (dims.size() == 2) {
+    }
+    else if (dims.size() == 2) {
         string name = composite_name(dims);
         if (masks.find(name) != masks.end()) {
             DEBUG_ZERO("dims.size() == 2, name=%s, skipping\n", name.c_str());
             return;
-        } else {
+        }
+        else {
             DEBUG_ZERO("dims.size() == 2, name=%s\n", name.c_str());
             masks[name] = create_composite_mask2d(masks, dims);
         }
-    } else if (dims.size() == 3) {
+    }
+    else if (dims.size() == 3) {
         string name = composite_name(dims);
         if (masks.find(name) != masks.end()) {
             DEBUG_ZERO("dims.size() == 3, name=%s, skipping\n", name.c_str());
             return;
-        } else {
+        }
+        else {
             DEBUG_ZERO("dims.size() == 3, name=%s\n", name.c_str());
             masks[name] = create_composite_mask3d(masks, dims);
         }
-    } else {
+    }
+    else {
         ERR("bad dimension size (must be <= 3)");
     }
 }
@@ -972,19 +1020,26 @@ void count_masks(MaskMap &masks)
     DEBUG_ZERO("count_masks BEGIN\n");
 
     for (MaskMap::iterator it=masks.begin(); it!=masks.end(); ++it) {
-        if (it->first.find(COMPOSITE_PREFIX) == 0) continue; // don't count these
+        if (it->first.find(COMPOSITE_PREFIX) == 0) {
+            continue;    // don't count these
+        }
         Mask &mask = it->second;
         mask.local_count = 0;
         mask.global_count = 0;
         if (mask.data) {
             for (size_t i=0; i<mask.local_size; ++i) {
-                if (mask.data[i] != 0) ++mask.local_count;
+                if (mask.data[i] != 0) {
+                    ++mask.local_count;
+                }
             }
             mask.global_count = mask.local_count;
-        } else {
+        }
+        else {
             NGA_Access64(mask.handle, &mask.lo, &mask.hi, &mask.data, NULL);
             for (size_t i=0; i<mask.local_size; ++i) {
-                if (mask.data[i] != 0) ++mask.local_count;
+                if (mask.data[i] != 0) {
+                    ++mask.local_count;
+                }
             }
             NGA_Release_update64(mask.handle, &mask.lo, &mask.hi);
             mask.data = NULL;
@@ -999,9 +1054,9 @@ void count_masks(MaskMap &masks)
 
 // record variables
 void copy_record_var(
-        VarInfo var_in,
-        VarInfo var_out,
-        MaskMap masks)
+    VarInfo var_in,
+    VarInfo var_out,
+    MaskMap masks)
 {
     Mask the_record_mask = masks["time"];
     int num_records = the_record_mask.dim.size;
@@ -1016,7 +1071,7 @@ void copy_record_var(
     int64_t size_in, size_out;
     // Recall we're linearizing these arrays so that GA_Pack works.
     // Due to the linearization, we must specify a chunk size that equates
-    // to the product of all but the first dim, otherwise we'd get unpredictable 
+    // to the product of all but the first dim, otherwise we'd get unpredictable
     // array distribution (across otherwise multi-dimensional bounds)
     size_in  =  var_in.edges[1]; // start at dim after record dim
     size_out = var_out.edges[1]; // start at dim after record dim
@@ -1077,7 +1132,9 @@ void copy_record_var(
     }
 #endif
     for (MPI_Offset record=0; record<num_records; ++record) {
-        if (record_mask[record] == 0) continue; // skip if masked out
+        if (record_mask[record] == 0) {
+            continue;    // skip if masked out
+        }
 
         // set the record to read
         start_in[0] = record;
@@ -1088,11 +1145,13 @@ void copy_record_var(
             int *ptr;
             NGA_Access64(g_var_in, &lo_in, &hi_in, &ptr, NULL);
             error = ncmpi_get_vara_int_all(var_in.ncid, var_in.id, start_in, count_in, ptr);
-        } else if (var_out.type == NC_FLOAT) {
+        }
+        else if (var_out.type == NC_FLOAT) {
             float *ptr;
             NGA_Access64(g_var_in, &lo_in, &hi_in, &ptr, NULL);
             error = ncmpi_get_vara_float_all(var_in.ncid, var_in.id, start_in, count_in, ptr);
-        } else if (var_out.type == NC_DOUBLE) {
+        }
+        else if (var_out.type == NC_DOUBLE) {
             double *ptr;
             NGA_Access64(g_var_in, &lo_in, &hi_in, &ptr, NULL);
             error = ncmpi_get_vara_double_all(var_in.ncid, var_in.id, start_in, count_in, ptr);
@@ -1121,11 +1180,13 @@ void copy_record_var(
             int *ptr;
             NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
             error = ncmpi_put_vara_int_all(var_out.ncid, var_out.id, start_out, count_out, &ptr[0]);
-        } else if (var_out.type == NC_FLOAT) {
+        }
+        else if (var_out.type == NC_FLOAT) {
             float *ptr;
             NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
             error = ncmpi_put_vara_float_all(var_out.ncid, var_out.id, start_out, count_out, &ptr[0]);
-        } else if (var_out.type == NC_DOUBLE) {
+        }
+        else if (var_out.type == NC_DOUBLE) {
             double *ptr;
             NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
             error = ncmpi_put_vara_double_all(var_out.ncid, var_out.id, start_out, count_out, &ptr[0]);
@@ -1153,7 +1214,7 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
     int64_t size_in, size_out;
     // Recall we're linearizing these arrays so that GA_Pack works.
     // Due to the linearization, we must specify a chunk size that equates
-    // to all but the first dim, otherwise we'd get unpredictable 
+    // to all but the first dim, otherwise we'd get unpredictable
     // array distribution (across otherwise multi-dimensional bounds)
     size_in  =  var_in.edges[0];
     size_out = var_out.edges[0];
@@ -1215,11 +1276,13 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         int *ptr;
         NGA_Access64(g_var_in, &lo_in, &hi_in, &ptr, NULL);
         error = ncmpi_get_vara_int_all(var_in.ncid, var_in.id, start_in, count_in, ptr);
-    } else if (var_out.type == NC_FLOAT) {
+    }
+    else if (var_out.type == NC_FLOAT) {
         float *ptr;
         NGA_Access64(g_var_in, &lo_in, &hi_in, &ptr, NULL);
         error = ncmpi_get_vara_float_all(var_in.ncid, var_in.id, start_in, count_in, ptr);
-    } else if (var_out.type == NC_DOUBLE) {
+    }
+    else if (var_out.type == NC_DOUBLE) {
         double *ptr;
         NGA_Access64(g_var_in, &lo_in, &hi_in, &ptr, NULL);
         error = ncmpi_get_vara_double_all(var_in.ncid, var_in.id, start_in, count_in, ptr);
@@ -1248,7 +1311,8 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         for (size_t idx=0; idx<limit; ++idx) {
             if (mapping->find(ptr[idx]) == mapping->end()) {
                 ptr[idx] = -1;
-            } else {
+            }
+            else {
                 ptr[idx] = (*mapping)[ptr[idx]];
             }
         }
@@ -1263,11 +1327,13 @@ void copy_var(VarInfo var_in, VarInfo var_out, MaskMap masks, IndexMap *mapping)
         int *ptr;
         NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
         error = ncmpi_put_vara_int_all(var_out.ncid, var_out.id, start_out, count_out, &ptr[0]);
-    } else if (var_out.type == NC_FLOAT) {
+    }
+    else if (var_out.type == NC_FLOAT) {
         float *ptr;
         NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
         error = ncmpi_put_vara_float_all(var_out.ncid, var_out.id, start_out, count_out, &ptr[0]);
-    } else if (var_out.type == NC_DOUBLE) {
+    }
+    else if (var_out.type == NC_DOUBLE) {
         double *ptr;
         NGA_Access64(g_var_out, &lo_out, &hi_out, &ptr, NULL);
         error = ncmpi_put_vara_double_all(var_out.ncid, var_out.id, start_out, count_out, &ptr[0]);

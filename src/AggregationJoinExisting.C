@@ -53,7 +53,7 @@ AggregationJoinExisting::~AggregationJoinExisting()
     }
 
     transform(datasets.begin(), datasets.end(), datasets.begin(),
-            pagoda::ptr_deleter<Dataset*>);
+              pagoda::ptr_deleter<Dataset*>);
 
     delete agg_dim;
 }
@@ -109,10 +109,12 @@ void AggregationJoinExisting::add(Dataset *dataset)
             if (other_dim->get_name() == agg_dim_name) {
                 agg_dim = new AggregationDimension(this, other_dim);
                 dims.push_back(agg_dim);
-            } else {
+            }
+            else {
                 dims.push_back(other_dim);
             }
-        } else if (other_dim->get_name() == agg_dim_name) {
+        }
+        else if (other_dim->get_name() == agg_dim_name) {
             agg_dim->add(other_dim);
         }
     }
@@ -134,12 +136,14 @@ void AggregationJoinExisting::add(Dataset *dataset)
                 agg_var = new AggregationVariable(this, agg_dim, other_var);
                 agg_vars[other_var->get_name()] = agg_var;
                 vars.push_back(agg_var);
-            } else {
+            }
+            else {
                 // either other_var is dimensionless or its outer dimension
                 // name did not match the aggregated dimension name
                 vars.push_back(other_var);
             }
-        } else {
+        }
+        else {
             // other_var was found in the aggregation
             if (other_var->get_ndim() > 0
                     && other_var->get_dims()[0]->get_name() == agg_dim_name) {
@@ -153,8 +157,9 @@ void AggregationJoinExisting::add(Dataset *dataset)
                 }
                 agg_var->add(other_var);
                 TRACER("agg_var->get_sizes()[0]=%ld\n",
-                        agg_var->get_shape()[0]);
-            } else {
+                       agg_var->get_shape()[0]);
+            }
+            else {
                 // no-op. other_var was found in the aggregation, but its
                 // outer dimension does not match the aggregated dimension.
                 // therefore this acts like a union aggregation (we toss out
@@ -185,7 +190,8 @@ FileFormat AggregationJoinExisting::get_file_format() const
 {
     if (datasets.empty()) {
         return FF_UNKNOWN;
-    } else {
+    }
+    else {
         return datasets.front()->get_file_format();
     }
 }

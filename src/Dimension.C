@@ -43,7 +43,8 @@ Mask* Dimension::get_mask() const
     TIMING("Dimension::get_mask()");
     if (masks) {
         return masks->get_mask(this);
-    } else {
+    }
+    else {
         return NULL;
     }
 }
@@ -52,12 +53,12 @@ Mask* Dimension::get_mask() const
 bool Dimension::equal(const Dimension *left, const Dimension *right)
 {
     return left->get_size() == right->get_size()
-        && left->get_name() == right->get_name();
+           && left->get_name() == right->get_name();
 }
 
 
 bool Dimension::equal(
-        const vector<Dimension*> &left, const vector<Dimension*> &right)
+    const vector<Dimension*> &left, const vector<Dimension*> &right)
 {
     if (left.size() != right.size()) {
         return false;

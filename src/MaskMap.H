@@ -58,7 +58,7 @@ class MaskMap
         void modify(const LatLonBox &box, Grid *grid);
 
         Mask* get_mask(const Dimension *dim);
-        Mask* operator [] (const Dimension *dim);
+        Mask* operator [](const Dimension *dim);
 
         ostream& print(ostream &os) const;
         friend ostream& operator << (ostream &os, const MaskMap &maskmap);
@@ -68,13 +68,13 @@ class MaskMap
         Mask* get_mask(const string &name, const Dimension *dim);
 
         void modify(const LatLonBox &box,
-                const Variable *lat, const Variable *lon,
-                Dimension *dim);
+                    const Variable *lat, const Variable *lon,
+                    Dimension *dim);
         void modify(const LatLonBox &box,
-                const Variable *lat, const Variable *lon,
-                Dimension *lat_dim, Dimension *lon_dim);
+                    const Variable *lat, const Variable *lon,
+                    Dimension *lat_dim, Dimension *lon_dim);
         void modify(Dimension *masked, Dimension *to_mask,
-                const Variable *topology);
+                    const Variable *topology);
 
         masks_t masks;
         cleared_t cleared;

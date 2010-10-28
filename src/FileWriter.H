@@ -59,32 +59,32 @@ class FileWriter
         virtual void def_dims(const vector<Dimension*> &dims);
 
         virtual void def_var(const string &name,
-                const vector<string> &dims,
-                const DataType &type,
-                const vector<Attribute*> &atts=vector<Attribute*>()) = 0;
+                             const vector<string> &dims,
+                             const DataType &type,
+                             const vector<Attribute*> &atts=vector<Attribute*>()) = 0;
         virtual void def_var(const string &name,
-                const vector<Dimension*> &dims,
-                const DataType &type,
-                const vector<Attribute*> &atts=vector<Attribute*>());
+                             const vector<Dimension*> &dims,
+                             const DataType &type,
+                             const vector<Attribute*> &atts=vector<Attribute*>());
         virtual void def_var(const string &name,
-                const vector<Mask*> &dims,
-                const DataType &type,
-                const vector<Attribute*> &atts=vector<Attribute*>());
+                             const vector<Mask*> &dims,
+                             const DataType &type,
+                             const vector<Attribute*> &atts=vector<Attribute*>());
         virtual void def_var(Variable *var);
         virtual void def_vars(const vector<Variable*> &vars);
 
         virtual void write_att(const string &name, Values *values,
-                DataType type, const string &var_name=string(""));
+                               DataType type, const string &var_name=string(""));
         virtual void write_att(Attribute *att,
-                const string &name=string("")) = 0;
+                               const string &name=string("")) = 0;
         virtual void write_atts(const vector<Attribute*> &atts,
-                const string &name=string(""));
+                                const string &name=string(""));
 
         virtual void write(Array *array, const string &name) = 0;
         virtual void write(Array *array, const string &name,
-                int64_t record) = 0;
+                           int64_t record) = 0;
         virtual void write(Array *array, const string &name,
-                const vector<int64_t> &start) = 0;
+                           const vector<int64_t> &start) = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const FileWriter *writer);

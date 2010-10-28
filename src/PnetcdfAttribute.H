@@ -24,7 +24,7 @@ class PnetcdfAttribute : public Attribute
 {
     public:
         PnetcdfAttribute(PnetcdfDataset *dataset, int attid,
-                PnetcdfVariable *var=NULL);
+                         PnetcdfVariable *var=NULL);
         virtual ~PnetcdfAttribute();
 
         virtual string get_name() const;

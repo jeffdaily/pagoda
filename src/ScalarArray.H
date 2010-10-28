@@ -29,14 +29,14 @@ class ScalarArray : public Array
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
-                const vector<int64_t> &src_lo,
-                const vector<int64_t> &src_hi,
-                const vector<int64_t> &dst_lo,
-                const vector<int64_t> &dst_hi);
+                          const vector<int64_t> &src_lo,
+                          const vector<int64_t> &src_hi,
+                          const vector<int64_t> &dst_lo,
+                          const vector<int64_t> &dst_hi);
 
         virtual bool owns_data() const;
         virtual void get_distribution(
-                vector<int64_t> &lo, vector<int64_t> &hi) const;
+            vector<int64_t> &lo, vector<int64_t> &hi) const;
         virtual void* access();
         virtual void* access() const;
         virtual void release() const;

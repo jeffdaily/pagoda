@@ -50,8 +50,8 @@ class CommandLineOption
         static unsigned int WIDTH;
 
         CommandLineOption(const int &value, const string &name,
-                const bool &argument, const string &description,
-                const string &extra_name1="", const string &extra_name2="");
+                          const bool &argument, const string &description,
+                          const string &extra_name1="", const string &extra_name2="");
         ~CommandLineOption();
 
         void set_value(const int &value);

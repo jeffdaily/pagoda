@@ -81,7 +81,8 @@ void LatLonBox::set(const string &latLonString, bool aux_order)
         ss.str(latLonParts[2]);
         se.str(latLonParts[1]);
         sw.str(latLonParts[0]);
-    } else {
+    }
+    else {
         sn.str(latLonParts[0]);
         ss.str(latLonParts[1]);
         se.str(latLonParts[2]);
@@ -119,9 +120,9 @@ bool LatLonBox::operator == (const LatLonBox &that) const
 {
     TIMING("LatLonBox::operator==(LatLonBox)");
     return this->n == that.n
-        && this->s == that.s
-        && this->e == that.e
-        && this->w == that.w;
+           && this->s == that.s
+           && this->e == that.e
+           && this->w == that.w;
 }
 
 
@@ -134,13 +135,13 @@ bool LatLonBox::operator != (const LatLonBox &that) const
 
 
 
-bool LatLonBox::operator <  (const LatLonBox &that) const
+bool LatLonBox::operator < (const LatLonBox &that) const
 {
     TIMING("LatLonBox::operator<(LatLonBox)");
     return this->n < that.n
-        && this->s > that.s
-        && this->e < that.e
-        && this->w > that.w;
+           && this->s > that.s
+           && this->e < that.e
+           && this->w > that.w;
 }
 
 
@@ -153,7 +154,7 @@ bool LatLonBox::operator <= (const LatLonBox &that) const
 
 
 
-bool LatLonBox::operator >  (const LatLonBox &that) const
+bool LatLonBox::operator > (const LatLonBox &that) const
 {
     TIMING("LatLonBox::operator>(LatLonBox)");
     return !(*this <= that);
@@ -191,13 +192,13 @@ bool LatLonBox::contains(long long lat, long long lon) const
 {
     TIMING("LatLonBox::contains(long long,long long)");
     long long _n = (0 < n) ? static_cast<long long>(floor(n))
-                           : static_cast<long long>(ceil(n));
+                   : static_cast<long long>(ceil(n));
     long long _s = (0 < s) ? static_cast<long long>(floor(s))
-                           : static_cast<long long>(ceil(s));
+                   : static_cast<long long>(ceil(s));
     long long _e = (0 < e) ? static_cast<long long>(floor(e))
-                           : static_cast<long long>(ceil(e));
+                   : static_cast<long long>(ceil(e));
     long long _w = (0 < w) ? static_cast<long long>(floor(w))
-                           : static_cast<long long>(ceil(w));
+                   : static_cast<long long>(ceil(w));
     return _s<lat && lat<_n && _w<lon && lon<_e;
 }
 
@@ -264,12 +265,12 @@ ostream& operator<<(ostream &os, const LatLonBox &box)
 {
     TIMING("operator<<(ostream,LatLonBox)");
     return os
-        << box.n << ","
-        << box.s << ","
-        << box.e << ","
-        << box.w << ","
-        << box.x << ","
-        << box.y;
+           << box.n << ","
+           << box.s << ","
+           << box.e << ","
+           << box.w << ","
+           << box.x << ","
+           << box.y;
 }
 
 
@@ -279,6 +280,7 @@ void LatLonBox::check()
     if (n > 90 || n < -90
             || s > 90 || s < -90
             || e > 180 || e < -180
-            || w > 180 || w < -180)
+            || w > 180 || w < -180) {
         throw RangeException(string(""));
+    }
 }

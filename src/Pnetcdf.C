@@ -102,12 +102,12 @@ int ncmpi::def_dim(int ncid, const string &name, MPI_Offset len)
 
 
 int ncmpi::def_var(int ncid, const string &name, nc_type xtype,
-        const vector<int> &dimids)
+                   const vector<int> &dimids)
 {
     int id;
     PNETCDF_TIMING1("ncmpi_def_var");
     ERRNO_CHECK(ncmpi_def_var(ncid, name.c_str(), xtype, dimids.size(),
-                &dimids[0], &id));
+                              &dimids[0], &id));
     return id;
 }
 
@@ -139,7 +139,7 @@ int ncmpi::inq_format(int ncid)
 }
 
 void ncmpi::inq(int ncid, int &ndims, int &nvars, int &ngatts,
-        int &unlimdimid)
+                int &unlimdimid)
 {
     PNETCDF_TIMING1("ncmpi_inq");
     ERRNO_CHECK(ncmpi_inq(ncid, &ndims, &nvars, &ngatts, &unlimdimid));
@@ -219,14 +219,14 @@ MPI_Offset ncmpi::inq_dimlen(int ncid, int dimid)
 
 
 void ncmpi::inq_var(int ncid, int varid, string &name, nc_type &xtypep,
-        vector<int> &dimids, int &natts)
+                    vector<int> &dimids, int &natts)
 {
     char cname[NC_MAX_NAME];
     int ndimsp;
     int dimidsp[NC_MAX_VAR_DIMS];
     PNETCDF_TIMING1("ncmpi_inq_var");
     ERRNO_CHECK(ncmpi_inq_var(ncid, varid, cname, &xtypep, &ndimsp,
-                dimidsp, &natts));
+                              dimidsp, &natts));
     name = cname;
     dimids.assign(dimidsp, dimidsp+ndimsp);
 }
@@ -289,7 +289,7 @@ int ncmpi::inq_varnatts(int ncid, int varid)
 
 
 void ncmpi::inq_att(int ncid, int varid, const string &name,
-        nc_type &xtype, MPI_Offset &len)
+                    nc_type &xtype, MPI_Offset &len)
 {
     PNETCDF_TIMING1("ncmpi_inq_att");
     ERRNO_CHECK(ncmpi_inq_att(ncid, varid, name.c_str(), &xtype, &len));
@@ -333,7 +333,7 @@ string ncmpi::inq_attname(int ncid, int varid, int attnum)
 
 
 void ncmpi::copy_att(int ncid, int varid, const string &name,
-        int ncid_out, int varid_out)
+                     int ncid_out, int varid_out)
 {
     PNETCDF_TIMING1("ncmpi_copy_att");
     ERRNO_CHECK(ncmpi_copy_att(ncid, varid, name.c_str(), ncid_out, varid_out));
@@ -341,7 +341,7 @@ void ncmpi::copy_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::rename_att(int ncid, int varid, const string &name,
-        const string &newname)
+                       const string &newname)
 {
     PNETCDF_TIMING1("ncmpi_rename_att");
     ERRNO_CHECK(ncmpi_rename_att(ncid, varid, name.c_str(), newname.c_str()));
@@ -356,92 +356,92 @@ void ncmpi::del_att(int ncid, int varid, const string &name)
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const string &values)
+                    const string &values)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_text", len, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_att_text(ncid, varid, name.c_str(), len,
-                values.c_str()));
+                                   values.c_str()));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<char> &values, nc_type xtype)
+                    const vector<char> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_uchar", len, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_att_text(ncid, varid, name.c_str(), len,
-                &values[0]));
+                                   &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<unsigned char> &values, nc_type xtype)
+                    const vector<unsigned char> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_uchar", len, NC_BYTE);
     ERRNO_CHECK(ncmpi_put_att_uchar(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                    &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<signed char> &values, nc_type xtype)
+                    const vector<signed char> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_schar", len, NC_BYTE);
     ERRNO_CHECK(ncmpi_put_att_schar(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                    &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<short> &values, nc_type xtype)
+                    const vector<short> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_short", len, NC_SHORT);
     ERRNO_CHECK(ncmpi_put_att_short(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                    &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<int> &values, nc_type xtype)
+                    const vector<int> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_int", len, NC_INT);
     ERRNO_CHECK(ncmpi_put_att_int(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                  &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<long> &values, nc_type xtype)
+                    const vector<long> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_long", len, NC_INT);
     ERRNO_CHECK(ncmpi_put_att_long(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                   &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<float> &values, nc_type xtype)
+                    const vector<float> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_float", len, NC_FLOAT);
     ERRNO_CHECK(ncmpi_put_att_float(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                    &values[0]));
 }
 
 
 void ncmpi::put_att(int ncid, int varid, const string &name,
-        const vector<double> &values, nc_type xtype)
+                    const vector<double> &values, nc_type xtype)
 {
     MPI_Offset len = values.size();
     PNETCDF_TIMING3("ncmpi_put_att_double", len, NC_DOUBLE);
     ERRNO_CHECK(ncmpi_put_att_double(ncid, varid, name.c_str(), xtype, len,
-                &values[0]));
+                                     &values[0]));
 }
 
 
@@ -456,7 +456,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name, string &values)
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<char> &values)
+                    vector<char> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_uchar", len, NC_CHAR);
@@ -466,7 +466,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<unsigned char> &values)
+                    vector<unsigned char> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_uchar", len, NC_CHAR);
@@ -476,7 +476,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<signed char> &values)
+                    vector<signed char> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_schar", len, NC_BYTE);
@@ -486,7 +486,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<short> &values)
+                    vector<short> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_short", len, NC_SHORT);
@@ -496,7 +496,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<int> &values)
+                    vector<int> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_int", len, NC_INT);
@@ -506,7 +506,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<long> &values)
+                    vector<long> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_long", len, NC_INT);
@@ -516,7 +516,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<float> &values)
+                    vector<float> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_float", len, NC_FLOAT);
@@ -526,7 +526,7 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::get_att(int ncid, int varid, const string &name,
-        vector<double> &values)
+                    vector<double> &values)
 {
     MPI_Offset len = ncmpi::inq_attlen(ncid, varid, name);
     PNETCDF_TIMING3("ncmpi_get_att_double", len, NC_DOUBLE);
@@ -536,8 +536,8 @@ void ncmpi::get_att(int ncid, int varid, const string &name,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const unsigned char *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const unsigned char *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_uchar_all", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_vara_uchar_all(ncid, varid, &start[0], &count[0], op));
@@ -545,8 +545,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const signed char *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const signed char *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_schar_all", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_vara_schar_all(ncid, varid, &start[0], &count[0], op));
@@ -554,8 +554,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const char *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const char *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_text_all", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_vara_text_all(ncid, varid, &start[0], &count[0], op));
@@ -563,8 +563,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const short *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const short *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_short_all", count, NC_SHORT);
     ERRNO_CHECK(ncmpi_put_vara_short_all(ncid, varid, &start[0], &count[0], op));
@@ -572,8 +572,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const int *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const int *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_int_all", count, NC_INT);
     ERRNO_CHECK(ncmpi_put_vara_int_all(ncid, varid, &start[0], &count[0], op));
@@ -581,8 +581,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const long *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const long *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_long_all", count, NC_INT);
     ERRNO_CHECK(ncmpi_put_vara_long_all(ncid, varid, &start[0], &count[0], op));
@@ -590,8 +590,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const float *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const float *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_float_all", count, NC_FLOAT);
     ERRNO_CHECK(ncmpi_put_vara_float_all(ncid, varid, &start[0], &count[0], op));
@@ -599,8 +599,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const double *op)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, const double *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_double_all", count, NC_DOUBLE);
     ERRNO_CHECK(ncmpi_put_vara_double_all(ncid, varid, &start[0], &count[0], op));
@@ -608,8 +608,8 @@ void ncmpi::put_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, unsigned char *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, unsigned char *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_uchar_all", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_get_vara_uchar_all(ncid, varid, &start[0], &count[0], ip));
@@ -617,8 +617,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, signed char *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, signed char *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_schar_all", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_get_vara_schar_all(ncid, varid, &start[0], &count[0], ip));
@@ -626,8 +626,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, char *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, char *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_text_all", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_get_vara_text_all(ncid, varid, &start[0], &count[0], ip));
@@ -635,8 +635,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, short *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, short *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_short_all", count, NC_SHORT);
     ERRNO_CHECK(ncmpi_get_vara_short_all(ncid, varid, &start[0], &count[0], ip));
@@ -644,8 +644,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, int *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, int *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_int_all", count, NC_INT);
     ERRNO_CHECK(ncmpi_get_vara_int_all(ncid, varid, &start[0], &count[0], ip));
@@ -653,8 +653,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, long *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, long *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_long_all", count, NC_INT);
     ERRNO_CHECK(ncmpi_get_vara_long_all(ncid, varid, &start[0], &count[0], ip));
@@ -662,8 +662,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, float *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, float *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_float_all", count, NC_FLOAT);
     ERRNO_CHECK(ncmpi_get_vara_float_all(ncid, varid, &start[0], &count[0], ip));
@@ -671,8 +671,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::get_vara_all(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, double *ip)
+                         const vector<MPI_Offset> &start,
+                         const vector<MPI_Offset> &count, double *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_double_all", count, NC_DOUBLE);
     ERRNO_CHECK(ncmpi_get_vara_double_all(ncid, varid, &start[0], &count[0], ip));
@@ -680,8 +680,8 @@ void ncmpi::get_vara_all(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const unsigned char *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const unsigned char *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_uchar", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_vara_uchar(ncid, varid, &start[0], &count[0], op));
@@ -689,8 +689,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const signed char *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const signed char *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_schar", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_vara_schar(ncid, varid, &start[0], &count[0], op));
@@ -698,8 +698,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const char *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const char *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_text", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_put_vara_text(ncid, varid, &start[0], &count[0], op));
@@ -707,8 +707,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const short *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const short *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_short", count, NC_SHORT);
     ERRNO_CHECK(ncmpi_put_vara_short(ncid, varid, &start[0], &count[0], op));
@@ -716,8 +716,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const int *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const int *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_int", count, NC_INT);
     ERRNO_CHECK(ncmpi_put_vara_int(ncid, varid, &start[0], &count[0], op));
@@ -725,8 +725,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const long *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const long *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_long", count, NC_INT);
     ERRNO_CHECK(ncmpi_put_vara_long(ncid, varid, &start[0], &count[0], op));
@@ -734,8 +734,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const float *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const float *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_float", count, NC_FLOAT);
     ERRNO_CHECK(ncmpi_put_vara_float(ncid, varid, &start[0], &count[0], op));
@@ -743,8 +743,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::put_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, const double *op)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const double *op)
 {
     PNETCDF_TIMING3("ncmpi_put_vara_double", count, NC_DOUBLE);
     ERRNO_CHECK(ncmpi_put_vara_double(ncid, varid, &start[0], &count[0], op));
@@ -752,8 +752,8 @@ void ncmpi::put_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, unsigned char *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, unsigned char *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_uchar", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_get_vara_uchar(ncid, varid, &start[0], &count[0], ip));
@@ -761,8 +761,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, signed char *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, signed char *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_schar", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_get_vara_schar(ncid, varid, &start[0], &count[0], ip));
@@ -770,8 +770,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, char *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, char *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_text", count, NC_CHAR);
     ERRNO_CHECK(ncmpi_get_vara_text(ncid, varid, &start[0], &count[0], ip));
@@ -779,8 +779,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, short *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, short *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_short", count, NC_SHORT);
     ERRNO_CHECK(ncmpi_get_vara_short(ncid, varid, &start[0], &count[0], ip));
@@ -788,8 +788,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, int *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, int *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_int", count, NC_INT);
     ERRNO_CHECK(ncmpi_get_vara_int(ncid, varid, &start[0], &count[0], ip));
@@ -797,8 +797,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, long *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, long *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_long", count, NC_INT);
     ERRNO_CHECK(ncmpi_get_vara_long(ncid, varid, &start[0], &count[0], ip));
@@ -806,8 +806,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, float *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, float *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_float", count, NC_FLOAT);
     ERRNO_CHECK(ncmpi_get_vara_float(ncid, varid, &start[0], &count[0], ip));
@@ -815,8 +815,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 void ncmpi::get_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, double *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, double *ip)
 {
     PNETCDF_TIMING3("ncmpi_get_vara_double", count, NC_DOUBLE);
     ERRNO_CHECK(ncmpi_get_vara_double(ncid, varid, &start[0], &count[0], ip));
@@ -824,8 +824,8 @@ void ncmpi::get_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, unsigned char *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, unsigned char *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -840,8 +840,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, signed char *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, signed char *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -856,8 +856,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, char *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, char *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -872,8 +872,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, short *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, short *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -888,8 +888,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, int *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, int *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -904,8 +904,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, long *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, long *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -920,8 +920,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, float *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, float *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -936,8 +936,8 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 int ncmpi::iget_vara(int ncid, int varid,
-        const vector<MPI_Offset> &start,
-        const vector<MPI_Offset> &count, double *ip)
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, double *ip)
 {
 #if HAVE_PNETCDF_NEW_NB
     int request;
@@ -952,12 +952,12 @@ int ncmpi::iget_vara(int ncid, int varid,
 
 
 void ncmpi::wait_all(int ncid,
-        vector<int> &array_of_requests,
-        vector<int> &array_of_statuses)
+                     vector<int> &array_of_requests,
+                     vector<int> &array_of_statuses)
 {
 #if HAVE_PNETCDF_NEW_NB
     PNETCDF_TIMING1("ncmpi_waitall");
     ERRNO_CHECK(ncmpi_wait_all(ncid, array_of_requests.size(),
-                &array_of_requests[0], &array_of_statuses[0]));
+                               &array_of_requests[0], &array_of_statuses[0]));
 #endif
 }

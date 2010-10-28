@@ -122,8 +122,9 @@ void MaskMap::modify(const DimSlice &slice)
 
     if (mask_it == masks.end()) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
-                slice_name.c_str());
-    } else {
+                           slice_name.c_str());
+    }
+    else {
         // clear the Mask the first time only
         if (cleared.count(slice_name) == 0) {
             cleared.insert(slice_name);
@@ -175,22 +176,36 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
         Dimension *corner_dim;
         Dimension *edge_dim;
 
-        if (cell_lat)        cell_dim = cell_lat->get_dims().at(0);
-        else if (cell_lon)   cell_dim = cell_lon->get_dims().at(0);
-        if (corner_lat)      corner_dim = corner_lat->get_dims().at(0);
-        else if (corner_lat) corner_dim = corner_lon->get_dims().at(0);
-        if (edge_lat)        edge_dim = edge_lat->get_dims().at(0);
-        else if (edge_lat)   edge_dim = edge_lon->get_dims().at(0);
+        if (cell_lat) {
+            cell_dim = cell_lat->get_dims().at(0);
+        }
+        else if (cell_lon) {
+            cell_dim = cell_lon->get_dims().at(0);
+        }
+        if (corner_lat) {
+            corner_dim = corner_lat->get_dims().at(0);
+        }
+        else if (corner_lat) {
+            corner_dim = corner_lon->get_dims().at(0);
+        }
+        if (edge_lat) {
+            edge_dim = edge_lat->get_dims().at(0);
+        }
+        else if (edge_lat) {
+            edge_dim = edge_lon->get_dims().at(0);
+        }
 
         if (cell_lat && cell_lon && cell_dim) {
             if (grid->is_radians()) {
                 modify(box*RAD_PER_DEG, cell_lat, cell_lon, cell_dim);
-            } else {
+            }
+            else {
                 modify(box, cell_lat, cell_lon, cell_dim);
             }
             if (corner_dim && cell_corners) {
                 modify(cell_dim, corner_dim, cell_corners);
-            } else {
+            }
+            else {
                 if (!corner_lat) {
                     pagoda::print_zero("grid corner lat missing\n");
                 }
@@ -203,7 +218,8 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
             }
             if (edge_dim && cell_edges) {
                 modify(cell_dim, edge_dim, cell_edges);
-            } else {
+            }
+            else {
                 if (!edge_lat) {
                     pagoda::print_zero("grid edge lat missing\n");
                 }
@@ -214,7 +230,8 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
                     pagoda::print_zero("grid edge dim missing\n");
                 }
             }
-        } else {
+        }
+        else {
             if (!cell_lat) {
                 pagoda::print_zero("grid cell lat missing\n");
             }
@@ -252,7 +269,7 @@ void MaskMap::modify(const vector<LatLonBox> &boxes, Grid *grid)
  * @param[in] dim the dimension we are masking
  */
 void MaskMap::modify(const LatLonBox &box,
-        const Variable *lat, const Variable *lon, Dimension *dim)
+                     const Variable *lat, const Variable *lon, Dimension *dim)
 {
     Mask *mask = get_mask(dim);
     Array *lat_array;
@@ -290,8 +307,8 @@ void MaskMap::modify(const LatLonBox &box,
  * @param[in] lon_dim the longitude dimension we are masking
  */
 void MaskMap::modify(
-        const LatLonBox &box, const Variable *lat, const Variable *lon,
-        Dimension *lat_dim, Dimension *lon_dim)
+    const LatLonBox &box, const Variable *lat, const Variable *lon,
+    Dimension *lat_dim, Dimension *lon_dim)
 {
     Mask *lat_mask = get_mask(lat_dim);
     Mask *lon_mask = get_mask(lon_dim);
@@ -337,7 +354,7 @@ void MaskMap::modify(
  * @param[in] topology relation between the two given Dimensions
  */
 void MaskMap::modify(
-        Dimension *dim_masked, Dimension *dim_to_mask, const Variable *topology)
+    Dimension *dim_masked, Dimension *dim_to_mask, const Variable *topology)
 {
     Mask *mask = get_mask(dim_masked);
     Mask *to_mask = get_mask(dim_to_mask);
@@ -376,10 +393,10 @@ void MaskMap::modify(
     topology_lo[1] = 0;
     topology_hi[0] = masked_lo.at(0) + mask_local_size-1;
     topology_hi[1] = connections-1;
-    
+
     // get portion of the topology local to the mask
     topology_data = (int*)topology_array->get(topology_lo, topology_hi);
-    
+
     // iterate over the topology indices and place into set
     mask_data = (int*)mask->access();
     for (int64_t idx=0; idx<mask_local_size; ++idx) {
@@ -387,7 +404,7 @@ void MaskMap::modify(
             int64_t local_offset = idx * connections;
             for (int64_t connection=0; connection<connections; ++connection) {
                 topology_subscripts.push_back(
-                        topology_data[local_offset+connection]);
+                    topology_data[local_offset+connection]);
             }
         }
     }
@@ -413,13 +430,14 @@ Mask* MaskMap::get_mask(const string &name, const Dimension *dim)
     masks_t::iterator it = masks.find(name);
     if (it == masks.end()) {
         return masks.insert(make_pair(name, Mask::create(dim))).first->second;
-    } else {
+    }
+    else {
         return it->second;
     }
 }
 
 
-Mask* MaskMap::operator [] (const Dimension *dim)
+Mask* MaskMap::operator [](const Dimension *dim)
 {
     return get_mask(dim);
 }

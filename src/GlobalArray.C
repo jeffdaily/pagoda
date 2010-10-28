@@ -126,7 +126,8 @@ int64_t GlobalArray::get_ndim() const
 
 void GlobalArray::fill(void *value)
 {
-    GA_Fill(handle, value); \
+    GA_Fill(handle, value);
+    \
 }
 
 
@@ -141,7 +142,8 @@ void GlobalArray::copy(const Array *src)
     }
     if (ga_src && GA_Compare_distr(handle, ga_src->handle) == 0) {
         GA_Copy(((GlobalArray*)ga_src)->handle, handle);
-    } else {
+    }
+    else {
         // idea is that each process accesses local data and get()s the passed
         // in array's data into those buffers.
         if (owns_data()) {
@@ -154,10 +156,10 @@ void GlobalArray::copy(const Array *src)
 
 
 void GlobalArray::copy(const Array *src,
-        const vector<int64_t> &src_lo,
-        const vector<int64_t> &src_hi,
-        const vector<int64_t> &dst_lo,
-        const vector<int64_t> &dst_hi)
+                       const vector<int64_t> &src_lo,
+                       const vector<int64_t> &src_hi,
+                       const vector<int64_t> &dst_lo,
+                       const vector<int64_t> &dst_hi)
 {
     const GlobalArray *ga_src = dynamic_cast<const GlobalArray*>(src);
     if (type != src->get_type()) {
@@ -169,8 +171,8 @@ void GlobalArray::copy(const Array *src,
         vector<int64_t> dst_lo_copy(dst_lo.begin(), dst_lo.end());
         vector<int64_t> dst_hi_copy(dst_hi.begin(), dst_hi.end());
         NGA_Copy_patch64('n',
-                ga_src->handle, &src_lo_copy[0], &src_hi_copy[0],
-                handle,         &dst_lo_copy[0], &dst_hi_copy[0]);
+                         ga_src->handle, &src_lo_copy[0], &src_hi_copy[0],
+                         handle,         &dst_lo_copy[0], &dst_hi_copy[0]);
     }
     ERR("not implemented: GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
 }
@@ -199,7 +201,8 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
     if (type == new_type) {
         // distributions are assumed to be identical
         dst_array = new GlobalArray(*this);
-    } else {
+    }
+    else {
         // distributions are assumed to be identical
         // types are different, so this is a cast
         dst_array = new GlobalArray(new_type, shape);
@@ -269,7 +272,8 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
 #undef cast_helper
             NGA_Release64(handle,                   &clo[0], &chi[0]);
             NGA_Release_update64(dst_array->handle, &clo[0], &chi[0]);
-        } else {
+        }
+        else {
             // we don't own any of the data, do nothing
         }
     }
@@ -313,8 +317,8 @@ void GlobalArray::operate_add(int that_handle)
 
 
 void GlobalArray::operate_add_patch(int that_handle,
-        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
-        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+                                    vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                                    vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
 #define GATYPE_EXPAND(mt,t) \
     if (type == mt) { \
@@ -374,8 +378,8 @@ void GlobalArray::operate_sub(int that_handle)
 
 
 void GlobalArray::operate_sub_patch(int that_handle,
-        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
-        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+                                    vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                                    vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
 #define GATYPE_EXPAND(mt,t) \
     if (type == mt) { \
@@ -430,13 +434,13 @@ void GlobalArray::operate_mul(int that_handle)
 
 
 void GlobalArray::operate_mul_patch(int that_handle,
-        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
-        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+                                    vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                                    vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
     GA_Elem_multiply_patch64(
-            handle, &my_lo[0], &my_hi[0],
-            that_handle, &that_lo[0], &that_hi[0],
-            handle, &my_lo[0], &my_hi[0]);
+        handle, &my_lo[0], &my_hi[0],
+        that_handle, &that_lo[0], &that_hi[0],
+        handle, &my_lo[0], &my_hi[0]);
 }
 
 
@@ -482,13 +486,13 @@ void GlobalArray::operate_div(int that_handle)
 
 
 void GlobalArray::operate_div_patch(int that_handle,
-        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
-        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+                                    vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                                    vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
     GA_Elem_divide_patch64(
-            handle, &my_lo[0], &my_hi[0],
-            that_handle, &that_lo[0], &that_hi[0],
-            handle, &my_lo[0], &my_hi[0]);
+        handle, &my_lo[0], &my_hi[0],
+        that_handle, &that_lo[0], &that_hi[0],
+        handle, &my_lo[0], &my_hi[0]);
 }
 
 
@@ -529,24 +533,26 @@ GlobalArray& GlobalArray::operator/=(const ScalarArray &that)
 
 
 void GlobalArray::operate(const GlobalArray &that,
-        GA_op_whole op_whole, GA_op_patch op_patch)
+                          GA_op_whole op_whole, GA_op_patch op_patch)
 {
     const GlobalArray *casted;
 
     if (type != that.type) {
         casted = that.cast(type);
-    } else {
+    }
+    else {
         casted = &that;
     }
 
     if (shape == casted->get_shape()) {
         (this->*op_whole)(casted->handle);
-    } else if (broadcast_check(casted)) {
+    }
+    else if (broadcast_check(casted)) {
         // shape mismatch, but broadcastable
         vector<int64_t> my_shape = shape;
         vector<int64_t> that_shape = casted->get_shape();
         vector<int64_t> broadcast_shape(my_shape.begin(),
-                my_shape.begin()+(my_shape.size()-that_shape.size()));
+                                        my_shape.begin()+(my_shape.size()-that_shape.size()));
         int64_t size = pagoda::shape_to_size(broadcast_shape);
         vector<int64_t> my_lo(my_shape.size(), 0);
         vector<int64_t> my_hi(my_shape);
@@ -569,7 +575,8 @@ void GlobalArray::operate(const GlobalArray &that,
             DEBUG_SYNC("that_hi=" + pagoda::vec_to_string(that_hi) + "\n");
             (this->*op_patch)(casted->handle, my_lo, my_hi, that_lo, that_hi);
         }
-    } else {
+    }
+    else {
         ERR("shape mismatch");
     }
 
@@ -594,12 +601,12 @@ void GlobalArray::set_distribution()
 bool GlobalArray::owns_data() const
 {
     return !(less_than(lo.begin(),lo.end(),0)
-            || less_than(hi.begin(),hi.end(),0));
+             || less_than(hi.begin(),hi.end(),0));
 }
 
 
 void GlobalArray::get_distribution(
-        vector<int64_t> &alo, vector<int64_t> &ahi) const
+    vector<int64_t> &alo, vector<int64_t> &ahi) const
 {
     alo.assign(lo.begin(),lo.end());
     ahi.assign(hi.begin(),hi.end());
@@ -641,10 +648,10 @@ void GlobalArray::release_update()
 
 
 void* GlobalArray::get(
-        void *buffer,
-        const vector<int64_t> &lo,
-        const vector<int64_t> &hi,
-        const vector<int64_t> &ld) const
+    void *buffer,
+    const vector<int64_t> &lo,
+    const vector<int64_t> &hi,
+    const vector<int64_t> &ld) const
 {
     vector<int64_t> lo_copy(lo.begin(),lo.end());
     vector<int64_t> hi_copy(hi.begin(),hi.end());
@@ -659,9 +666,9 @@ void* GlobalArray::get(
 
 
 void GlobalArray::put(void *buffer,
-        const vector<int64_t> &lo,
-        const vector<int64_t> &hi,
-        const vector<int64_t> &ld)
+                      const vector<int64_t> &lo,
+                      const vector<int64_t> &hi,
+                      const vector<int64_t> &ld)
 {
     vector<int64_t> lo_copy(lo.begin(), lo.end());
     vector<int64_t> hi_copy(hi.begin(), hi.end());
@@ -706,7 +713,7 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
         buffer = new t[n]; \
     } else
 #include "GlobalArray.def"
-    
+
     NGA_Gather64(handle, buffer, &subs[0], n);
 
     return buffer;
@@ -722,10 +729,12 @@ Array* GlobalArray::add(const Array *rhs) const
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) += *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) += *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::add(Array*) fell through");
     }
 
@@ -740,9 +749,11 @@ Array* GlobalArray::iadd(const Array *rhs)
 
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) += *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         (*this) += *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::iadd(Array*) fell through");
     }
 
@@ -759,10 +770,12 @@ Array* GlobalArray::sub(const Array *rhs) const
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) -= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) -= *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::sub(Array*) fell through");
     }
 
@@ -777,9 +790,11 @@ Array* GlobalArray::isub(const Array *rhs)
 
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) -= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         (*this) -= *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::isub(Array*) fell through");
     }
 
@@ -796,10 +811,12 @@ Array* GlobalArray::mul(const Array *rhs) const
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) *= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) *= *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::mul(Array*) fell through");
     }
 
@@ -814,9 +831,11 @@ Array* GlobalArray::imul(const Array *rhs)
 
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) *= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         (*this) *= *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::imul(Array*) fell through");
     }
 
@@ -833,10 +852,12 @@ Array* GlobalArray::div(const Array *rhs) const
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) /= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new GlobalArray(*this);
         (*self_copy) /= *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::div(Array*) fell through");
     }
 
@@ -851,9 +872,11 @@ Array* GlobalArray::idiv(const Array *rhs)
 
     if ((array = dynamic_cast<const GlobalArray*>(rhs))) {
         (*this) /= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         (*this) /= *scalar;
-    } else {
+    }
+    else {
         ERR("GlobalArray::idiv(Array*) fell through");
     }
 
@@ -868,13 +891,13 @@ void GlobalArray::operate_max(int that_handle)
 
 
 void GlobalArray::operate_max_patch(int that_handle,
-        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
-        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+                                    vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                                    vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
     GA_Elem_maximum_patch64(
-            handle, &my_lo[0], &my_hi[0],
-            that_handle, &that_lo[0], &that_hi[0],
-            handle, &my_lo[0], &my_hi[0]);
+        handle, &my_lo[0], &my_hi[0],
+        that_handle, &that_lo[0], &that_hi[0],
+        handle, &my_lo[0], &my_hi[0]);
 }
 
 
@@ -895,7 +918,8 @@ Array* GlobalArray::imax(const Array *rhs)
         operate(*array,
                 &GlobalArray::operate_max,
                 &GlobalArray::operate_max_patch);
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
 #define DATATYPE_EXPAND(DT,T) \
         if (DT == type) { \
             GlobalArray array_tmp(DT, shape); \
@@ -905,7 +929,8 @@ Array* GlobalArray::imax(const Array *rhs)
                     &GlobalArray::operate_max_patch); \
         } else
 #include "DataType.def"
-    } else {
+    }
+    else {
         ERR("GlobalArray::imax(Array*) fell through");
     }
 
@@ -920,13 +945,13 @@ void GlobalArray::operate_min(int that_handle)
 
 
 void GlobalArray::operate_min_patch(int that_handle,
-        vector<int64_t> &my_lo, vector<int64_t> &my_hi,
-        vector<int64_t> &that_lo, vector<int64_t> &that_hi)
+                                    vector<int64_t> &my_lo, vector<int64_t> &my_hi,
+                                    vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
     GA_Elem_minimum_patch64(
-            handle, &my_lo[0], &my_hi[0],
-            that_handle, &that_lo[0], &that_hi[0],
-            handle, &my_lo[0], &my_hi[0]);
+        handle, &my_lo[0], &my_hi[0],
+        that_handle, &that_lo[0], &that_hi[0],
+        handle, &my_lo[0], &my_hi[0]);
 }
 
 
@@ -947,7 +972,8 @@ Array* GlobalArray::imin(const Array *rhs)
         operate(*array,
                 &GlobalArray::operate_min,
                 &GlobalArray::operate_min_patch);
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
 #define DATATYPE_EXPAND(DT,T) \
         if (DT == type) { \
             GlobalArray array_tmp(DT, shape); \
@@ -957,7 +983,8 @@ Array* GlobalArray::imin(const Array *rhs)
                     &GlobalArray::operate_min_patch); \
         } else
 #include "DataType.def"
-    } else {
+    }
+    else {
         ERR("GlobalArray::imin(Array*) fell through");
     }
 

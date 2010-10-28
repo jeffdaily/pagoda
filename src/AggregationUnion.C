@@ -37,7 +37,7 @@ AggregationUnion::~AggregationUnion()
     TIMING("AggregationUnion::~AggregationUnion()");
 
     transform(datasets.begin(), datasets.end(), datasets.begin(),
-            pagoda::ptr_deleter<Dataset*>);
+              pagoda::ptr_deleter<Dataset*>);
 }
 
 
@@ -86,7 +86,8 @@ void AggregationUnion::add(Dataset *dataset)
         Dimension *orig_dim = get_dim(other_dim->get_name());
         if (! orig_dim) {
             dims.push_back(other_dim);
-        } else {
+        }
+        else {
             // dim already exists, but make sure the sizes are the same
             if (orig_dim->get_size() != other_dim->get_size()) {
                 ERR("union dimension mismatch");
@@ -126,7 +127,8 @@ FileFormat AggregationUnion::get_file_format() const
 {
     if (datasets.empty()) {
         return FF_UNKNOWN;
-    } else {
+    }
+    else {
         return datasets.front()->get_file_format();
     }
 }

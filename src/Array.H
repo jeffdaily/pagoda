@@ -118,7 +118,7 @@ class Array
 
         /**
          * Copies all elements from the given Array into this Array.
-         * 
+         *
          * The arrays must be the same type and shape.
          *
          * @param[in] src the Array to copy
@@ -131,7 +131,7 @@ class Array
          * The patches of Arrays may be of different shapes but must have the
          * same number of elements.  Patches must be nonoverlapping
          * (if src == dst).
-         * 
+         *
          * @param[in] src the Array to copy
          * @param[in] src_lo lower bounds of src Array
          * @param[in] src_hi upper bounds of src Array
@@ -139,10 +139,10 @@ class Array
          * @param[in] dst_hi upper bounds of dst Array
          */
         virtual void copy(const Array *src,
-                const vector<int64_t> &src_lo,
-                const vector<int64_t> &src_hi,
-                const vector<int64_t> &dst_lo,
-                const vector<int64_t> &dst_hi) = 0;
+                          const vector<int64_t> &src_lo,
+                          const vector<int64_t> &src_hi,
+                          const vector<int64_t> &dst_lo,
+                          const vector<int64_t> &dst_hi) = 0;
 
         /**
          * Returns true if the distribution of this Array matches the other.
@@ -210,7 +210,7 @@ class Array
          * Caller must cast the returned buffer to the appropriate type and
          * must also free the returned buffer when finished.  Shortcut for a
          * 1-Dimensional get.
-         * 
+         *
          * @param[in] lo
          * @param[in] hi
          * @return the new buffer
@@ -222,7 +222,7 @@ class Array
          * Caller must cast the returned buffer to the appropriate type and
          * must also free the returned buffer when finished.  Shortcut for a
          * 1-Dimensional get.
-         * 
+         *
          * @param[in,out] buffer preallocated local array
          * @param[in] lo
          * @param[in] hi
@@ -234,7 +234,7 @@ class Array
          * Copies data from Array into local buffer and returns the buffer.
          * Caller must cast the returned buffer to the appropriate type and
          * must also free the returned buffer when finished.
-         * 
+         *
          * @param[in] lo
          * @param[in] hi
          * @return the new buffer
@@ -246,7 +246,7 @@ class Array
          * Copies data from Array into local buffer and returns the buffer.
          * Caller must cast the returned buffer to the appropriate type and
          * must also free the returned buffer when finished.
-         * 
+         *
          * @param[in,out] buffer preallocated local array
          * @param[in] lo
          * @param[in] hi
@@ -259,7 +259,7 @@ class Array
         /**
          * Copies data from Array into given buffer and returns the buffer.
          * Caller must cast the returned buffer to the appropriate type.
-         * 
+         *
          * @param[in,out] buffer preallocated local array
          * @param[in] lo
          * @param[in] hi

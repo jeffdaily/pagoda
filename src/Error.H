@@ -34,5 +34,5 @@ do { \
 if (e) { \
     ERR("assertion failed"); \
 } \
-
+ 
 #endif // ERROR_H_

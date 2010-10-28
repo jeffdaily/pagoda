@@ -129,14 +129,14 @@ void pagoda::abort(const char *message, int errorcode)
  * Returns the minimum of all values from all processes.
  *
  * @param[in,out] values the values to take the minimums of
- */ 
+ */
 void pagoda::gop_min(vector<long> &values)
 {
 #if HAVE_GA
     GA_Lgop(&values[0], values.size(), "min");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_LONG, MPI_MIN, MPI_COMM_WORLD);
+                  MPI_LONG, MPI_MIN, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -147,14 +147,14 @@ void pagoda::gop_min(vector<long> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<int> &values)
 {
 #if HAVE_GA
     GA_Igop(&values[0], values.size(), "+");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -165,14 +165,14 @@ void pagoda::gop_sum(vector<int> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<long> &values)
 {
 #if HAVE_GA
     GA_Lgop(&values[0], values.size(), "+");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -183,14 +183,14 @@ void pagoda::gop_sum(vector<long> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<long long> &values)
 {
 #if HAVE_GA && HAVE_GA_LLGOP
     GA_Llgop(&values[0], values.size(), "+");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -202,7 +202,7 @@ void pagoda::gop_sum(vector<long long> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<int64_t> &values)
 {
 #   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
@@ -228,14 +228,14 @@ void pagoda::gop_sum(vector<int64_t> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<float> &values)
 {
 #if HAVE_GA
     GA_Fgop(&values[0], values.size(), "+");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -246,14 +246,14 @@ void pagoda::gop_sum(vector<float> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<double> &values)
 {
 #if HAVE_GA
     GA_Dgop(&values[0], values.size(), "+");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -264,14 +264,14 @@ void pagoda::gop_sum(vector<double> &values)
  * Returns the sum of all values from all processes.
  *
  * @param[in,out] values the values to take the sums of
- */ 
+ */
 void pagoda::gop_sum(vector<long double> &values)
 {
 #if HAVE_GA && HAVE_GA_LDGOP
     GA_Ldgop(&values[0], values.size(), "+");
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-            MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #else
 #   error
 #endif
@@ -327,7 +327,8 @@ bool pagoda::ends_with(const string &fullString, const string &ending)
 
     if (len_string > len_ending) {
         return (0 == fullString.compare(arg1, len_ending, ending));
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -344,8 +345,8 @@ vector<string> pagoda::split(const string &s)
     vector<string> tokens;
     istringstream iss(s);
     copy(istream_iterator<string>(iss),
-            istream_iterator<string>(),
-            back_inserter<vector<string> >(tokens));
+         istream_iterator<string>(),
+         back_inserter<vector<string> >(tokens));
     return tokens;
 }
 
@@ -379,10 +380,11 @@ void pagoda::trim(string& str)
     if (pos != string::npos) {
         str.erase(pos + 1);
         pos = str.find_first_not_of(' ');
-        if(pos != string::npos) {
+        if (pos != string::npos) {
             str.erase(0, pos);
         }
-    } else {
+    }
+    else {
         str.erase(str.begin(), str.end());
     }
 }
@@ -432,7 +434,7 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
     }
     gigabytes = 1.0 / 1073741824.0 * max_size * 8;
     TRACER("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
-            max_name.c_str(), max_size*8, gigabytes);
+           max_name.c_str(), max_size*8, gigabytes);
 
     //max_size = int64_t(max_size * 0.04);
     max_size = int64_t(max_size / pagoda::num_nodes());
@@ -460,10 +462,12 @@ bool pagoda::file_exists(const string &filename)
         // end of its scope
         if ((ifstream(filename.c_str()))) {
             values.push_back(1);
-        } else {
+        }
+        else {
             values.push_back(0);
         }
-    } else {
+    }
+    else {
         values.push_back(0);
     }
     pagoda::gop_sum(values);
@@ -488,10 +492,10 @@ void pagoda::print_backtrace()
     char **strings;
     size_t i;
 
-    size = backtrace (array, 10);
-    strings = backtrace_symbols (array, size);
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
 
-    printf ("Obtained %zd stack frames.\n", size);
+    printf("Obtained %zd stack frames.\n", size);
 
     for (i = 0; i < size; i++) {
 #   if CPP_DEMANGLE
@@ -507,14 +511,15 @@ void pagoda::print_backtrace()
             tmp = abi::__cxa_demangle(name.c_str(), NULL, 0, &status);
             printf("%s%s%s\n", pre.c_str(), tmp, post.c_str());
             free(tmp);
-        } else {
-            printf ("%s\n", strings[i]);
+        }
+        else {
+            printf("%s\n", strings[i]);
         }
 #   else
-        printf ("%s\n", strings[i]);
+        printf("%s\n", strings[i]);
 #   endif
     }
 
-    free (strings);
+    free(strings);
 #endif
 }

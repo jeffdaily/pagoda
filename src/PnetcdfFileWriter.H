@@ -38,17 +38,17 @@ class PnetcdfFileWriter : public FileWriter
         virtual void def_dim(const string &name, int64_t size);
 
         virtual void def_var(const string &name,
-                const vector<string> &dims,
-                const DataType &type,
-                const vector<Attribute*> &atts);
+                             const vector<string> &dims,
+                             const DataType &type,
+                             const vector<Attribute*> &atts);
 
         virtual void write_att(Attribute *att, const string &name=string(""));
 
         virtual void write(Array *array, const string &name);
         virtual void write(Array *array, const string &name,
-                int64_t record);
+                           int64_t record);
         virtual void write(Array *array, const string &name,
-                const vector<int64_t> &start);
+                           const vector<int64_t> &start);
 
         virtual ostream& print(ostream &os) const;
 

@@ -101,9 +101,9 @@ static inline void header(ostringstream &out)
 
 
 static inline void line(ostringstream &out, string name,
-        int calls, int calls_total,
-        uint64_t times, uint64_t times_total, uint64_t times_global,
-        uint64_t bytes)
+                        int calls, int calls_total,
+                        uint64_t times, uint64_t times_total, uint64_t times_global,
+                        uint64_t bytes)
 {
     out << left
         << setw(g_name_width) << name
@@ -122,9 +122,9 @@ static inline void line(ostringstream &out, string name,
 
 // create reverse mapping; calculate sizes of output columns
 static inline void reverse_info(
-        const PnetcdfIOMap &iomap,
-        PnetcdfIOMapR &iomap_reverse,
-        uint64_t &total, int &width, int &name_width)
+    const PnetcdfIOMap &iomap,
+    PnetcdfIOMapR &iomap_reverse,
+    uint64_t &total, int &width, int &name_width)
 {
     uint64_t max = 0;
 
@@ -153,7 +153,7 @@ static inline void reverse_info(
 
 
 static inline void calc_info(const PnetcdfIOMap &iomap,
-        uint64_t &total, int &width)
+                             uint64_t &total, int &width)
 {
     uint64_t max = 0;
 
@@ -182,9 +182,9 @@ PnetcdfTiming::PnetcdfTiming(const string &name)
 
 
 PnetcdfTiming::PnetcdfTiming(
-        const string &name,
-        MPI_Offset count,
-        nc_type type)
+    const string &name,
+    MPI_Offset count,
+    nc_type type)
     :   name(name)
     ,   start(0)
 {
@@ -200,9 +200,9 @@ PnetcdfTiming::PnetcdfTiming(
 
 
 PnetcdfTiming::PnetcdfTiming(
-        const string &name,
-        const vector<MPI_Offset> &count,
-        nc_type type)
+    const string &name,
+    const vector<MPI_Offset> &count,
+    nc_type type)
     :   name(name)
     ,   start(0)
 {
@@ -226,18 +226,32 @@ void PnetcdfTiming::calc_bytes(const vector<MPI_Offset> &count, nc_type type)
         size *= count[i];
     }
     switch (type) {
-        case NC_BYTE:   size *= 1; break;
-        case NC_CHAR:   size *= 1; break;
-        case NC_SHORT:  size *= 2; break;
-        case NC_INT:    size *= 4; break;
-        case NC_FLOAT:  size *= 4; break;
-        case NC_DOUBLE: size *= 8; break;
-        default: ERR("type not recognized");
+        case NC_BYTE:
+            size *= 1;
+            break;
+        case NC_CHAR:
+            size *= 1;
+            break;
+        case NC_SHORT:
+            size *= 2;
+            break;
+        case NC_INT:
+            size *= 4;
+            break;
+        case NC_FLOAT:
+            size *= 4;
+            break;
+        case NC_DOUBLE:
+            size *= 8;
+            break;
+        default:
+            ERR("type not recognized");
     }
     new_size = bytes[name] + size;
     if (new_size < bytes[name]) {
         cerr << pagoda::me << " WARNING: bytes overrun" << endl;
-    } else {
+    }
+    else {
         bytes[name] = new_size;
     }
 }
@@ -255,7 +269,8 @@ PnetcdfTiming::~PnetcdfTiming()
 
         if (new_sum > times[name]) {
             times[name] = new_sum;
-        } else {
+        }
+        else {
             cerr << "WARNING: times overrun: " << name << endl;
         }
     }
@@ -336,10 +351,11 @@ string PnetcdfTiming::get_stats_calls(bool descending)
             uint64_t _bytes = (bytes_it == bytes.end()) ? 0 : bytes_it->second;
 
             line(out, name, it->first, calls_total,
-                    _times, times_total, end_global-start_global,
-                    _bytes);
+                 _times, times_total, end_global-start_global,
+                 _bytes);
         }
-    } else {
+    }
+    else {
         for (PnetcdfIOMapR::iterator it=calls_reverse.begin(),
                 end=calls_reverse.end(); it!=end; ++it) {
         }

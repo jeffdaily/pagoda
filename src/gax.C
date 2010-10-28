@@ -80,7 +80,7 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
     }
 
     //GA_Sync(); // TODO do we need this?
-    
+
     NGA_Distribution64(g_src, me, &lo, &hi);
     elems = hi-lo+1;
 
@@ -136,7 +136,8 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
         partial_sum_op(C_DBL,double,armci_msg_dgop)
         ; // for last else above
 #undef partial_sum_op
-    } else {
+    }
+    else {
         /* broadcast last value to all processes */
         /* then sum those values and add to each element as appropriate */
         NGA_Access64(g_src, &lo, &hi, &ptr_src, NULL);
@@ -216,7 +217,8 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
         TRACER("no elements on this process\n");
         TRACER("no elements on this process\n");
         TRACER("no Clean up\n");
-    } else {
+    }
+    else {
         int64_t elems_src[ndim_src];
         int64_t elems_product_src=1;
         int64_t index[ndim_src];
@@ -244,7 +246,8 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
             /* if any of the local mask counts are zero, no work is needed */
             TRACER("0 == local_counts_product\n");
             TRACER("0 == local_counts_product\n");
-        } else {
+        }
+        else {
             /* determine where the data is to go */
             for (int i=0; i<ndim_src; ++i) {
                 int tmp;
@@ -258,37 +261,37 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
                 //printf("%d,", ld_dst[i]);
             }
             //printf("\n");
-            
+
             /* Create the destination buffer */
             switch (type_src) {
 #define pack_bit_copy(MTYPE,TYPE,FMT) \
                 case MTYPE: \
-                    { \
-                        int64_t buf_dst_index = 0; \
-                        TYPE *buf_src = NULL; \
-                        TYPE *buf_dst = new TYPE[local_counts_product]; \
-                        NGA_Access64(g_src, lo_src, hi_src, &buf_src, ld_src); \
-                        TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
-                        for (int64_t i=0; i<elems_product_src; ++i) { \
-                            unravel64i(i, ndim_src, elems_src, index); \
-                            int okay = 1; \
-                            for (int j=0; j<ndim_src; ++j) { \
-                                okay *= local_masks[j][index[j]]; \
-                            } \
-                            if (0 != okay) { \
-                                buf_dst[buf_dst_index++] = buf_src[i]; \
-                            } \
+                { \
+                    int64_t buf_dst_index = 0; \
+                    TYPE *buf_src = NULL; \
+                    TYPE *buf_dst = new TYPE[local_counts_product]; \
+                    NGA_Access64(g_src, lo_src, hi_src, &buf_src, ld_src); \
+                    TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
+                    for (int64_t i=0; i<elems_product_src; ++i) { \
+                        unravel64i(i, ndim_src, elems_src, index); \
+                        int okay = 1; \
+                        for (int j=0; j<ndim_src; ++j) { \
+                            okay *= local_masks[j][index[j]]; \
                         } \
-                        if (buf_dst_index != local_counts_product) { \
-                            printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
-                            GA_Error("pack: mismatch", buf_dst_index); \
+                        if (0 != okay) { \
+                            buf_dst[buf_dst_index++] = buf_src[i]; \
                         } \
-                        TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
-                        NGA_Put64(g_dst, lo_dst, hi_dst, buf_dst, ld_dst); \
-                        NGA_Release64(g_src, lo_src, hi_src); \
-                        delete [] buf_dst; \
-                        break; \
-                    }
+                    } \
+                    if (buf_dst_index != local_counts_product) { \
+                        printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
+                        GA_Error("pack: mismatch", buf_dst_index); \
+                    } \
+                    TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
+                    NGA_Put64(g_dst, lo_dst, hi_dst, buf_dst, ld_dst); \
+                    NGA_Release64(g_src, lo_src, hi_src); \
+                    delete [] buf_dst; \
+                    break; \
+                }
                 pack_bit_copy(C_INT,int,%d)
                 pack_bit_copy(C_LONG,long,%ld)
                 pack_bit_copy(C_FLOAT,float,%f)
@@ -354,7 +357,8 @@ void gax::enumerate(int g_src, void *start_val, void *inc_val)
     if (0 > src_lo && 0 > src_hi) {
         //TRACER("enumerate result = N/A\n");
         //TRACER("enumerate count = N/A\n");
-    } else {
+    }
+    else {
         loc_lo = 0;
         loc_hi = src_size-1;
         count = 0;
@@ -433,17 +437,21 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
     if (0 > lo_msk && 0 > hi_msk) {
         GA_Lgop(counts, nproc, "+");
         TRACER("unpack1d lo,hi N/A 1\n");
-    } else {
+    }
+    else {
         NGA_Access64(g_msk, &lo_msk, &hi_msk, &mask, NULL);
         for (int64_t i=0,limit=(hi_msk-lo_msk+1); i<limit; ++i) {
-            if (0 != mask[i]) ++(counts[me]);
+            if (0 != mask[i]) {
+                ++(counts[me]);
+            }
         }
         NGA_Release64(g_msk, &lo_msk, &hi_msk);
         mask = NULL;
         GA_Lgop(counts, nproc, "+");
         if (0 == counts[me]) {
             TRACER("unpack1d lo,hi N/A 2\n");
-        } else {
+        }
+        else {
             // tally up where to start the 'get' of the packed array
             for (int i=0; i<me; ++i) {
                 lo_src += counts[i];
@@ -457,23 +465,23 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
             switch (type) {
 #define unpack1d_op(MTYPE,TYPE) \
                 case MTYPE: { \
-                    TYPE srcbuf[hi_src-lo_src+1]; \
-                    TYPE *src = srcbuf; \
-                    TYPE *dst; \
-                    int *msk; \
-                    NGA_Get64(g_src, &lo_src, &hi_src, srcbuf, NULL); \
-                    NGA_Access64(g_dst, &lo_msk, &hi_msk, &dst, NULL); \
-                    NGA_Access64(g_msk, &lo_msk, &hi_msk, &msk, NULL); \
-                    for (size_t i=0,limit=hi_msk-lo_msk+1; i<limit; ++i) { \
-                        if (msk[i] != 0) { \
-                            dst[i] = *src; \
-                            ++src; \
-                        } \
+                TYPE srcbuf[hi_src-lo_src+1]; \
+                TYPE *src = srcbuf; \
+                TYPE *dst; \
+                int *msk; \
+                NGA_Get64(g_src, &lo_src, &hi_src, srcbuf, NULL); \
+                NGA_Access64(g_dst, &lo_msk, &hi_msk, &dst, NULL); \
+                NGA_Access64(g_msk, &lo_msk, &hi_msk, &msk, NULL); \
+                for (size_t i=0,limit=hi_msk-lo_msk+1; i<limit; ++i) { \
+                    if (msk[i] != 0) { \
+                        dst[i] = *src; \
+                        ++src; \
                     } \
-                    NGA_Release64(g_msk, &lo_msk, &hi_msk); \
-                    NGA_Release_update64(g_dst, &lo_msk, &hi_msk); \
-                    break; \
-                }
+                } \
+                NGA_Release64(g_msk, &lo_msk, &hi_msk); \
+                NGA_Release_update64(g_dst, &lo_msk, &hi_msk); \
+                break; \
+            }
                 unpack1d_op(C_INT,int)
                 unpack1d_op(C_LONG,long)
                 unpack1d_op(C_LONGLONG,long long)

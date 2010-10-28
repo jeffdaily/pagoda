@@ -33,7 +33,10 @@ using std::vector;
 #   ifdef __cplusplus
 extern "C"
 #   endif
-int F77_DUMMY_MAIN() { return 1; }
+int F77_DUMMY_MAIN()
+{
+    return 1;
+}
 #endif
 
 
@@ -72,7 +75,7 @@ int main(int argc, char **argv)
                 pagoda::println_zero(str.str());
             }
         }
-        
+
         // we can't share a MaskMap in case the record dimensions differ
         // between ensembles
         for (size_t i=0; i<datasets.size(); ++i) {
@@ -110,7 +113,7 @@ int main(int argc, char **argv)
             Variable *var = all_vars[0][i];
             Array *result = NULL;
             Array *array = NULL;
-            
+
             // read the first var directly into result
             result = var->read(result);
             if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
@@ -130,9 +133,11 @@ int main(int argc, char **argv)
                 array = current_var->read(array);
                 if (op == OP_MAX) {
                     result->imax(array);
-                } else if (op == OP_MIN) {
+                }
+                else if (op == OP_MIN) {
                     result->imin(array);
-                } else {
+                }
+                else {
                     if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
                         // square the values
                         array->imul(array);
@@ -148,7 +153,8 @@ int main(int argc, char **argv)
                 ScalarArray scalar(result->get_type());
                 scalar.fill_value(datasets.size());
                 result->idiv(&scalar);
-            } else if (op == OP_RMSSDN) {
+            }
+            else if (op == OP_RMSSDN) {
                 ScalarArray scalar(result->get_type());
                 scalar.fill_value(datasets.size()-1);
                 result->idiv(&scalar);
@@ -157,7 +163,8 @@ int main(int argc, char **argv)
             // some operations require additional process */
             if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
                 result->ipow(0.5);
-            } else if (op == OP_SQRAVG) {
+            }
+            else if (op == OP_SQRAVG) {
                 result->imul(result);
             }
 
@@ -175,7 +182,8 @@ int main(int argc, char **argv)
 
         pagoda::finalize();
 
-    } catch (CommandException &ex) {
+    }
+    catch (CommandException &ex) {
         for (size_t i=0; i<datasets.size(); ++i) {
             delete datasets[i];
             delete masks[i];
@@ -186,9 +194,11 @@ int main(int argc, char **argv)
         pagoda::println_zero(ex.what());
         pagoda::finalize();
         return EXIT_FAILURE;
-    } catch (PagodaException &ex) {
+    }
+    catch (PagodaException &ex) {
         pagoda::abort(ex.what());
-    } catch (exception &ex) {
+    }
+    catch (exception &ex) {
         pagoda::abort(ex.what());
     }
 

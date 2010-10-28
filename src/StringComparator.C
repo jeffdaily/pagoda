@@ -22,9 +22,9 @@ StringComparator::StringComparator()
 
 
 StringComparator::StringComparator(
-        const string &value,
-        bool ignore_case,
-        bool within)
+    const string &value,
+    bool ignore_case,
+    bool within)
     :   value(value)
     ,   ignore_case(ignore_case)
     ,   within(within)
@@ -60,7 +60,7 @@ StringComparator::~StringComparator()
 }
 
 
-bool StringComparator::operator() (const string &that) const
+bool StringComparator::operator()(const string &that) const
 {
     TIMING("StringComparator::operator()(string)");
     string mine = value;
@@ -71,7 +71,8 @@ bool StringComparator::operator() (const string &that) const
     }
     if (within) {
         return mine.find(theirs) != string::npos;
-    } else {
+    }
+    else {
         return mine == theirs;
     }
 }
@@ -80,14 +81,14 @@ bool StringComparator::operator() (const string &that) const
 /**
  * Return true if any of strings in input vector match our value.
  */
-bool StringComparator::operator() (const vector<string> &that) const
+bool StringComparator::operator()(const vector<string> &that) const
 {
     TIMING("StringComparator::operator()(vector<string>)");
     vector<string>::const_iterator it = that.begin();
     vector<string>::const_iterator end = that.end();
 
     for (; it!=end; ++it) {
-        if (this->operator() (*it)) {
+        if (this->operator()(*it)) {
             return true;
         }
     }

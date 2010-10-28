@@ -33,14 +33,14 @@ class NodeZeroArray : public Array
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
-                const vector<int64_t> &src_lo,
-                const vector<int64_t> &src_hi,
-                const vector<int64_t> &dst_lo,
-                const vector<int64_t> &dst_hi);
+                          const vector<int64_t> &src_lo,
+                          const vector<int64_t> &src_hi,
+                          const vector<int64_t> &dst_lo,
+                          const vector<int64_t> &dst_hi);
 
         virtual bool owns_data() const;
         virtual void get_distribution(
-                vector<int64_t> &lo, vector<int64_t> &hi) const;
+            vector<int64_t> &lo, vector<int64_t> &hi) const;
         virtual void* access();
         virtual void* access() const;
         virtual void release() const;
@@ -115,7 +115,8 @@ NodeZeroArray<T>::NodeZeroArray(const vector<int64_t> &shape)
         for (size_t i=0; i<hi.size(); ++i) {
             hi[i] -= 1;
         }
-    } else {
+    }
+    else {
         lo.assign(shape.size(), -1);
         hi.assign(shape.size(), -2);
     }
@@ -200,7 +201,8 @@ void NodeZeroArray<T>::copy(const Array *src)
         if (0 == pagoda::me) {
             std::copy(sa_src->data, sa_src->data+size, data);
         }
-    } else {
+    }
+    else {
         // passed Array is not a NodeZeroArray -- this is a full copy to node
         // zero which could be expensive in terms of memory on that node
         if (0 == pagoda::me) {
@@ -224,9 +226,10 @@ void NodeZeroArray<T>::copy(const Array *src, const vector<int64_t> &src_lo, con
 template <class T>
 bool NodeZeroArray<T>::owns_data() const
 {
-    if (pagoda::nodeid() == 0){
+    if (pagoda::nodeid() == 0) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -315,10 +318,12 @@ Array* NodeZeroArray<T>::add(const Array *rhs) const
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) += *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) += *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::add(Array*) fell through");
     }
 
@@ -336,10 +341,12 @@ Array* NodeZeroArray<T>::sub(const Array *rhs) const
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) -= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) -= *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::sub(Array*) fell through");
     }
 
@@ -357,10 +364,12 @@ Array* NodeZeroArray<T>::mul(const Array *rhs) const
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) *= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) *= *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::mul(Array*) fell through");
     }
 
@@ -378,10 +387,12 @@ Array* NodeZeroArray<T>::div(const Array *rhs) const
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) /= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         self_copy = new NodeZeroArray<T>(*this);
         (*self_copy) /= *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::div(Array*) fell through");
     }
 
@@ -424,9 +435,11 @@ Array* NodeZeroArray<T>::iadd(const Array *rhs)
 
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         *this += *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         *this += *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::iadd(Array*) fell through");
     }
 
@@ -442,9 +455,11 @@ Array* NodeZeroArray<T>::isub(const Array *rhs)
 
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         *this -= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         *this -= *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::isub(Array*) fell through");
     }
 
@@ -460,9 +475,11 @@ Array* NodeZeroArray<T>::imul(const Array *rhs)
 
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         *this *= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         *this *= *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::imul(Array*) fell through");
     }
 
@@ -478,9 +495,11 @@ Array* NodeZeroArray<T>::idiv(const Array *rhs)
 
     if ((array = dynamic_cast<const NodeZeroArray<T>*>(rhs))) {
         *this /= *array;
-    } else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
+    }
+    else if ((scalar = dynamic_cast<const ScalarArray*>(rhs))) {
         *this /= *scalar;
-    } else {
+    }
+    else {
         ERR("NodeZeroArray<T>::idiv(Array*) fell through");
     }
 

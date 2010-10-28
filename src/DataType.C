@@ -153,39 +153,52 @@ int DataType::to_ga() const
     TIMING("DataType::to_ga()");
 
     if (false) {
-    /*
-    } else if (operator==(DataType::CHAR)) {
-        return C_CHAR;
-    */
-    } else if (operator==(DataType::SHORT)) {
+        /*
+        } else if (operator==(DataType::CHAR)) {
+            return C_CHAR;
+        */
+    }
+    else if (operator==(DataType::SHORT)) {
         throw DataTypeException("GA does not support C short");
-    } else if (operator==(DataType::INT)) {
+    }
+    else if (operator==(DataType::INT)) {
         return C_INT;
-    } else if (operator==(DataType::LONG)) {
+    }
+    else if (operator==(DataType::LONG)) {
         return C_LONG;
-    } else if (operator==(DataType::LONGLONG)) {
+    }
+    else if (operator==(DataType::LONGLONG)) {
         return C_LONGLONG;
-    } else if (operator==(DataType::FLOAT)) {
+    }
+    else if (operator==(DataType::FLOAT)) {
         return C_FLOAT;
-    } else if (operator==(DataType::DOUBLE)) {
+    }
+    else if (operator==(DataType::DOUBLE)) {
         return C_DBL;
-    } else if (operator==(DataType::LONGDOUBLE)) {
+    }
+    else if (operator==(DataType::LONGDOUBLE)) {
 #ifdef C_LDBL
         return C_LDBL;
 #else
         throw DataTypeException("GA does not support C long double");
 #endif
-    } else if (operator==(DataType::UCHAR)) {
+    }
+    else if (operator==(DataType::UCHAR)) {
         throw DataTypeException("GA does not support C unsigned char");
-    } else if (operator==(DataType::USHORT)) {
+    }
+    else if (operator==(DataType::USHORT)) {
         throw DataTypeException("GA does not support C unsigned short");
-    } else if (operator==(DataType::UINT)) {
+    }
+    else if (operator==(DataType::UINT)) {
         throw DataTypeException("GA does not support C unsigned int");
-    } else if (operator==(DataType::ULONG)) {
+    }
+    else if (operator==(DataType::ULONG)) {
         throw DataTypeException("GA does not support C unsigned long");
-    } else if (operator==(DataType::ULONGLONG)) {
+    }
+    else if (operator==(DataType::ULONGLONG)) {
         throw DataTypeException("GA does not support C unsigned long long");
-    } else if (operator==(DataType::STRING)) {
+    }
+    else if (operator==(DataType::STRING)) {
         throw DataTypeException("GA does not support C char*");
     }
 
@@ -202,11 +215,13 @@ nc_type DataType::to_nc() const
 {
     TIMING("DataType::to_nc()");
 
-    if        (operator==(DataType::CHAR)) {
+    if (operator==(DataType::CHAR)) {
         return NC_CHAR;
-    } else if (operator==(DataType::SCHAR)) {
+    }
+    else if (operator==(DataType::SCHAR)) {
         return NC_BYTE;
-    } else if (operator==(DataType::SHORT)) {
+    }
+    else if (operator==(DataType::SHORT)) {
 #if   2 == SIZEOF_SHORT
         return NC_SHORT;
 #elif 4 == SIZEOF_SHORT
@@ -216,7 +231,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from SHORT");
 #endif
-    } else if (operator==(DataType::INT)) {
+    }
+    else if (operator==(DataType::INT)) {
 #if   2 == SIZEOF_INT
         return NC_SHORT;
 #elif 4 == SIZEOF_INT
@@ -226,7 +242,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from INT");
 #endif
-    } else if (operator==(DataType::LONG)) {
+    }
+    else if (operator==(DataType::LONG)) {
 #if   2 == SIZEOF_LONG
         return NC_SHORT;
 #elif 4 == SIZEOF_LONG
@@ -236,7 +253,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from LONG");
 #endif
-    } else if (operator==(DataType::LONGLONG)) {
+    }
+    else if (operator==(DataType::LONGLONG)) {
 #if   2 == SIZEOF_LONG_LONG
         return NC_SHORT;
 #elif 4 == SIZEOF_LONG_LONG
@@ -246,7 +264,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from LONGLONG");
 #endif
-    } else if (operator==(DataType::FLOAT)) {
+    }
+    else if (operator==(DataType::FLOAT)) {
 #if   4 == SIZEOF_FLOAT
         return NC_FLOAT;
 #elif 8 == SIZEOF_FLOAT
@@ -254,7 +273,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from FLOAT");
 #endif
-    } else if (operator==(DataType::DOUBLE)) {
+    }
+    else if (operator==(DataType::DOUBLE)) {
 #if   4 == SIZEOF_DOUBLE
         return NC_FLOAT;
 #elif 8 == SIZEOF_DOUBLE
@@ -262,7 +282,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from DOUBLE");
 #endif
-    } else if (operator==(DataType::LONGDOUBLE)) {
+    }
+    else if (operator==(DataType::LONGDOUBLE)) {
 #if   4 == SIZEOF_LONG_DOUBLE
         return NC_FLOAT;
 #elif 8 == SIZEOF_LONG_DOUBLE
@@ -270,13 +291,15 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from LONGDOUBLE");
 #endif
-    } else if (operator==(DataType::UCHAR)) {
+    }
+    else if (operator==(DataType::UCHAR)) {
 #if HAVE_NETCDF4
         return NC_UBYTE;
 #else
         throw DataTypeException("could not determine nc_type from UCHAR");
 #endif
-    } else if (operator==(DataType::USHORT)) {
+    }
+    else if (operator==(DataType::USHORT)) {
 #if   HAVE_NETCDF4 && 2 == SIZEOF_UNSIGNED_SHORT
         return NC_USHORT;
 #elif HAVE_NETCDF4 && 4 == SIZEOF_UNSIGNED_SHORT
@@ -286,7 +309,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from USHORT");
 #endif
-    } else if (operator==(DataType::UINT)) {
+    }
+    else if (operator==(DataType::UINT)) {
 #if   HAVE_NETCDF4 && 2 == SIZEOF_UNSIGNED_INT
         return NC_USHORT;
 #elif HAVE_NETCDF4 && 4 == SIZEOF_UNSIGNED_INT
@@ -296,7 +320,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from UINT");
 #endif
-    } else if (operator==(DataType::ULONG)) {
+    }
+    else if (operator==(DataType::ULONG)) {
 #if   HAVE_NETCDF4 && 2 == SIZEOF_UNSIGNED_LONG
         return NC_USHORT;
 #elif HAVE_NETCDF4 && 4 == SIZEOF_UNSIGNED_LONG
@@ -306,7 +331,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from ULONG");
 #endif
-    } else if (operator==(DataType::ULONGLONG)) {
+    }
+    else if (operator==(DataType::ULONGLONG)) {
 #if   HAVE_NETCDF4 && 2 == SIZEOF_UNSIGNED_LONG_LONG
         return NC_USHORT;
 #elif HAVE_NETCDF4 && 4 == SIZEOF_UNSIGNED_LONG_LONG
@@ -316,7 +342,8 @@ nc_type DataType::to_nc() const
 #else
         throw DataTypeException("could not determine nc_type from ULONGLONG");
 #endif
-    } else if (operator==(DataType::STRING)) {
+    }
+    else if (operator==(DataType::STRING)) {
 #if   HAVE_NETCDF4
         return NC_STRING;
 #else
@@ -337,14 +364,17 @@ nc_type DataType::to_nc() const
 DataType DataType::to_dt(int type)
 {
     TIMING("DataType::to_dt(int)");
-    
-    if        (NC_NAT == type) { // Not A Type
+
+    if (NC_NAT == type) {        // Not A Type
         throw DataTypeException("NC_NAT not supported");
-    } else if (NC_BYTE == type) { // signed 1 byte integer
+    }
+    else if (NC_BYTE == type) {   // signed 1 byte integer
         return DataType::SCHAR;
-    } else if (NC_CHAR == type) { // ISO/ASCII character
+    }
+    else if (NC_CHAR == type) {   // ISO/ASCII character
         return DataType::CHAR;
-    } else if (NC_SHORT == type) { // signed 2 byte integer
+    }
+    else if (NC_SHORT == type) {   // signed 2 byte integer
 #if   2 == SIZEOF_SHORT
         return DataType::SHORT;
 #elif 2 == SIZEOF_INT
@@ -356,7 +386,8 @@ DataType DataType::to_dt(int type)
 #else
         throw DataTypeException("no corresponding C type for NC_SHORT");
 #endif
-    } else if (NC_INT == type) { // signed 4 byte integer
+    }
+    else if (NC_INT == type) {   // signed 4 byte integer
 #if   4 == SIZEOF_SHORT
         return DataType::SHORT;
 #elif 4 == SIZEOF_INT
@@ -368,7 +399,8 @@ DataType DataType::to_dt(int type)
 #else
         throw DataTypeException("no corresponding C type for NC_INT");
 #endif
-    } else if (NC_FLOAT == type) { // single precision floating point number
+    }
+    else if (NC_FLOAT == type) {   // single precision floating point number
 #if   4 == SIZEOF_FLOAT
         return DataType::FLOAT;
 #elif 4 == SIZEOF_DOUBLE
@@ -378,7 +410,8 @@ DataType DataType::to_dt(int type)
 #else
         throw DataTypeException("no corresponding C type for NC_FLOAT");
 #endif
-    } else if (NC_DOUBLE == type) { // double precision floating point number
+    }
+    else if (NC_DOUBLE == type) {   // double precision floating point number
 #if   8 == SIZEOF_FLOAT
         return DataType::FLOAT;
 #elif 8 == SIZEOF_DOUBLE
@@ -389,9 +422,11 @@ DataType DataType::to_dt(int type)
         throw DataTypeException("no corresponding C type for NC_DOUBLE");
 #endif
 #ifdef HAVE_NETCDF4
-    } else if (NC_UBYTE == type) { // unsigned 1 byte integer
+    }
+    else if (NC_UBYTE == type) {   // unsigned 1 byte integer
         return DataType::UCHAR;
-    } else if (NC_USHORT == type) { // unsigned 2 byte integer
+    }
+    else if (NC_USHORT == type) {   // unsigned 2 byte integer
 #   if   2 == SIZEOF_UNSIGNED_SHORT
         return DataType::USHORT;
 #   elif 2 == SIZEOF_UNSIGNED_INT
@@ -403,7 +438,8 @@ DataType DataType::to_dt(int type)
 #   else
         throw DataTypeException("no corresponding C type for NC_USHORT");
 #   endif
-    } else if (NC_UINT == type) { // unsigned 4 byte integer
+    }
+    else if (NC_UINT == type) {   // unsigned 4 byte integer
 #   if   4 == SIZEOF_UNSIGNED_SHORT
         return DataType::USHORT;
 #   elif 4 == SIZEOF_UNSIGNED_INT
@@ -415,7 +451,8 @@ DataType DataType::to_dt(int type)
 #   else
         throw DataTypeException("no corresponding C type for NC_UINT");
 #   endif
-    } else if (NC_INT64 == type) { // signed 8 byte integer
+    }
+    else if (NC_INT64 == type) {   // signed 8 byte integer
 #   if   8 == SIZEOF_INT
         return DataType::INT;
 #   elif 8 == SIZEOF_LONG
@@ -425,7 +462,8 @@ DataType DataType::to_dt(int type)
 #   else
         throw DataTypeException("no corresponding C type for NC_INT64");
 #   endif
-    } else if (NC_UINT64 == type) { /* unsigned 8 byte integer */
+    }
+    else if (NC_UINT64 == type) {   /* unsigned 8 byte integer */
 #   if   8 == SIZEOF_UNSIGNED_INT
         return DataType::UINT;
 #   elif 8 == SIZEOF_UNSIGNED_LONG
@@ -435,25 +473,32 @@ DataType DataType::to_dt(int type)
 #   else
         throw DataTypeException("no corresponding C type for NC_UINT64");
 #   endif
-    } else if (NC_STRING == type) { /* string */
+    }
+    else if (NC_STRING == type) {   /* string */
         throw DataTypeException("no corresponding C type for NC_STRING");
 #endif /* HAVE_NETCDF4 */
-    /*
-    } else if (C_CHAR == type) {
-        return DataType::CHAR;
-    */
-    } else if (C_INT == type) {
+        /*
+        } else if (C_CHAR == type) {
+            return DataType::CHAR;
+        */
+    }
+    else if (C_INT == type) {
         return DataType::INT;
-    } else if (C_LONG == type) {
+    }
+    else if (C_LONG == type) {
         return DataType::LONG;
-    } else if (C_LONGLONG == type) {
+    }
+    else if (C_LONGLONG == type) {
         return DataType::LONGLONG;
-    } else if (C_FLOAT == type) {
+    }
+    else if (C_FLOAT == type) {
         return DataType::FLOAT;
-    } else if (C_DBL == type) {
+    }
+    else if (C_DBL == type) {
         return DataType::DOUBLE;
 #ifdef C_LDBL
-    } else if (C_LDBL == type) {
+    }
+    else if (C_LDBL == type) {
         return DataType::LONGDOUBLE;
 #endif
     }
@@ -461,18 +506,63 @@ DataType DataType::to_dt(int type)
 }
 
 
-template <> DataType DataType::ctype<char>() { return DataType::CHAR; }
-template <> DataType DataType::ctype<short>() { return DataType::SHORT; }
-template <> DataType DataType::ctype<int>() { return DataType::INT; }
-template <> DataType DataType::ctype<long>() { return DataType::LONG; }
-template <> DataType DataType::ctype<long long>() { return DataType::LONGLONG; }
-template <> DataType DataType::ctype<float>() { return DataType::FLOAT; }
-template <> DataType DataType::ctype<double>() { return DataType::DOUBLE; }
-template <> DataType DataType::ctype<long double>() { return DataType::LONGDOUBLE; }
-template <> DataType DataType::ctype<unsigned char>() { return DataType::UCHAR; }
-template <> DataType DataType::ctype<unsigned short>() { return DataType::USHORT; }
-template <> DataType DataType::ctype<unsigned int>() { return DataType::UINT; }
-template <> DataType DataType::ctype<unsigned long>() { return DataType::ULONG; }
-template <> DataType DataType::ctype<unsigned long long>() { return DataType::ULONGLONG; }
-template <> DataType DataType::ctype<signed char>() { return DataType::SCHAR; }
-template <> DataType DataType::ctype<std::string>() { return DataType::STRING; }
+template <> DataType DataType::ctype<char>()
+{
+    return DataType::CHAR;
+}
+template <> DataType DataType::ctype<short>()
+{
+    return DataType::SHORT;
+}
+template <> DataType DataType::ctype<int>()
+{
+    return DataType::INT;
+}
+template <> DataType DataType::ctype<long>()
+{
+    return DataType::LONG;
+}
+template <> DataType DataType::ctype<long long>()
+{
+    return DataType::LONGLONG;
+}
+template <> DataType DataType::ctype<float>()
+{
+    return DataType::FLOAT;
+}
+template <> DataType DataType::ctype<double>()
+{
+    return DataType::DOUBLE;
+}
+template <> DataType DataType::ctype<long double>()
+{
+    return DataType::LONGDOUBLE;
+}
+template <> DataType DataType::ctype<unsigned char>()
+{
+    return DataType::UCHAR;
+}
+template <> DataType DataType::ctype<unsigned short>()
+{
+    return DataType::USHORT;
+}
+template <> DataType DataType::ctype<unsigned int>()
+{
+    return DataType::UINT;
+}
+template <> DataType DataType::ctype<unsigned long>()
+{
+    return DataType::ULONG;
+}
+template <> DataType DataType::ctype<unsigned long long>()
+{
+    return DataType::ULONGLONG;
+}
+template <> DataType DataType::ctype<signed char>()
+{
+    return DataType::SCHAR;
+}
+template <> DataType DataType::ctype<std::string>()
+{
+    return DataType::STRING;
+}

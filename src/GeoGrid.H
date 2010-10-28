@@ -47,7 +47,7 @@ class GeoGrid : public Grid
         GeoGrid(const GeoGrid &that);
 
         Variable* get_coord(const string &att_name,
-                const string &coord_name, const string &dim_name);
+                            const string &coord_name, const string &dim_name);
         Dimension* get_dim(const string &att_name, const string &dim_name);
         Variable* get_topology(const string &att_name, const string &var_name);
 

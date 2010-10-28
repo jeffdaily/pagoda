@@ -41,16 +41,16 @@ class AbstractDataset : public Dataset
         virtual Grid* get_grid();
 
         virtual Attribute* get_att(const string &name,
-                bool ignore_case=false, bool within=false) const;
+                                   bool ignore_case=false, bool within=false) const;
         virtual Attribute* get_att(const vector<string> &names,
-                bool ignore_case=false, bool within=false) const;
+                                   bool ignore_case=false, bool within=false) const;
 
         virtual Dimension* get_dim(const string &name,
-                bool ignore_case=false, bool within=false) const;
+                                   bool ignore_case=false, bool within=false) const;
         virtual Dimension* get_udim() const;
 
         virtual Variable* get_var(const string &name,
-                bool ignore_case=false, bool within=false) const;
+                                  bool ignore_case=false, bool within=false) const;
 
         virtual void set_masks(MaskMap *masks);
         virtual void push_masks(MaskMap *masks);

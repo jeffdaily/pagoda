@@ -60,7 +60,8 @@ void PgeaCommands::parse(int argc, char **argv)
         if (find(VALID.begin(),VALID.end(),op_type) == VALID.end()) {
             throw CommandException("operator '" + op_type + "' not recognized");
         }
-    } else {
+    }
+    else {
         op_type = OP_AVG;
     }
 }

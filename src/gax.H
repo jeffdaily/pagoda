@@ -1,7 +1,8 @@
 #ifndef GAX_H_
 #define GAX_H_
 
-namespace gax {
+namespace gax
+{
 
     void partial_sum(int g_src, int g_dst, int excl);
     void pack(int g_src, int g_dst, int *g_masks, int *g_masksums);

@@ -14,97 +14,97 @@
 unsigned int CommandLineOption::WIDTH(20);
 
 CommandLineOption CommandLineOption::ALPHABETIZE(
-        'a', "alphabetize", false,
-        "disable alphabetization of extracted variables");
+    'a', "alphabetize", false,
+    "disable alphabetization of extracted variables");
 CommandLineOption CommandLineOption::APPEND(
-        'A', "append", false,
-        "append to existing output file, if any");
+    'A', "append", false,
+    "append to existing output file, if any");
 CommandLineOption CommandLineOption::AUXILIARY(
-        'X', "auxiliary", true,
-        "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");
+    'X', "auxiliary", true,
+    "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");
 CommandLineOption CommandLineOption::AVG_TYPE(
-        'y', "op_typ", true,
-        "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
+    'y', "op_typ", true,
+    "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
 CommandLineOption CommandLineOption::CDF3(
-        '3', "3", false,
-        "output file in netCDF3 CLASSIC (32-bit offset) storage format");
+    '3', "3", false,
+    "output file in netCDF3 CLASSIC (32-bit offset) storage format");
 CommandLineOption CommandLineOption::CDF4(
-        '6', "64", false,
-        "output file in netCDF3 64-bit offset storage format");
+    '6', "64", false,
+    "output file in netCDF3 64-bit offset storage format");
 CommandLineOption CommandLineOption::CDF5(
-        '5', "5", false,
-        "output file in parallel netCDF 64-bit data format");
+    '5', "5", false,
+    "output file in parallel netCDF 64-bit data format");
 CommandLineOption CommandLineOption::COORDS(
-        'c', "coords", false,
-        "all coordinate variables will be processed",
-        "crd");
+    'c', "coords", false,
+    "all coordinate variables will be processed",
+    "crd");
 CommandLineOption CommandLineOption::DIMENSION(
-        'd', "dimension", true,
-        "dim[,min[,max[,stride]]]",
-        "dmn");
+    'd', "dimension", true,
+    "dim[,min[,max[,stride]]]",
+    "dmn");
 CommandLineOption CommandLineOption::EXCLUDE(
-        'x', "exclude", false,
-        "extract all variables EXCEPT those specified with -v",
-        "xcl");
+    'x', "exclude", false,
+    "extract all variables EXCEPT those specified with -v",
+    "xcl");
 CommandLineOption CommandLineOption::FILE_FORMAT(
-        0, "file_format", true,
-        "=classic same as -3* =64bit same as -6* =64data same as -5",
-        "fl_fmt");
+    0, "file_format", true,
+    "=classic same as -3* =64bit same as -6* =64data same as -5",
+    "fl_fmt");
 CommandLineOption CommandLineOption::FIX_RECORD_DIMENSION(
-        0, "fix_rec_dmn", false,
-        "change record dimension into fixed dimension in output file");
+    0, "fix_rec_dmn", false,
+    "change record dimension into fixed dimension in output file");
 CommandLineOption CommandLineOption::HEADER_PAD(
-        0, "header_pad", true,
-        "pad output header with indicated number of bytes",
-        "hdr_pad");
+    0, "header_pad", true,
+    "pad output header with indicated number of bytes",
+    "hdr_pad");
 CommandLineOption CommandLineOption::HELP(
-        'h', "help", false,
-        "print this usage information and exit");
+    'h', "help", false,
+    "print this usage information and exit");
 CommandLineOption CommandLineOption::HISTORY(
-        'h', "history", false,
-        "do not append to 'history' global attribute",
-        "hst");
+    'h', "history", false,
+    "do not append to 'history' global attribute",
+    "hst");
 CommandLineOption CommandLineOption::INPUT_PATH(
-        'p', "path", true,
-        "path prefix for all input filenames",
-        "pth");
+    'p', "path", true,
+    "path prefix for all input filenames",
+    "pth");
 CommandLineOption CommandLineOption::JOIN(
-        'j', "join", true,
-        "join all input files on the given dimension");
+    'j', "join", true,
+    "join all input files on the given dimension");
 CommandLineOption CommandLineOption::LATLONBOX(
-        'b', "box", true,
-        "north,south,east,west lat/lon bounding box");
+    'b', "box", true,
+    "north,south,east,west lat/lon bounding box");
 CommandLineOption CommandLineOption::NO_COORDS(
-        'C', "no-coords", false,
-        "associated coordinate variables should not be processed");
+    'C', "no-coords", false,
+    "associated coordinate variables should not be processed");
 CommandLineOption CommandLineOption::OPERATION(
-        'y', "operation", true,
-        "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");
+    'y', "operation", true,
+    "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");
 CommandLineOption CommandLineOption::OP_TYPE(
-        'y', "op_typ", true,
-        "binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
+    'y', "op_typ", true,
+    "binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
 CommandLineOption CommandLineOption::OUTPUT(
-        'o', "output", true,
-        "output file name (or use last positional argument)",
-        "fl_out");
+    'o', "output", true,
+    "output file name (or use last positional argument)",
+    "fl_out");
 CommandLineOption CommandLineOption::OVERWRITE(
-        'O', "overwrite", false,
-        "overwrite existing output file, if any",
-        "ovr");
+    'O', "overwrite", false,
+    "overwrite existing output file, if any",
+    "ovr");
 CommandLineOption CommandLineOption::TOPOLOGY(
-        'T', "topology", false,
-        "do not process toplogy variables");
+    'T', "topology", false,
+    "do not process toplogy variables");
 CommandLineOption CommandLineOption::UNION(
-        'u', "union", false,
-        "take the union of all input files");
+    'u', "union", false,
+    "take the union of all input files");
 CommandLineOption CommandLineOption::VARIABLE(
-        'v', "variable", true,
-        "var1[,var2[,...]] variable(s) to process");
+    'v', "variable", true,
+    "var1[,var2[,...]] variable(s) to process");
 
 
 CommandLineOption::CommandLineOption(const int &value, const string &name,
-        const bool &argument, const string &description,
-        const string &extra_name1, const string &extra_name2)
+                                     const bool &argument, const string &description,
+                                     const string &extra_name1, const string &extra_name2)
     :   _value(value)
     ,   _names()
     ,   _has_argument(argument)
@@ -228,7 +228,8 @@ string CommandLineOption::get_usage() const
     if (usage.size() >= WIDTH) {
         usage += "\n";
         usage += space;
-    } else {
+    }
+    else {
         while (usage.size() < WIDTH) {
             usage += " ";
         }
@@ -248,7 +249,8 @@ string CommandLineOption::get_usage() const
             usage += "\n";
             usage += space;
             length = 0;
-        } else {
+        }
+        else {
             usage += " ";
             usage += parts[i];
             length += 1 + parts[i].size();
@@ -272,8 +274,7 @@ string CommandLineOption::get_option() const
 }
 
 
-struct option CommandLineOption::get_long_option() const
-{
+struct option CommandLineOption::get_long_option() const {
     struct option ret;
 
     ret.name = _names.front().c_str();
@@ -324,8 +325,7 @@ vector<string> CommandLineOption::get_arguments() const
 }
 
 
-struct option CommandLineOption::get_long_opt_null()
-{
+struct option CommandLineOption::get_long_opt_null() {
     struct option ret;
 
     ret.name = NULL;

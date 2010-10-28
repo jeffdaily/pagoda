@@ -11,9 +11,9 @@ using std::runtime_error;
  */
 class NotImplementedException : public runtime_error
 {
-  public:
-    NotImplementedException(const string& s)
-      : runtime_error(s) {}
+    public:
+        NotImplementedException(const string& s)
+            : runtime_error(s) {}
 };
 
 #endif // NOTIMPLEMENTEDEXCEPTION_H_

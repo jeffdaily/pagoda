@@ -30,8 +30,8 @@ namespace ncmpi
     void     end_indep_data(int ncid);
     void     close(int ncid);
 
-    int  def_dim   (int ncid, const string &name, MPI_Offset len);
-    int  def_var   (int ncid, const string &name, nc_type xtype, const vector<int> &dimids);
+    int  def_dim(int ncid, const string &name, MPI_Offset len);
+    int  def_var(int ncid, const string &name, nc_type xtype, const vector<int> &dimids);
     void rename_dim(int ncid, int dimid, const string &name);
     void rename_var(int ncid, int varid, const string &name);
 
@@ -53,14 +53,14 @@ namespace ncmpi
     vector<int> inq_vardimid(int ncid, int varid);
     int         inq_varnatts(int ncid, int varid);
 
-    void        inq_att    (int ncid, int varid, const string &name, nc_type &xtype, MPI_Offset &len);
-    int         inq_attid  (int ncid, int varid, const string &name);
+    void        inq_att(int ncid, int varid, const string &name, nc_type &xtype, MPI_Offset &len);
+    int         inq_attid(int ncid, int varid, const string &name);
     nc_type     inq_atttype(int ncid, int varid, const string &name);
-    MPI_Offset  inq_attlen (int ncid, int varid, const string &name);
+    MPI_Offset  inq_attlen(int ncid, int varid, const string &name);
     string      inq_attname(int ncid, int varid, int attnum);
-    void        copy_att   (int ncid, int varid, const string &name, int ncid_out, int varid_out);
-    void        rename_att (int ncid, int varid, const string &name, const string &newname);
-    void        del_att    (int ncid, int varid, const string &name);
+    void        copy_att(int ncid, int varid, const string &name, int ncid_out, int varid_out);
+    void        rename_att(int ncid, int varid, const string &name, const string &newname);
+    void        del_att(int ncid, int varid, const string &name);
 
     void put_att(int ncid, int varid, const string &name, const string &values);
     void put_att(int ncid, int varid, const string &name, const vector<char> &values, nc_type xtype=NC_CHAR);
@@ -124,7 +124,7 @@ namespace ncmpi
     int iget_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, long *ip);
     int iget_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, float *ip);
     int iget_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, double *ip);
-    
+
     void wait_all(int ncid, vector<int> &array_of_requests, vector<int> &array_of_statuses);
 
     /*

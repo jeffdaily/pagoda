@@ -126,7 +126,7 @@ class GridTypeException : public PagodaException
             :   PagodaException(where,what)
         {}
         explicit GridTypeException(const string &where, const string &what,
-                int value)
+                                   int value)
             :   PagodaException(where,what,value)
         {}
         explicit GridTypeException(const string &what, int value)
@@ -151,7 +151,7 @@ class GridException : public PagodaException
             :   PagodaException(where,what)
         {}
         explicit GridException(const string &where, const string &what,
-                int value)
+                               int value)
             :   PagodaException(where,what,value)
         {}
 };

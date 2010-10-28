@@ -11,9 +11,9 @@ using std::runtime_error;
  */
 class IndexOutOfBoundsException : public runtime_error
 {
-  public:
-    IndexOutOfBoundsException(const string& s)
-      : runtime_error(s) {}
+    public:
+        IndexOutOfBoundsException(const string& s)
+            : runtime_error(s) {}
 };
 
 #endif // INDEXOUTOFBOUNDSEXCEPTION_H_

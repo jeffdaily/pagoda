@@ -15,7 +15,8 @@ using std::set;
 using std::string;
 using std::vector;
 
-class Attribute; class Dataset;
+class Attribute;
+class Dataset;
 class Dimension;
 class FileWriter;
 class Variable;

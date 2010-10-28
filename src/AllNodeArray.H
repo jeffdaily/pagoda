@@ -34,14 +34,14 @@ class AllNodeArray : public Array
 
         virtual void copy(const Array *src);
         virtual void copy(const Array *src,
-                const vector<int64_t> &src_lo,
-                const vector<int64_t> &src_hi,
-                const vector<int64_t> &dst_lo,
-                const vector<int64_t> &dst_hi);
+                          const vector<int64_t> &src_lo,
+                          const vector<int64_t> &src_hi,
+                          const vector<int64_t> &dst_lo,
+                          const vector<int64_t> &dst_hi);
 
         virtual bool owns_data() const;
         virtual void get_distribution(
-                vector<int64_t> &lo, vector<int64_t> &hi) const;
+            vector<int64_t> &lo, vector<int64_t> &hi) const;
         virtual void* access();
         virtual void* access() const;
         virtual void release() const;
@@ -99,7 +99,7 @@ AllNodeArray<T>::AllNodeArray(DataType type, vector<int64_t> shape)
     ,   lo(shape.size(), 0)
     ,   hi(shape)
 {
-    // hi is really shape -1 
+    // hi is really shape -1
     for (size_t i=0; i<hi.size(); i++) {
         hi[i] -= 1;
     }
@@ -194,7 +194,7 @@ bool AllNodeArray<T>::owns_data() const
 
 template <class T>
 void AllNodeArray<T>::get_distribution(
-        vector<int64_t> &lo, vector<int64_t> &hi) const
+    vector<int64_t> &lo, vector<int64_t> &hi) const
 {
     lo = this->lo;
     hi = this->hi;

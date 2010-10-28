@@ -51,11 +51,11 @@ PnetcdfDataset::~PnetcdfDataset()
     TIMING("PnetcdfDataset::~PnetcdfDataset()");
     using pagoda::ptr_deleter;
     transform(atts.begin(), atts.end(), atts.begin(),
-            ptr_deleter<PnetcdfAttribute*>);
+              ptr_deleter<PnetcdfAttribute*>);
     transform(dims.begin(), dims.end(), dims.begin(),
-            ptr_deleter<PnetcdfDimension*>);
+              ptr_deleter<PnetcdfDimension*>);
     transform(vars.begin(), vars.end(), vars.begin(),
-            ptr_deleter<PnetcdfVariable*>);
+              ptr_deleter<PnetcdfVariable*>);
     close();
 }
 
@@ -156,11 +156,14 @@ FileFormat PnetcdfDataset::get_file_format() const
     int format = ncmpi::inq_format(ncid);
     if (format == NC_FORMAT_64BIT_DATA) {
         return FF_PNETCDF_CDF5;
-    } else if (format == NC_FORMAT_64BIT) {
+    }
+    else if (format == NC_FORMAT_64BIT) {
         return FF_PNETCDF_CDF2;
-    } else if (format == NC_FORMAT_CLASSIC) {
+    }
+    else if (format == NC_FORMAT_CLASSIC) {
         return FF_PNETCDF_CDF1;
-    } else {
+    }
+    else {
         ERR("unknown file format");
     }
     return FF_UNKNOWN;

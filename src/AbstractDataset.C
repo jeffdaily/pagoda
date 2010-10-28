@@ -29,7 +29,7 @@ AbstractDataset::~AbstractDataset()
 {
     TIMING("AbstractDataset::~AbstractDataset()");
     transform(grids.begin(), grids.end(), grids.begin(),
-            pagoda::ptr_deleter<Grid*>);
+              pagoda::ptr_deleter<Grid*>);
 }
 
 
@@ -53,7 +53,7 @@ Grid* AbstractDataset::get_grid()
 
 
 Attribute* AbstractDataset::get_att(
-        const string &name, bool ignore_case, bool within) const
+    const string &name, bool ignore_case, bool within) const
 {
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
@@ -76,7 +76,7 @@ Attribute* AbstractDataset::get_att(
 
 
 Attribute* AbstractDataset::get_att(
-        const vector<string> &names, bool ignore_case, bool within) const
+    const vector<string> &names, bool ignore_case, bool within) const
 {
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
@@ -99,7 +99,7 @@ Attribute* AbstractDataset::get_att(
 
 
 Dimension* AbstractDataset::get_dim(
-        const string &name, bool ignore_case, bool within) const
+    const string &name, bool ignore_case, bool within) const
 {
     vector<Dimension*> dims = get_dims();
     vector<Dimension*>::const_iterator it = dims.begin();
@@ -138,7 +138,7 @@ Dimension* AbstractDataset::get_udim() const
 
 
 Variable* AbstractDataset::get_var(
-        const string &name, bool ignore_case, bool within) const
+    const string &name, bool ignore_case, bool within) const
 {
     TIMING("AbstractDataset::get_var(string,bool,bool)");
     vector<Variable*> vars = get_vars();
@@ -175,7 +175,8 @@ MaskMap* AbstractDataset::pop_masks()
 {
     if (masks.empty()) {
         return NULL;
-    } else {
+    }
+    else {
         MaskMap *ret = masks.back();
         masks.pop_back();
         return ret;
@@ -187,7 +188,8 @@ MaskMap* AbstractDataset::get_masks() const
 {
     if (masks.empty()) {
         return NULL;
-    } else {
+    }
+    else {
         return masks.back();
     }
 }

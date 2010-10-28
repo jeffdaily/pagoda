@@ -22,9 +22,9 @@ using std::vector;
 
 
 PnetcdfAttribute::PnetcdfAttribute(
-        PnetcdfDataset *dataset,
-        int attid,
-        PnetcdfVariable *var)
+    PnetcdfDataset *dataset,
+    int attid,
+    PnetcdfVariable *var)
     :   Attribute()
     ,   dataset(dataset)
     ,   var(var)
@@ -53,8 +53,7 @@ PnetcdfAttribute::PnetcdfAttribute(
     get_attr_values(DataType::INT,    int)
     get_attr_values(DataType::LONG,   long)
     get_attr_values(DataType::FLOAT,  float)
-    get_attr_values(DataType::DOUBLE, double)
-    {
+    get_attr_values(DataType::DOUBLE, double) {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef get_attr_values

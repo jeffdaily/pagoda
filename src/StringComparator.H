@@ -16,13 +16,13 @@ class StringComparator
     public:
         StringComparator();
         StringComparator(const string &value, bool ignore_case=false,
-                bool within=false);
+                         bool within=false);
         StringComparator(const StringComparator &copy);
         StringComparator& operator= (const StringComparator &copy);
         virtual ~StringComparator();
 
-        bool operator() (const string &that) const;
-        bool operator() (const vector<string> &that) const;
+        bool operator()(const string &that) const;
+        bool operator()(const vector<string> &that) const;
 
         void set_value(const string &value);
         void set_ignore_case(bool ignore_case=true);

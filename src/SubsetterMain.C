@@ -33,7 +33,10 @@ static void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_ma
 #   ifdef __cplusplus
 extern "C"
 #   endif
-int F77_DUMMY_MAIN() { return 1; }
+int F77_DUMMY_MAIN()
+{
+    return 1;
+}
 #endif
 
 
@@ -51,7 +54,7 @@ int main(int argc, char **argv)
 #ifdef GATHER_PNETCDF_TIMING
         PnetcdfTiming::start_global = PnetcdfTiming::get_time();
         PRINT_ZERO("PnetcdfTiming::start_global=%ld\n\n",
-                PnetcdfTiming::start_global);
+                   PnetcdfTiming::start_global);
 #endif /* GATHER_PNETCDF_TIMING */
 
         SubsetterCommands cmd;
@@ -78,7 +81,8 @@ int main(int argc, char **argv)
         const vector<string> &infiles = cmd.get_intput_filenames();
         if (cmd.get_join_name().empty()) {
             dataset = agg = new AggregationUnion;
-        } else {
+        }
+        else {
             dataset = agg = new AggregationJoinExisting(cmd.get_join_name());
         }
         for (size_t i=0,limit=infiles.size(); i<limit; ++i) {
@@ -107,7 +111,7 @@ int main(int argc, char **argv)
                 int g_mask = mask->get_handle();
                 if (sum_map.find(g_mask) == sum_map.end()) {
                     TRACER("Creating partial sum for %s\n",
-                            mask->get_name().c_str());
+                           mask->get_name().c_str());
                     sum_map[g_mask] = GA_Duplicate(g_mask, "maskcopy");
                     partial_sum(g_mask, sum_map[g_mask], 0);
                 }
@@ -117,7 +121,7 @@ int main(int argc, char **argv)
 
         writer = FileWriter::create(cmd.get_output_filename());
         TRACER("after writer = FileWriter::create(%s)\n",
-                cmd.get_output_filename().c_str());
+               cmd.get_output_filename().c_str());
         writer->copy_atts(dataset->get_atts());
         TRACER("after writer->copy_atts(dataset->get_atts());\n");
         writer->def_dims(dataset->get_dims());
@@ -128,7 +132,8 @@ int main(int argc, char **argv)
             Variable *var = *it;
             if (var->has_record() && var->get_ndim() > 1) {
                 subset_record(var, writer, sum_map);
-            } else {
+            }
+            else {
                 subset(var, writer, sum_map);
             }
         }
@@ -159,7 +164,8 @@ int main(int argc, char **argv)
         GA_Terminate();
         MPI_Finalize();
         return EXIT_SUCCESS;
-    } catch (exception &ex) {
+    }
+    catch (exception &ex) {
         GA_Error((char*)ex.what(),0);
     }
 }
@@ -196,7 +202,7 @@ void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
             }
             ga_masksums[dimidx] = sum_map[ga_masks[dimidx]];
             TRACER("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
-                    dimidx, ga_masks[dimidx], dimidx, ga_masksums[dimidx]);
+                   dimidx, ga_masks[dimidx], dimidx, ga_masksums[dimidx]);
         }
 
         TRACER("before ga_out (pack_dst) create\n");
@@ -204,7 +210,8 @@ void subset(Variable *var, FileWriter *writer, map<int,int> sum_map)
         pack(var->get_handle(), ga_out, ga_masks, ga_masksums);
         writer->write(ga_out, name);
         GA_Destroy(ga_out);
-    } else {
+    }
+    else {
         // no masks, so a direct copy
         writer->write(var->get_handle(), name);
     }
@@ -237,13 +244,14 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
         dims[0]->get_mask()->get_data(mask_rec);
 #ifdef TRACE
         ostringstream os;
-        os << "Record mask is " << mask_rec[0]; 
+        os << "Record mask is " << mask_rec[0];
         for (size_t i=1; i<mask_rec.size(); ++i) {
             os << ',' << mask_rec[i];
         }
         TRACER(os.str());
 #endif
-    } else {
+    }
+    else {
         TRACER("No record mask, setting to all 1s\n");
         mask_rec.assign(dims[0]->get_size(), 1);
     }
@@ -262,7 +270,7 @@ void subset_record(Variable *var, FileWriter *writer, map<int,int> sum_map)
         }
         ga_masksums[dimidx-1] = sum_map[ga_masks[dimidx-1]];
         TRACER("ga_masks[%zd]=%d,ga_masksums[%zd]=%d\n",
-                dimidx, ga_masks[dimidx-1], dimidx, ga_masksums[dimidx-1]);
+               dimidx, ga_masks[dimidx-1], dimidx, ga_masksums[dimidx-1]);
     }
 
     ga_out = NGA_Create64(matype, ndim_1, &shape_out[1], "pack_dst", NULL);

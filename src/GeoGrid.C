@@ -46,13 +46,13 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
 
     // first, look for one or more special "grid" variable(s)
     // it is dimensionless with a cell_type attribute of "hex"
-    for ( ; var_it!=var_end; ++var_it) {
+    for (; var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
         if (var->get_ndim() == 0) {
             atts = var->get_atts();
             att_it = atts.begin();
             att_end = atts.end();
-            for ( ; att_it!=att_end; ++att_it) {
+            for (; att_it!=att_end; ++att_it) {
                 Attribute *att = *att_it;
                 if (att->get_name() == "cell_type") {
                     if (att->get_string() == "hex") {
@@ -71,7 +71,7 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
     atts = dataset->get_atts();
     att_it = atts.begin();
     att_end = atts.end();
-    for ( ; att_it!=att_end; ++att_it) {
+    for (; att_it!=att_end; ++att_it) {
         Attribute *att = *att_it;
         if (att->get_name() == "grid") {
             if (att->get_string() == "geodesic") {
@@ -132,10 +132,10 @@ GridType GeoGrid::get_type() const
 
 
 Variable* GeoGrid::get_coord(const string &att_name,
-        const string &coord_name, const string &dim_name)
+                             const string &coord_name, const string &dim_name)
 {
     TRACER("GeoGrid::get_coord(%s,%s,%s)\n", att_name.c_str(),
-            coord_name.c_str(), dim_name.c_str());
+           coord_name.c_str(), dim_name.c_str());
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
         if (att) {
@@ -143,8 +143,8 @@ Variable* GeoGrid::get_coord(const string &att_name,
             vector<string>::iterator part;
             if (parts.size() != 2) {
                 EXCEPT(GridException,
-                        "expected " + att_name + " attribute "
-                        "to have two values", parts.size());
+                       "expected " + att_name + " attribute "
+                       "to have two values", parts.size());
             }
             for (part=parts.begin(); part!=parts.end(); ++part) {
                 Variable *var = dataset->get_var(*part);
@@ -153,31 +153,34 @@ Variable* GeoGrid::get_coord(const string &att_name,
                 string long_name;
                 if (!var) {
                     EXCEPT(GridException,
-                            "could not locate variable " + *part, 0);
+                           "could not locate variable " + *part, 0);
                 }
                 standard_name = var->get_standard_name();
                 long_name = var->get_long_name();
                 TRACER("\tcomparing '%s' '%s' '%s'\n",
-                        coord_name.c_str(), standard_name.c_str(),
-                        long_name.c_str());
+                       coord_name.c_str(), standard_name.c_str(),
+                       long_name.c_str());
                 if (!standard_name.empty()) {
                     cmp.set_value(standard_name);
                     if (cmp(coord_name)) {
                         TRACER("\tfound\n");
                         return var;
                     }
-                } else if (!long_name.empty()) {
+                }
+                else if (!long_name.empty()) {
                     cmp.set_value(long_name);
                     if (cmp(coord_name)) {
                         TRACER("\tfound\n");
                         return var;
                     }
-                } else {
+                }
+                else {
                     TRACER("\tNOT FOUND\n");
                 }
             }
         }
-    } else {
+    }
+    else {
         // look for a variable with the given dimension name as its only
         // dimension and then for a substring match within the "standard_name"
         // or "long_name" attributes
@@ -197,7 +200,7 @@ Variable* GeoGrid::get_coord(const string &att_name,
                             || cmp(var->get_long_name())) {
                         return var;
                         /*
-                    } else {
+                                            } else {
                         pagoda::print_zero(
                                 "cmp did not match %s to either %s or %s\n",
                                 coord_name.c_str(),
@@ -252,7 +255,7 @@ Variable* GeoGrid::get_corner_lon()
 
 bool GeoGrid::is_radians()
 {
-    vector<Variable* (GeoGrid::*)()> funcs;
+    vector<Variable*(GeoGrid::*)()> funcs;
     funcs.push_back(&GeoGrid::get_cell_lat);
     funcs.push_back(&GeoGrid::get_cell_lon);
     funcs.push_back(&GeoGrid::get_edge_lat);
@@ -263,7 +266,7 @@ bool GeoGrid::is_radians()
     for (size_t i=0; i<funcs.size(); ++i) {
         Variable *var;
         Attribute *att;
-        Variable* (GeoGrid::*func)() = funcs[i];
+        Variable*(GeoGrid::*func)() = funcs[i];
         if ((var = (this->*func)())) {
             if ((att = var->get_att("units"))
                     && att->get_string() == "radians") {
@@ -284,14 +287,15 @@ Dimension* GeoGrid::get_dim(const string &att_name, const string &dim_name)
             vector<string> parts = pagoda::split(att->get_string());
             if (parts.size() != 2) {
                 EXCEPT(GridException,
-                        "expected " + att_name + " attribute "
-                        "to have two values", parts.size());
-            } else {
+                       "expected " + att_name + " attribute "
+                       "to have two values", parts.size());
+            }
+            else {
                 for (size_t i=0; i<parts.size(); ++i) {
                     Variable *var = dataset->get_var(parts[i]);
                     if (!var) {
                         EXCEPT(GridException,
-                                "could not locate variable" + parts[i], 0);
+                               "could not locate variable" + parts[i], 0);
                     }
                     return var->get_dims().at(0);
                 }
@@ -331,7 +335,7 @@ Variable* GeoGrid::get_topology(const string &att_name, const string &var_name)
             Variable *var = dataset->get_var(var_name);
             if (!var) {
                 EXCEPT(GridException,
-                        "could not locate variable " + var_name, 0);
+                       "could not locate variable " + var_name, 0);
             }
             return var;
         }

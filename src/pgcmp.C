@@ -46,7 +46,8 @@ static void init_map(const vector<T> &v, map<string,T> &m)
 }
 
 
-bool cmp(double x, double y) {
+bool cmp(double x, double y)
+{
     return std::abs(x-y)/std::max(1.0,std::abs(x)) <= 1e-12;
 }
 
@@ -118,7 +119,7 @@ int main(int argc, char **argv)
         init_map(rhs_atts, rhs_atts_m);
         init_map(rhs_dims, rhs_dims_m);
         init_map(rhs_vars, rhs_vars_m);
-        
+
         // attributes are allowed to differ in number, not content
         for (size_t i=0; i<lhs_atts.size(); ++i) {
             Attribute *lhs_att = lhs_atts[i];
@@ -137,7 +138,8 @@ int main(int argc, char **argv)
 
             if (rhs_atts_m.count(name)) {
                 rhs_att = rhs_atts_m[name];
-            } else {
+            }
+            else {
                 ostringstream str;
                 str << "global attribute '" << name << "' not found";
                 //throw str.str();
@@ -158,7 +160,7 @@ int main(int argc, char **argv)
                 continue;
             }
             result = mismatch(lhs_values.begin(), lhs_values.end(),
-                    rhs_values.begin(), cmp);
+                              rhs_values.begin(), cmp);
             if (result.first != lhs_values.end()) {
                 ostringstream str;
                 str << "global attribute '" << name << "' mismatch:" << endl;
@@ -178,7 +180,8 @@ int main(int argc, char **argv)
 
             if (rhs_dims_m.count(name)) {
                 rhs_dim = rhs_dims_m[name];
-            } else {
+            }
+            else {
                 ostringstream str;
                 str << "dimension '" << name << "' not found";
                 throw str.str();
@@ -203,7 +206,8 @@ int main(int argc, char **argv)
 
             if (rhs_vars_m.count(name)) {
                 rhs_var = rhs_vars_m[name];
-            } else {
+            }
+            else {
                 ostringstream str;
                 str << "variable '" << name << "' not found";
                 throw str.str();
@@ -271,16 +275,26 @@ int main(int argc, char **argv)
             delete rhs_array;
         }
 
-        delete lhs; lhs=NULL;
-        delete rhs; rhs=NULL;
+        delete lhs;
+        lhs=NULL;
+        delete rhs;
+        rhs=NULL;
 
-    } catch (string &ex) {
-        if (lhs) { delete lhs; lhs=NULL; }
-        if (rhs) { delete rhs; rhs=NULL; }
+    }
+    catch (string &ex) {
+        if (lhs) {
+            delete lhs;
+            lhs=NULL;
+        }
+        if (rhs) {
+            delete rhs;
+            rhs=NULL;
+        }
         pagoda::println_zero(stderr, ex);
         pagoda::finalize();
         return EXIT_FAILURE;
-    } catch (PagodaException &ex) {
+    }
+    catch (PagodaException &ex) {
         pagoda::abort(ex.what());
     }
 

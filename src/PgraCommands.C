@@ -60,7 +60,8 @@ void PgraCommands::parse(int argc, char **argv)
         if (find(VALID.begin(),VALID.end(),op_type) == VALID.end()) {
             throw CommandException("operator '" + op_type + "' not recognized");
         }
-    } else {
+    }
+    else {
         op_type = OP_AVG;
     }
 }
@@ -80,13 +81,14 @@ Dataset* PgraCommands::get_dataset()
 
     if (input_filenames.size() == 1) {
         dataset = Dataset::open(input_filenames[0]);
-    } else {
+    }
+    else {
         // we need to determine the record dimension
         Dataset *first_dataset = Dataset::open(input_filenames[0]);
         Dimension *udim = first_dataset->get_udim();
         if (udim == NULL) {
             throw CommandException(
-                    "first input file does not contain a record dimension");
+                "first input file does not contain a record dimension");
         }
         join_name = udim->get_name();
         dataset = agg = new AggregationJoinExisting(join_name);

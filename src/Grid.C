@@ -146,24 +146,32 @@ bool Grid::is_coordinate(const Variable *var)
     if (!var) {
         TRACER("\tNULL\n");
         ret = false;
-    } else if (var == get_cell_lat()) {
+    }
+    else if (var == get_cell_lat()) {
         ret = true;
-    } else if (var == get_cell_lon()) {
+    }
+    else if (var == get_cell_lon()) {
         ret = true;
-    } else if (var == get_edge_lat()) {
+    }
+    else if (var == get_edge_lat()) {
         ret = true;
-    } else if (var == get_edge_lon()) {
+    }
+    else if (var == get_edge_lon()) {
         ret = true;
-    } else if (var == get_corner_lat()) {
+    }
+    else if (var == get_corner_lat()) {
         ret = true;
-    } else if (var == get_corner_lon()) {
+    }
+    else if (var == get_corner_lon()) {
         ret = true;
-    } else if (var->get_dims().size() == 1
-            && var->get_dims()[0]->get_name() == var->get_name()) {
+    }
+    else if (var->get_dims().size() == 1
+             && var->get_dims()[0]->get_name() == var->get_name()) {
         // does this Variable have only 1 dim with same name?
         TRACER("\ttruly\n");
         ret = true;
-    } else {
+    }
+    else {
         // does this Variable's name match any "coordinates" attribute?
         // does this Variable's name match any "bounds" attribute?
         const Dataset *dataset = get_dataset();
@@ -218,34 +226,46 @@ bool Grid::is_topology(const Variable *var)
     if (!var) {
         TRACER("Grid::is_topology NULL\n");
         ret = false;
-    } else if (var == get_cell_cells()) {
+    }
+    else if (var == get_cell_cells()) {
         ret = true;
-    } else if (var == get_cell_edges()) {
+    }
+    else if (var == get_cell_edges()) {
         ret = true;
-    } else if (var == get_cell_corners()) {
+    }
+    else if (var == get_cell_corners()) {
         ret = true;
-    } else if (var == get_edge_cells()) {
+    }
+    else if (var == get_edge_cells()) {
         ret = true;
-    } else if (var == get_edge_edges()) {
+    }
+    else if (var == get_edge_edges()) {
         ret = true;
-    } else if (var == get_edge_corners()) {
+    }
+    else if (var == get_edge_corners()) {
         ret = true;
-    } else if (var == get_corner_cells()) {
+    }
+    else if (var == get_corner_cells()) {
         ret = true;
-    } else if (var == get_corner_edges()) {
+    }
+    else if (var == get_corner_edges()) {
         ret = true;
-    } else if (var == get_corner_corners()) {
+    }
+    else if (var == get_corner_corners()) {
         ret = true;
-    } else if (var == get_grid()) {
+    }
+    else if (var == get_grid()) {
         ret = true;
-    } else {
+    }
+    else {
         ret = false;
     }
 
 #ifdef TRACE
     if (ret) {
         TRACER("Grid::is_topology TRUE  %s\n", var->get_name().c_str());
-    } else {
+    }
+    else {
         TRACER("Grid::is_topology FALSE %s\n", var->get_name().c_str());
     }
 #endif

@@ -17,13 +17,17 @@ Array* Array::create(DataType type, vector<int64_t> shape)
     TIMING("Array::create(DataType,vector<int64_t>)");
     if (shape.empty()) {
         return new ScalarArray(type);
-    } else if (type == DataType::CHAR) {
+    }
+    else if (type == DataType::CHAR) {
         return new NodeZeroArray<char>(shape);
-    } else if (type == DataType::UCHAR) {
+    }
+    else if (type == DataType::UCHAR) {
         return new NodeZeroArray<unsigned char>(shape);
-    } else if (type == DataType::SCHAR) {
+    }
+    else if (type == DataType::SCHAR) {
         return new NodeZeroArray<signed char>(shape);
-    } else if (type == DataType::SHORT) {
+    }
+    else if (type == DataType::SHORT) {
         return new NodeZeroArray<short>(shape);
     }
     return new GlobalArray(type, shape);
@@ -43,7 +47,8 @@ Array* Array::create(DataType type, vector<Dimension*> dims)
 
     if (dims.empty()) {
         return new ScalarArray(type);
-    } else if (type == DataType::CHAR) {
+    }
+    else if (type == DataType::CHAR) {
         return new NodeZeroArray<char>(shape);
     }
     return new GlobalArray(type, shape);
@@ -85,7 +90,7 @@ bool Array::is_scalar() const
 bool Array::same_distribution(const Array *other) const
 {
     vector<long> values(1,
-            (get_local_shape() == other->get_local_shape()) ? 1 : 0);
+                        (get_local_shape() == other->get_local_shape()) ? 1 : 0);
 
     TIMING("Array::same_distribution(Array*)");
 
@@ -107,7 +112,7 @@ void* Array::get(void *buffer, int64_t lo, int64_t hi) const
 
 
 void* Array::get(void *buffer,
-        const vector<int64_t> &lo, const vector<int64_t> &hi) const
+                 const vector<int64_t> &lo, const vector<int64_t> &hi) const
 {
     vector<int64_t> ld = pagoda::get_shape(lo,hi);
 
@@ -145,7 +150,7 @@ void Array::put(void *buffer, int64_t lo, int64_t hi)
 
 
 void Array::put(void *buffer,
-        const vector<int64_t> &lo, const vector<int64_t> &hi)
+                const vector<int64_t> &lo, const vector<int64_t> &hi)
 {
     vector<int64_t> ld = pagoda::get_shape(lo,hi);
 

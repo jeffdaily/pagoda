@@ -15,16 +15,16 @@ using std::string;
  */
 class CommandException : public PagodaException
 {
-  public:
-      explicit CommandException(const string &what)
-          : PagodaException(what) {}
+    public:
+        explicit CommandException(const string &what)
+            : PagodaException(what) {}
 
-      explicit CommandException(const string &where, const string &what)
-          : PagodaException(where, what) {}
+        explicit CommandException(const string &where, const string &what)
+            : PagodaException(where, what) {}
 
-      explicit CommandException(const string &where, const string &what,
-              int value)
-          : PagodaException(where, what, value) {}
+        explicit CommandException(const string &where, const string &what,
+                                  int value)
+            : PagodaException(where, what, value) {}
 };
 
 #endif // COMMANDEXCEPTION_H_

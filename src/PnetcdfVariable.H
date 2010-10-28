@@ -48,10 +48,10 @@ class PnetcdfVariable : public AbstractVariable
         Array* read(Array *dst, bool nonblocking) const;
         Array* read(int64_t record, Array *dst, bool nonblocking) const;
         bool find_bit(const vector<Dimension*> &adims,
-                const vector<int64_t> &lo, const vector<int64_t> &hi) const;
+                      const vector<int64_t> &lo, const vector<int64_t> &hi) const;
         void do_read(Array *dst, const vector<MPI_Offset> &start,
-                const vector<MPI_Offset> &count, bool found_bit,
-                bool nonblocking) const;
+                     const vector<MPI_Offset> &count, bool found_bit,
+                     bool nonblocking) const;
 
         PnetcdfDataset *dataset;
         int id;

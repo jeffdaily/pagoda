@@ -42,9 +42,9 @@ class Variable
         virtual string get_standard_name() const = 0;
         virtual string get_long_name() const = 0;
         virtual Attribute* get_att(const string &name,
-                bool ignore_case=false) const = 0;
+                                   bool ignore_case=false) const = 0;
         virtual Attribute* get_att(const vector<string> &names,
-                bool ignore_case=false) const = 0;
+                                   bool ignore_case=false) const = 0;
 
         virtual Dataset* get_dataset() const = 0;
         virtual vector<Mask*> get_masks() const = 0;

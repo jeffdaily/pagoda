@@ -24,9 +24,9 @@ class LatLonBox
 
         bool operator == (const LatLonBox &that) const;
         bool operator != (const LatLonBox &that) const;
-        bool operator <  (const LatLonBox &that) const;
+        bool operator < (const LatLonBox &that) const;
         bool operator <= (const LatLonBox &that) const;
-        bool operator >  (const LatLonBox &that) const;
+        bool operator > (const LatLonBox &that) const;
         bool operator >= (const LatLonBox &that) const;
 
         bool contains(int lat, int lon) const;
@@ -38,7 +38,7 @@ class LatLonBox
         void scale(double value);
 
         LatLonBox& operator*=(double value);
-        LatLonBox  operator* (double value) const;
+        LatLonBox  operator*(double value) const;
 
         static LatLonBox enclose(const LatLonBox &first, const LatLonBox &second);
 

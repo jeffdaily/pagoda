@@ -28,7 +28,7 @@ class AggregationVariable : public AbstractVariable
 {
     public:
         AggregationVariable(Aggregation *agg,
-                AggregationDimension *agg_dim, Variable *var);
+                            AggregationDimension *agg_dim, Variable *var);
         virtual ~AggregationVariable();
 
         void add(Variable *var);

@@ -40,9 +40,9 @@ class AbstractVariable : public Variable
         virtual string get_standard_name() const;
         virtual string get_long_name() const;
         virtual Attribute* get_att(const string &name,
-                bool ignore_case=false) const;
+                                   bool ignore_case=false) const;
         virtual Attribute* get_att(const vector<string> &names,
-                bool ignore_case=false) const;
+                                   bool ignore_case=false) const;
 
         virtual Dataset* get_dataset() const = 0;
         virtual vector<Mask*> get_masks() const;

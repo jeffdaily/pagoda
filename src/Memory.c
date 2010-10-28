@@ -13,7 +13,8 @@ void* pagoda_malloc(size_t bytes, int align, char *name)
     return malloc(bytes);
 }
 
-void pagoda_free(void *ptr) {
+void pagoda_free(void *ptr)
+{
     free(ptr);
 }
 

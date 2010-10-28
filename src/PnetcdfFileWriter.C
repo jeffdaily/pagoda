@@ -35,11 +35,14 @@ static int file_format_to_nc_format(FileFormat format)
     assert(FF_PNETCDF_CDF1 <= format && format <= FF_PNETCDF_CDF5);
     if (format == FF_PNETCDF_CDF1) {
         return 0; /* NC_FORMAT_CLASSIC is default */
-    } else if (format == FF_PNETCDF_CDF2) {
+    }
+    else if (format == FF_PNETCDF_CDF2) {
         return NC_64BIT_OFFSET;
-    } else if (format == FF_PNETCDF_CDF5) {
+    }
+    else if (format == FF_PNETCDF_CDF5) {
         return NC_64BIT_DATA;
-    } else {
+    }
+    else {
         ERR("FileFormat not recognized");
     }
 }
@@ -94,7 +97,7 @@ FileWriter* PnetcdfFileWriter::create()
         ostringstream value;
         value << _header_pad;
         MPI_Info_set(info, "nc_header_align_size",
-                const_cast<char*>(value.str().c_str()));
+                     const_cast<char*>(value.str().c_str()));
     }
 
     // create the output file
@@ -128,13 +131,16 @@ FileWriter* PnetcdfFileWriter::create()
                 }
                 var_shape[name] = shape;
             }
-        } else if (_overwrite){
+        }
+        else if (_overwrite) {
             ncid = ncmpi::create(MPI_COMM_WORLD, filename,
-                    file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
-        } else {
+                                 file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
+        }
+        else {
             ERR("file exists");
         }
-    } else {
+    }
+    else {
         ncid = ncmpi::create(MPI_COMM_WORLD, filename, _file_format, info);
     }
 
@@ -190,7 +196,8 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
     if (size <= 0) {
         if (_fixed_record_dimension > 0) {
             size = _fixed_record_dimension;
-        } else {
+        }
+        else {
             size = NC_UNLIMITED;
         }
     }
@@ -203,10 +210,11 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
             strerr << " old=" << dim_size[name] << " new=" << size;
             ERR(strerr.str());
         }
-    } else {
+    }
+    else {
         id = ncmpi::def_dim(ncid, name, size);
         TRACER("PnetcdfFileWriter::def_dim %s=%lld id=%d\n",
-                name.c_str(), size, id);
+               name.c_str(), size, id);
         dim_id[name] = id;
         dim_size[name] = size;
         if (size == NC_UNLIMITED) {
@@ -217,9 +225,9 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 
 
 void PnetcdfFileWriter::def_var(const string &name,
-        const vector<string> &dims,
-        const DataType &type,
-        const vector<Attribute*> &atts)
+                                const vector<string> &dims,
+                                const DataType &type,
+                                const vector<Attribute*> &atts)
 {
     vector<int> dim_ids;
     vector<int64_t> shape;
@@ -232,7 +240,8 @@ void PnetcdfFileWriter::def_var(const string &name,
     if (_append && (var_id.find(name) != var_id.end())) {
         // if appending and variable exists, overwrite attributes only
         write_atts_id(atts, var_id[name]);
-    } else {
+    }
+    else {
         for (int64_t i=0,limit=dims.size(); i<limit; ++i) {
             dim_ids.push_back(get_dim_id(dims.at(i)));
             shape.push_back(get_dim_size(dims.at(i)));
@@ -399,8 +408,7 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
     put_attr_values(DataType::INT,    int)
     put_attr_values(DataType::LONG,   long)
     put_attr_values(DataType::FLOAT,  float)
-    put_attr_values(DataType::DOUBLE, double)
-    {
+    put_attr_values(DataType::DOUBLE, double) {
         EXCEPT(DataTypeException, "DataType not handled", dt);
     }
 #undef put_attr_values
@@ -432,7 +440,8 @@ void PnetcdfFileWriter::write(Array *array, const string &name)
         if (compare_shape != array_shape) {
             ERR("shape mismatch");
         }
-    } else {
+    }
+    else {
         if (shape_to_compare != array->get_shape()) {
             ERR("shape mismatch");
         }
@@ -454,7 +463,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
 
     TIMING("PnetcdfFileWriter::write(Array*,string,int64_t)");
     TRACER("PnetcdfFileWriter::write record %ld %s\n",
-            (long)record, name.c_str());
+           (long)record, name.c_str());
 
     if (array_shape.size()+1 != shape.size()) {
         ERR("array rank mismatch");
@@ -472,7 +481,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
 
         count[0] = 1;
         std::copy(array_local_shape.begin(), array_local_shape.end(),
-                count.begin()+1);
+                  count.begin()+1);
         start[0] = record;
         array->get_distribution(lo, hi);
         std::copy(lo.begin(), lo.end(), start.begin()+1);
@@ -495,8 +504,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
     write_var_all(int,           DataType::INT)
     write_var_all(long,          DataType::LONG)
     write_var_all(float,         DataType::FLOAT)
-    write_var_all(double,        DataType::DOUBLE)
-    {
+    write_var_all(double,        DataType::DOUBLE) {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef write_var_all
@@ -505,7 +513,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
 
 // it's a "patch" write.  the "hi" is implied by the shape of the given array
 void PnetcdfFileWriter::write(Array *array, const string &name,
-        const vector<int64_t> &start)
+                              const vector<int64_t> &start)
 {
     DataType type = array->get_type();
     vector<int64_t> array_shape = array->get_shape();
@@ -554,8 +562,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
     write_var_all(int,           DataType::INT)
     write_var_all(long,          DataType::LONG)
     write_var_all(float,         DataType::FLOAT)
-    write_var_all(double,        DataType::DOUBLE)
-    {
+    write_var_all(double,        DataType::DOUBLE) {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef write_var_all

@@ -108,8 +108,12 @@ Slice<T>::Slice(string arg)
     }
 
     name = parts[0];
-    if (parts.size() > 3) step = new T(strtol(parts[3].c_str(), NULL, 10));
-    if (parts.size() > 2) stop = new T(strtol(parts[2].c_str(), NULL, 10));
+    if (parts.size() > 3) {
+        step = new T(strtol(parts[3].c_str(), NULL, 10));
+    }
+    if (parts.size() > 2) {
+        stop = new T(strtol(parts[2].c_str(), NULL, 10));
+    }
     start = strtol(parts[1].c_str(), NULL, 10);
 }
 
@@ -142,8 +146,12 @@ Slice<T>& Slice<T>::operator= (const Slice<T> &other)
 template <class T>
 Slice<T>::~Slice()
 {
-    if (stop) delete stop;
-    if (step) delete step;
+    if (stop) {
+        delete stop;
+    }
+    if (step) {
+        delete step;
+    }
 }
 
 
@@ -173,17 +181,19 @@ template <class T>
 ostream& operator<< (ostream &os, const Slice<T> &other)
 {
     os << "Slice("
-        << other.name << ","
-        << other.start << ",";
+       << other.name << ","
+       << other.start << ",";
     if (other.stop) {
         os << *other.stop;
-    } else {
+    }
+    else {
         os << "NULL";
     }
     os << ",";
     if (other.step) {
         os << *other.step;
-    } else {
+    }
+    else {
         os << "NULL";
     }
     os << ")";
@@ -217,34 +227,44 @@ string Slice<T>::get_name() const
 template <class T>
 void Slice<T>::indices(T size, T &_start, T &_stop, T &_step) const
 {
-    if (size < 0) throw RangeException(string("size must be positive"));
+    if (size < 0) {
+        throw RangeException(string("size must be positive"));
+    }
 
     _start = this->start;
-    if (_start < 0) _start += size;
-    if (_start < 0 || _start >= size)
+    if (_start < 0) {
+        _start += size;
+    }
+    if (_start < 0 || _start >= size) {
         throw RangeException(string("start < 0 || start >= size"));
+    }
 
     if (this->stop) {
         _stop = *(this->stop);
-        if (_stop < 0) _stop += size;
-        if (_stop < 0 || _stop > size)
+        if (_stop < 0) {
+            _stop += size;
+        }
+        if (_stop < 0 || _stop > size) {
             throw RangeException(string("stop < 0 || stop > size"));
-    } else {
+        }
+    }
+    else {
         _stop = _start;
     }
 
     if (this->step) {
         _step = *(this->step);
-    } else {
+    }
+    else {
         _step = 1;
     }
 
     if (_start > _stop && _step > 0)
         throw RangeException(
-                string("start > stop && step > 0 (causes no-op loop)"));
+            string("start > stop && step > 0 (causes no-op loop)"));
     if (_start < _stop && _step < 0)
         throw RangeException(
-                string("start < stop && step < 0 (causes infinite loop)"));
+            string("start < stop && step < 0 (causes infinite loop)"));
 }
 
 
@@ -267,34 +287,44 @@ void Slice<T>::indices(T size, T &_start, T &_stop, T &_step) const
 template <class T>
 void Slice<T>::indices_exclusive(T size, T &_start, T &_stop, T &_step) const
 {
-    if (size < 0) throw RangeException(string("size must be positive"));
+    if (size < 0) {
+        throw RangeException(string("size must be positive"));
+    }
 
     _start = this->start;
-    if (_start < 0) _start += size;
-    if (_start < 0 || _start >= size)
+    if (_start < 0) {
+        _start += size;
+    }
+    if (_start < 0 || _start >= size) {
         throw RangeException(string("start < 0 || start >= size"));
+    }
 
     if (this->stop) {
         _stop = *(this->stop);
-        if (_stop < 0) _stop += size;
-        if (_stop < 0 || _stop > size)
+        if (_stop < 0) {
+            _stop += size;
+        }
+        if (_stop < 0 || _stop > size) {
             throw RangeException(string("stop < 0 || stop > size"));
-    } else {
+        }
+    }
+    else {
         _stop = _start + 1;
     }
 
     if (this->step) {
         _step = *(this->step);
-    } else {
+    }
+    else {
         _step = 1;
     }
 
     if (_start > _stop && _step > 0)
         throw RangeException(
-                string("start > stop && step > 0 (causes no-op loop)"));
+            string("start > stop && step > 0 (causes no-op loop)"));
     if (_start < _stop && _step < 0)
         throw RangeException(
-                string("start < stop && step < 0 (causes infinite loop)"));
+            string("start < stop && step < 0 (causes infinite loop)"));
 }
 
 typedef Slice<int64_t> DimSlice;

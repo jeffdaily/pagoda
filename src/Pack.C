@@ -21,10 +21,10 @@ using std::vector;
  * x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
  */
 static inline void unravel64i(
-        int64_t x,
-        int ndim,
-        int64_t *dims,
-        int64_t *result)
+    int64_t x,
+    int ndim,
+    int64_t *dims,
+    int64_t *result)
 {
     //TIMING("unravel64i(int64_t,int,int64_t*,int64_t*)");
     result[ndim-1] = x % dims[ndim-1];
@@ -46,9 +46,9 @@ static inline void unravel64i(
  * x and dims of [a,b,c,d] --> [x/dcb % a, x/dc % b, x/d % c, x/1 % d]
  */
 static inline void unravel64i(
-        int64_t x, 
-        const vector<int64_t> &dims,
-        vector<int64_t> &result)
+    int64_t x,
+    const vector<int64_t> &dims,
+    vector<int64_t> &result)
 {
     //TIMING("unravel64i(int64_t,int,int64_t*,int64_t*)");
     int64_t ndim = dims.size();
@@ -152,7 +152,8 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
 #undef partial_sum_op
         g_dst->release_update();
         g_src->release();
-    } else {
+    }
+    else {
         /* no elements stored on this process */
         /* broadcast dummy value to all processes */
 #define partial_sum_op(DTYPE,TYPE) \
@@ -166,8 +167,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
         partial_sum_op(DataType::LONGLONG,  long long)
         partial_sum_op(DataType::FLOAT,     float)
         partial_sum_op(DataType::DOUBLE,    double)
-        partial_sum_op(DataType::LONGDOUBLE,long double)
-        {
+        partial_sum_op(DataType::LONGDOUBLE,long double) {
             EXCEPT(DataTypeException, "DataType not handled", type_dst);
         }
 #undef partial_sum_op
@@ -179,7 +179,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
  * N-Dimensional packing/subsetting.
  */
 void pagoda::pack(const Array *g_src, Array *g_dst,
-        const vector<Mask*> &g_masks)
+                  const vector<Mask*> &g_masks)
 {
     vector<Array*> sums;
     vector<Array*> masks_copy(g_masks.begin(), g_masks.end());
@@ -197,7 +197,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
  * N-Dimensional packing/subsetting.
  */
 void pagoda::pack(const Array *g_src, Array *g_dst,
-        const vector<Array*> &g_masks, const vector<Array*> &g_masksums)
+                  const vector<Array*> &g_masks, const vector<Array*> &g_masksums)
 {
     DataType type_src = g_src->get_type();
     int ndim_src = g_src->get_ndim();
@@ -228,7 +228,8 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         TRACER("no elements on this process\n");
         TRACER("no elements on this process\n");
         TRACER("no Clean up\n");
-    } else {
+    }
+    else {
         vector<int64_t> elems_src(ndim_src,0);
         vector<int64_t> index(ndim_src,0);
         vector<int64_t> local_counts(ndim_src,0);
@@ -254,7 +255,8 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
             /* if any of the local mask counts are zero, no work is needed */
             TRACER("0 == local_counts_product\n");
             TRACER("0 == local_counts_product\n");
-        } else {
+        }
+        else {
             /* determine where the data is to go */
             for (int i=0; i<ndim_src; ++i) {
                 int *tmp = (int*)g_masksums[i]->get(lo_src[i],lo_src[i]);
@@ -268,7 +270,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                 //printf("%d,", ld_dst[i]);
             }
             //printf("\n");
-            
+
             /* Create the destination buffer */
 #define pack_bit_copy(DTYPE,TYPE,FMT) \
             if (type_src == DTYPE) { \
@@ -300,8 +302,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
             pack_bit_copy(DataType::LONGLONG,long long,%ld)
             pack_bit_copy(DataType::FLOAT,float,%f)
             pack_bit_copy(DataType::DOUBLE,double,%f)
-            pack_bit_copy(DataType::LONGDOUBLE,long double,%f)
-            {
+            pack_bit_copy(DataType::LONGDOUBLE,long double,%f) {
                 EXCEPT(DataTypeException, "DataType not handled", type_src);
             }
 #undef pack_bit_copy
@@ -329,9 +330,9 @@ void pagoda::unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 
 
 void pagoda::unravel64(
-        int64_t x,
-        const vector<int64_t> &dims,
-        vector<int64_t> &result)
+    int64_t x,
+    const vector<int64_t> &dims,
+    vector<int64_t> &result)
 {
     TIMING("unravel64(int64_t,int,int64_t*,int64_t*)");
     unravel64i(x,dims,result);
@@ -380,8 +381,7 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
         enumerate_op(DataType::LONGLONG,  long long)
         enumerate_op(DataType::FLOAT,     float)
         enumerate_op(DataType::DOUBLE,    double)
-        enumerate_op(DataType::LONGDOUBLE,long double)
-        {
+        enumerate_op(DataType::LONGDOUBLE,long double) {
             EXCEPT(DataTypeException, "DataType not handled", type);
         }
 #undef enumerate_op
@@ -416,7 +416,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     }
     if (DataType::INT != msk->get_type()) {
         pagoda::abort("unpack1d: msk must be of type INT",
-                msk->get_type().get_id());
+                      msk->get_type().get_id());
     }
 
     // count mask bits on each proc
@@ -425,7 +425,8 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         TRACER("unpack1d lo,hi N/A 1 counts[me]=%ld\n", counts[me]);
         TRACER("unpack1d END\n");
         return; // this process doesn't participate
-    } else {
+    }
+    else {
         mask = (int*)msk->access();
         for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) {
             if (0 != mask[i]) {
@@ -447,7 +448,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     }
     hi_src[0] = lo_src[0] + counts[me] - 1;
     TRACER("unpack1d lo,hi,counts[me] = %ld,%ld,%ld\n",
-            lo_src[0], hi_src[0], counts[me]);
+           lo_src[0], hi_src[0], counts[me]);
     // do the unpacking
     // assumption is that dst array has same distribution as msk array
 #define unpack1d_op(DTYPE,TYPE) \
@@ -471,8 +472,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     unpack1d_op(DataType::LONGLONG,long long)
     unpack1d_op(DataType::FLOAT,float)
     unpack1d_op(DataType::DOUBLE,double)
-    unpack1d_op(DataType::LONGDOUBLE,long double)
-    {
+    unpack1d_op(DataType::LONGDOUBLE,long double) {
         EXCEPT(DataTypeException, "DataType not handled", type_src);
     }
 #undef unpack1d_op

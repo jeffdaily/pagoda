@@ -6,7 +6,7 @@
 #include "Values.H"
 
 GenericAttribute::GenericAttribute(
-        const string &name, Values *values, DataType type)
+    const string &name, Values *values, DataType type)
     :   Attribute()
     ,   name(name)
     ,   values(values)

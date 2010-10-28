@@ -154,22 +154,26 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("output") == 0) {
         if (positional_arguments.size() == 1) {
             throw CommandException("output file argument required");
-        } else if (positional_arguments.size() == 0) {
+        }
+        else if (positional_arguments.size() == 0) {
             throw CommandException("input and output file arguments required");
         }
         output_filename = positional_arguments.back();
         if (input_path.empty()) {
             input_filenames.assign(positional_arguments.begin(),
-                    positional_arguments.end()-1);
-        } else {
+                                   positional_arguments.end()-1);
+        }
+        else {
             for (size_t i=0; i<positional_arguments.size()-1; ++i) {
                 input_filenames.push_back(input_path + positional_arguments[i]);
             }
         }
-    } else if (parser.count("output") == 1) {
+    }
+    else if (parser.count("output") == 1) {
         output_filename = parser.get_argument("output");
         input_filenames = positional_arguments;
-    } else if (parser.count("output") > 1) {
+    }
+    else if (parser.count("output") > 1) {
         throw CommandException("too many output file arguments");
     }
 
@@ -245,17 +249,21 @@ void GenericCommands::parse(int argc, char **argv)
         string val;
         if (args.empty()) {
             throw CommandException("file format requires an argument");
-        } else if (args.size() > 1) {
+        }
+        else if (args.size() > 1) {
             throw CommandException("file format given more than one argument");
         }
         val = args.front();
         if (val == "classic") {
             file_format = FF_PNETCDF_CDF1;
-        } else if (val == "64bit") {
+        }
+        else if (val == "64bit") {
             file_format = FF_PNETCDF_CDF2;
-        } else if (val == "64data") {
+        }
+        else if (val == "64data") {
             file_format = FF_PNETCDF_CDF5;
-        } else {
+        }
+        else {
             throw CommandException("file format string not recognized");
         }
     }
@@ -313,10 +321,12 @@ Dataset* GenericCommands::get_dataset()
 
     if (input_filenames.size() == 1) {
         dataset = Dataset::open(input_filenames[0]);
-    } else {
+    }
+    else {
         if (join_name.empty()) {
             dataset = agg = new AggregationUnion;
-        } else {
+        }
+        else {
             dataset = agg = new AggregationJoinExisting(join_name);
         }
         for (size_t i=0,limit=input_filenames.size(); i<limit; ++i) {
@@ -344,10 +354,10 @@ FileWriter* GenericCommands::get_output() const
     FileWriter *writer = FileWriter::open(output_filename);
 
     writer->append(append)
-        ->overwrite(overwrite)
-        ->fixed_record_dimension(record_dimension_size)
-        ->header_pad(header_pad)
-        ->create();
+    ->overwrite(overwrite)
+    ->fixed_record_dimension(record_dimension_size)
+    ->header_pad(header_pad)
+    ->create();
 
     return writer;
 }
@@ -388,26 +398,31 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset)
     if (variables.empty()) {
         if (exclude_variables) {
             // do nothing, keep vars_to_keep empty
-        } else if (process_all_coords) {
+        }
+        else if (process_all_coords) {
             // do nothing, keep vars_to_keep, add coords later
-        } else {
+        }
+        else {
             // we want all variables
             for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
                 vars_to_keep.insert((*it)->get_name());
             }
         }
-    } else {
+    }
+    else {
         if (exclude_variables) {
             // invert given variables
             for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
                 string name = (*it)->get_name();
                 if (variables.count(name)) {
                     // skip
-                } else {
+                }
+                else {
                     vars_to_keep.insert(name);
                 }
             }
-        } else {
+        }
+        else {
             // don't invert given variables
             for (it=vars_in.begin(),end=vars_in.end(); it!=end; ++it) {
                 string name = (*it)->get_name();
@@ -482,7 +497,7 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset)
     if (alphabetize) {
         sort(vars_out.begin(), vars_out.end(), var_cmp);
     }
-    
+
     variables_cache[dataset] = vars_out;
 
     return vars_out;
@@ -537,7 +552,7 @@ vector<Dimension*> GenericCommands::get_dimensions(Dataset *dataset)
     if (alphabetize) {
         sort(dims_out.begin(), dims_out.end(), dim_cmp);
     }
-    
+
     dimensions_cache[dataset] = dims_out;
 
     return dims_out;
@@ -582,11 +597,12 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
             // destroyed which is a memory leak.
             // TODO cache Attribute in this GenericCommands instance
             atts[pos] = new GenericAttribute("history",
-                    history_complete, DataType::CHAR);
-        } else {
+                                             history_complete, DataType::CHAR);
+        }
+        else {
             history_complete = new TypedValues<char>(history_copy);
             atts.push_back(new GenericAttribute("history",
-                    history_complete, DataType::CHAR));
+                                                history_complete, DataType::CHAR));
         }
     }
 

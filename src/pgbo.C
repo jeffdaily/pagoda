@@ -31,7 +31,10 @@ using std::vector;
 #   ifdef __cplusplus
 extern "C"
 #   endif
-int F77_DUMMY_MAIN() { return 1; }
+int F77_DUMMY_MAIN()
+{
+    return 1;
+}
 #endif
 
 //#define READ_ALL
@@ -41,9 +44,9 @@ int F77_DUMMY_MAIN() { return 1; }
 
 static void write(Variable *var, FileWriter *writer);
 static void write_shape_match_per_record(
-        Variable *lhs, Variable *rhs, string op, FileWriter *writer);
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer);
 static void write_shape_match(
-        Variable *lhs, Variable *rhs, string op, FileWriter *writer);
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer);
 static void do_op(Array *lhs, string op, Array *rhs);
 
 
@@ -88,10 +91,11 @@ int main(int argc, char **argv)
         grids = dataset->get_grids();
         if (grids.empty()) {
             pagoda::print_zero("no grid found\n");
-        } else {
+        }
+        else {
             grid = grids[0];
         }
-        
+
         // create masks for dataset and operand
         ds_masks = new MaskMap(dataset);
         ds_masks->modify(cmd.get_slices());
@@ -114,26 +118,31 @@ int main(int argc, char **argv)
                 // no corresponding variable in the operand dataset,
                 // so copy ds_var unchanged to output
                 pagoda::print_zero(
-                        "missing operand variable " + ds_var->get_name());
+                    "missing operand variable " + ds_var->get_name());
                 write(ds_var, writer);
-            } else if (grid->is_coordinate(ds_var)
-                    || grid->is_topology(ds_var)) {
+            }
+            else if (grid->is_coordinate(ds_var)
+                     || grid->is_topology(ds_var)) {
                 // we have a coordinate or topology variable,
                 // so copy ds_var unchanged to output
                 write(ds_var, writer);
-            } else if (ds_var->get_ndim() < op_var->get_ndim()) {
+            }
+            else if (ds_var->get_ndim() < op_var->get_ndim()) {
                 ERR("operand variable rank < input variable rank");
-            } else if (ds_var->get_shape() == op_var->get_shape()) {
+            }
+            else if (ds_var->get_shape() == op_var->get_shape()) {
                 // shapes of each var match
                 // if either variable is record-based, both are treated as such
                 if (ds_var->has_record() || op_var->has_record()) {
                     write_shape_match_per_record(
-                            ds_var, op_var, op_type, writer);
-                } else {
+                        ds_var, op_var, op_type, writer);
+                }
+                else {
                     // oh well, we tried to do something record-based
                     write_shape_match(ds_var, op_var, op_type, writer);
                 }
-            } else {
+            }
+            else {
                 // at this point we know the shapes are mismatched, but at
                 // least they are broadcast-able
             }
@@ -148,11 +157,13 @@ int main(int argc, char **argv)
 
         pagoda::finalize();
 
-    } catch (CommandException &ex) {
+    }
+    catch (CommandException &ex) {
         pagoda::println_zero(ex.what());
         pagoda::finalize();
         return EXIT_FAILURE;
-    } catch (exception &ex) {
+    }
+    catch (exception &ex) {
         pagoda::abort(ex.what());
     }
 
@@ -172,7 +183,8 @@ static void write(Variable *var, FileWriter *writer)
             writer->write(array, var->get_name(), rec);
         }
         delete array;
-    } else {
+    }
+    else {
         Array *array = var->read();
         writer->write(array, var->get_name());
         delete array;
@@ -181,7 +193,7 @@ static void write(Variable *var, FileWriter *writer)
 
 
 static void write_shape_match_per_record(
-        Variable *lhs, Variable *rhs, string op, FileWriter *writer)
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer)
 {
     // operate one record at a time for both vars
     Array *lhs_array = NULL; // reuse allocated array each record
@@ -198,7 +210,7 @@ static void write_shape_match_per_record(
 
 
 static void write_shape_match(
-        Variable *lhs, Variable *rhs, string op, FileWriter *writer)
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer)
 {
     Array *lhs_array = lhs->read();
     Array *rhs_array = rhs->read();
@@ -213,13 +225,17 @@ static void do_op(Array *lhs, string op, Array *rhs)
 {
     if (op == "+") {
         lhs = lhs->iadd(rhs);
-    } else if (op == "-") {
+    }
+    else if (op == "-") {
         lhs = lhs->isub(rhs);
-    } else if (op == "*") {
+    }
+    else if (op == "*") {
         lhs = lhs->imul(rhs);
-    } else if (op == "/") {
+    }
+    else if (op == "/") {
         lhs = lhs->idiv(rhs);
-    } else {
+    }
+    else {
         ERR("bad op_type"); // shouldn't happen, but still...
     }
 }

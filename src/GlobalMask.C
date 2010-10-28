@@ -170,7 +170,9 @@ void GlobalMask::modify(const DimSlice &slice)
     dirty_count = true;
 
     // bail if mask doesn't own any of the data
-    if (!owns_data()) return;
+    if (!owns_data()) {
+        return;
+    }
 
     slice.indices(get_size(), slo, shi, step);
     get_distribution(lo,hi);
@@ -181,19 +183,24 @@ void GlobalMask::modify(const DimSlice &slice)
             for (int64_t i=start,limit=(shi-lo[0]); i<=limit; i+=step) {
                 data[i] = 1;
             }
-        } else { // hi < shi
+        }
+        else {   // hi < shi
             for (int64_t i=start,limit=(hi[0]-lo[0]+1); i<=limit; i+=step) {
                 data[i] = 1;
             }
         }
-    } else if (lo[0] <= shi) { // && lo[0] > slo
+    }
+    else if (lo[0] <= shi) {   // && lo[0] > slo
         int64_t start = slo-lo[0];
-        while (start < 0) start+=step;
+        while (start < 0) {
+            start+=step;
+        }
         if (hi[0] >= shi) {
             for (int64_t i=start,limit=(shi-lo[0]); i<=limit; i+=step) {
                 data[i] = 1;
             }
-        } else { // hi < shi
+        }
+        else {   // hi < shi
             for (int64_t i=start,limit=(hi[0]-lo[0]+1); i<=limit; i+=step) {
                 data[i] = 1;
             }
@@ -218,15 +225,19 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     dirty_count = true;
 
     // bail if we don't own any of the data
-    if (!owns_data()) return;
+    if (!owns_data()) {
+        return;
+    }
 
     // lat, lon, and this must have the same shape
     // but it is assumed that they have the same distributions
     if (lat->get_shape() != lon->get_shape()) {
         pagoda::abort("GlobalMask::modify lat lon shape mismatch", 0);
-    } else if (get_shape() != lat->get_shape()) {
+    }
+    else if (get_shape() != lat->get_shape()) {
         pagoda::abort("GlobalMask::modify mask lat/lon shape mismatch", 0);
-    } else if (lat->get_type() != lon->get_type()) {
+    }
+    else if (lat->get_type() != lon->get_type()) {
         pagoda::abort("GlobalMask::modify lat lon types differ", 0);
     }
 
@@ -249,8 +260,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     adjust_op(DataType::LONGLONG,long long)
     adjust_op(DataType::FLOAT,float)
     adjust_op(DataType::DOUBLE,double)
-    adjust_op(DataType::LONGDOUBLE,long double)
-    {
+    adjust_op(DataType::LONGDOUBLE,long double) {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef adjust_op
@@ -274,7 +284,9 @@ void GlobalMask::modify(double min, double max, const Array *var)
     dirty_count = true;
 
     // bail if we don't own any of the data
-    if (!owns_data()) return;
+    if (!owns_data()) {
+        return;
+    }
 
     // lat, lon, and this must have the same shape
     // but it is assumed that they have the same distributions
@@ -299,8 +311,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
     adjust_op(DataType::LONGLONG,long long)
     adjust_op(DataType::FLOAT,float)
     adjust_op(DataType::DOUBLE,double)
-    adjust_op(DataType::LONGDOUBLE,long double)
-    {
+    adjust_op(DataType::LONGDOUBLE,long double) {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef adjust_op
@@ -336,7 +347,7 @@ void GlobalMask::normalize()
  * A new Array is created based on the size of this GlobalMask.  Then, based on the
  * set bits of this GlobalMask, the new Array is enumerated such the first set bit
  * is 0, the next set bit is 1, and so on.  Any unset bit is set to the value
- * of -1.  
+ * of -1.
  *
  * For example:
  *
@@ -365,7 +376,8 @@ Array* GlobalMask::reindex()
             pagoda::enumerate(tmp, NULL, NULL);
             pagoda::unpack1d(tmp, index, mask);
             delete tmp;
-        } else {
+        }
+        else {
             pagoda::enumerate(index, NULL, NULL);
         }
         dirty_index = false;
@@ -458,7 +470,7 @@ bool GlobalMask::owns_data() const
 
 
 void GlobalMask::get_distribution(
-        vector<int64_t> &lo, vector<int64_t> &hi) const
+    vector<int64_t> &lo, vector<int64_t> &hi) const
 {
     mask->get_distribution(lo,hi);
 }
@@ -489,20 +501,20 @@ void GlobalMask::release_update()
 
 
 void* GlobalMask::get(
-        void *buffer,
-        const vector<int64_t> &lo,
-        const vector<int64_t> &hi,
-        const vector<int64_t> &ld) const
+    void *buffer,
+    const vector<int64_t> &lo,
+    const vector<int64_t> &hi,
+    const vector<int64_t> &ld) const
 {
     return mask->get(buffer,lo,hi,ld);
 }
 
 
 void GlobalMask::put(
-        void *buffer,
-        const vector<int64_t> &lo,
-        const vector<int64_t> &hi,
-        const vector<int64_t> &ld)
+    void *buffer,
+    const vector<int64_t> &lo,
+    const vector<int64_t> &hi,
+    const vector<int64_t> &ld)
 {
     mask->put(buffer,lo,hi,ld);
 }

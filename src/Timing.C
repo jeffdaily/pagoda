@@ -64,8 +64,8 @@ static inline void header(ostringstream &out)
 
 
 static inline void line(ostringstream &out,
-        string name, int counts, int counts_total,
-        int64_t times, int64_t times_total, int64_t times_global)
+                        string name, int counts, int counts_total,
+                        int64_t times, int64_t times_total, int64_t times_global)
 {
     out << left
         << setw(g_name_width) << name
@@ -102,10 +102,12 @@ Timing::~Timing()
         int64_t new_sum = times[name] + diff;
         if (new_sum > 0) {
             times[name] = new_sum;
-        } else {
+        }
+        else {
             std::cerr << "WARNING: times integer overflow: " << name << endl;
         }
-    } else if (diff < 0) {
+    }
+    else if (diff < 0) {
         std::cerr << "WARNING: diff < 0: " << name << endl;
         std::cerr << "\t" << end << "-" << start << "=" << diff << endl;
     }
@@ -190,10 +192,11 @@ string Timing::get_stats_calls(bool descending)
         rend = counts_reverse.rend();
         for (; rit!=rend; ++rit) {
             line(out, rit->second, rit->first, counts_total,
-                    times.find(rit->second)->second, times_total,
-                    end_global-start_global);
+                 times.find(rit->second)->second, times_total,
+                 end_global-start_global);
         }
-    } else {
+    }
+    else {
         CountsMapReverse::iterator rit;
         CountsMapReverse::iterator rend;
 
@@ -201,8 +204,8 @@ string Timing::get_stats_calls(bool descending)
         rend = counts_reverse.end();
         for (; rit!=rend; ++rit) {
             line(out, rit->second, rit->first, counts_total,
-                    times.find(rit->second)->second, times_total,
-                    end_global-start_global);
+                 times.find(rit->second)->second, times_total,
+                 end_global-start_global);
         }
     }
 
@@ -270,10 +273,11 @@ string Timing::get_stats_total_time(bool descending)
         rend = times_reverse.rend();
         for (; rit!=rend; ++rit) {
             line(out, rit->second, counts.find(rit->second)->second,
-                    counts_total, rit->first, times_total,
-                    end_global-start_global);
+                 counts_total, rit->first, times_total,
+                 end_global-start_global);
         }
-    } else {
+    }
+    else {
         TimesMapReverse::iterator rit;
         TimesMapReverse::iterator rend;
 
@@ -281,8 +285,8 @@ string Timing::get_stats_total_time(bool descending)
         rend = times_reverse.end();
         for (; rit!=rend; ++rit) {
             line(out, rit->second, counts.find(rit->second)->second,
-                    counts_total, rit->first, times_total,
-                    end_global-start_global);
+                 counts_total, rit->first, times_total,
+                 end_global-start_global);
         }
     }
 

@@ -32,7 +32,10 @@ using std::vector;
 #   ifdef __cplusplus
 extern "C"
 #   endif
-int F77_DUMMY_MAIN() { return 1; }
+int F77_DUMMY_MAIN()
+{
+    return 1;
+}
 #endif
 
 
@@ -68,10 +71,11 @@ int main(int argc, char **argv)
         grids = dataset->get_grids();
         if (grids.empty()) {
             pagoda::print_zero("no grid found\n");
-        } else {
+        }
+        else {
             grid = grids[0];
         }
-        
+
         masks = new MaskMap(dataset);
         masks->modify(cmd.get_slices());
         masks->modify(cmd.get_boxes(), grid);
@@ -99,7 +103,7 @@ int main(int argc, char **argv)
                     delete result;
                     continue;
                 }
-               
+
                 if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
                     // square the values
                     result->imul(result);
@@ -110,11 +114,12 @@ int main(int argc, char **argv)
                     array = var->read(rec, array);
                     if (op == OP_MAX) {
                         result->imax(array);
-                    } else if (op == OP_MIN) {
+                    }
+                    else if (op == OP_MIN) {
                         result->imin(array);
-                    } else {
-                        if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR)
-                        {
+                    }
+                    else {
+                        if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
                             // square the values
                             array->imul(array);
                         }
@@ -129,7 +134,8 @@ int main(int argc, char **argv)
                     ScalarArray scalar(result->get_type());
                     scalar.fill_value(nrec);
                     result->idiv(&scalar);
-                } else if (op == OP_RMSSDN) {
+                }
+                else if (op == OP_RMSSDN) {
                     ScalarArray scalar(result->get_type());
                     scalar.fill_value(nrec-1);
                     result->idiv(&scalar);
@@ -138,14 +144,16 @@ int main(int argc, char **argv)
                 // some operations require additional process */
                 if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
                     result->ipow(0.5);
-                } else if (op == OP_SQRAVG) {
+                }
+                else if (op == OP_SQRAVG) {
                     result->imul(result);
                 }
 
                 writer->write(result, var->get_name(), 0);
                 delete result;
                 delete array;
-            } else {
+            }
+            else {
                 Array *array = var->read();
                 writer->write(array, var->get_name());
                 delete array;
@@ -159,7 +167,8 @@ int main(int argc, char **argv)
 
         pagoda::finalize();
 
-    } catch (CommandException &ex) {
+    }
+    catch (CommandException &ex) {
         if (dataset) {
             delete dataset;
         }
@@ -172,9 +181,11 @@ int main(int argc, char **argv)
         pagoda::println_zero(ex.what());
         pagoda::finalize();
         return EXIT_FAILURE;
-    } catch (PagodaException &ex) {
+    }
+    catch (PagodaException &ex) {
         pagoda::abort(ex.what());
-    } catch (exception &ex) {
+    }
+    catch (exception &ex) {
         pagoda::abort(ex.what());
     }
 

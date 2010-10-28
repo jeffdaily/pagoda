@@ -90,8 +90,8 @@ string VariableDecorator::get_long_name() const
 
 
 Attribute* VariableDecorator::get_att(
-        const string &name,
-        bool ignore_case) const
+    const string &name,
+    bool ignore_case) const
 {
     TIMING("VariableDecorator::get_att(string,bool)");
     return var->get_att(name, ignore_case);
@@ -99,8 +99,8 @@ Attribute* VariableDecorator::get_att(
 
 
 Attribute* VariableDecorator::get_att(
-        const vector<string> &names,
-        bool ignore_case) const
+    const vector<string> &names,
+    bool ignore_case) const
 {
     TIMING("VariableDecorator::get_att(vector<string>,bool)");
     return var->get_att(names, ignore_case);

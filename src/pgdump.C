@@ -63,7 +63,8 @@ int main(int argc, char **argv)
         cout << dim->get_name() << " = ";
         if (dim->is_unlimited()) {
             cout << "UNLIMITED ; // (" << dim->get_size() << " currently)";
-        } else {
+        }
+        else {
             cout << dim->get_size() << " ;";
         }
         cout << endl;

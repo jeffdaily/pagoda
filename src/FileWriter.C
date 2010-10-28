@@ -67,7 +67,8 @@ void FileWriter::def_dim(Dimension *dim)
 {
     if (dim->is_unlimited()) {
         def_dim(dim->get_name(), 0);
-    } else {
+    }
+    else {
         def_dim(dim->get_name(), dim->get_size());
     }
 }
@@ -94,7 +95,7 @@ void FileWriter::def_dims(const vector<Dimension*> &dims)
 
 
 void FileWriter::def_var(const string &name, const vector<Dimension*> &dims,
-        const DataType &type, const vector<Attribute*> &atts)
+                         const DataType &type, const vector<Attribute*> &atts)
 {
     vector<Dimension*>::const_iterator dim_it;
     vector<Dimension*>::const_iterator dim_end;
@@ -109,7 +110,7 @@ void FileWriter::def_var(const string &name, const vector<Dimension*> &dims,
 
 
 void FileWriter::def_var(const string &name, const vector<Mask*> &masks,
-        const DataType &type, const vector<Attribute*> &atts)
+                         const DataType &type, const vector<Attribute*> &atts)
 {
     vector<Mask*>::const_iterator msk_it;
     vector<Mask*>::const_iterator msk_end;
@@ -140,7 +141,7 @@ void FileWriter::def_vars(const vector<Variable*> &vars)
 
 
 void FileWriter::write_att(const string &name, Values *values,
-        DataType type, const string &var_name)
+                           DataType type, const string &var_name)
 {
     GenericAttribute att(name, values, type);
     write_att(&att, name);

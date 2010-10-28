@@ -17,17 +17,17 @@ using std::string;
  */
 class PagodaException : public runtime_error
 {
-  public:
-      explicit PagodaException(const string &what)
-          : runtime_error(what) {}
+    public:
+        explicit PagodaException(const string &what)
+            : runtime_error(what) {}
 
-      explicit PagodaException(const string &where, const string &what)
-          : runtime_error(where + ": " + what) {}
+        explicit PagodaException(const string &where, const string &what)
+            : runtime_error(where + ": " + what) {}
 
-      explicit PagodaException(const string &where, const string &what,
-              int value)
-          : runtime_error(where + ": " + what + " :: "
-                  + pagoda::to_string(value)) {}
+        explicit PagodaException(const string &where, const string &what,
+                                 int value)
+            : runtime_error(where + ": " + what + " :: "
+                            + pagoda::to_string(value)) {}
 };
 
 #endif // PAGODAEXCEPTION_H_

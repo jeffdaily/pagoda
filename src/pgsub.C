@@ -30,7 +30,10 @@ using std::vector;
 #   ifdef __cplusplus
 extern "C"
 #   endif
-int F77_DUMMY_MAIN() { return 1; }
+int F77_DUMMY_MAIN()
+{
+    return 1;
+}
 #endif
 
 //#define READ_ALL
@@ -71,10 +74,11 @@ int main(int argc, char **argv)
         grids = dataset->get_grids();
         if (grids.empty()) {
             pagoda::print_zero("no grid found\n");
-        } else {
+        }
+        else {
             grid = grids[0];
         }
-        
+
         masks = new MaskMap(dataset);
         masks->modify(cmd.get_slices());
         masks->modify(cmd.get_boxes(), grid);
@@ -103,7 +107,8 @@ int main(int argc, char **argv)
                     writer->write(array, var->get_name(), rec);
                 }
                 delete array;
-            } else {
+            }
+            else {
                 Array *array = var->read();
                 writer->write(array, var->get_name());
                 delete array;
@@ -135,11 +140,13 @@ int main(int argc, char **argv)
 
         pagoda::finalize();
 
-    } catch (CommandException &ex) {
+    }
+    catch (CommandException &ex) {
         pagoda::println_zero(ex.what());
         pagoda::finalize();
         return EXIT_FAILURE;
-    } catch (exception &ex) {
+    }
+    catch (exception &ex) {
         pagoda::abort(ex.what());
     }
 
