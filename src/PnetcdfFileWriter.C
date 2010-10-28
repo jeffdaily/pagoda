@@ -10,7 +10,6 @@
 #include <pnetcdf.h>
 
 #include "Attribute.H"
-#include "ConnectivityVariable.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
