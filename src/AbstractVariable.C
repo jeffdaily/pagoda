@@ -183,16 +183,6 @@ vector<Mask*> AbstractVariable::get_masks() const
 }
 
 
-/**
- * If there is a Mask over the record Dimension, translate the given record
- * from the index space of the mask into the index space of the whole data.
- *
- * It is safe to call even if no masks are set in which case the record is
- * returned unchanged.
- *
- * @param[in] record the record to translate
- * @return the translated record
- */
 int64_t AbstractVariable::translate_record(int64_t record) const
 {
     vector<Mask*> masks = get_masks();
@@ -237,22 +227,12 @@ int64_t AbstractVariable::translate_record(int64_t record) const
 }
 
 
-/**
- * Enables whether record translation takes place.
- *
- * @see translate_record
- */
 void AbstractVariable::set_translate_record(bool value)
 {
     enable_record_translation = value;
 }
 
 
-/**
- * Return true if this Variable has any active Masks.
- *
- * @return true if this Variable requires subsetting
- */
 bool AbstractVariable::needs_subset() const
 {
     vector<Mask*> masks = get_masks();
@@ -274,11 +254,6 @@ bool AbstractVariable::needs_subset() const
 }
 
 
-/**
- * Return true if this Variable has any active, non-record Masks.
- *
- * @return true if this Variable requires subsetting
- */
 bool AbstractVariable::needs_subset_record() const
 {
     vector<Mask*> masks = get_masks();
@@ -302,12 +277,6 @@ bool AbstractVariable::needs_subset_record() const
 }
 
 
-/**
- * If this is a topology Variable and its connected Dimension has been subset,
- * we must renumber this Variable's values.
- *
- * @return true if this Variable should be renumbered
- */
 bool AbstractVariable::needs_renumber() const
 {
     vector<Grid*> grids = get_dataset()->get_grids();
@@ -330,13 +299,6 @@ bool AbstractVariable::needs_renumber() const
 }
 
 
-/**
- * If this is a topology Variable and its connected Dimension has been subset,
- * go ahead and renumber the given array assuming it was something that was
- * read earlier.
- *
- * @param[in] array the Array to renumber
- */
 void AbstractVariable::renumber(Array *array) const
 {
     vector<Grid*> grids = get_dataset()->get_grids();

@@ -8,6 +8,9 @@ class Dimension;
 class Variable;
 
 
+/**
+ * The geodesic grid implementation of the Grid interface.
+ */
 class GeoGrid : public Grid
 {
     public:

@@ -13,6 +13,13 @@ class Variable;
 using std::ostream;
 
 
+/**
+ * Implements the Attribute interface.
+ *
+ * This allows arbitrary Attribute instances to be created and written via the
+ * FileWriter, rather than simply copying or modifying existing Attribute
+ * instances only.
+ */
 class GenericAttribute : public Attribute
 {
     public:
@@ -29,9 +36,9 @@ class GenericAttribute : public Attribute
         virtual ostream& print(ostream &os) const;
 
     protected:
-        string name;
-        Values *values;
-        DataType type;
+        string name; /**< name of this Attribute */
+        Values *values; /**< Values associated with this Attribute */
+        DataType type; /**< DataType of this Attribute */
 
 };
 

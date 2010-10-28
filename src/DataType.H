@@ -48,38 +48,117 @@ class DataType
         static const DataType SCHAR;
         static const DataType STRING;
 
+        /**
+         * Convert either a Global Arrays type or a netcdf type to a DataType.
+         *
+         * Luckily the GA types are integers within 1000 and 1016 and the
+         * netcdf types are from 0 to 6.
+         *
+         * @param[in] type the integer to convert to a DataType
+         */
         DataType(int type);
+
+        /** 
+         * Copy constructor.
+         *
+         * @param[in] type the DataType to copy
+         */
         DataType(const DataType &type);
+
+        /**
+         * Assignment to an intger.
+         *
+         * @param[in] type the integer to convert to a DataType
+         * @return this DataType
+         */
         DataType& operator = (int type);
+
+        /**
+         * Assignment to another DataType.
+         *
+         * @param[in] type the other DataType
+         * @return this DataType
+         */
         DataType& operator = (const DataType &type);
 
+        /** 
+         * Equality comparison. 
+         * 
+         * @param[in] type the DataType to compare 
+         * @return true if the IDs are equal 
+         */ 
         bool operator == (const DataType &type) const;
+
+        /**
+         * Inequality comparison.
+         *
+         * @param[in] type the DataType to compare
+         * @return true if the IDs are not equal
+         */
         bool operator != (const DataType &type) const;
 
+        /**
+         * Inserts the name of the DataType into the given stream.
+         *
+         * @param[in,out] os the stream
+         * @param[in] type the DataType to insert
+         * @return the given stream
+         */
         friend ostream& operator << (ostream &os, const DataType &type);
 
+        /**
+         * Convert DataType to Global Arrays type.
+         *
+         * @return the Global Arrays type
+         */
         int to_ga() const;
+
+        /**
+         * Convert DataType to netcdf type.
+         *
+         * @return the netcdf type
+         */
         nc_type to_nc() const;
+
         int get_id() const {
             return id;
         }
+
+        /**
+         * Returns the string represenation of this DataType.
+         */
         string get_name() const {
             return name;
         }
 
+        /**
+         * Returns the DataType instance for a given C type.
+         */
         template <class T> static DataType ctype();
 
     protected:
+        /**
+         * Convert int to DataType.
+         *
+         * @param[in] type the integer to convert
+         * @return the corresponding DataType
+         */
         static DataType to_dt(int type);
-        DataType();
+
+        /**
+         * Constructs DataType with a name.
+         */
         DataType(const string &name);
 
-        static int next_id;
-        int id;
-        string name;
+        static int next_id; /**< id of next DataType constructed */
+        int id; /**< id of this DataType */
+        string name; /**< name of this DataType */
 };
 
 
+/**
+ * An exception as a result of a DataType mismatch, conversion problem, etc.
+ */
 class DataTypeException : public runtime_error
 {
     public:
@@ -98,8 +177,9 @@ class DataTypeException : public runtime_error
                               +string(" :: ")+pagoda::to_string(line))
         {}
         explicit DataTypeException(const string &where,
-                                   const string &what, const DataType &type) :   runtime_error(where + ": " + what
-                                               +string(" :: ")+type.get_name())
+                                   const string &what, const DataType &type)
+            :   runtime_error(where + ": " + what
+                              +string(" :: ")+type.get_name())
         {}
         explicit DataTypeException(const string &what, const DataType &type)
             :   runtime_error(what

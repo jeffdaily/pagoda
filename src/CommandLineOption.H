@@ -25,6 +25,7 @@ static string OP_DIV("/");
 static string OP_MUL("*");
 static string OP_SUB("-");
 
+/** The types of averages supported. */
 enum AverageOperator {
     AO_AVG,
     AO_SQRAVG,
@@ -37,6 +38,7 @@ enum AverageOperator {
     AO_TTL,
 };
 
+/** The types of binary operations supported. */
 enum BinaryOperator {
     BO_ADD,
     BO_DIV,
@@ -44,6 +46,13 @@ enum BinaryOperator {
     BO_SUB,
 };
 
+
+/**
+ * A CommandLineOption mimics the GNU getopt struct long_option.
+ *
+ * This class allows for the collection of multiple long options into a single
+ * logical entity.  This allows for aliases, shorthands, etc.
+ */
 class CommandLineOption
 {
     public:
@@ -51,7 +60,8 @@ class CommandLineOption
 
         CommandLineOption(const int &value, const string &name,
                           const bool &argument, const string &description,
-                          const string &extra_name1="", const string &extra_name2="");
+                          const string &extra_name1="",
+                          const string &extra_name2="");
         ~CommandLineOption();
 
         void set_value(const int &value);

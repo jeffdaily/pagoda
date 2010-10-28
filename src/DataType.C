@@ -35,13 +35,6 @@ const DataType DataType::STRING("string");
 int DataType::next_id(1);
 
 
-DataType::DataType()
-    :   id(next_id++)
-    ,   name("")
-{
-}
-
-
 DataType::DataType(const string &name)
     :   id(next_id++)
     ,   name(name)
@@ -49,14 +42,6 @@ DataType::DataType(const string &name)
 }
 
 
-/**
- * Convert either a Global Arrays type or a netcdf type to a DataType.
- *
- * Luckily the GA types are integers within 1000 and 1016 and the netcdf types
- * are from 0 to 6.
- *
- * @param[in] type the integer to convert to a DataType
- */
 DataType::DataType(int type)
     :   id(-1)
     ,   name("")
@@ -67,11 +52,6 @@ DataType::DataType(int type)
 }
 
 
-/**
- * Copy constructor.
- *
- * @param[in] type the DataType to copy
- */
 DataType::DataType(const DataType &type)
     :   id(type.id)
     ,   name(type.name)
@@ -79,12 +59,6 @@ DataType::DataType(const DataType &type)
 }
 
 
-/**
- * Assignment to an intger.
- *
- * @param[in] type the integer to convert to a DataType
- * @return this DataType
- */
 DataType& DataType::operator = (int type)
 {
     *this = DataType::to_dt(type);
@@ -92,12 +66,6 @@ DataType& DataType::operator = (int type)
 }
 
 
-/**
- * Assignment to another DataType.
- *
- * @param[in] type the other DataType
- * @return this DataType
- */
 DataType& DataType::operator = (const DataType &type)
 {
     id = type.id;
@@ -106,48 +74,24 @@ DataType& DataType::operator = (const DataType &type)
 }
 
 
-/**
- * Equality comparison.
- *
- * @param[in] type the DataType to compare
- * @return true if the IDs are equal
- */
 bool DataType::operator == (const DataType &type) const
 {
     return id == type.id;
 }
 
 
-/**
- * Inequality comparison.
- *
- * @param[in] type the DataType to compare
- * @return true if the IDs are not equal
- */
 bool DataType::operator != (const DataType &type) const
 {
     return id != type.id;
 }
 
 
-/**
- * Inserts the name of the DataType into the given stream.
- *
- * @param[in,out] os the stream
- * @param[in] type the DataType to insert
- * @return the given stream
- */
 ostream& operator << (ostream &os, const DataType &type)
 {
     return os << type.name;
 }
 
 
-/**
- * Convert DataType to Global Arrays type.
- *
- * @return the Global Arrays type
- */
 int DataType::to_ga() const
 {
     TIMING("DataType::to_ga()");
@@ -206,11 +150,6 @@ int DataType::to_ga() const
 }
 
 
-/**
- * Convert DataType to netcdf type.
- *
- * @return the netcdf type
- */
 nc_type DataType::to_nc() const
 {
     TIMING("DataType::to_nc()");
@@ -355,12 +294,6 @@ nc_type DataType::to_nc() const
 }
 
 
-/**
- * Convert int to DataType.
- *
- * @param[in] type the integer to convert
- * @return the corresponding DataType
- */
 DataType DataType::to_dt(int type)
 {
     TIMING("DataType::to_dt(int)");

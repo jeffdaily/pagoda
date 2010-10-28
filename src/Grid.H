@@ -56,18 +56,21 @@ class GridType
  * operations between grids, whether the underlying grids are unstructured or
  * not.
  *
- * The cell, edge, and corner methods may return Variables and Dimensions not
- * found in the underlying Dataset.  In other words, the Grid interface is
- * allowed to create the missing pieces.  For example, a regular grid is
- * represented using separate latitude and longitude Dimensions.  Calling
- * get_cell_dim() should then return a new Dimension (not found in the
- * original Dataset) with a length of the product of the lengths of the
- * latitude and longitude Dimensions.  This new Dimension represents the
- * Dimension shared between the latitude and longitude coordinate Variables
- * in an unstructured representation of the regular grid.  Likewise,
- * get_cell_lat would not return the lat(lat) coordinate Variable, but rather
- * the lat(cell) auxiliary coordinate Variable in terms of the unstructured
- * representation.
+ * The cell, edge, and corner methods may return Variable and Dimension
+ * intances not found in the underlying Dataset.  In other words, the Grid
+ * interface is allowed to create the missing pieces.  For example, a regular
+ * grid is represented using separate latitude and longitude Dimension
+ * instances.  Calling get_cell_dim() should then return a new Dimension (not
+ * found in the original Dataset) with a length equal to the product of the
+ * lengths of the latitude and longitude Dimension instances.  This new
+ * Dimension represents the Dimension shared between the latitude and
+ * longitude coordinate Variable instances in an unstructured representation
+ * of the regular grid.  Likewise, get_cell_lat() would not return the lat(lat)
+ * coordinate Variable, but rather the lat(cell) auxiliary coordinate Variable
+ * in terms of the unstructured representation.
+ *
+ * TODO: implement get_lat() et al to get the coordinate Variable instances in
+ * their natural represenatations.
  */
 class Grid
 {
