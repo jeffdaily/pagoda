@@ -567,7 +567,7 @@ PACKAGE_STRING='pagoda 0.2'
 PACKAGE_BUGREPORT='jeff.daily@pnl.gov'
 PACKAGE_URL='https://svn.pnl.gov/gcrm'
 
-ac_unique_file="src/Mainp.C"
+ac_unique_file="src/pagoda.H"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -636,8 +636,10 @@ build_vendor
 build_cpu
 build
 LIBTOOL
-ENABLE_GA_TESTS_FALSE
-ENABLE_GA_TESTS_TRUE
+ENABLE_SANDBOX_GA_FALSE
+ENABLE_SANDBOX_GA_TRUE
+ENABLE_SANDBOX_FALSE
+ENABLE_SANDBOX_TRUE
 MPI_CPPFLAGS
 MPI_LDFLAGS
 MPI_LIBS
@@ -749,7 +751,8 @@ enable_dependency_tracking
 with_pnetcdf
 with_ga
 with_mpi
-enable_ga_tests
+enable_sandbox
+enable_sandbox_ga
 enable_static
 with_pic
 enable_fast_install
@@ -1399,7 +1402,8 @@ Optional Features:
   --enable-shared[=PKGS]  build shared libraries [default=no]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-ga-tests       build Global Arrays based tests
+  --enable-sandbox        build sandbox programs
+  --enable-sandbox-ga     build Global Arrays sandbox programs
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
@@ -8545,18 +8549,32 @@ fi
 
 
 
-# Whether to build Global Arrays test programs
-# Check whether --enable-ga-tests was given.
-if test "${enable_ga_tests+set}" = set; then :
-  enableval=$enable_ga_tests;
+# Whether to build the sandbox programs.
+# Check whether --enable-sandbox was given.
+if test "${enable_sandbox+set}" = set; then :
+  enableval=$enable_sandbox;
 fi
 
- if test "x$enable_ga_tests" = xyes; then
-  ENABLE_GA_TESTS_TRUE=
-  ENABLE_GA_TESTS_FALSE='#'
+ if test "x$enable_sandbox" = xyes; then
+  ENABLE_SANDBOX_TRUE=
+  ENABLE_SANDBOX_FALSE='#'
 else
-  ENABLE_GA_TESTS_TRUE='#'
-  ENABLE_GA_TESTS_FALSE=
+  ENABLE_SANDBOX_TRUE='#'
+  ENABLE_SANDBOX_FALSE=
+fi
+
+# Whether to build Global Arrays programs within the sandbox.
+# Check whether --enable-sandbox-ga was given.
+if test "${enable_sandbox_ga+set}" = set; then :
+  enableval=$enable_sandbox_ga;
+fi
+
+ if test "x$enable_sandbox_ga" = xyes; then
+  ENABLE_SANDBOX_GA_TRUE=
+  ENABLE_SANDBOX_GA_FALSE='#'
+else
+  ENABLE_SANDBOX_GA_TRUE='#'
+  ENABLE_SANDBOX_GA_FALSE=
 fi
 
 
@@ -20987,8 +21005,12 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${ENABLE_GA_TESTS_TRUE}" && test -z "${ENABLE_GA_TESTS_FALSE}"; then
-  as_fn_error "conditional \"ENABLE_GA_TESTS\" was never defined.
+if test -z "${ENABLE_SANDBOX_TRUE}" && test -z "${ENABLE_SANDBOX_FALSE}"; then
+  as_fn_error "conditional \"ENABLE_SANDBOX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_SANDBOX_GA_TRUE}" && test -z "${ENABLE_SANDBOX_GA_FALSE}"; then
+  as_fn_error "conditional \"ENABLE_SANDBOX_GA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PROFILE_TRUE}" && test -z "${PROFILE_FALSE}"; then

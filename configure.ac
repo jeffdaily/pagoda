@@ -7,7 +7,7 @@ AC_INIT([pagoda], [0.2], [jeff.daily@pnl.gov], [pagoda],
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([src/Mainp.C])
+AC_CONFIG_SRCDIR([src/pagoda.H])
 
 #####################################################3
 # automake
@@ -130,10 +130,15 @@ PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
 PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 
-# Whether to build Global Arrays test programs
-AC_ARG_ENABLE([ga-tests],
-    [AS_HELP_STRING([--enable-ga-tests], [build Global Arrays based tests])])
-AM_CONDITIONAL([ENABLE_GA_TESTS], [test "x$enable_ga_tests" = xyes])
+# Whether to build the sandbox programs.
+AC_ARG_ENABLE([sandbox],
+    [AS_HELP_STRING([--enable-sandbox], [build sandbox programs])])
+AM_CONDITIONAL([ENABLE_SANDBOX], [test "x$enable_sandbox" = xyes])
+# Whether to build Global Arrays programs within the sandbox.
+AC_ARG_ENABLE([sandbox-ga],
+    [AS_HELP_STRING([--enable-sandbox-ga],
+                    [build Global Arrays sandbox programs])])
+AM_CONDITIONAL([ENABLE_SANDBOX_GA], [test "x$enable_sandbox_ga" = xyes])
 
 # Does pnetcdf have the new nonblocking interface?
 PAGODA_PNETCDF_NB_INT
