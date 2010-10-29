@@ -5,6 +5,8 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include <cassert>
+
 #include "CommandException.H"
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
@@ -32,6 +34,15 @@ void CommandLineParser::push_back(CommandLineOption *option)
             name_it!=names.end(); ++name_it) {
         options_map[*name_it] = option;
     }
+}
+
+
+void CommandLineParser::erase(CommandLineOption *option)
+{
+    optvec_t::iterator it;
+    it = find(options.begin(), options.end(), option);
+    assert(it != options.end());
+    options.erase(it);
 }
 
 

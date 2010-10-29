@@ -24,6 +24,7 @@ class CommandLineParser
         ~CommandLineParser();
 
         void push_back(CommandLineOption *option);
+        void erase(CommandLineOption *option);
         void parse(int argc, char **argv);
         int count(const string &name) const;
         string get_argument(const string &name) const;

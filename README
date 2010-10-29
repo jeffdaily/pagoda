@@ -8,11 +8,11 @@ The command::
 
     ./configure && make && make install
 
-should compile the static library libpagoda.a and the programs pgsub and pgbo
-and install them into /usr/local.  Please refer to the INSTALL file for
-generic build instructions.  That would be a good place to start if you are
-new to using configure scripts.  Detailed instructions are covered later in
-this file.
+should compile the static library libpagoda.a and the programs pgsub, pgra,
+pgea, and pgbo and install them into /usr/local.  Please refer to the INSTALL
+file for generic build instructions.  That would be a good place to start if
+you are new to using configure scripts.  Detailed instructions are covered
+later in this file.
 
 QUESTIONS/HELP/SUPPORT/BUG-REPORTS
 ==================================
@@ -22,7 +22,7 @@ email: jeff.daily@pnl.gov
 DEPENDENCIES
 ============
 
-The subsetter uses autoconf/automake/libtool to build and has dependencies on
+pagoda uses autoconf/automake/libtool to build and has dependencies on
 Global Arrays (http://www.emsl.pnl.gov/docs/global/) and parallel netcdf
 (http://trac.mcs.anl.gov/projects/parallel-netcdf/).
 
@@ -31,9 +31,15 @@ GLOBAL ARRAYS (GA)
 At the time of pagoda's initial releases, GA transitioned to using configure
 and a single library (libga) for version 5.0.  Prior to 5.0, building GA
 involved knowing your "TARGET" system and produced as many as five separate
-yet dependent libraries (liblinalg, libma, libglobal, libarmci, libpario,
+yet inter-dependent libraries (liblinalg, libma, libglobal, libarmci, libpario,
 libtcgmsg, libtcgmsg-mpi).  pagoda's configure system attempts to locate libga
-first and then the other libraries as needed.
+first and then the other libraries as needed.  GA was traditionally built for
+Fortran programs and as such by default contains Fortran source code.  This
+requires the Fortan libraries to be known at link-time.  Since this is the
+most common case, configure will try to determine $FLIBS for solely the
+purpose of linking with GA.  GA can be built without dependence on Fortran
+source and libraries, but that mode of GA install is not well tested.  In the
+future there will hopefully be a better way of detecting a GA installation.
 
 Please refer to GA's own documentation for how to build it, usually located
 within their releases' README files.
@@ -59,6 +65,23 @@ environment variable is important, apparently, because it toggles a feature of
 GA necessary on portals systems or else global operations within GA will
 crawl.
 
+BUILDING GLOBAL ARRAYS 5.0.0 Beta
+---------------------------------
+For detailed instructions on building GA 5.x or better (now converted to
+autotools), please see the README file in the GA distribution.
+
+tar -xvzf ga-5-0B.tgz
+cd ga-5-0B
+mkdir bld
+cd bld
+../configure
+make
+
+OTHER GLOBAL ARRAYS NOTES
+-------------------------
+Note: as of this writing, GA's MA_USE_ARMCI_MEM is broken.  It is unclear when 
+this broke, but unset MA_USE_ARMCI_MEM in your environment.
+
 BUILDING PAGODA
 ===============
 
@@ -77,27 +100,53 @@ any sample input files.
 
 RUNNING PAGODA
 ==============
+The following options are common to all operators:
 
-SUBSETTER (pgsub)
------------------
-The subsetter (pgsub) takes command line options and filename arguments.  The
-help screen is as follows::
-    
-    Usage: pgsub [options] infile1 [infile2 ...] output
-    
-    -h, --help           print this usage information and exit
-    -o, --output         output file name (or use last positional argument)
-    -X, --auxiliary      lon_min,lon_max,lat_min,lat_max auxiliary coordinate
-                         bounding box
-    -b, --box            north,south,east,west lat/lon bounding box
-    -d, --dimension      dim[,min[,max[,stride]]]
-    -v, --variable       var1[,var2[,...]] variable(s) to process
-    -x, --exclude        extract all variables EXCEPT those specified with -v
-    -a, --alphabetize    disable alphabetization of extracted variables
-    -c, --coords         all coordinate variables will be processed
-    -C, --no-coords      associated coordinate variables should not be processed
-    -j, --join           dimension join all input files on the given dimension
-    -u, --union          take the union of all input files
+-h, --help           print this usage information and exit
+
+-3, --3              output file in netCDF3 CLASSIC (32-bit offset) storage
+                     format
+
+-6, --64             output file in netCDF3 64-bit offset storage format
+
+-5, --5              output file in parallel netCDF 64-bit data format
+
+--file_format=FMT, --fl_fmt=FMT
+                     FMT=classic same as -3
+                     FMT=64bit same as -6
+                     FMT=64data same as -5
+
+-A, --append         append to existing output file, if any
+
+-a, --alphabetize    disable alphabetization of extracted variables
+
+-C, --no-coords      associated coordinate variables should not be processed
+
+-c, --coords         all coordinate variables will be processed
+
+-d, --dimension      dim[,min[,max[,stride]]]
+
+--fix_rec_dmn        change record dimension into fixed dimension in output file
+
+--header_pad, --hdr_pad
+                     pad output header with indicated number of bytes
+
+-h, --history        do not append to 'history' global attribute
+
+-o, --output         output file name (or use last positional argument)
+
+-O, --overwrite      overwrite existing output file, if any
+
+-p, --path           path prefix for all input filenames
+
+-v, --variable       var1[,var2[,...]] variable(s) to process
+
+-X, --auxiliary      lon_min,lon_max,lat_min,lat_max auxiliary coordinate
+                     bounding box
+
+-x, --exclude        extract all variables EXCEPT those specified with -v
+
+-b, --box            north,south,east,west lat/lon bounding box
 
 Specify a bounding box representing the subset as indicated.  The values
 themselves may be in floating point or integer notation e.g.
@@ -109,30 +158,41 @@ placed on the command line, a "union" aggregation will occur.  If you use the
 aggregation capability is not as extensively tested as running a single input
 file.
 
-NOTE: The famous "MJO" region is "-b 20,-20,170,150"
+NOTE: The famous "MJO" region we often test is "-b 20,-20,170,150"
+
+SUBSETTER (pgsub)
+-----------------
+The following options are unique to pgsub:
+
+-j, --join           join all input files on the given dimension
+
+-u, --union          take the union of all input files
 
 BINARY OPERATOR (pgbo)
 ----------------------
-The binary operator (pgsub) takes command line options and filename arguments.
-The help screen is as follows::
+The following options are unique to pgbo:
 
-    Usage: pgsub infile1 infile2 output
-    
-    -h, --help           print this usage information and exit
-    -o, --output         output file name (or use last positional argument)
-    -X, --auxiliary      lon_min,lon_max,lat_min,lat_max auxiliary coordinate
-                         bounding box
-    -b, --box            north,south,east,west lat/lon bounding box
-    -d, --dimension      dim[,min[,max[,stride]]]
-    -v, --variable       var1[,var2[,...]] variable(s) to process
-    -x, --exclude        extract all variables EXCEPT those specified with -v
-    -a, --alphabetize    disable alphabetization of extracted variables
-    -c, --coords         all coordinate variables will be processed
-    -C, --no-coords      associated coordinate variables should not be processed
-    -j, --join           dimension join all input files on the given dimension
-    -u, --union          take the union of all input files
-    -h, --history        do not append to 'history' global attribute
-    -y, --op_typ         Binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)
+-y, --op_typ         binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)
 
 Notice the additional "op_typ" argument.  Also notice that aggregation is not
-supported.  Otherwise it operates similarly to the subsetter.
+supported.  Otherwise it operates similarly to pgsub.
+
+RECORD AVERAGER (pgra)
+----------------------
+The following options are unique to pgra:
+
+-y, --op_typ         average operation:
+                     avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl
+
+Notice the additional "op_typ" argument.  Also notice that aggregation is not
+supported.  Otherwise it operates similarly to pgsub.
+
+ENSEMBLE AVERAGER (pgea)
+------------------------
+The following options are unique to pgra:
+
+-y, --op_typ         average operation:
+                     avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl
+
+Notice the additional "op_typ" argument.  Also notice that aggregation is not
+supported.  Otherwise it operates similarly to pgsub.

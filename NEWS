@@ -1,0 +1,11 @@
+pagoda NEWS - User visible changes.
+
+* Major changes in pagoda 0.5 (2010-10-28) [unstable]
+  Released by Jeff daily, based on svn version r402.
+
+** This is the first public release of pagoda.
+
+** This release implements pgsub, pgra, pgea, and pgbo which mimic the NetCDF
+   Operators ncks, ncra, ncea, and ncbo respectively.
+
+** The API and tools are notably missing support for _FillValue/missing_value.

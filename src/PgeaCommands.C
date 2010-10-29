@@ -158,7 +158,10 @@ string PgeaCommands::get_operator() const
 
 void PgeaCommands::init()
 {
-    parser.push_back(&CommandLineOption::OP_TYPE);
+    parser.push_back(&CommandLineOption::AVG_TYPE);
+    // erase the aggregation ops
+    parser.erase(&CommandLineOption::JOIN);
+    parser.erase(&CommandLineOption::UNION);
 
     if (VALID.empty()) {
         VALID.push_back(OP_AVG);
