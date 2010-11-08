@@ -9,84 +9,101 @@ The command::
     ./configure && make && make install
 
 should compile the static library libpagoda.a and the programs pgsub, pgra,
-pgea, and pgbo and install them into /usr/local.  Please refer to the INSTALL
-file for generic build instructions.  That would be a good place to start if
-you are new to using configure scripts.  Detailed instructions are covered
-later in this file.
+pgea, pgbo, pgcmp, and pgdump and install them into /usr/local.  Please refer
+to the INSTALL file for generic build instructions.  That would be a good
+place to start if you are new to using configure scripts.  Detailed
+instructions are covered later in this file.
 
 QUESTIONS/HELP/SUPPORT/BUG-REPORTS
 ==================================
 
-email: jeff.daily@pnl.gov
+email: pagoda-dev@googlegroups.com
 
 DEPENDENCIES
 ============
 
 pagoda uses autoconf/automake/libtool to build and has dependencies on
-Global Arrays (http://www.emsl.pnl.gov/docs/global/) and parallel netcdf
-(http://trac.mcs.anl.gov/projects/parallel-netcdf/).
+ * Message Passing Interface
+ * Global Arrays (http://www.emsl.pnl.gov/docs/global/)
+ * parallel netcdf (http://trac.mcs.anl.gov/projects/parallel-netcdf/).
 
 GLOBAL ARRAYS (GA)
 ------------------
 At the time of pagoda's initial releases, GA transitioned to using configure
 and a single library (libga) for version 5.0.  Prior to 5.0, building GA
 involved knowing your "TARGET" system and produced as many as five separate
-yet inter-dependent libraries (liblinalg, libma, libglobal, libarmci, libpario,
-libtcgmsg, libtcgmsg-mpi).  pagoda's configure system attempts to locate libga
-first and then the other libraries as needed.  GA was traditionally built for
-Fortran programs and as such by default contains Fortran source code.  This
-requires the Fortan libraries to be known at link-time.  Since this is the
-most common case, configure will try to determine $FLIBS for solely the
-purpose of linking with GA.  GA can be built without dependence on Fortran
-source and libraries, but that mode of GA install is not well tested.  In the
-future there will hopefully be a better way of detecting a GA installation.
+yet inter-dependent libraries (liblinalg, libma, libglobal, libarmci,
+libpario, libtcgmsg, libtcgmsg-mpi).  pagoda's configure system attempts to
+locate libga first and then the other libraries as needed.  GA was
+traditionally built for Fortran programs so by default contains Fortran source
+code.  This requires the Fortan libraries to be known at link-time.  Since
+this is the most common case, configure will try to determine $FLIBS for
+solely the purpose of linking with GA.  GA can be built without dependence on
+Fortran source and libraries, but that mode of GA install is not well tested.
+In the future there will hopefully be a better way of detecting a GA
+installation.
 
 Please refer to GA's own documentation for how to build it, usually located
 within their releases' README files.
 
 BUILDING GLOBAL ARRAYS 4.3.x on franklin.nersc.gov
---------------------------------------------------
-I'm not using the provided GA 4.x.x on franklin (e.g. module load ga).  The
-environment variables I use to build GA 4.3.x are as follows:
+..................................................
+Do no use the provided GA 4.x.x on franklin (e.g. module load ga) since it is
+usually an older version.  The environment variables we use to build GA 4.3.x
+are as follows::
 
-setenv TARGET LINUX64
-setenv MSG_COMMS MPI
-setenv ARMCI_NETWORK PORTALS
-setenv CC cc
-setenv CXX CC
-setenv F77 ftn
-setenv FC ftn
-setenv XT_SYMMETRIC_HEAP_SIZE 1G
-setenv MA_USE_ARMCI_MEM 1
-setenv CRAY_PORTALS_USE_BLOCKING_POLL 1
+    setenv TARGET LINUX64
+    setenv MSG_COMMS MPI
+    setenv ARMCI_NETWORK PORTALS
+    setenv CC cc
+    setenv CXX CC
+    setenv F77 ftn
+    setenv FC ftn
+    setenv XT_SYMMETRIC_HEAP_SIZE 1G
+    #setenv MA_USE_ARMCI_MEM 1 # <--- this option is currently broken; don't use
+    setenv CRAY_PORTALS_USE_BLOCKING_POLL 1
 
-With the above, you should be able to simply "make" GA.  The latter
-environment variable is important, apparently, because it toggles a feature of
-GA necessary on portals systems or else global operations within GA will
-crawl.
+With the above, you should be able to simply "make" GA.  The last environment
+variable is important, apparently, because it toggles a feature of GA
+necessary on portals systems or else global operations within GA will crawl.
 
-BUILDING GLOBAL ARRAYS 5.0.0 Beta
----------------------------------
+For the recommended envrionment variables on other platforms, please see the
+GA support page http://www.emsl.pnl.gov/docs/global/support.html.
+
+BUILDING GLOBAL ARRAYS 5.0 Beta
+...............................
 For detailed instructions on building GA 5.x or better (now converted to
-autotools), please see the README file in the GA distribution.
+autotools), please see the README file in the GA distribution.  The following
+example will build GA 5.x to use sockets for communication (this is not
+optimal -- please see GA's README file)::
 
-tar -xvzf ga-5-0B.tgz
-cd ga-5-0B
-mkdir bld
-cd bld
-../configure
-make
+    tar -xvzf ga-5-0B.tgz
+    cd ga-5-0B
+    mkdir bld
+    cd bld
+    ../configure
+    make
 
 OTHER GLOBAL ARRAYS NOTES
--------------------------
+.........................
 Note: as of this writing, GA's MA_USE_ARMCI_MEM is broken.  It is unclear when 
 this broke, but unset MA_USE_ARMCI_MEM in your environment.
+
+PARALLEL NETCDF (PNETCDF)
+-------------------------
+We recommend using the latest available version of pnetcdf.  We test with
+version 1.2.0.  Pagoda may still work with earlier versions of pnetcdf, but in
+order to take advantage of the latest pnetcdf IO optimizations, version 1.2.0
+or better is required.
+
+Pagoda has been known to work with pnetcdf 1.1.1.  Note that in pnetcdf 1.1.0
+there were problems with C++ compilers and the pnetcdf.h header.
 
 BUILDING PAGODA
 ===============
 
-Salt to taste the following.  Note that I do prefer to add --prefix=`pwd` to
-my own development configurations::
+Salt to taste the following.  Note that we prefer to add --prefix=`pwd` to
+our own development configurations::
 
     mkdir bld
     cd bld
@@ -94,105 +111,11 @@ my own development configurations::
     #### OR ####
     ../configure --with-pnetcdf=/path/to/pnetcdf/install --with-ga="-L/path/to/ga4.x/lib/TARGET -I/path/to/ga4.x/include"
 
-By now you should be able to "make".  The "make check" target will currently
-only build all test programs.  There is currently no test suite nor are there
-any sample input files.
+By now you should be able to "make".  The "make check" target is currently not
+implemented and will eventually contain our test suite.  The "make checkprogs"
+target will build all test programs as they become available.
 
-RUNNING PAGODA
-==============
-The following options are common to all operators:
-
--h, --help           print this usage information and exit
-
--3, --3              output file in netCDF3 CLASSIC (32-bit offset) storage
-                     format
-
--6, --64             output file in netCDF3 64-bit offset storage format
-
--5, --5              output file in parallel netCDF 64-bit data format
-
---file_format=FMT, --fl_fmt=FMT
-                     FMT=classic same as -3
-                     FMT=64bit same as -6
-                     FMT=64data same as -5
-
--A, --append         append to existing output file, if any
-
--a, --alphabetize    disable alphabetization of extracted variables
-
--C, --no-coords      associated coordinate variables should not be processed
-
--c, --coords         all coordinate variables will be processed
-
--d, --dimension      dim[,min[,max[,stride]]]
-
---fix_rec_dmn        change record dimension into fixed dimension in output file
-
---header_pad, --hdr_pad
-                     pad output header with indicated number of bytes
-
--h, --history        do not append to 'history' global attribute
-
--o, --output         output file name (or use last positional argument)
-
--O, --overwrite      overwrite existing output file, if any
-
--p, --path           path prefix for all input filenames
-
--v, --variable       var1[,var2[,...]] variable(s) to process
-
--X, --auxiliary      lon_min,lon_max,lat_min,lat_max auxiliary coordinate
-                     bounding box
-
--x, --exclude        extract all variables EXCEPT those specified with -v
-
--b, --box            north,south,east,west lat/lon bounding box
-
-Specify a bounding box representing the subset as indicated.  The values
-themselves may be in floating point or integer notation e.g.
-"-b 20.0,-20.0,170,150" (note the lack of spaces).  If multiple input files are
-placed on the command line, a "union" aggregation will occur.  If you use the
-"-j" argument in addition to placing multiple input files, it will perform a
-"join existing" aggregation.  See NcML aggregation documentation for details
-(http://www.unidata.ucar.edu/software/netcdf/ncml/v2.2/Aggregation.html).  The
-aggregation capability is not as extensively tested as running a single input
-file.
-
-NOTE: The famous "MJO" region we often test is "-b 20,-20,170,150"
-
-SUBSETTER (pgsub)
------------------
-The following options are unique to pgsub:
-
--j, --join           join all input files on the given dimension
-
--u, --union          take the union of all input files
-
-BINARY OPERATOR (pgbo)
-----------------------
-The following options are unique to pgbo:
-
--y, --op_typ         binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)
-
-Notice the additional "op_typ" argument.  Also notice that aggregation is not
-supported.  Otherwise it operates similarly to pgsub.
-
-RECORD AVERAGER (pgra)
-----------------------
-The following options are unique to pgra:
-
--y, --op_typ         average operation:
-                     avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl
-
-Notice the additional "op_typ" argument.  Also notice that aggregation is not
-supported.  Otherwise it operates similarly to pgsub.
-
-ENSEMBLE AVERAGER (pgea)
-------------------------
-The following options are unique to pgra:
-
--y, --op_typ         average operation:
-                     avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl
-
-Notice the additional "op_typ" argument.  Also notice that aggregation is not
-supported.  Otherwise it operates similarly to pgsub.
+There is a "sandobox" in which small test programs exist, but it should be
+ignored by end users.  It exists mainly for testing certain third party
+library functionality or for developing new ideas outside of the main source.
+You must --enable-sandbox to build the programs (if you are a developer).
