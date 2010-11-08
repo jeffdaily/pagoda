@@ -54,10 +54,10 @@ bool cmp(double x, double y)
 
 
 string usage(
-"Usage: pgcmp <filename> <filename> []\n"
-"\n"
-"If the third argument exists, then any mismatch detected results in a hard\n"
-"failure rather than warning and moving on.\n"
+    "Usage: pgcmp <filename> <filename> []\n"
+    "\n"
+    "If the third argument exists, then any mismatch detected results in a hard\n"
+    "failure rather than warning and moving on.\n"
 );
 
 
@@ -88,11 +88,13 @@ int main(int argc, char **argv)
             lhs = Dataset::open(argv[1]);
             rhs = Dataset::open(argv[2]);
             warn = true;
-        } else if (argc == 4) {
+        }
+        else if (argc == 4) {
             lhs = Dataset::open(argv[1]);
             rhs = Dataset::open(argv[2]);
             warn = false;
-        } else {
+        }
+        else {
             throw usage;
         }
 
@@ -120,7 +122,8 @@ int main(int argc, char **argv)
             str << lhs_dims.size() << "!=" << rhs_dims.size();
             if (warn) {
                 pagoda::println_zero("WARNING: " + str.str());
-            } else {
+            }
+            else {
                 throw str.str();
             }
         }
@@ -130,7 +133,8 @@ int main(int argc, char **argv)
             str << lhs_vars.size() << "!=" << rhs_vars.size();
             if (warn) {
                 pagoda::println_zero("WARNING: " + str.str());
-            } else {
+            }
+            else {
                 throw str.str();
             }
         }
@@ -191,7 +195,8 @@ int main(int argc, char **argv)
                 if (warn) {
                     pagoda::println_zero("WARNING: " + str.str());
                     continue;
-                } else {
+                }
+                else {
                     throw str.str();
                 }
             }
@@ -214,7 +219,8 @@ int main(int argc, char **argv)
                 if (warn) {
                     pagoda::println_zero("WARNING: " + str.str());
                     continue;
-                } else {
+                }
+                else {
                     throw str.str();
                 }
             }
@@ -226,7 +232,8 @@ int main(int argc, char **argv)
                 if (warn) {
                     pagoda::println_zero("WARNING: " + str.str());
                     continue;
-                } else {
+                }
+                else {
                     throw str.str();
                 }
             }
@@ -250,7 +257,8 @@ int main(int argc, char **argv)
                 if (warn) {
                     pagoda::println_zero("WARNING: " + str.str());
                     continue;
-                } else {
+                }
+                else {
                     throw str.str();
                 }
             }
@@ -264,7 +272,8 @@ int main(int argc, char **argv)
                 if (warn) {
                     pagoda::println_zero("WARNING: " + str.str());
                     continue;
-                } else {
+                }
+                else {
                     throw str.str();
                 }
             }
@@ -278,7 +287,8 @@ int main(int argc, char **argv)
                 if (warn) {
                     pagoda::println_zero("WARNING: " + str.str());
                     continue;
-                } else {
+                }
+                else {
                     throw str.str();
                 }
             }

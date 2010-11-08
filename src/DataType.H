@@ -58,7 +58,7 @@ class DataType
          */
         DataType(int type);
 
-        /** 
+        /**
          * Copy constructor.
          *
          * @param[in] type the DataType to copy
@@ -81,12 +81,12 @@ class DataType
          */
         DataType& operator = (const DataType &type);
 
-        /** 
-         * Equality comparison. 
-         * 
-         * @param[in] type the DataType to compare 
-         * @return true if the IDs are equal 
-         */ 
+        /**
+         * Equality comparison.
+         *
+         * @param[in] type the DataType to compare
+         * @return true if the IDs are equal
+         */
         bool operator == (const DataType &type) const;
 
         /**
