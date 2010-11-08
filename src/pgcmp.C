@@ -48,8 +48,17 @@ static void init_map(const vector<T> &v, map<string,T> &m)
 
 bool cmp(double x, double y)
 {
-    return std::abs(x-y)/std::max(1.0,std::abs(x)) <= 1e-12;
+    //return std::abs(x-y)/std::max(1.0,std::abs(x)) <= 1e-12;
+    return std::abs(x-y)/std::max(1.0,std::abs(x)) <= 1e-6;
 }
+
+
+string usage(
+"Usage: pgcmp <filename> <filename> []\n"
+"\n"
+"If the third argument exists, then any mismatch detected results in a hard\n"
+"failure rather than warning and moving on.\n"
+);
 
 
 int main(int argc, char **argv)
@@ -70,19 +79,27 @@ int main(int argc, char **argv)
     map<string,Dimension*> rhs_dims_m;
     map<string,Variable*>  rhs_vars_m;
 
+    bool warn;
+
     pagoda::initialize(&argc,&argv);
 
     try {
-        if (argc != 3) {
-            throw "Usage: pgcmp <filename> <filename>";
+        if (argc == 3) {
+            lhs = Dataset::open(argv[1]);
+            rhs = Dataset::open(argv[2]);
+            warn = true;
+        } else if (argc == 4) {
+            lhs = Dataset::open(argv[1]);
+            rhs = Dataset::open(argv[2]);
+            warn = false;
+        } else {
+            throw usage;
         }
 
-        lhs = Dataset::open(argv[1]);
         lhs_atts = lhs->get_atts();
         lhs_dims = lhs->get_dims();
         lhs_vars = lhs->get_vars();
 
-        rhs = Dataset::open(argv[2]);
         rhs_atts = rhs->get_atts();
         rhs_dims = rhs->get_dims();
         rhs_vars = rhs->get_vars();
@@ -96,19 +113,26 @@ int main(int argc, char **argv)
             str << "number of global attributes mismatch: ";
             str << lhs_atts.size() << "!=" << rhs_atts.size();
             pagoda::println_zero("WARNING: " + str.str());
-            //throw str.str();
         }
         if (lhs_dims.size() != rhs_dims.size()) {
             ostringstream str;
             str << "number of dimensions mismatch: ";
             str << lhs_dims.size() << "!=" << rhs_dims.size();
-            throw str.str();
+            if (warn) {
+                pagoda::println_zero("WARNING: " + str.str());
+            } else {
+                throw str.str();
+            }
         }
         if (lhs_vars.size() != rhs_vars.size()) {
             ostringstream str;
             str << "number of variables mismatch: ";
             str << lhs_vars.size() << "!=" << rhs_vars.size();
-            throw str.str();
+            if (warn) {
+                pagoda::println_zero("WARNING: " + str.str());
+            } else {
+                throw str.str();
+            }
         }
 
         // the code is a bit simpler if we use maps; initialize them
@@ -142,7 +166,6 @@ int main(int argc, char **argv)
             else {
                 ostringstream str;
                 str << "global attribute '" << name << "' not found";
-                //throw str.str();
                 pagoda::println_zero("WARNING: " + str.str());
                 continue;
             }
@@ -155,7 +178,6 @@ int main(int argc, char **argv)
                 ostringstream str;
                 str << "global attribute '" << name << "' length mismatch: ";
                 str << lhs_values.size() << "!=" << rhs_values.size();
-                //throw str.str();
                 pagoda::println_zero("WARNING: " + str.str());
                 continue;
             }
@@ -166,7 +188,12 @@ int main(int argc, char **argv)
                 str << "global attribute '" << name << "' mismatch:" << endl;
                 str << "'" << lhs_att->get_string() << "'" << endl;
                 str << "'" << rhs_att->get_string() << "'";
-                throw str.str();
+                if (warn) {
+                    pagoda::println_zero("WARNING: " + str.str());
+                    continue;
+                } else {
+                    throw str.str();
+                }
             }
         }
 
@@ -184,14 +211,24 @@ int main(int argc, char **argv)
             else {
                 ostringstream str;
                 str << "dimension '" << name << "' not found";
-                throw str.str();
+                if (warn) {
+                    pagoda::println_zero("WARNING: " + str.str());
+                    continue;
+                } else {
+                    throw str.str();
+                }
             }
 
             if (lhs_dim->get_size() != rhs_dim->get_size()) {
                 ostringstream str;
                 str << "dimension '" << name << "' size mismatch: ";
                 str << lhs_dim->get_size() << "!=" << rhs_dim->get_size();
-                throw str.str();
+                if (warn) {
+                    pagoda::println_zero("WARNING: " + str.str());
+                    continue;
+                } else {
+                    throw str.str();
+                }
             }
         }
 
@@ -210,7 +247,12 @@ int main(int argc, char **argv)
             else {
                 ostringstream str;
                 str << "variable '" << name << "' not found";
-                throw str.str();
+                if (warn) {
+                    pagoda::println_zero("WARNING: " + str.str());
+                    continue;
+                } else {
+                    throw str.str();
+                }
             }
 
             if (lhs_var->get_shape() != rhs_var->get_shape()) {
@@ -219,7 +261,12 @@ int main(int argc, char **argv)
                 str << pagoda::vec_to_string(lhs_var->get_shape());
                 str << "!=";
                 str << pagoda::vec_to_string(rhs_var->get_shape());
-                throw str.str();
+                if (warn) {
+                    pagoda::println_zero("WARNING: " + str.str());
+                    continue;
+                } else {
+                    throw str.str();
+                }
             }
 
             if (lhs_var->get_type() != rhs_var->get_type()) {
@@ -228,7 +275,12 @@ int main(int argc, char **argv)
                 str << lhs_var->get_type();
                 str << "!=";
                 str << rhs_var->get_type();
-                throw str.str();
+                if (warn) {
+                    pagoda::println_zero("WARNING: " + str.str());
+                    continue;
+                } else {
+                    throw str.str();
+                }
             }
 
             // read in entire variables
@@ -262,7 +314,12 @@ int main(int argc, char **argv)
                             str << lhs[j] << "!=" << rhs[j]; \
                             lhs_array->release(); \
                             rhs_array->release(); \
-                            ERR(str.str()); \
+                            if (warn) { \
+                                pagoda::println_zero("WARNING: " + str.str()); \
+                                break; \
+                            } else { \
+                                throw str.str(); \
+                            } \
                         } \
                     } \
                 } else
