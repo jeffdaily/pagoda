@@ -11,11 +11,11 @@
  *
  * @section Installation
  *
- * pagoda depends on the Global Arrays toolkit
+ * pagoda depends on the Message Passing Interface, the Global Arrays toolkit
  * (http://www.emsl.pnl.gov/docs/global/) and parallel netcdf
  * (http://trac.mcs.anl.gov/projects/parallel-netcdf).
  *
- * See INSTALL in the distribution for details.
+ * See INSTALL and README in the distribution for details.
  * Note that we use the autotools to build pagoda, so those familiar with
  * running configure and make should start with configure --help.
  */

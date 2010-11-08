@@ -349,8 +349,8 @@ void MaskMap::modify(
  * is useful.  Read it as: modify the mask for the "to_mask" Dimension based
  * on the given "masked" Dimension and the given "topology" relation.
  *
- * @param[in] masked the Dimension which already has an associated Mask
- * @param[in] to_mask the Dimension which should be masked based on masked
+ * @param[in] dim_masked the Dimension which already has an associated Mask
+ * @param[in] dim_to_mask the Dimension which should be masked based on masked
  * @param[in] topology relation between the two given Dimensions
  */
 void MaskMap::modify(
