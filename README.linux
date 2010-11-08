@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# The following steps get Pagoda to build on a generic Linux workstation or
+# cluster.
+#
+# You will likely need to change the MPI compiler names to suit your
+# particular system.  The following is known to work with OpenMPI on a Linux
+# workstation.
+#
+# If you put the required tarballs in your current working directory, you can
+# execute this file as a script.
+#
+TOP=`pwd`
+PNETCDF_DIR=parallel-netcdf-1.2.0
+GA_DIR=ga-5-0B
+PAGODA_DIR=pagoda-0.5.1
+export MPICC=mpicc
+export MPICXX=mpicxx
+export MPIF77=mpif77
+export MPIF90=mpif90
+#
+# GA install
+tar -xzf $GA_DIR.tgz
+cd $GA_DIR
+mkdir bld
+cd bld
+../configure CC=$MPICC F77=$MPIF77 --prefix=`pwd`
+make
+make install
+#
+# pnetcdf install
+cd $TOP
+tar -xzf $PNETCDF_DIR.tar.gz
+cd $PNETCDF_DIR
+./configure MPICC=$MPICC MPIF77=$MPIF77 MPIF90=$MPIF90 MPICXX=$MPICXX --prefix=`pwd`/local
+make
+make install
+#
+# pagoda install
+cd $TOP
+tar -xzf $PAGODA_DIR.tgz
+cd $PAGODA_DIR
+mkdir  bld
+cd bld
+../configure CC=$MPICC F77=$MPIF77 CXX=$MPICXX --with-pnetcdf=$TOP/$PNETCDF_DIR/local --with-ga=$TOP/$GA_DIR/bld --prefix=`pwd`

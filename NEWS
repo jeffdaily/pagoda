@@ -1,5 +1,14 @@
 pagoda NEWS - User visible changes.
 
+* Major changes in pagoda 0.5.1 (2010-11-08) [unstable]
+  Released by Jeff daily, based on svn version r412.
+
+** The pgcmp tool was relaxed.
+
+** Minor build fixes with regard to the sandbox.
+
+** Documentation fixes and additional READMEs.
+
 * Major changes in pagoda 0.5 (2010-10-28) [unstable]
   Released by Jeff daily, based on svn version r402.
 

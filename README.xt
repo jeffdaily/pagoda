@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# The following steps get Pagoda to build on the franklin Cray XT at NERSC.
+#
+# If you put the required tarballs in your current working directory, you can
+# execute this file as a script.
+#
+TOP=`pwd`
+PNETCDF_DIR=parallel-netcdf-1.2.0
+GA_DIR=ga-5-0B
+PAGODA_DIR=pagoda-0.5.1
+#
+# GA install
+tar -xzf $GA_DIR.tgz
+cd $GA_DIR
+mkdir bld
+cd bld
+../configure --with-portals --prefix=`pwd`
+make
+make install
+#
+# pnetcdf install
+cd $TOP
+tar -xzf $PNETCDF_DIR.tar.gz
+cd $PNETCDF_DIR
+./configure MPICC=cc MPIF77=ftn MPIF90=ftn MPICXX=CC --prefix=`pwd`/local
+make
+make install
+#
+# pagoda install
+cd $TOP
+tar -xzf $PAGODA_DIR.tgz
+cd $PAGODA_DIR
+mkdir  bld
+cd bld
+../configure --with-pnetcdf=$TOP/$PNETCDF_DIR/local --with-ga=$TOP/$GA_DIR/bld --prefix=`pwd`
