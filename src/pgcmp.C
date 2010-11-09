@@ -48,8 +48,8 @@ static void init_map(const vector<T> &v, map<string,T> &m)
 
 bool cmp(double x, double y)
 {
-    //return std::abs(x-y)/std::max(1.0,std::abs(x)) <= 1e-12;
-    return std::abs(x-y)/std::max(1.0,std::abs(x)) <= 1e-6;
+    //return std::fabs(x-y)/std::max(1.0,std::fabs(x)) <= 1e-12;
+    return std::fabs(x-y)/std::max(1.0,std::fabs(x)) <= 1e-6;
 }
 
 
