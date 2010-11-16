@@ -535,7 +535,7 @@ template <class T>
 Array* NodeZeroArray<T>::ipow(double exponent)
 {
     if (0 == pagoda::me) {
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] = static_cast<T>(std::pow(data[i], exponent));
         }
     }
@@ -547,7 +547,7 @@ template <class T>
 NodeZeroArray<T>& NodeZeroArray<T>::operator+=(const NodeZeroArray<T> &that)
 {
     if (0 == pagoda::me) {
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] += that.data[i];
         }
     }
@@ -560,7 +560,7 @@ NodeZeroArray<T>& NodeZeroArray<T>::operator+=(const ScalarArray &that)
 {
     if (0 == pagoda::me) {
         T value = that.as<T>();
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] += value;
         }
     }
@@ -572,7 +572,7 @@ template <class T>
 NodeZeroArray<T>& NodeZeroArray<T>::operator-=(const NodeZeroArray<T> &that)
 {
     if (0 == pagoda::me) {
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] -= that.data[i];
         }
     }
@@ -585,7 +585,7 @@ NodeZeroArray<T>& NodeZeroArray<T>::operator-=(const ScalarArray &that)
 {
     if (0 == pagoda::me) {
         T value = that.as<T>();
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] -= value;
         }
     }
@@ -597,7 +597,7 @@ template <class T>
 NodeZeroArray<T>& NodeZeroArray<T>::operator*=(const NodeZeroArray<T> &that)
 {
     if (0 == pagoda::me) {
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] *= that.data[i];
         }
     }
@@ -610,7 +610,7 @@ NodeZeroArray<T>& NodeZeroArray<T>::operator*=(const ScalarArray &that)
 {
     if (0 == pagoda::me) {
         T value = that.as<T>();
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] *= value;
         }
     }
@@ -622,7 +622,7 @@ template <class T>
 NodeZeroArray<T>& NodeZeroArray<T>::operator/=(const NodeZeroArray<T> &that)
 {
     if (0 == pagoda::me) {
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] /= that.data[i];
         }
     }
@@ -635,7 +635,7 @@ NodeZeroArray<T>& NodeZeroArray<T>::operator/=(const ScalarArray &that)
 {
     if (0 == pagoda::me) {
         T value = that.as<T>();
-        for (size_t i=0; i<size; ++i) {
+        for (int64_t i=0; i<size; ++i) {
             data[i] /= value;
         }
     }
