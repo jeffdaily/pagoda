@@ -41,11 +41,11 @@ class AggregationVariable : public AbstractVariable
 
         virtual DataType get_type() const;
 
-        virtual Array* read(Array *dst) const;
-        virtual Array* read(int64_t record, Array *dst) const;
+        virtual Array* read(Array *dst=NULL) const;
+        virtual Array* read(int64_t record, Array *dst=NULL) const;
 
-        virtual Array* iread(Array *dst);
-        virtual Array* iread(int64_t record, Array *dst);
+        virtual Array* iread(Array *dst=NULL);
+        virtual Array* iread(int64_t record, Array *dst=NULL);
 
         virtual ostream& print(ostream &os) const;
 
@@ -55,6 +55,17 @@ class AggregationVariable : public AbstractVariable
         vector<Variable*> vars; /**< Variables we are concatenating */
         vector<Array*> arrays_to_copy; /**< when non-blocking completes */
         Array *array_to_fill; /**< when non-blocking completes */
+
+    private:
+        /**
+         * Reads one timestep at a time and copies to dst Array.
+         */
+        Array* read_per_record(Array *dst) const;
+
+        /**
+         * Reads one aggregated Variable at a time and copies to dst Array.
+         */
+        Array* read_per_variable(Array *dst) const;
 };
 
 #endif // AGGREGATIONVARIABLE_H_

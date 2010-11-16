@@ -51,15 +51,11 @@ class Variable
 
         virtual DataType get_type() const = 0;
 
-        virtual Array* read() const = 0;
-        virtual Array* read(Array *dst) const = 0;
-        virtual Array* read(int64_t record) const = 0;
-        virtual Array* read(int64_t record, Array *dst) const = 0;
+        virtual Array* read(Array *dst=NULL) const = 0;
+        virtual Array* read(int64_t record, Array *dst=NULL) const = 0;
 
-        virtual Array* iread() = 0;
-        virtual Array* iread(Array *dst) = 0;
-        virtual Array* iread(int64_t record) = 0;
-        virtual Array* iread(int64_t record, Array *dst) = 0;
+        virtual Array* iread(Array *dst=NULL) = 0;
+        virtual Array* iread(int64_t record, Array *dst=NULL) = 0;
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Variable *other);

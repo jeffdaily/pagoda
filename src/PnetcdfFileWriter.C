@@ -223,6 +223,18 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 }
 
 
+void PnetcdfFileWriter::def_dim(Mask *mask)
+{
+    FileWriter::def_dim(mask);
+}
+
+
+void PnetcdfFileWriter::def_dim(Dimension *dim)
+{
+    FileWriter::def_dim(dim);
+}
+
+
 void PnetcdfFileWriter::def_var(const string &name,
                                 const vector<string> &dims,
                                 const DataType &type,
@@ -252,6 +264,30 @@ void PnetcdfFileWriter::def_var(const string &name,
         var_shape[name] = shape;
         write_atts_id(atts, id);
     }
+}
+
+
+void PnetcdfFileWriter::def_var(const string &name,
+                                const vector<Dimension*> &dims,
+                                const DataType &type,
+                                const vector<Attribute*> &atts)
+{
+    FileWriter::def_var(name, dims, type, atts);
+}
+
+
+void PnetcdfFileWriter::def_var(const string &name,
+                                const vector<Mask*> &dims,
+                                const DataType &type,
+                                const vector<Attribute*> &atts)
+{
+    FileWriter::def_var(name, dims, type, atts);
+}
+
+
+void PnetcdfFileWriter::def_var(Variable *var)
+{
+    FileWriter::def_var(var);
 }
 
 
@@ -374,6 +410,14 @@ void PnetcdfFileWriter::maybe_enddef()
         ncmpi::enddef(ncid);
         TRACER("PnetcdfFileWriter::maybe_enddef END DEF\n");
     }
+}
+
+
+void PnetcdfFileWriter::write_att(const string &name, Values *values,
+                                  DataType type,
+                                  const string &var_name)
+{
+    FileWriter::write_att(name, values, type, var_name);
 }
 
 

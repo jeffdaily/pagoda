@@ -54,7 +54,7 @@ class GlobalMask :  public Mask
                           const vector<int64_t> &dst_lo,
                           const vector<int64_t> &dst_hi);
 
-        virtual bool same_distribution(const Array *other);
+        virtual bool same_distribution(const Array *other) const;
 
         virtual bool owns_data() const;
         virtual void get_distribution(
@@ -64,16 +64,19 @@ class GlobalMask :  public Mask
         virtual void release() const;
         virtual void release_update();
 
-        virtual void* get(void *buffer,
-                          const vector<int64_t> &lo,
+        virtual void* get(void *buffer=NULL) const;
+        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const;
+        virtual void* get(const vector<int64_t> &lo,
                           const vector<int64_t> &hi,
-                          const vector<int64_t> &ld) const;
+                          void *buffer) const;
+        virtual void put(void *buffer);
+        virtual void put(void *buffer, int64_t lo, int64_t hi);
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
-                         const vector<int64_t> &hi,
-                         const vector<int64_t> &ld);
+                         const vector<int64_t> &hi);
         virtual void scatter(void *buffer, vector<int64_t> &subscripts);
-        virtual void* gather(vector<int64_t> &subscripts) const;
+        virtual void* gather(vector<int64_t> &subscripts,
+                             void *buffer=NULL) const;
 
         virtual Array* add(const Array *rhs) const;
         virtual Array* sub(const Array *rhs) const;

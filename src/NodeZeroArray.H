@@ -46,17 +46,19 @@ class NodeZeroArray : public Array
         virtual void release() const;
         virtual void release_update();
 
-        virtual void* get() const;
-        virtual void* get(void *buffer,
-                          const vector<int64_t> &lo,
+        virtual void* get(void *buffer=NULL) const;
+        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const;
+        virtual void* get(const vector<int64_t> &lo,
                           const vector<int64_t> &hi,
-                          const vector<int64_t> &ld) const;
+                          void *buffer=NULL) const;
+        virtual void put(void *buffer);
+        virtual void put(void *buffer, int64_t lo, int64_t hi);
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
-                         const vector<int64_t> &hi,
-                         const vector<int64_t> &ld);
+                         const vector<int64_t> &hi);
         virtual void scatter(void *buffer, vector<int64_t> &subscripts);
-        virtual void* gather(vector<int64_t> &subscripts) const;
+        virtual void* gather(vector<int64_t> &subscripts,
+                             void *buffer=NULL) const;
 
         virtual Array* add(const Array *rhs) const;
         virtual Array* sub(const Array *rhs) const;
@@ -270,22 +272,51 @@ void NodeZeroArray<T>::release_update()
 
 
 template <class T>
-void* NodeZeroArray<T>::get() const
+void* NodeZeroArray<T>::get(void *buffer) const
 {
+    // TODO should return a copy
     return data;
 }
 
 
 template <class T>
-void* NodeZeroArray<T>::get(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld) const
+void* NodeZeroArray<T>::get(int64_t lo, int64_t hi, void *buffer) const
 {
-    // TODO
-    ERR("not implemented NodeZeroArray<T>::get");
+    // TODO implement, don't forget should return a copy
+    ERR("not implemented NodeZeroArray<T>::get(int64_t,int64_t,void*)");
 }
 
 
 template <class T>
-void NodeZeroArray<T>::put(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld)
+void* NodeZeroArray<T>::get(const vector<int64_t> &lo,
+                            const vector<int64_t> &hi,
+                            void *buffer) const
+{
+    // TODO implement, don't forget should return a copy
+    ERR("not implemented NodeZeroArray<T>::get(const vector<int64_t>&,const vector<int64_t>&,void*");
+}
+
+
+template <class T>
+void NodeZeroArray<T>::put(void *buffer)
+{
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::put");
+}
+
+
+template <class T>
+void NodeZeroArray<T>::put(void *buffer, int64_t lo, int64_t hi)
+{
+    // TODO
+    ERR("not implemented NodeZeroArray<T>::put");
+}
+
+
+template <class T>
+void NodeZeroArray<T>::put(void *buffer,
+                           const vector<int64_t> &lo,
+                           const vector<int64_t> &hi)
 {
     // TODO
     ERR("not implemented NodeZeroArray<T>::put");
@@ -301,7 +332,7 @@ void NodeZeroArray<T>::scatter(void *buffer, vector<int64_t> &subscripts)
 
 
 template <class T>
-void* NodeZeroArray<T>::gather(vector<int64_t> &subscripts) const
+void* NodeZeroArray<T>::gather(vector<int64_t> &subscripts, void *buffer) const
 {
     // TODO
     ERR("not implemented NodeZeroArray<T>::gather");

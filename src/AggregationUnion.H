@@ -49,6 +49,7 @@ class AggregationUnion : public Aggregation
         virtual vector<Variable*> get_vars() const;
 
         virtual void add(Dataset *dataset);
+        virtual void add(const vector<Dataset*> &datasets);
         virtual vector<Dataset*> get_datasets() const;
 
         /**

@@ -15,7 +15,7 @@ ScalarArray::ScalarArray(DataType type)
 {
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        value = (void*)(new T); \
+        value = static_cast<void*>(new T); \
     } else
 #include "DataType.def"
 }
@@ -27,8 +27,9 @@ ScalarArray::ScalarArray(const ScalarArray &that)
 {
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        value = (void*)(new T); \
-        *((T*)value) = *((T*)(that.value)); \
+        T *tmp = new T; \
+        *tmp = *static_cast<T*>(that.value); \
+        value = static_cast<void*>(tmp); \
     } else
 #include "DataType.def"
 }
@@ -38,7 +39,7 @@ ScalarArray::~ScalarArray()
 {
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        delete ((T*)value); \
+        delete static_cast<T*>(value); \
     } else
 #include "DataType.def"
 }
@@ -72,7 +73,7 @@ void ScalarArray::fill(void *new_value)
 {
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        *((T*)value) = *((T*)new_value); \
+        *static_cast<T*>(value) = *static_cast<T*>(new_value); \
     } else
 #include "DataType.def"
 }
@@ -90,7 +91,7 @@ void ScalarArray::copy(const Array *src)
     if (sa_src) {
 #define DATATYPE_EXPAND(DT,T) \
         if (DT == type) { \
-            *((T*)value) = *((T*)(sa_src->value)); \
+            *static_cast<T*>(value) = *static_cast<T*>(sa_src->value); \
         } else
 #include "DataType.def"
     }
@@ -140,29 +141,70 @@ void ScalarArray::release_update()
 }
 
 
-void* ScalarArray::get() const
+void* ScalarArray::get(void *buffer) const
 {
-    return value;
-}
+    void *ret;
 
+    if (buffer == NULL) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            ret = static_cast<void*>(new T); \
+        } else
+#include "DataType.def"
+    } else {
+        ret = buffer;
+    }
 
-void* ScalarArray::get(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld) const
-{
-    ASSERT(lo.empty());
-    ASSERT(hi.empty());
-    ASSERT(ld.empty());
-    return value;
-}
-
-
-void ScalarArray::put(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld)
-{
-    ASSERT(lo.empty());
-    ASSERT(hi.empty());
-    ASSERT(ld.empty());
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        *((T*)value) = *((T*)(buffer)); \
+        *static_cast<T*>(ret) = *static_cast<T*>(value); \
+    } else
+#include "DataType.def"
+
+    return ret;
+}
+
+
+void* ScalarArray::get(int64_t lo, int64_t hi, void *buffer) const
+{
+    ERR("ScalarArray::get(int64_t,int64_t,void*) invalid for ScalarArray");
+    //return NULL; // unreachable
+}
+
+
+void* ScalarArray::get(const vector<int64_t> &lo, const vector<int64_t> &hi,
+                       void *buffer) const
+{
+    ASSERT(lo.empty());
+    ASSERT(hi.empty());
+    return get(buffer);;
+}
+
+
+void ScalarArray::put(void *buffer)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        *static_cast<T*>(value) = *static_cast<T*>(buffer); \
+    } else
+#include "DataType.def"
+}
+
+
+void ScalarArray::put(void *buffer, int64_t lo, int64_t hi)
+{
+    ERR("ScalarArray::put(void*,int64_t,int64_t) invalid for ScalarArray");
+}
+
+
+void ScalarArray::put(void *buffer,
+                      const vector<int64_t> &lo, const vector<int64_t> &hi)
+{
+    ASSERT(lo.empty());
+    ASSERT(hi.empty());
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        *static_cast<T*>(value) = *static_cast<T*>(buffer); \
     } else
 #include "DataType.def"
 }
@@ -173,16 +215,16 @@ void ScalarArray::scatter(void *buffer, vector<int64_t> &subscripts)
     ASSERT(subscripts.empty());
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
-        *((T*)value) = *((T*)(buffer)); \
+        *static_cast<T*>(value) = *static_cast<T*>(buffer); \
     } else
 #include "DataType.def"
 }
 
 
-void* ScalarArray::gather(vector<int64_t> &subscripts) const
+void* ScalarArray::gather(vector<int64_t> &subscripts, void *buffer) const
 {
     ASSERT(subscripts.empty());
-    return value;
+    return get(buffer);
 }
 
 

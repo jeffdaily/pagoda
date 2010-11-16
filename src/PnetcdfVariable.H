@@ -34,10 +34,10 @@ class PnetcdfVariable : public AbstractVariable
         virtual vector<Attribute*> get_atts() const;
         virtual Dataset* get_dataset() const;
         virtual DataType get_type() const;
-        virtual Array* read(Array *dst) const;
-        virtual Array* read(int64_t record, Array *dst) const;
-        virtual Array* iread(Array *dst);
-        virtual Array* iread(int64_t record, Array *dst);
+        virtual Array* read(Array *dst=NULL) const;
+        virtual Array* read(int64_t record, Array *dst=NULL) const;
+        virtual Array* iread(Array *dst=NULL);
+        virtual Array* iread(int64_t record, Array *dst=NULL);
 
         virtual ostream& print(ostream &os) const;
 

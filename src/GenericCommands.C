@@ -197,7 +197,6 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("variable")) {
         vector<string> args = parser.get_arguments("variable");
-        vector<string>::iterator truncate_location;
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
             istringstream iss(*it);
             while (iss) {

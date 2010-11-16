@@ -18,6 +18,9 @@ AM_DISABLE_SHARED
 #####################################################3
 # Fortran 77
 #####################################################3
+AC_MSG_NOTICE
+AC_MSG_NOTICE([Fortran 77 tests])
+AC_MSG_NOTICE
 AC_LANG_PUSH([Fortran 77])
 
 # Checks for Fortran 77 programs.
@@ -39,6 +42,9 @@ AC_LANG_POP([Fortran 77])
 #####################################################3
 # C
 #####################################################3
+AC_MSG_NOTICE
+AC_MSG_NOTICE([C tests])
+AC_MSG_NOTICE
 AC_LANG_PUSH([C])
 
 # Checks for C programs.
@@ -66,6 +72,9 @@ AC_LANG_POP([C])
 #####################################################3
 # C++
 #####################################################3
+AC_MSG_NOTICE
+AC_MSG_NOTICE([C++ tests])
+AC_MSG_NOTICE
 AC_LANG_PUSH([C++])
 
 # Checks for C++ programs.
@@ -154,6 +163,9 @@ AC_LANG_POP([C++])
 #####################################################3
 # Libtool.
 #####################################################3
+AC_MSG_NOTICE
+AC_MSG_NOTICE([Libtool tests])
+AC_MSG_NOTICE
 LT_INIT
 
 #####################################################3

@@ -99,6 +99,7 @@ bool Array::same_distribution(const Array *other) const
 }
 
 
+#if 0
 void* Array::get(int64_t lo, int64_t hi) const
 {
     return get(vector<int64_t>(1,lo),vector<int64_t>(1,hi));
@@ -158,6 +159,7 @@ void Array::put(void *buffer,
 
     put(buffer, lo, hi, ld);
 }
+#endif
 
 
 ostream& operator << (ostream &os, const Array *array)

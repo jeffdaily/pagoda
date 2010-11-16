@@ -93,10 +93,21 @@ DataType AggregationVariable::get_type() const
 }
 
 
-#if AGGREGATION_VARIABLE_READ_LOMEM
 Array* AggregationVariable::read(Array *dst) const
 {
-    /* Reads one timestep at a time and copies to dst Array */
+    if (dst == NULL) {
+        return AbstractVariable::read_alloc();
+    }
+#if AGGREGATION_VARIABLE_READ_LOMEM
+    return read_per_record(dst);
+#else
+    return read_per_variable(dst);
+#endif
+}
+
+
+Array* AggregationVariable::read_per_record(Array *dst) const
+{
     Array *src;
     int ndim;
     vector<int64_t> dst_lo;
@@ -132,11 +143,9 @@ Array* AggregationVariable::read(Array *dst) const
     return dst;
 }
 
-#else /* ! AGGREGATION_VARIABLE_READ_LOMEM */
 
-Array* AggregationVariable::read(Array *dst) const
+Array* AggregationVariable::read_per_variable(Array *dst) const
 {
-    /* Reads one aggregated Variable at a time and copies to dst Array */
     int ndim = get_ndim();
     vector<int64_t> dst_lo(ndim, 0);
     vector<int64_t> dst_hi = get_shape();
@@ -172,12 +181,15 @@ Array* AggregationVariable::read(Array *dst) const
 
     return dst;
 }
-#endif  /* AGGREGATION_VARIABLE_READ_LOMEM */
 
 
 Array* AggregationVariable::read(int64_t record, Array *dst) const
 {
     int64_t index_within_var = translate_record(record);
+
+    if (dst == NULL) {
+        return AbstractVariable::read_alloc(record);
+    }
 
     if (record < 0 || record > get_shape().at(0)) {
         throw IndexOutOfBoundsException("AggregationVariable::read");
@@ -211,6 +223,10 @@ Array* AggregationVariable::iread(Array *dst)
     vector<Variable*>::const_iterator var_it;
     vector<Variable*>::const_iterator var_end;
 
+    if (dst == NULL) {
+        return AbstractVariable::iread_alloc();
+    }
+
     array_to_fill = dst;
 
     for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
@@ -225,6 +241,10 @@ Array* AggregationVariable::iread(Array *dst)
 Array* AggregationVariable::iread(int64_t record, Array *dst)
 {
     int64_t index_within_var = translate_record(record);
+
+    if (dst == NULL) {
+        return AbstractVariable::iread_alloc(record);
+    }
 
     if (record < 0 || record > get_shape().at(0)) {
         throw IndexOutOfBoundsException("AggregationVariable::iread");

@@ -457,7 +457,7 @@ void GlobalMask::copy(const Array *src, const vector<int64_t> &src_lo, const vec
 }
 
 
-bool GlobalMask::same_distribution(const Array *other)
+bool GlobalMask::same_distribution(const Array *other) const
 {
     return mask->same_distribution(other);
 }
@@ -500,23 +500,41 @@ void GlobalMask::release_update()
 }
 
 
-void* GlobalMask::get(
-    void *buffer,
-    const vector<int64_t> &lo,
-    const vector<int64_t> &hi,
-    const vector<int64_t> &ld) const
+void* GlobalMask::get(void *buffer) const
 {
-    return mask->get(buffer,lo,hi,ld);
+    return mask->get(buffer);
 }
 
 
-void GlobalMask::put(
-    void *buffer,
-    const vector<int64_t> &lo,
-    const vector<int64_t> &hi,
-    const vector<int64_t> &ld)
+void* GlobalMask::get(int64_t lo, int64_t hi, void *buffer) const
 {
-    mask->put(buffer,lo,hi,ld);
+    return mask->get(lo,hi,buffer);
+}
+
+
+void* GlobalMask::get(const vector<int64_t> &lo, const vector<int64_t> &hi,
+                      void *buffer) const
+{
+    return mask->get(lo,hi,buffer);
+}
+
+
+void GlobalMask::put(void *buffer)
+{
+    mask->put(buffer);
+}
+
+
+void GlobalMask::put(void *buffer, int64_t lo, int64_t hi)
+{
+    mask->put(buffer,lo,hi);
+}
+
+
+void GlobalMask::put(void *buffer,
+                     const vector<int64_t> &lo, const vector<int64_t> &hi)
+{
+    mask->put(buffer,lo,hi);
 }
 
 
@@ -526,9 +544,9 @@ void GlobalMask::scatter(void *buffer, vector<int64_t> &subscripts)
 }
 
 
-void* GlobalMask::gather(vector<int64_t> &subscripts) const
+void* GlobalMask::gather(vector<int64_t> &subscripts, void *buffer) const
 {
-    return mask->gather(subscripts);
+    return mask->gather(subscripts, buffer);
 }
 
 

@@ -49,16 +49,19 @@ class GlobalArray : public Array
         virtual void release() const;
         virtual void release_update();
 
-        virtual void* get(void *buffer,
-                          const vector<int64_t> &lo,
+        virtual void* get(void *buffer=NULL) const;
+        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const;
+        virtual void* get(const vector<int64_t> &lo,
                           const vector<int64_t> &hi,
-                          const vector<int64_t> &ld) const;
+                          void *buffer=NULL) const;
+        virtual void put(void *buffer);
+        virtual void put(void *buffer, int64_t lo, int64_t hi);
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
-                         const vector<int64_t> &hi,
-                         const vector<int64_t> &ld);
+                         const vector<int64_t> &hi);
         virtual void scatter(void *buffer, vector<int64_t> &subscripts);
-        virtual void* gather(vector<int64_t> &subscripts) const;
+        virtual void* gather(vector<int64_t> &subscripts,
+                             void *buffer=NULL) const;
 
         virtual Array* add(const Array *rhs) const;
         virtual Array* sub(const Array *rhs) const;

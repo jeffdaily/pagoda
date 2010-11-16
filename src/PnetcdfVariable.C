@@ -95,8 +95,8 @@ DataType PnetcdfVariable::get_type() const
 
 Array* PnetcdfVariable::read(Array *dst) const
 {
-    if (!dst) {
-        return AbstractVariable::read();
+    if (dst == NULL) {
+        return AbstractVariable::read_alloc();
     }
     return read(dst, false);
 }
@@ -104,8 +104,8 @@ Array* PnetcdfVariable::read(Array *dst) const
 
 Array* PnetcdfVariable::iread(Array *dst)
 {
-    if (!dst) {
-        return AbstractVariable::iread();
+    if (dst == NULL) {
+        return AbstractVariable::iread_alloc();
     }
     return read(dst, true);
 }
@@ -172,8 +172,8 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
 
 Array* PnetcdfVariable::read(int64_t record, Array *dst) const
 {
-    if (!dst) {
-        return AbstractVariable::read(record);
+    if (dst == NULL) {
+        return AbstractVariable::read_alloc(record);
     }
     return read(record, dst, false);
 }
@@ -181,8 +181,8 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst) const
 
 Array* PnetcdfVariable::iread(int64_t record, Array *dst)
 {
-    if (!dst) {
-        return AbstractVariable::iread(record);
+    if (dst == NULL) {
+        return AbstractVariable::iread_alloc(record);
     }
     return read(record, dst, true);
 }

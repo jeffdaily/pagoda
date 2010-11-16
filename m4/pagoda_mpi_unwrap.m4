@@ -30,76 +30,115 @@ AC_LANG_CASE(
 [Fortran], [
     wrapped="$FC"
 ])
-AS_VAR_PUSHDEF([ga_cv_mpi_naked], [ga_cv_mpi[]_AC_LANG_ABBREV[]_naked])
-AC_CACHE_CHECK([for base $wrapped compiler], [ga_cv_mpi_naked], [
+AS_VAR_PUSHDEF([pagoda_cv_mpi_naked], [pagoda_cv_mpi[]_AC_LANG_ABBREV[]_naked])
+AC_CACHE_CHECK([for base $wrapped compiler], [pagoda_cv_mpi_naked], [
 versions="--version -v -V -qversion"
 inside="$srcdir/build-aux/inside.pl"
 found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
-AS_IF([test "x$ga_cv_mpi_naked" = x], [
+AS_IF([test "x$pagoda_cv_mpi_naked" = x], [
 echo "only comparing stdout" >&AS_MESSAGE_LOG_FD
-for version in $versions; do
-    for naked_compiler in $compilers; do
-        rm -f mpi.txt mpi.err naked.txt naked.err
-        AS_IF([$wrapped $version 1>mpi.txt 2>mpi.err],
-            [found_wrapped_version=1
-             AS_IF([$naked_compiler $version 1>naked.txt 2>naked.err],
-                [AS_IF([$inside mpi.txt naked.txt >/dev/null],
-                    [ga_cv_mpi_naked=$naked_compiler; break],
-                    [echo "inside.pl failed, skipping" >&AS_MESSAGE_LOG_FD])],
-                [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])],
-            [echo "$wrapped $version failed, skipping" >&AS_MESSAGE_LOG_FD])
-    done
-    AS_IF([test "x$ga_cv_mpi_naked" != x], [break])
+for version in $versions
+do
+    echo "trying version=$version" >&AS_MESSAGE_LOG_FD
+    rm -f mpi.txt mpi.err naked.txt naked.err
+    AS_IF([$wrapped $version 1>mpi.txt 2>mpi.err],
+        [found_wrapped_version=1
+         for naked_compiler in $compilers
+         do
+            AS_IF([test "x$naked_compiler" != "x$wrapped"],
+                [AS_IF([$naked_compiler $version 1>naked.txt 2>naked.err],
+                    [AS_IF([$inside mpi.txt naked.txt >/dev/null],
+                        [pagoda_cv_mpi_naked=$naked_compiler; break],
+                        [echo "inside.pl $wrapped $naked_compiler failed, skipping" >&AS_MESSAGE_LOG_FD])],
+                    [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])])
+         done],
+        [echo "$wrapped $version failed, skipping" >&AS_MESSAGE_LOG_FD])
+    AS_IF([test "x$pagoda_cv_mpi_naked" != x], [break])
 done
 ])
-# Perhaps none of the MPI compilers had a zero exit status (this is wrong).
+# Perhaps none of the MPI compilers had a zero exit status (this is bad).
+# In this case we have to do a brute force match regardless of exit status.
 AS_IF([test "x$found_wrapped_version" = x0], [
 echo "no zero exit status found for MPI compilers" >&AS_MESSAGE_LOG_FD
-AS_IF([test "x$ga_cv_mpi_naked" = x], [
-for version in $versions; do
-    for naked_compiler in $compilers; do
-        rm -f mpi.txt mpi.err naked.txt naked.err
-        $wrapped $version 1>mpi.txt 2>mpi.err
-        AS_IF([$naked_compiler $version 1>naked.txt 2>naked.err],
-            [AS_IF([$inside mpi.txt naked.txt >/dev/null],
-                [ga_cv_mpi_naked=$naked_compiler; break],
-                [echo "inside.pl failed, skipping" >&AS_MESSAGE_LOG_FD])],
-            [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])
+AS_IF([test "x$pagoda_cv_mpi_naked" = x], [
+for version in $versions
+do
+    echo "trying version=$version" >&AS_MESSAGE_LOG_FD
+    rm -f mpi.txt mpi.err
+    $wrapped $version 1>mpi.txt 2>mpi.err
+    for naked_compiler in $compilers
+    do
+        AS_IF([test "x$naked_compiler" != "x$wrapped"],
+            [rm -f naked.txt naked.err
+             AS_IF([$naked_compiler $version 1>naked.txt 2>naked.err],
+                [AS_IF([$inside mpi.txt naked.txt >/dev/null],
+                    [pagoda_cv_mpi_naked=$naked_compiler; break],
+                    [echo "inside.pl $wrapped $naked_compiler failed, skipping" >&AS_MESSAGE_LOG_FD])],
+                [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])])
     done
-    AS_IF([test "x$ga_cv_mpi_naked" != x], [break])
+    AS_IF([test "x$pagoda_cv_mpi_naked" != x], [break])
 done
 ])
 ])
 # Try by combining stdout/err into one file.
-AS_IF([test "x$ga_cv_mpi_naked" = x], [
+AS_IF([test "x$pagoda_cv_mpi_naked" = x], [
 echo "try combining stdout and stderr into one file" >&AS_MESSAGE_LOG_FD
-for version in $versions; do
-    for naked_compiler in $compilers; do
-        rm -f mpi.txt naked.txt
-        AS_IF([$wrapped $version 1>mpi.txt 2>&1],
-            [AS_IF([$naked_compiler $version 1>naked.txt 2>&1],
+for version in $versions
+do
+    echo "trying version=$version" >&AS_MESSAGE_LOG_FD
+    rm -f mpi.txt naked.txt
+    AS_IF([$wrapped $version 1>mpi.txt 2>&1],
+        [for naked_compiler in $compilers
+         do
+            AS_IF([test "x$naked_compiler" != "x$wrapped"],
+                [AS_IF([$naked_compiler $version 1>naked.txt 2>&1],
+                    [AS_IF([$inside mpi.txt naked.txt >/dev/null],
+                        [pagoda_cv_mpi_naked=$naked_compiler; break],
+                        [echo "inside.pl $wrapped $naked_compiler failed, skipping" >&AS_MESSAGE_LOG_FD])],
+                    [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])])
+         done],
+        [echo "$wrapped $version failed, skipping" >&AS_MESSAGE_LOG_FD])
+    AS_IF([test "x$pagoda_cv_mpi_naked" != x], [break])
+done
+])
+# If we got this far, then it's likely that the MPI compiler had a zero exit
+# status when it shouldn't have for one version flag, but later had a non-zero
+# exit status for a flag it shouldn't have.  One false positive hid a false
+# negative.  In this case, brute force compare all MPI compiler output against
+# all compiler output.
+AS_IF([test "x$pagoda_cv_mpi_naked" = x], [
+echo "we have a very badly behaving MPI compiler" >&AS_MESSAGE_LOG_FD
+for version in $versions
+do
+    echo "trying version=$version" >&AS_MESSAGE_LOG_FD
+    rm -f mpi.txt mpi.err
+    $wrapped $version 1>mpi.txt 2>mpi.err
+    for naked_compiler in $compilers
+    do
+        AS_IF([test "x$naked_compiler" != "x$wrapped"],
+            [rm -f naked.txt naked.err
+             AS_IF([$naked_compiler $version 1>naked.txt 2>naked.err],
                 [AS_IF([$inside mpi.txt naked.txt >/dev/null],
-                    [ga_cv_mpi_naked=$naked_compiler; break],
-                    [echo "inside.pl failed, skipping" >&AS_MESSAGE_LOG_FD])],
-                [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])],
-            [echo "$wrapped $version failed, skipping" >&AS_MESSAGE_LOG_FD])
+                    [pagoda_cv_mpi_naked=$naked_compiler; break],
+                    [echo "inside.pl $wrapped $naked_compiler failed, skipping" >&AS_MESSAGE_LOG_FD])],
+                [echo "$naked_compiler $version failed, skipping" >&AS_MESSAGE_LOG_FD])])
     done
-    AS_IF([test "x$ga_cv_mpi_naked" != x], [break])
+    AS_IF([test "x$pagoda_cv_mpi_naked" != x], [break])
 done
 ])
 rm -f mpi.txt mpi.err naked.txt naked.err
-AS_IF([test "x$ga_cv_mpi_naked" = x], [ga_cv_mpi_naked=error])
+AS_IF([test "x$pagoda_cv_mpi_naked" = x], [pagoda_cv_mpi_naked=error])
 ])
-AS_VAR_POPDEF([ga_cv_mpi_naked])
-AS_IF([test "x$ga_cv_mpi_naked" = xerror],
+AS_VAR_POPDEF([pagoda_cv_mpi_naked])
+AS_IF([test "x$pagoda_cv_mpi_naked" = xerror],
     [AC_MSG_WARN([Could not determine the Fortran compiler wrapped by MPI])
      AC_MSG_WARN([This is usually okay])])
 ])dnl
 
 
 # PAGODA_MPI_UNWRAP_PUSH()
-# ------------------------
+# --------------------
 # Set CC/CXX/F77/FC to their unwrapped MPI counterparts.
 # Save their old values for restoring later.
 AC_DEFUN([PAGODA_MPI_UNWRAP_PUSH], [
@@ -107,15 +146,15 @@ pagoda_mpi_unwrap_push_save_CC="$CC"
 pagoda_mpi_unwrap_push_save_CXX="$CXX"
 pagoda_mpi_unwrap_push_save_F77="$F77"
 pagoda_mpi_unwrap_push_save_FC="$FC"
-AS_IF([test "x$ga_cv_mpic_naked"   != xerror], [ CC="$ga_cv_mpic_naked"])
-AS_IF([test "x$ga_cv_mpicxx_naked" != xerror], [CXX="$ga_cv_mpicxx_naked"])
-AS_IF([test "x$ga_cv_mpif77_naked" != xerror], [F77="$ga_cv_mpif77_naked"])
-AS_IF([test "x$ga_cv_mpifc_naked"  != xerror], [ FC="$ga_cv_mpifc_naked"])
+AS_IF([test "x$pagoda_cv_mpic_naked"   != xerror], [ CC="$pagoda_cv_mpic_naked"])
+AS_IF([test "x$pagoda_cv_mpicxx_naked" != xerror], [CXX="$pagoda_cv_mpicxx_naked"])
+AS_IF([test "x$pagoda_cv_mpif77_naked" != xerror], [F77="$pagoda_cv_mpif77_naked"])
+AS_IF([test "x$pagoda_cv_mpifc_naked"  != xerror], [ FC="$pagoda_cv_mpifc_naked"])
 ])dnl
 
 
 # PAGODA_MPI_UNWRAP_POP()
-# -----------------------
+# -------------------
 # Restore CC/CXX/F77/FC to their MPI counterparts.
 AC_DEFUN([PAGODA_MPI_UNWRAP_POP], [
  CC="$pagoda_mpi_unwrap_push_save_CC"

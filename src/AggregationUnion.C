@@ -108,6 +108,12 @@ void AggregationUnion::add(Dataset *dataset)
 }
 
 
+void AggregationUnion::add(const vector<Dataset*> &datasets)
+{
+    Aggregation::add(datasets);
+}
+
+
 vector<Dataset*> AggregationUnion::get_datasets() const
 {
     return datasets;

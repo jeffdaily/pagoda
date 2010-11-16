@@ -55,6 +55,13 @@ class PnetcdfDataset : public AbstractDataset
 
         virtual ostream& print(ostream &os) const;
 
+        virtual Attribute* get_att(const string &name,
+                                   bool ignore_case=false,
+                                   bool within=false) const;
+        virtual Attribute* get_att(const vector<string> &names,
+                                   bool ignore_case=false,
+                                   bool within=false) const;
+
         /**
          * Returns the PnetcdfAttribute at index i.
          *
@@ -62,6 +69,10 @@ class PnetcdfDataset : public AbstractDataset
          * @return the PnetcdfAttribute at index i
          */
         PnetcdfAttribute* get_att(size_t i) const;
+
+        virtual Dimension* get_dim(const string &name,
+                                   bool ignore_case=false,
+                                   bool within=false) const;
 
         /**
          * Returns the PnetcdfDimension at index i.
@@ -71,13 +82,17 @@ class PnetcdfDataset : public AbstractDataset
          */
         PnetcdfDimension* get_dim(size_t i) const;
 
+        virtual Variable* get_var(const string &name,
+                                  bool ignore_case=false,
+                                  bool within=false) const;
+
         /**
          * Returns the PnetcdfVariable at index i.
          *
          * @param[in] i the index
          * @return the PnetcdfVariable at index i
          */
-        PnetcdfVariable*  get_var(size_t i) const;
+        PnetcdfVariable* get_var(size_t i) const;
 
         /**
          * Returns the name of the file represented by this Dataset.

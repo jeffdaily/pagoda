@@ -171,6 +171,12 @@ void AggregationJoinExisting::add(Dataset *dataset)
 }
 
 
+void AggregationJoinExisting::add(const vector<Dataset*> &dataset)
+{
+    Aggregation::add(dataset);
+}
+
+
 vector<Dataset*> AggregationJoinExisting::get_datasets() const
 {
     return datasets;

@@ -23,42 +23,44 @@ class Array
     public:
 
         /**
-         * Factory Array creation.
+         * Factory Array creation taking a shape directly.
          *
-         * @param[in] type the type of Array to create
-         * @param[in] shape the shape of the Array to create
+         * @param[in] type of Array to create
+         * @param[in] shape of the Array to create
+         * @return the new Array
          */
         static Array* create(DataType type, vector<int64_t> shape);
 
         /**
-         * Factory Array creation.
+         * Factory Array creation deriving shape from dims.
          *
-         * @param[in] type the type of Array to create
-         * @param[in] dims the shape is take from the given Dimensions
+         * @param[in] type of Array to create
+         * @param[in] dims the shape is taken from the given Dimensions
+         * @return the new Array
          */
         static Array* create(DataType type, vector<Dimension*> dims);
 
         /**
-         * Array destructor.
+         * Destroys the Array.
          */
         virtual ~Array();
 
         /**
-         * Return the DataType of the Array.
+         * Returns the DataType of the Array.
          *
          * @return the DataType
          */
         virtual DataType get_type() const = 0;
 
         /**
-         * Return the shape of the Array.
+         * Returns the shape of the Array.
          *
          * @return the shape
          */
         virtual vector<int64_t> get_shape() const = 0;
 
         /**
-         * Return the size of the Array.
+         * Returns the size of the Array.
          *
          * @return the global number of elements in the Array
          */
@@ -97,14 +99,14 @@ class Array
         /**
          * Fills the array with the given value.
          *
-         * @param[in] value the value to fill with
+         * @param[in] value to fill with
          */
         virtual void fill(void *value) = 0;
 
         /**
          * Fills the array with the given value.
          *
-         * @param[in] value the value to fill with
+         * @param[in] value to fill with
          */
         template <class CT> void fill_value(CT value) {
             DataType type = get_type();
@@ -160,7 +162,7 @@ class Array
         virtual bool owns_data() const = 0;
 
         /**
-         * Get the local distribution of the Array.
+         * Gets the local distribution of the Array.
          *
          * lo and hi will be empty if this process does not own any data.
          *
@@ -181,6 +183,7 @@ class Array
          * @return the starting address of the local data
          */
         virtual void* access() = 0;
+
         /**
          * Returns the starting address of the local data
          *
@@ -206,116 +209,98 @@ class Array
         virtual void release_update() = 0;
 
         /**
-         * Copies data from Array into local buffer and returns the buffer.
-         * Caller must cast the returned buffer to the appropriate type and
-         * must also free the returned buffer when finished.  Shortcut for a
-         * 1-Dimensional get.
+         * Copies all data from Array into local buffer and returns the buffer.
          *
-         * @param[in] lo
-         * @param[in] hi
-         * @return the new buffer
-         */
-        virtual void* get(int64_t lo, int64_t hi) const;
-
-        /**
-         * Copies data from Array into local buffer and returns the buffer.
-         * Caller must cast the returned buffer to the appropriate type and
-         * must also free the returned buffer when finished.  Shortcut for a
-         * 1-Dimensional get.
-         *
-         * @param[in,out] buffer preallocated local array
-         * @param[in] lo
-         * @param[in] hi
-         * @return the given buffer, modified
-         */
-        virtual void* get(void *buffer, int64_t lo, int64_t hi) const;
-
-        /**
-         * Copies data from Array into local buffer and returns the buffer.
          * Caller must cast the returned buffer to the appropriate type and
          * must also free the returned buffer when finished.
          *
-         * @param[in] lo
-         * @param[in] hi
-         * @return the new buffer
+         * The buffer argument is optional.  If not NULL, the buffer should
+         * point to an appropriately sized and typed contiguous block of
+         * memory.  If NULL, an appropriately sized and typed buffer will be
+         * allocated via new.
+         *
+         * @param[in] buffer to copy into
+         * @return the buffer; new if buffer was NULL
+         */
+        virtual void* get(void *buffer=NULL) const = 0;
+
+        /**
+         * Copies data from Array into local buffer and returns the buffer.
+         *
+         * Caller must cast the returned buffer to the appropriate type and
+         * must also free the returned buffer when finished.  Shortcut for a
+         * 1-Dimensional get.  It is an error to call this if the rank of the
+         * Array is not 1.
+         *
+         * The buffer argument is optional.  If not NULL, the buffer should
+         * point to an appropriately sized and typed contiguous block of
+         * memory.  If NULL, an appropriately sized and typed buffer will be
+         * allocated via new.
+         *
+         * @param[in] lo the lowest index in the range to retrieve
+         * @param[in] hi the highest index in the range to retrieve
+         * @param[in] buffer to copy into
+         * @return the buffer; new if buffer was NULL
+         */
+        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const = 0;
+
+        /**
+         * Copies data from Array into local buffer and returns the buffer.
+         *
+         * Caller must cast the returned buffer to the appropriate type and
+         * must also free the returned buffer when finished.
+         *
+         * The buffer argument is optional.  If not NULL, the buffer should
+         * point to an appropriately sized and typed contiguous block of
+         * memory.  If NULL, an appropriately sized and typed buffer will be
+         * allocated via new.
+         *
+         * @param[in] lo the lowest indices to retrieve
+         * @param[in] hi the highest indices to retrieve
+         * @param[in] buffer to copy into
+         * @return the buffer; new if buffer was NULL
          */
         virtual void* get(const vector<int64_t> &lo,
-                          const vector<int64_t> &hi) const;
-
-        /**
-         * Copies data from Array into local buffer and returns the buffer.
-         * Caller must cast the returned buffer to the appropriate type and
-         * must also free the returned buffer when finished.
-         *
-         * @param[in,out] buffer preallocated local array
-         * @param[in] lo
-         * @param[in] hi
-         * @return the given buffer, modified
-         */
-        virtual void* get(void *buffer,
-                          const vector<int64_t> &lo,
-                          const vector<int64_t> &hi) const;
-
-        /**
-         * Copies data from Array into given buffer and returns the buffer.
-         * Caller must cast the returned buffer to the appropriate type.
-         *
-         * @param[in,out] buffer preallocated local array
-         * @param[in] lo
-         * @param[in] hi
-         * @param[in] ld array specifying the leading
-         *               dimensions/strides/extents of the buffer array
-         * @return the given buffer, modified
-         */
-        virtual void* get(void *buffer,
-                          const vector<int64_t> &lo,
                           const vector<int64_t> &hi,
-                          const vector<int64_t> &ld) const = 0;
+                          void *buffer=NULL) const = 0;
 
         /**
          * Copies data from the source buffer into into the Array.
-         * 1-D shorthand.
          *
-         * The buffer is assumed to have the same number of elements as the
-         * indicated patch.
+         * The buffer is assumed to both have the same number of elements as
+         * the entire Array and also to be contiguous.
          *
-         * @param[in] buffer the buffer
+         * @param[in] buffer the contiguous buffer
+         */
+        virtual void put(void *buffer) = 0;
+
+        /**
+         * Copies data from the source buffer into into the 1-D Array.
+         *
+         * The buffer is assumed both to have the same number of elements as
+         * the indicated patch and also to be contiguous.
+         *
+         * It is an error to call this if the rank of the Array is not 1.
+         *
+         * @param[in] buffer the contiguous buffer
          * @param[in] lo
          * @param[in] hi
          */
-        virtual void put(void *buffer, int64_t lo, int64_t hi);
+        virtual void put(void *buffer, int64_t lo, int64_t hi) = 0;
 
         /**
-         * Copies data from the source buffer into into the Array.
-         * Assumes leading dimensions (ld) can be inferred from shape of the
-         * specified patch.
+         * Copies data from the source buffer into into the Array patch.
          *
          * The buffer is assumed to have the same number of elements as the
          * indicated patch.
          *
-         * @param[in] buffer the buffer
+         * @param[in] buffer the contiguous buffer
          * @param[in] lo
          * @param[in] hi
          */
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
-                         const vector<int64_t> &hi);
-
-        /**
-         * Copies data from the source buffer into into the Array.
-         *
-         * The buffer is assumed to have the same number of elements as the
-         * indicated patch.
-         *
-         * @param[in] buffer the buffer
-         * @param[in] lo
-         * @param[in] hi
-         * @param[in] ld the leading dimensions of the buffer array
-         */
-        virtual void put(void *buffer,
-                         const vector<int64_t> &lo,
-                         const vector<int64_t> &hi,
-                         const vector<int64_t> &ld) = 0;
+                         const vector<int64_t> &hi) = 0;
 
         /**
          * Scatters values into this Array.
@@ -336,9 +321,11 @@ class Array
          * the specified subscripts.
          *
          * @param[in] subscripts the indices from where to gather
+         * @param[in] buffer contiguous local array to copy values into
          * @return the gathered values
          */
-        virtual void* gather(vector<int64_t> &subscripts) const = 0;
+        virtual void* gather(vector<int64_t> &subscripts,
+                             void *buffer=NULL) const = 0;
 
         /**
          * Adds two Arrays.

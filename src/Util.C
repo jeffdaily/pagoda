@@ -278,6 +278,12 @@ void pagoda::gop_sum(vector<long double> &values)
 }
 
 
+static int64_t op_lohi_diff(int64_t lo, int64_t hi)
+{
+    return hi-lo+1;
+}
+
+
 /**
  * Returns the shape of the given region.
  *
@@ -285,15 +291,20 @@ void pagoda::gop_sum(vector<long double> &values)
  * @param[in] hi
  * @return the shape
  */
-vector<int64_t> pagoda::get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi)
+vector<int64_t> pagoda::get_shape(const vector<int64_t> &lo,
+                                  const vector<int64_t> &hi)
 {
     vector<int64_t> ret(lo.size());
 
     TIMING("pagoda::get_shape(vector<int64_t>,vector<int64_t>)");
 
+#if 0
     for (size_t i=0,limit=lo.size(); i<limit; ++i) {
         ret[i] = hi[i]-lo[i]+1;
     }
+#else
+    std::transform(lo.begin(), lo.end(), hi.begin(), ret.begin(), op_lohi_diff);
+#endif
 
     return ret;
 }

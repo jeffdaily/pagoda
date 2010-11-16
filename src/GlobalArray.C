@@ -3,6 +3,7 @@
 #endif
 
 #include <algorithm>
+#include <functional>
 #include <sstream>
 #include <typeinfo>
 
@@ -148,7 +149,7 @@ void GlobalArray::copy(const Array *src)
         // in array's data into those buffers.
         if (owns_data()) {
             void *data = access();
-            src->get(data, lo, hi);
+            data = src->get(lo, hi, data);
             release_update();
         }
     }
@@ -647,33 +648,87 @@ void GlobalArray::release_update()
 }
 
 
-void* GlobalArray::get(
-    void *buffer,
-    const vector<int64_t> &lo,
-    const vector<int64_t> &hi,
-    const vector<int64_t> &ld) const
+void* GlobalArray::get(void *buffer) const
 {
-    vector<int64_t> lo_copy(lo.begin(),lo.end());
-    vector<int64_t> hi_copy(hi.begin(),hi.end());
-    vector<int64_t> ld_copy(ld.begin(),ld.end());
+    vector<int64_t> lo(0, shape.size());
+    vector<int64_t> hi(shape.begin(), shape.end());
+    vector<int64_t> shape_copy(shape.begin(), shape.end());
 
     TIMING("GlobalArray::get(void*,vector<int64_t>,vector<int64_t>,vector<int64_t>)");
+    // GA indexing is inclusive i.e. shape is 1 too big
+    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
 
-    NGA_Get64(handle, &lo_copy[0], &hi_copy[0], buffer, &ld_copy[0]);
+    if (buffer == NULL) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            buffer = static_cast<void*>(new T[pagoda::shape_to_size(shape)]); \
+        } else
+#include "DataType.def"
+    }
+
+    NGA_Get64(handle, &lo[0], &hi[0], buffer, &shape_copy[1]);
 
     return buffer;
 }
 
 
+void* GlobalArray::get(int64_t lo, int64_t hi, void *buffer) const
+{
+    return get(vector<int64_t>(1,lo), vector<int64_t>(1,hi), buffer);
+}
+
+
+void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
+                       void *buffer) const
+{
+    vector<int64_t> lo_copy(lo.begin(),lo.end());
+    vector<int64_t> hi_copy(hi.begin(),hi.end());
+    vector<int64_t> shape = pagoda::get_shape(lo,hi);
+
+    TIMING("GlobalArray::get(void*,vector<int64_t>,vector<int64_t>,vector<int64_t>)");
+
+    if (buffer == NULL) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            buffer = static_cast<void*>(new T[pagoda::shape_to_size(shape)]); \
+        } else
+#include "DataType.def"
+    }
+
+    NGA_Get64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1]);
+
+    return buffer;
+}
+
+
+void GlobalArray::put(void *buffer)
+{
+    vector<int64_t> lo(0, shape.size());
+    vector<int64_t> hi(shape.begin(), shape.end());
+    vector<int64_t> shape_copy(shape.begin(), shape.end());
+
+    TIMING("GlobalArray::put(void*)");
+
+    // GA indexing is inclusive i.e. shape is 1 too big
+    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+
+    NGA_Put64(handle, &lo[0], &hi[0], buffer, &shape_copy[1]);
+}
+
+
+void GlobalArray::put(void *buffer, int64_t lo, int64_t hi)
+{
+    put(buffer, vector<int64_t>(1,lo), vector<int64_t>(1,hi));
+}
+
+
 void GlobalArray::put(void *buffer,
-                      const vector<int64_t> &lo,
-                      const vector<int64_t> &hi,
-                      const vector<int64_t> &ld)
+                      const vector<int64_t> &lo, const vector<int64_t> &hi)
 {
     vector<int64_t> lo_copy(lo.begin(), lo.end());
     vector<int64_t> hi_copy(hi.begin(), hi.end());
-    vector<int64_t> ld_copy(ld.begin(), ld.end());
-    NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &ld_copy[0]);
+    vector<int64_t> shape_copy(shape.begin(), shape.end());
+    NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape_copy[1]);
 }
 
 
@@ -694,13 +749,12 @@ void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
 }
 
 
-void* GlobalArray::gather(vector<int64_t> &subscripts) const
+void* GlobalArray::gather(vector<int64_t> &subscripts, void *buffer) const
 {
     // GA has a funky C signature for this one...
     int64_t ndim = get_ndim();
     int64_t n = subscripts.size() / ndim;
     vector<int64_t*> subs(n,0);
-    void *buffer;
 
     TIMING("GlobalArray::gather(void*,vector<int64_t>)");
 
@@ -708,11 +762,13 @@ void* GlobalArray::gather(vector<int64_t> &subscripts) const
         subs[i] = &subscripts[i*ndim];
     }
 
+    if (buffer == NULL) {
 #define GATYPE_EXPAND(mt,t) \
-    if (type == mt) { \
-        buffer = new t[n]; \
-    } else
+        if (type == mt) { \
+            buffer = new t[n]; \
+        } else
 #include "GlobalArray.def"
+    }
 
     NGA_Gather64(handle, buffer, &subs[0], n);
 

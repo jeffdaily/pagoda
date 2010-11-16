@@ -210,7 +210,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
     vector<int64_t> dims_dst(ndim_dst,0);
     vector<int64_t> lo_dst(ndim_dst,0);
     vector<int64_t> hi_dst(ndim_dst,0);
-    vector<int64_t> ld_dst(ndim_dst-1,0);
+    //vector<int64_t> ld_dst(ndim_dst-1,0);
 
     TIMING("pack(Array*,Array*,vector<Array*>)");
     TIMING("pack(Array*,Array*,vector<Array*>) BEGIN");
@@ -265,10 +265,12 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                 delete [] tmp;
             }
             //printf("ld_dst=");
+            /*
             for (int i=0; i<ndim_src-1; ++i) {
                 ld_dst[i] = local_counts[i+1];
                 //printf("%d,", ld_dst[i]);
             }
+            */
             //printf("\n");
 
             /* Create the destination buffer */
@@ -293,7 +295,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                     pagoda::abort("pack: mismatch", buf_dst_index); \
                 } \
                 TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
-                g_dst->put(buf_dst, lo_dst, hi_dst, ld_dst); \
+                g_dst->put(buf_dst, lo_dst, hi_dst); \
                 g_src->release(); \
                 delete [] buf_dst; \
             } else

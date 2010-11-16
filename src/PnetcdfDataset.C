@@ -114,6 +114,22 @@ vector<Variable*> PnetcdfDataset::get_vars() const
 }
 
 
+Attribute* PnetcdfDataset::get_att(const string &name,
+                                   bool ignore_case,
+                                   bool within) const
+{
+    return AbstractDataset::get_att(name, ignore_case, within);
+}
+
+
+Attribute* PnetcdfDataset::get_att(const vector<string> &names,
+                                   bool ignore_case,
+                                   bool within) const
+{
+    return AbstractDataset::get_att(names, ignore_case, within);
+}
+
+
 PnetcdfAttribute* PnetcdfDataset::get_att(size_t i) const
 {
     TIMING("PnetcdfDataset::get_att(size_t)");
@@ -121,10 +137,26 @@ PnetcdfAttribute* PnetcdfDataset::get_att(size_t i) const
 }
 
 
+Dimension* PnetcdfDataset::get_dim(const string &name,
+                                   bool ignore_case,
+                                   bool within) const
+{
+    return AbstractDataset::get_dim(name, ignore_case, within);
+}
+
+
 PnetcdfDimension* PnetcdfDataset::get_dim(size_t i) const
 {
     TIMING("PnetcdfDataset::get_dim(size_t)");
     return dims.at(i);
+}
+
+
+Variable* PnetcdfDataset::get_var(const string &name,
+                                  bool ignore_case,
+                                  bool within) const
+{
+    return AbstractDataset::get_var(name, ignore_case, within);
 }
 
 
@@ -166,7 +198,7 @@ FileFormat PnetcdfDataset::get_file_format() const
     else {
         ERR("unknown file format");
     }
-    return FF_UNKNOWN;
+    //return FF_UNKNOWN; // unreachable
 }
 
 

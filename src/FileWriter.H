@@ -74,7 +74,8 @@ class FileWriter
         virtual void def_vars(const vector<Variable*> &vars);
 
         virtual void write_att(const string &name, Values *values,
-                               DataType type, const string &var_name=string(""));
+                               DataType type,
+                               const string &var_name=string(""));
         virtual void write_att(Attribute *att,
                                const string &name=string("")) = 0;
         virtual void write_atts(const vector<Attribute*> &atts,

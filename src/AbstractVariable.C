@@ -316,14 +316,14 @@ void AbstractVariable::renumber(Array *array) const
 }
 
 
-Array* AbstractVariable::read() const
+Array* AbstractVariable::read_alloc() const
 {
     Array *dst = Array::create(get_type(), get_shape());
     return read(dst);
 }
 
 
-Array* AbstractVariable::read(int64_t record) const
+Array* AbstractVariable::read_alloc(int64_t record) const
 {
     vector<int64_t> shape;
     Array *dst;
@@ -336,14 +336,14 @@ Array* AbstractVariable::read(int64_t record) const
 }
 
 
-Array* AbstractVariable::iread()
+Array* AbstractVariable::iread_alloc()
 {
     Array *dst = Array::create(get_type(), get_shape());
     return iread(dst);
 }
 
 
-Array* AbstractVariable::iread(int64_t record)
+Array* AbstractVariable::iread_alloc(int64_t record)
 {
     vector<int64_t> shape;
     Array *dst;
