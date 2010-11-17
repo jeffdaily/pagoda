@@ -16,30 +16,6 @@ AM_INIT_AUTOMAKE([foreign silent-rules subdir-objects])
 AM_DISABLE_SHARED
 
 #####################################################3
-# Fortran 77
-#####################################################3
-AC_MSG_NOTICE
-AC_MSG_NOTICE([Fortran 77 tests])
-AC_MSG_NOTICE
-AC_LANG_PUSH([Fortran 77])
-
-# Checks for Fortran 77 programs.
-AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
-PAGODA_MPI_UNWRAP
-
-# Checks for Fortran 77 header files.
-
-# Checks for Fortran 77 typedefs, structures, and compiler characteristics.
-
-# Checks for Fortran 77 type sizes.
-
-# Checks for Fortran 77 library functions.
-
-# Checks for Fortran 77 libraries.
-
-AC_LANG_POP([Fortran 77])
-
-#####################################################3
 # C
 #####################################################3
 AC_MSG_NOTICE
@@ -70,6 +46,34 @@ AC_C_INLINE
 AC_LANG_POP([C])
 
 #####################################################3
+# Fortran 77
+#####################################################3
+AC_MSG_NOTICE
+AC_MSG_NOTICE([Fortran 77 tests])
+AC_MSG_NOTICE
+AC_LANG_PUSH([Fortran 77])
+
+# Checks for Fortran 77 programs.
+AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
+PAGODA_MPI_UNWRAP
+
+# Checks for Fortran 77 header files.
+
+# Checks for Fortran 77 typedefs, structures, and compiler characteristics.
+PAGODA_MPI_UNWRAP_PUSH
+AC_F77_LIBRARY_LDFLAGS
+PAGODA_MPI_UNWRAP_POP
+AC_F77_WRAPPERS
+
+# Checks for Fortran 77 type sizes.
+
+# Checks for Fortran 77 library functions.
+
+# Checks for Fortran 77 libraries.
+
+AC_LANG_POP([Fortran 77])
+
+#####################################################3
 # C++
 #####################################################3
 AC_MSG_NOTICE
@@ -84,9 +88,7 @@ PAGODA_MPI_UNWRAP
 # Checks for C++ header files.
 
 # Checks for C++ typedefs, structures, and compiler characteristics.
-PAGODA_MPI_UNWRAP_PUSH
-AC_F77_LIBRARY_LDFLAGS
-PAGODA_MPI_UNWRAP_POP
+#PAGODA_CHECK_FLIBS
 AC_F77_DUMMY_MAIN
 AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT

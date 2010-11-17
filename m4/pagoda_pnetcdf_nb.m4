@@ -6,11 +6,15 @@
 AC_DEFUN([PAGODA_PNETCDF_NB_INT],
 [AC_CACHE_CHECK([whether pnetcdf uses the int non-blocking interface],
     [pagoda_cv_pnetcdf_nb_int],
-    [AC_LANG_PUSH([C++])
+    [save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS"
+     save_LIBS="$LIBS"; LIBS="$LIBS $PNETCDF_LIBS"
+     AC_LANG_PUSH([C++])
      AC_LINK_IFELSE([AC_LANG_CALL([], [ncmpi_wait_all])],
         [pagoda_cv_pnetcdf_nb_int=yes],
         [pagoda_cv_pnetcdf_nb_int=no])
-     AC_LANG_POP([C++])])
+     AC_LANG_POP([C++])
+     LDFLAGS="$save_LDFLAGS"
+     LIBS="$save_LIBS"])
 AS_IF([test $pagoda_cv_pnetcdf_nb_int = yes],
     [$1
      AC_DEFINE([HAVE_PNETCDF_NEW_NB], [1], [pnetcdf version >=1.2])],
