@@ -4589,7 +4589,7 @@ if test "${pagoda_cv_mpic_naked+set}" = set; then :
 else
 
 versions="--version -v -V -qversion"
-inside="$srcdir/build-aux/inside.pl"
+inside="$ac_aux_dir/inside.pl"
 found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$pagoda_cv_mpic_naked" = x; then :
@@ -5631,7 +5631,7 @@ if test "${pagoda_cv_mpif77_naked+set}" = set; then :
 else
 
 versions="--version -v -V -qversion"
-inside="$srcdir/build-aux/inside.pl"
+inside="$ac_aux_dir/inside.pl"
 found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$pagoda_cv_mpif77_naked" = x; then :
@@ -6919,7 +6919,7 @@ if test "${pagoda_cv_mpicxx_naked+set}" = set; then :
 else
 
 versions="--version -v -V -qversion"
-inside="$srcdir/build-aux/inside.pl"
+inside="$ac_aux_dir/inside.pl"
 found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$pagoda_cv_mpicxx_naked" = x; then :

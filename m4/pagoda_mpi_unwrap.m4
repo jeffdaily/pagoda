@@ -33,7 +33,7 @@ AC_LANG_CASE(
 AS_VAR_PUSHDEF([pagoda_cv_mpi_naked], [pagoda_cv_mpi[]_AC_LANG_ABBREV[]_naked])
 AC_CACHE_CHECK([for base $wrapped compiler], [pagoda_cv_mpi_naked], [
 versions="--version -v -V -qversion"
-inside="$srcdir/build-aux/inside.pl"
+inside="$ac_aux_dir/inside.pl"
 found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 AS_IF([test "x$pagoda_cv_mpi_naked" = x], [
