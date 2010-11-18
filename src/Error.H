@@ -31,8 +31,8 @@ do { \
 #define ERRCODE(e,code) EXCEPT(PagodaException,e,code)
 
 #define ASSERT(e) \
-if (e) { \
-    ERR("assertion failed"); \
+if (!(e)) { \
+    ERR("Assertion failed: " TOSTRING(e)); \
 } \
  
 #endif // ERROR_H_

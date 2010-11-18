@@ -16,6 +16,7 @@
 #include "Pack.H"
 #include "StringComparator.H"
 #include "Timing.H"
+#include "Values.H"
 #include "Variable.H"
 
 using std::ostringstream;
@@ -119,6 +120,42 @@ string AbstractVariable::get_long_name() const
     }
 
     return "";
+}
+
+
+bool AbstractVariable::has_fill_value() const
+{
+    vector<string> names;
+    names.push_back("_FillValue");
+    names.push_back("missing_value");
+    return NULL != get_att(names);
+}
+
+
+double AbstractVariable::get_fill_value() const
+{
+    double value;
+    Attribute *att;
+    vector<string> names;
+
+    names.push_back("_FillValue");
+    names.push_back("missing_value");
+    att = get_att(names);
+    if (NULL == att) {
+        ERR("no _FillValue nor missing_value attribute\n"
+                "code should test has_fill_value() first");
+    }
+    if (att->get_type() == DataType::CHAR) {
+        istringstream sin(att->get_string());
+        sin >> value;
+        if (sin.fail()) {
+            ERR("could not convert _FillValue/missing_value from char");
+        }
+    } else {
+        att->get_values()->as(0, value);
+    }
+
+    return value;
 }
 
 

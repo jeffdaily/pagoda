@@ -41,6 +41,8 @@ class Variable
         virtual int64_t num_atts() const = 0;
         virtual string get_standard_name() const = 0;
         virtual string get_long_name() const = 0;
+        virtual bool has_fill_value() const = 0;
+        virtual double get_fill_value() const = 0;
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const = 0;
         virtual Attribute* get_att(const vector<string> &names,

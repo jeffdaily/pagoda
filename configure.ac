@@ -141,16 +141,6 @@ PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
 PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 
-# Whether to build the sandbox programs.
-AC_ARG_ENABLE([sandbox],
-    [AS_HELP_STRING([--enable-sandbox], [build sandbox programs])])
-AM_CONDITIONAL([ENABLE_SANDBOX], [test "x$enable_sandbox" = xyes])
-# Whether to build Global Arrays programs within the sandbox.
-AC_ARG_ENABLE([sandbox-ga],
-    [AS_HELP_STRING([--enable-sandbox-ga],
-                    [build Global Arrays sandbox programs])])
-AM_CONDITIONAL([ENABLE_SANDBOX_GA], [test "x$enable_sandbox_ga" = xyes])
-
 # Does pnetcdf have the new nonblocking interface?
 PAGODA_PNETCDF_NB_INT
 
@@ -158,17 +148,9 @@ PAGODA_PNETCDF_NB_INT
 PAGODA_PNETCDF_INQ_FORMAT
 
 # Checks for GA functionality.
-AC_CHECK_FUNCS([GA_Llgop GA_Ldgop])
+PAGODA_GA_GOP
 
 AC_LANG_POP([C++])
-
-#####################################################3
-# Libtool.
-#####################################################3
-AC_MSG_NOTICE
-AC_MSG_NOTICE([Libtool tests])
-AC_MSG_NOTICE
-LT_INIT
 
 #####################################################3
 # Debug helper stuff.
@@ -189,10 +171,31 @@ AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
 #####################################################3
 # Misc.
 #####################################################3
+# Whether to build the sandbox programs.
+AC_ARG_ENABLE([sandbox],
+    [AS_HELP_STRING([--enable-sandbox], [build sandbox programs])])
+AM_CONDITIONAL([ENABLE_SANDBOX], [test "x$enable_sandbox" = xyes])
+# Whether to build Global Arrays programs within the sandbox.
+AC_ARG_ENABLE([sandbox-ga],
+    [AS_HELP_STRING([--enable-sandbox-ga],
+                    [build Global Arrays sandbox programs])])
+AM_CONDITIONAL([ENABLE_SANDBOX_GA], [test "x$enable_sandbox_ga" = xyes])
+
+AC_PATH_PROG([NCGEN], [ncgen])
+AM_CONDITIONAL([HAVE_NCGEN], [test "x$NCGEN" != x])
+
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but
 # putting this here will at least put mpi.h before any OTHER include files.
 AH_BOTTOM([#include <mpi.h>])
+
+#####################################################3
+# Libtool.
+#####################################################3
+AC_MSG_NOTICE
+AC_MSG_NOTICE([Libtool tests])
+AC_MSG_NOTICE
+LT_INIT
 
 #####################################################3
 # The End.

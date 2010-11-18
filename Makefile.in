@@ -36,9 +36,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2)
 bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT) \
 	pgra$(EXEEXT) pgea$(EXEEXT) pgcmp$(EXEEXT)
+check_PROGRAMS = tests/FillValue$(EXEEXT) $(am__EXEEXT_1) \
+	$(am__EXEEXT_2)
 
 #############################################################################
 # sandbox
@@ -86,6 +87,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/pagoda_arg_parse.m4 \
 	$(top_srcdir)/m4/pagoda_check_package.m4 \
 	$(top_srcdir)/m4/pagoda_cxx_variadic_macro.m4 \
+	$(top_srcdir)/m4/pagoda_ga_gop.m4 \
 	$(top_srcdir)/m4/pagoda_mpi_unwrap.m4 \
 	$(top_srcdir)/m4/pagoda_pnetcdf_inq_format.m4 \
 	$(top_srcdir)/m4/pagoda_pnetcdf_nb.m4 \
@@ -488,6 +490,9 @@ sandbox_ga_TestUnpack_LDADD = $(LDADD)
 sandbox_ga_TestUnpack_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
+am_tests_FillValue_OBJECTS = tests/FillValue.$(OBJEXT)
+tests_FillValue_OBJECTS = $(am_tests_FillValue_OBJECTS)
+tests_FillValue_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -556,7 +561,7 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_ga_TestRavel_SOURCES) $(sandbox_ga_TestRead_SOURCES) \
 	$(sandbox_ga_TestScanAdd_SOURCES) \
 	$(sandbox_ga_TestSort_SOURCES) $(sandbox_ga_TestUnion_SOURCES) \
-	$(sandbox_ga_TestUnpack_SOURCES)
+	$(sandbox_ga_TestUnpack_SOURCES) $(tests_FillValue_SOURCES)
 DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) \
 	$(pgcmp_SOURCES) $(pgdump_SOURCES) $(pgea_SOURCES) \
 	$(pgra_SOURCES) $(pgsub_SOURCES) \
@@ -594,7 +599,8 @@ DIST_SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) \
 	$(am__sandbox_ga_TestScanAdd_SOURCES_DIST) \
 	$(am__sandbox_ga_TestSort_SOURCES_DIST) \
 	$(am__sandbox_ga_TestUnion_SOURCES_DIST) \
-	$(am__sandbox_ga_TestUnpack_SOURCES_DIST)
+	$(am__sandbox_ga_TestUnpack_SOURCES_DIST) \
+	$(tests_FillValue_SOURCES)
 HEADERS = $(pkginclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -664,6 +670,7 @@ MKDIR_P = @MKDIR_P@
 MPI_CPPFLAGS = @MPI_CPPFLAGS@
 MPI_LDFLAGS = @MPI_LDFLAGS@
 MPI_LIBS = @MPI_LIBS@
+NCGEN = @NCGEN@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -751,6 +758,9 @@ AM_CXXFLAGS = $(WALL) $(PROFILE)
 AM_LDFLAGS = $(PROFILE) $(PNETCDF_LDFLAGS) $(GA_LDFLAGS)
 LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
+EXTRA_DIST = data/FillValue.cdl
+CLEANFILES = data/FillValue.nc
+DISTCLEANFILES = data/$(am__dirstamp)
 lib_LTLIBRARIES = libpagoda.la
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
@@ -795,6 +805,11 @@ libpagoda_la_SOURCES = src/AbstractDataset.C src/AbstractVariable.C \
 	src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
 	src/Variable.C
+tests_FillValue_SOURCES = tests/FillValue.C
+tests_FillValue_DEPENDENCIES = data/FillValue.nc libpagoda.la
+AM_V_NCGEN = $(am__v_NCGEN_$(V))
+am__v_NCGEN_ = $(am__v_NCGEN_$(AM_DEFAULT_VERBOSITY))
+am__v_NCGEN_0 = @echo "  NCGEN " $@;
 @ENABLE_SANDBOX_TRUE@sandbox_ga_TestAttribute_SOURCES = sandbox/ga/TestAttribute.C
 @ENABLE_SANDBOX_TRUE@sandbox_ga_TestBin_SOURCES = sandbox/ga/TestBin.C
 @ENABLE_SANDBOX_TRUE@sandbox_ga_TestDimension_SOURCES = sandbox/ga/TestDimension.C
@@ -835,7 +850,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .c .lo .o .obj
+.SUFFIXES: .C .c .cdl .lo .nc .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -1255,6 +1270,17 @@ sandbox/ga/TestUnpack.$(OBJEXT): sandbox/ga/$(am__dirstamp) \
 sandbox/ga/TestUnpack$(EXEEXT): $(sandbox_ga_TestUnpack_OBJECTS) $(sandbox_ga_TestUnpack_DEPENDENCIES) sandbox/ga/$(am__dirstamp)
 	@rm -f sandbox/ga/TestUnpack$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sandbox_ga_TestUnpack_OBJECTS) $(sandbox_ga_TestUnpack_LDADD) $(LIBS)
+tests/$(am__dirstamp):
+	@$(MKDIR_P) tests
+	@: > tests/$(am__dirstamp)
+tests/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) tests/$(DEPDIR)
+	@: > tests/$(DEPDIR)/$(am__dirstamp)
+tests/FillValue.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/FillValue$(EXEEXT): $(tests_FillValue_OBJECTS) $(tests_FillValue_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/FillValue$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_FillValue_OBJECTS) $(tests_FillValue_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1393,6 +1419,7 @@ mostlyclean-compile:
 	-rm -f src/pgea.$(OBJEXT)
 	-rm -f src/pgra.$(OBJEXT)
 	-rm -f src/pgsub.$(OBJEXT)
+	-rm -f tests/FillValue.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1485,6 +1512,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgra.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgsub.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/FillValue.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1548,6 +1576,7 @@ clean-libtool:
 	-rm -rf sandbox/.libs sandbox/_libs
 	-rm -rf sandbox/ga/.libs sandbox/ga/_libs
 	-rm -rf src/.libs src/_libs
+	-rm -rf tests/.libs tests/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -1798,6 +1827,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -1808,6 +1838,9 @@ distclean-generic:
 	-rm -f sandbox/ga/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
+	-rm -f tests/$(DEPDIR)/$(am__dirstamp)
+	-rm -f tests/$(am__dirstamp)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1819,7 +1852,7 @@ clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR)
+	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR) tests/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -1867,7 +1900,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR)
+	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR) tests/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1909,6 +1942,14 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-pkgincludeHEADERS
 
+.cdl.nc:
+	$(AM_V_NCGEN)$(NCGEN) -o $@ $<
+
+data/FillValue.nc: data/$(am__dirstamp)
+
+data/$(am__dirstamp):
+	@$(MKDIR_P) data
+	@: > data/$(am__dirstamp)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

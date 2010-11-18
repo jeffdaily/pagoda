@@ -15,8 +15,10 @@ AM_CXXFLAGS = $(WALL) $(PROFILE)
 AM_LDFLAGS = $(PROFILE) $(PNETCDF_LDFLAGS) $(GA_LDFLAGS)
 LDADD = libpagoda.la $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(GA_LIBS) $(FLIBS)
+EXTRA_DIST =
+CLEANFILES =
+DISTCLEANFILES =
 
-check_PROGRAMS = 
 bin_PROGRAMS = pgdump pgsub pgbo pgra pgea pgcmp
 lib_LTLIBRARIES = libpagoda.la
 
@@ -135,6 +137,33 @@ libpagoda_la_SOURCES += src/Timing.C
 libpagoda_la_SOURCES += src/Util.C
 libpagoda_la_SOURCES += src/Values.C
 libpagoda_la_SOURCES += src/Variable.C
+
+#############################################################################
+# tests
+#
+check_PROGRAMS =
+check_PROGRAMS += tests/FillValue
+
+tests_FillValue_SOURCES = tests/FillValue.C
+tests_FillValue_DEPENDENCIES = data/FillValue.nc libpagoda.la
+
+AM_V_NCGEN = $(am__v_NCGEN_$(V))
+am__v_NCGEN_ = $(am__v_NCGEN_$(AM_DEFAULT_VERBOSITY))
+am__v_NCGEN_0 = @echo "  NCGEN " $@;
+.cdl.nc:
+	$(AM_V_NCGEN)$(NCGEN) -o $@ $<
+
+EXTRA_DIST += data/FillValue.cdl
+
+data/FillValue.nc: data/$(am__dirstamp)
+
+CLEANFILES += data/FillValue.nc
+
+data/$(am__dirstamp):
+	@$(MKDIR_P) data
+	@: > data/$(am__dirstamp)
+
+DISTCLEANFILES += data/$(am__dirstamp)
 
 #############################################################################
 # sandbox

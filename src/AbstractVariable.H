@@ -41,6 +41,8 @@ class AbstractVariable : public Variable
         virtual int64_t num_atts() const;
         virtual string get_standard_name() const;
         virtual string get_long_name() const;
+        virtual bool has_fill_value() const;
+        virtual double get_fill_value() const;
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const;
         virtual Attribute* get_att(const vector<string> &names,
