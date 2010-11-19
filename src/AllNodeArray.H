@@ -4,7 +4,7 @@
 #include <cmath>
 #include <vector>
 
-#include "Array.H"
+#include "AbstractArray.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -17,7 +17,7 @@ using std::vector;
  * An N-dimensional distributed Array with all data replicated on all nodes.
  */
 template <class T>
-class AllNodeArray : public Array
+class AllNodeArray : public AbstractArray
 {
     public:
         AllNodeArray(DataType type, vector<int64_t> shape);
@@ -93,7 +93,8 @@ class AllNodeArray : public Array
 
 template <class T>
 AllNodeArray<T>::AllNodeArray(DataType type, vector<int64_t> shape)
-    :   type(type)
+    :   AbstractArray()
+    ,   type(type)
     ,   data(new T[pagoda::shape_to_size(shape)])
     ,   shape(shape)
     ,   lo(shape.size(), 0)
@@ -107,8 +108,9 @@ AllNodeArray<T>::AllNodeArray(DataType type, vector<int64_t> shape)
 
 
 template <class T>
-AllNodeArray<T>::AllNodeArray(const AllNodeArray &that)
-    :   type(that.type)
+AllNodeArray<T>::AllNodeArray(const AllNodeArray<T> &that)
+    :   AbstractArray(that)
+    ,   type(that.type)
     ,   data(new T[pagoda::shape_to_size(that.shape)])
     ,   shape(that.shape)
     ,   lo(that.lo)

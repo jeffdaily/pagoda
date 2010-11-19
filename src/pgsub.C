@@ -123,7 +123,8 @@ int main(int argc, char **argv)
             }
         }
         dataset->wait();
-        // write all non-record variables first, TODO non-blocking
+        // write all non-record variables first
+        /** @todo implement non-blocking read */
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             Variable *var = *var_it;
             array = arrays.find(var->get_name());

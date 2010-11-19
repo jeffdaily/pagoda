@@ -64,7 +64,7 @@ class Array
          *
          * @return the global number of elements in the Array
          */
-        virtual int64_t get_size() const;
+        virtual int64_t get_size() const = 0;
 
         /**
          * Returns the local shape of the Array portion owned by this process.
@@ -78,7 +78,7 @@ class Array
          *
          * @return the local number of elements in the Array
          */
-        virtual int64_t get_local_size() const;
+        virtual int64_t get_local_size() const = 0;
 
         /**
          * Returns the number of dimensions in this Array.
@@ -94,7 +94,7 @@ class Array
          *
          * @return true if the number of dimensions is zero.
          */
-        virtual bool is_scalar() const;
+        virtual bool is_scalar() const = 0;
 
         /**
          * Fills the array with the given value.
@@ -152,7 +152,7 @@ class Array
          * @param[in] other the other Array
          * @return true if the distribution of this Array matches the other.
          */
-        virtual bool same_distribution(const Array *other) const;
+        virtual bool same_distribution(const Array *other) const = 0;
 
         /**
          * Returns true if this process owns a local portion of the Array.
@@ -482,12 +482,12 @@ class Array
          *
          * @param[in] value the fill value
          */
-        virtual void set_fill_value(double value);
+        virtual void set_fill_value(double value) = 0;
 
         /**
          * Returns true if a fill value is set for this Array.
          */
-        virtual bool has_fill_value() const;
+        virtual bool has_fill_value() const = 0;
 
         /**
          * Returns the fill value.
@@ -495,21 +495,27 @@ class Array
          * It is an error to call this function without first checking
          * has_fill_value().
          */
-        virtual double get_fill_value() const;
+        virtual double get_fill_value() const = 0;
 
         /**
          * Unsets the fill value.
          */
-        virtual void clear_fill_value();
+        virtual void clear_fill_value() = 0;
 
         /**
          * Sets a counter for arithmetic operations (used with fill values).
          *
          * @param[in] counter
          */
-        virtual void set_counter(Array *counter);
+        virtual void set_counter(Array *counter) = 0;
 
+        /**
+         * Virtual friend implementation of stream insertion operator.
+         *
+         * @param[in] os the stream
+         */
         virtual ostream& print(ostream &os) const = 0;
+
         friend ostream& operator << (ostream &os, const Array *array);
 
         /**
@@ -518,13 +524,10 @@ class Array
         virtual void dump() const = 0;
 
     protected:
+        /**
+         * Constructs the Array interface.
+         */
         Array();
-
-        bool broadcast_check(const Array *rhs) const;
-
-        bool _has_fill_value;
-        double _fill_value;
-        Array *counter;
 };
 
 #endif /* ARRAY_H_ */

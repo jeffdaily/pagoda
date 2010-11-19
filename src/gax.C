@@ -79,7 +79,7 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
         GA_Error("partial_sum: supports 1-dim arrays only", g_dst);
     }
 
-    //GA_Sync(); // TODO do we need this?
+    //GA_Sync(); /** @todo do we need GA_Sync()? */
 
     NGA_Distribution64(g_src, me, &lo, &hi);
     elems = hi-lo+1;
@@ -208,7 +208,7 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
     NGA_Inquire64(g_src, &type_src, &ndim_src, dims_src);
     NGA_Inquire64(g_dst, &type_dst, &ndim_dst, dims_dst);
 
-    //GA_Sync(); // TODO do we need this?
+    //GA_Sync(); /** @todo do we need GA_Sync()? */
 
     NGA_Distribution64(g_src, me, lo_src, hi_src);
 

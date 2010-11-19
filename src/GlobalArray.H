@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "Array.H"
+#include "AbstractArray.H"
 #include "DataType.H"
 #include "Dimension.H"
 #include "ScalarArray.H"
@@ -19,7 +19,7 @@ typedef void (GlobalArray::*GA_op_patch)(int,
 /**
  * An N-dimensional distributed Array based on the Global Arrays toolkit.
  */
-class GlobalArray : public Array
+class GlobalArray : public AbstractArray
 {
     public:
         GlobalArray(DataType type, vector<int64_t> shape);

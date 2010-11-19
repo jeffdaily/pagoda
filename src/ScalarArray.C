@@ -10,7 +10,8 @@
 
 
 ScalarArray::ScalarArray(DataType type)
-    :   type(type)
+    :   AbstractArray()
+    ,   type(type)
     ,   value(NULL)
 {
 #define DATATYPE_EXPAND(DT,T) \
@@ -22,7 +23,8 @@ ScalarArray::ScalarArray(DataType type)
 
 
 ScalarArray::ScalarArray(const ScalarArray &that)
-    :   type(that.type)
+    :   AbstractArray(that)
+    ,   type(that.type)
     ,   value(NULL)
 {
 #define DATATYPE_EXPAND(DT,T) \
@@ -131,13 +133,13 @@ void* ScalarArray::access() const
 
 void ScalarArray::release() const
 {
-    // TODO could verify at this point that all values are the same
+    /** @todo could verify at this point that all values are the same */
 }
 
 
 void ScalarArray::release_update()
 {
-    // TODO could verify at this point that all values are the same
+    /** @todo could verify at this point that all values are the same */
 }
 
 

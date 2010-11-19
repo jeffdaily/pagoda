@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "Array.H"
+#include "AbstractArray.H"
 #include "DataType.H"
 #include "Dimension.H"
 
@@ -16,7 +16,7 @@ using std::vector;
  * Useful when wanting to use the virtual operators such as add and
  * broadcasting is desired.
  */
-class ScalarArray : public Array
+class ScalarArray : public AbstractArray
 {
     public:
         ScalarArray(DataType type);

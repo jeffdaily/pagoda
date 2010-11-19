@@ -33,7 +33,7 @@ Mask* Mask::create(const Dimension *dim)
  * Constructor.
  */
 Mask::Mask()
-    :   Array()
+    :   AbstractArray()
 {
     TIMING("Mask::Mask()");
 }

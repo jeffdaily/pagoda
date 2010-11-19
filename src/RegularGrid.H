@@ -11,7 +11,7 @@ class Variable;
 /**
  * The implementation of the Grid interface for regular grids.
  *
- * TODO: this is unfinished
+ * @todo this is unfinished
  */
 class RegularGrid : public Grid
 {

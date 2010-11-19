@@ -30,6 +30,7 @@ pgea_SOURCES = src/pgea.C
 pgcmp_SOURCES = src/pgcmp.C
 
 pkginclude_HEADERS =
+pkginclude_HEADERS += src/AbstractArray.H
 pkginclude_HEADERS += src/AbstractDataset.H
 pkginclude_HEADERS += src/AbstractVariable.H
 pkginclude_HEADERS += src/AggregationDimension.H
@@ -90,6 +91,7 @@ pkginclude_HEADERS += src/Values.H
 pkginclude_HEADERS += src/Variable.H
 
 libpagoda_la_SOURCES =
+libpagoda_la_SOURCES += src/AbstractArray.C
 libpagoda_la_SOURCES += src/AbstractDataset.C
 libpagoda_la_SOURCES += src/AbstractVariable.C
 libpagoda_la_SOURCES += src/Aggregation.C

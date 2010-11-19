@@ -74,7 +74,7 @@ vector<Dimension*> AggregationVariable::get_dims() const
 vector<Attribute*> AggregationVariable::get_atts() const
 {
     TIMING("AggregationVariable::get_atts()");
-    // TODO return union of attributes of all vars
+    /** @todo return union of attributes of all vars */
     return vars[0]->get_atts();
 }
 
@@ -214,8 +214,10 @@ Array* AggregationVariable::read_per_variable(Array *dst) const
     }
     dst_hi[0] = 0;
 
-    // TODO could optimize by reusing Array *src if shape doesn't change
-    // between reads
+    /**
+     * @todo could optimize by reusing Array *src if shape doesn't change
+     * between reads
+     */
     for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
         Array *src = var->read();

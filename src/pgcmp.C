@@ -294,7 +294,7 @@ int main(int argc, char **argv)
             }
 
             // read in entire variables
-            // TODO optimize for memory by reading one record at a time
+            /** @todo optimize for memory by reading one record at a time */
             lhs_array = lhs_var->read();
             rhs_array = rhs_var->read();
             if (!lhs_array->same_distribution(rhs_array)) {

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "Array.H"
+#include "AbstractArray.H"
 #include "LatLonBox.H"
 #include "Slice.H"
 
@@ -25,7 +25,7 @@ class Dimension;
  * Masks are used to indicate which portions of a Dimension are viable during
  * operations, such as subsetting, etc.
  */
-class Mask : public Array
+class Mask : public AbstractArray
 {
     public:
         /**

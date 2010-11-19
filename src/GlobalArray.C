@@ -49,24 +49,24 @@ void GlobalArray::create()
 
 
 GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
-    :   Array()
+    :   AbstractArray()
     ,   handle(0)
     ,   type(type)
     ,   shape(shape)
-    ,   lo()
-    ,   hi()
+    ,   lo(shape.size())
+    ,   hi(shape.size())
 {
     create();
 }
 
 
 GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
-    :   Array()
+    :   AbstractArray()
     ,   handle(0)
     ,   type(type)
     ,   shape()
-    ,   lo()
-    ,   hi()
+    ,   lo(dims.size())
+    ,   hi(dims.size())
 {
     for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
             it!=end; ++it) {
@@ -77,7 +77,7 @@ GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
 
 
 GlobalArray::GlobalArray(const GlobalArray &that)
-    :   Array()
+    :   AbstractArray(that)
     ,   handle(0)
     ,   type(that.type)
     ,   shape(that.shape)
@@ -128,7 +128,6 @@ int64_t GlobalArray::get_ndim() const
 void GlobalArray::fill(void *value)
 {
     GA_Fill(handle, value);
-    \
 }
 
 
@@ -522,7 +521,7 @@ GlobalArray& GlobalArray::operator/=(const GlobalArray &that)
 
 GlobalArray& GlobalArray::operator/=(const ScalarArray &that)
 {
-    // TODO GA_Scale won't work for integers!
+    /** @todo GA_Scale won't work for integers! */
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
         T cast = static_cast<T>(1.0 / *((T*)that.get())); \
@@ -589,10 +588,9 @@ void GlobalArray::operate(const GlobalArray &that,
 
 void GlobalArray::set_distribution()
 {
-    int64_t llo[GA_MAX_DIM], lhi[GA_MAX_DIM];
-    NGA_Distribution64(handle, GA_Nodeid(), llo, lhi);
-    lo.assign(llo, llo+shape.size());
-    hi.assign(lhi, lhi+shape.size());
+    NGA_Distribution64(handle, GA_Nodeid(), &lo[0], &hi[0]);
+    /** @todo verify lo and hi are valid, clear them if not so that we follow
+     * the conventions in the documentation of Array::get_distribution */
 }
 
 

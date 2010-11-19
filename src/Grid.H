@@ -69,7 +69,7 @@ class GridType
  * coordinate Variable, but rather the lat(cell) auxiliary coordinate Variable
  * in terms of the unstructured representation.
  *
- * TODO: implement get_lat() et al to get the coordinate Variable instances in
+ * @todo implement get_lat() et al to get the coordinate Variable instances in
  * their natural represenatations.
  */
 class Grid

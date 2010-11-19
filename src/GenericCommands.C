@@ -594,7 +594,7 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
             // by its parent Dataset and will be cleaned up when the parent
             // Dataset is deleted.  However this new Attribute will not get
             // destroyed which is a memory leak.
-            // TODO cache Attribute in this GenericCommands instance
+            /** @todo cache Attribute in this GenericCommands instance */
             atts[pos] = new GenericAttribute("history",
                                              history_complete, DataType::CHAR);
         }

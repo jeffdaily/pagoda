@@ -102,7 +102,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
         pagoda::abort("partial_sum: supports 1-dim Arrays only", 0);
     }
 
-    //pagoda::barrier(); // TODO do we need this?
+    //pagoda::barrier(); /** @todo do we need pagoda::barrier()? */
 
     elems = g_src->get_local_size();
 
@@ -219,7 +219,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         pagoda::abort("pack: src and dst ndims don't match", ndim_src-ndim_dst);
     }
 
-    //pagoda::barrier(); // TODO do we need this?
+    //pagoda::barrier(); /** @todo do we need this? */
 
     g_src->get_distribution(lo_src,hi_src);
 

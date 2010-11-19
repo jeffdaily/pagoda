@@ -4,7 +4,7 @@
 #include <cmath>
 #include <vector>
 
-#include "Array.H"
+#include "AbstractArray.H"
 #include "Bootstrap.H"
 #include "DataType.H"
 #include "Debug.H"
@@ -17,7 +17,7 @@ using std::vector;
  * An N-dimensional distributed Array with all data on node zero.
  */
 template <class T>
-class NodeZeroArray : public Array
+class NodeZeroArray : public AbstractArray
 {
     public:
         NodeZeroArray(const vector<int64_t> &shape);
@@ -101,7 +101,7 @@ class NodeZeroArray : public Array
 
 template <class T>
 NodeZeroArray<T>::NodeZeroArray(const vector<int64_t> &shape)
-    :   Array()
+    :   AbstractArray()
     ,   type(DataType::ctype<T>())
     ,   data(NULL)
     ,   shape(shape)
@@ -127,7 +127,7 @@ NodeZeroArray<T>::NodeZeroArray(const vector<int64_t> &shape)
 
 template <class T>
 NodeZeroArray<T>::NodeZeroArray(const NodeZeroArray<T> &that)
-    :   Array()
+    :   AbstractArray(that)
     ,   type(that.type)
     ,   data(NULL)
     ,   shape(that.shape)
@@ -274,7 +274,7 @@ void NodeZeroArray<T>::release_update()
 template <class T>
 void* NodeZeroArray<T>::get(void *buffer) const
 {
-    // TODO should return a copy
+    /** @todo should return a copy */
     return data;
 }
 
@@ -282,7 +282,7 @@ void* NodeZeroArray<T>::get(void *buffer) const
 template <class T>
 void* NodeZeroArray<T>::get(int64_t lo, int64_t hi, void *buffer) const
 {
-    // TODO implement, don't forget should return a copy
+    /** @todo implement, don't forget should return a copy */
     ERR("not implemented NodeZeroArray<T>::get(int64_t,int64_t,void*)");
 }
 
@@ -292,7 +292,7 @@ void* NodeZeroArray<T>::get(const vector<int64_t> &lo,
                             const vector<int64_t> &hi,
                             void *buffer) const
 {
-    // TODO implement, don't forget should return a copy
+    /** @todo implement, don't forget should return a copy */
     ERR("not implemented NodeZeroArray<T>::get(const vector<int64_t>&,const vector<int64_t>&,void*");
 }
 
@@ -300,7 +300,7 @@ void* NodeZeroArray<T>::get(const vector<int64_t> &lo,
 template <class T>
 void NodeZeroArray<T>::put(void *buffer)
 {
-    // TODO
+    /** @todo implement */
     ERR("not implemented NodeZeroArray<T>::put");
 }
 
@@ -308,7 +308,7 @@ void NodeZeroArray<T>::put(void *buffer)
 template <class T>
 void NodeZeroArray<T>::put(void *buffer, int64_t lo, int64_t hi)
 {
-    // TODO
+    /** @todo implement */
     ERR("not implemented NodeZeroArray<T>::put");
 }
 
@@ -318,7 +318,7 @@ void NodeZeroArray<T>::put(void *buffer,
                            const vector<int64_t> &lo,
                            const vector<int64_t> &hi)
 {
-    // TODO
+    /** @todo implement */
     ERR("not implemented NodeZeroArray<T>::put");
 }
 
@@ -326,7 +326,7 @@ void NodeZeroArray<T>::put(void *buffer,
 template <class T>
 void NodeZeroArray<T>::scatter(void *buffer, vector<int64_t> &subscripts)
 {
-    // TODO
+    /** @todo implement */
     ERR("not implemented NodeZeroArray<T>::scatter");
 }
 
@@ -334,7 +334,7 @@ void NodeZeroArray<T>::scatter(void *buffer, vector<int64_t> &subscripts)
 template <class T>
 void* NodeZeroArray<T>::gather(vector<int64_t> &subscripts, void *buffer) const
 {
-    // TODO
+    /** @todo implement */
     ERR("not implemented NodeZeroArray<T>::gather");
 }
 
@@ -543,7 +543,7 @@ Array* NodeZeroArray<T>::imax(const Array *rhs)
 {
     const NodeZeroArray<T> *array = dynamic_cast<const NodeZeroArray<T>*>(rhs);
     if (array) {
-        // TODO
+        /** @todo implement */
         ERR("not implemented NodeZeroArray<T>::imax");
     }
     ERR("NodeZeroArray<T>::idiv(Array*) fell through");
@@ -555,7 +555,7 @@ Array* NodeZeroArray<T>::imin(const Array *rhs)
 {
     const NodeZeroArray<T> *array = dynamic_cast<const NodeZeroArray<T>*>(rhs);
     if (array) {
-        // TODO
+        /** @todo implement */
         ERR("not implemented NodeZeroArray<T>::imin");
     }
     ERR("NodeZeroArray<T>::idiv(Array*) fell through");
@@ -685,7 +685,7 @@ ostream& NodeZeroArray<T>::print(ostream &os) const
 template <class T>
 void NodeZeroArray<T>::dump() const
 {
-    // TODO
+    /** @todo implement */
     ERR("not implemented NodeZeroArray<T>::dump");
 }
 
