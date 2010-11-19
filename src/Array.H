@@ -475,6 +475,40 @@ class Array
          */
         virtual Array* ipow(double exponent) = 0;
 
+        /**
+         * Sets the fill value for this Array.
+         *
+         * All operations adhere to fill value.
+         *
+         * @param[in] value the fill value
+         */
+        virtual void set_fill_value(double value);
+
+        /**
+         * Returns true if a fill value is set for this Array.
+         */
+        virtual bool has_fill_value() const;
+
+        /**
+         * Returns the fill value.
+         *
+         * It is an error to call this function without first checking
+         * has_fill_value().
+         */
+        virtual double get_fill_value() const;
+
+        /**
+         * Unsets the fill value.
+         */
+        virtual void clear_fill_value();
+
+        /**
+         * Sets a counter for arithmetic operations (used with fill values).
+         *
+         * @param[in] counter
+         */
+        virtual void set_counter(Array *counter);
+
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const Array *array);
 
@@ -487,6 +521,10 @@ class Array
         Array();
 
         bool broadcast_check(const Array *rhs) const;
+
+        bool _has_fill_value;
+        double _fill_value;
+        Array *counter;
 };
 
 #endif /* ARRAY_H_ */

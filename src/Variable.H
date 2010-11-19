@@ -41,8 +41,38 @@ class Variable
         virtual int64_t num_atts() const = 0;
         virtual string get_standard_name() const = 0;
         virtual string get_long_name() const = 0;
-        virtual bool has_fill_value() const = 0;
-        virtual double get_fill_value() const = 0;
+
+        /**
+         * Returns true if this Variable has missing data.
+         *
+         * Sometimes the fill/missing value may change from file to file if
+         * this Variable represents an aggregation (or perhaps in the future
+         * the fill/missing value may be allowed to change from record to
+         * record within the same file.)  The index parameter allows for the
+         * correct fill/missing value to be returned.
+         *
+         * @param[in] index of the record
+         * @return true if this Variable has missing data.
+         */
+        virtual bool has_fill_value(int64_t index=-1) const = 0;
+
+        /**
+         * Returns the fill/missing value.
+         *
+         * It is an error to call this function without first checking
+         * has_fill_value() == true.
+         *
+         * Sometimes the fill/missing value may change from file to file if
+         * this Variable represents an aggregation (or perhaps in the future
+         * the fill/missing value may be allowed to change from record to
+         * record within the same file.)  The index parameter allows for the
+         * correct fill/missing value to be returned.
+         *
+         * @param[in] index of the record
+         * @return the fill/missing value
+         */
+        virtual double get_fill_value(int64_t index=-1) const = 0;
+
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const = 0;
         virtual Attribute* get_att(const vector<string> &names,

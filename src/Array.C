@@ -99,67 +99,36 @@ bool Array::same_distribution(const Array *other) const
 }
 
 
-#if 0
-void* Array::get(int64_t lo, int64_t hi) const
+void Array::set_fill_value(double value)
 {
-    return get(vector<int64_t>(1,lo),vector<int64_t>(1,hi));
+    _fill_value = value;
+    _has_fill_value = true;
 }
 
 
-void* Array::get(void *buffer, int64_t lo, int64_t hi) const
+bool Array::has_fill_value() const
 {
-    return get(buffer, vector<int64_t>(1,lo),vector<int64_t>(1,hi));
+    return _has_fill_value;
 }
 
 
-void* Array::get(void *buffer,
-                 const vector<int64_t> &lo, const vector<int64_t> &hi) const
+double Array::get_fill_value() const
 {
-    vector<int64_t> ld = pagoda::get_shape(lo,hi);
-
-    ld.erase(ld.begin());
-
-    return get(buffer, lo, hi, ld);
+    return _fill_value;
 }
 
 
-void* Array::get(const vector<int64_t> &lo, const vector<int64_t> &hi) const
+void Array::clear_fill_value()
 {
-    void *buffer;
-    vector<int64_t> ld = pagoda::get_shape(lo,hi);
-    int64_t buffer_size = pagoda::shape_to_size(ld);
-    DataType type = get_type();
-
-    TIMING("Array::get(vector<int64_t>,vector<int64_t>)");
-
-    ld.erase(ld.begin());
-
-#define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        buffer = new T[buffer_size]; \
-    } else
-#include "DataType.def"
-
-    return get(buffer, lo, hi, ld);
+    _fill_value = 0.0;
+    _has_fill_value = false;
 }
 
 
-void Array::put(void *buffer, int64_t lo, int64_t hi)
+void Array::set_counter(Array *counter)
 {
-    put(buffer, vector<int64_t>(1,lo), vector<int64_t>(1,hi));
+    this->counter = counter;
 }
-
-
-void Array::put(void *buffer,
-                const vector<int64_t> &lo, const vector<int64_t> &hi)
-{
-    vector<int64_t> ld = pagoda::get_shape(lo,hi);
-
-    ld.erase(ld.begin());
-
-    put(buffer, lo, hi, ld);
-}
-#endif
 
 
 ostream& operator << (ostream &os, const Array *array)

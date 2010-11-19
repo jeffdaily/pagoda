@@ -123,7 +123,7 @@ string AbstractVariable::get_long_name() const
 }
 
 
-bool AbstractVariable::has_fill_value() const
+bool AbstractVariable::has_fill_value(int64_t index) const
 {
     vector<string> names;
     names.push_back("_FillValue");
@@ -132,7 +132,7 @@ bool AbstractVariable::has_fill_value() const
 }
 
 
-double AbstractVariable::get_fill_value() const
+double AbstractVariable::get_fill_value(int64_t index) const
 {
     double value;
     Attribute *att;

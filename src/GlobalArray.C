@@ -616,21 +616,29 @@ void GlobalArray::get_distribution(
 
 void* GlobalArray::access()
 {
-    void *tmp;
-    vector<int64_t> ld(lo.size());
-    NGA_Access64(handle, &lo[0], &hi[0], &tmp, &ld[0]);
-    return tmp;
+    if (owns_data()) {
+        void *tmp;
+        vector<int64_t> ld(lo.size());
+        NGA_Access64(handle, &lo[0], &hi[0], &tmp, &ld[0]);
+        return tmp;
+    }
+
+    return NULL;
 }
 
 
 void* GlobalArray::access() const
 {
-    void *tmp;
-    vector<int64_t> ld(lo.size());
-    vector<int64_t> lo_copy(lo.begin(),lo.end());
-    vector<int64_t> hi_copy(hi.begin(),hi.end());
-    NGA_Access64(handle, &lo_copy[0], &hi_copy[0], &tmp, &ld[0]);
-    return tmp;
+    if (owns_data()) {
+        void *tmp;
+        vector<int64_t> ld(lo.size());
+        vector<int64_t> lo_copy(lo.begin(),lo.end());
+        vector<int64_t> hi_copy(hi.begin(),hi.end());
+        NGA_Access64(handle, &lo_copy[0], &hi_copy[0], &tmp, &ld[0]);
+        return tmp;
+    }
+
+    return NULL;
 }
 
 

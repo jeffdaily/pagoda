@@ -39,6 +39,9 @@ int F77_DUMMY_MAIN()
 #endif
 
 
+void init_tally(Array *result, Array *tally, double fill);
+
+
 int main(int argc, char **argv)
 {
     PgraCommands cmd;
@@ -93,6 +96,7 @@ int main(int argc, char **argv)
                 int64_t nrec = var->get_nrec();
                 Array *result = NULL;
                 Array *array = NULL; // reuse allocated array each record
+                Array *tally = NULL;
 
                 // optimization: read the first record directly into result
                 result = var->read(0, result);
@@ -102,6 +106,11 @@ int main(int argc, char **argv)
                     writer->write(result, var->get_name(), 0);
                     delete result;
                     continue;
+                }
+
+                if (var->has_fill_value(0)) {
+                    tally = Array::create(DataType::INT, result->get_shape());
+                    init_tally(result, tally, var->get_fill_value(0));
                 }
 
                 if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
@@ -119,29 +128,44 @@ int main(int argc, char **argv)
                         result->imin(array);
                     }
                     else {
-                        if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+                        if (op == OP_RMS
+                                || op == OP_RMSSDN
+                                || op == OP_AVGSQR) {
                             // square the values
                             array->imul(array);
                         }
-                        // sum the values or squares
+                        // sum the values or squares, keep a tally
+                        result->set_counter(tally);
                         result->iadd(array);
+                        result->set_counter(NULL);
                     }
                 }
 
                 // normalize, multiply, etc where necessary
                 if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
                         || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
-                    ScalarArray scalar(result->get_type());
-                    scalar.fill_value(nrec);
-                    result->idiv(&scalar);
+                    if (NULL != tally) {
+                        result->idiv(tally);
+                    } else {
+                        ScalarArray scalar(result->get_type());
+                        scalar.fill_value(nrec);
+                        result->idiv(&scalar);
+                    }
                 }
                 else if (op == OP_RMSSDN) {
-                    ScalarArray scalar(result->get_type());
-                    scalar.fill_value(nrec-1);
-                    result->idiv(&scalar);
+                    if (NULL != tally) {
+                        ScalarArray scalar(tally->get_type());
+                        scalar.fill_value(1);
+                        tally->isub(&scalar);
+                        result->idiv(tally);
+                    } else {
+                        ScalarArray scalar(result->get_type());
+                        scalar.fill_value(nrec-1);
+                        result->idiv(&scalar);
+                    }
                 }
 
-                // some operations require additional process */
+                // some operations require additional processing */
                 if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
                     result->ipow(0.5);
                 }
@@ -152,6 +176,9 @@ int main(int argc, char **argv)
                 writer->write(result, var->get_name(), 0);
                 delete result;
                 delete array;
+                if (NULL != tally) {
+                    delete tally;
+                }
             }
             else {
                 Array *array = var->read();
@@ -191,3 +218,32 @@ int main(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
+
+
+void init_tally(Array *result, Array *tally, double fill)
+{
+    void *ptr_result;
+    int *ptr_tally;
+    DataType type = result->get_type();
+    
+    // result and tally arrays are assumed to have same distributions
+    ASSERT(result->same_distribution(tally));
+
+    ptr_result = result->access();
+    ptr_tally = static_cast<int*>(tally->access());
+    if (NULL != ptr_result) {
+        ASSERT(NULL != ptr_tally);
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            T *data = static_cast<T*>(ptr_result); \
+            T _fill = static_cast<T>(fill); \
+            for (int64_t i=0,limit=result->get_local_size(); i<limit; ++i) { \
+                ptr_tally[i] = (data[i] == _fill) ? 0 : 1; \
+            } \
+        } else
+#include "DataType.def"
+        result->release();
+        tally->release_update();
+    }
+}
+

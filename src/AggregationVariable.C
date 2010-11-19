@@ -79,6 +79,60 @@ vector<Attribute*> AggregationVariable::get_atts() const
 }
 
 
+bool AggregationVariable::has_fill_value(int64_t record) const
+{
+    int64_t index_within_var = translate_record(record);
+
+    if (record < 0 || record > get_shape().at(0)) {
+        throw IndexOutOfBoundsException("AggregationVariable::has_fill_value");
+    }
+
+    for (size_t index_var=0; index_var<vars.size(); ++index_var) {
+        Variable *var = vars.at(index_var);
+        int64_t num_records;
+        // we want the non-masked size of this variable
+        get_dataset()->push_masks(NULL);
+        num_records = var->get_shape().at(0);
+        get_dataset()->pop_masks();
+        if (index_within_var < num_records) {
+            return var->has_fill_value();
+        }
+        else {
+            index_within_var -= num_records;
+        }
+    }
+
+    return false;
+}
+
+
+double AggregationVariable::get_fill_value(int64_t record) const
+{
+    int64_t index_within_var = translate_record(record);
+
+    if (record < 0 || record > get_shape().at(0)) {
+        throw IndexOutOfBoundsException("AggregationVariable::has_fill_value");
+    }
+
+    for (size_t index_var=0; index_var<vars.size(); ++index_var) {
+        Variable *var = vars.at(index_var);
+        int64_t num_records;
+        // we want the non-masked size of this variable
+        get_dataset()->push_masks(NULL);
+        num_records = var->get_shape().at(0);
+        get_dataset()->pop_masks();
+        if (index_within_var < num_records) {
+            return var->get_fill_value();
+        }
+        else {
+            index_within_var -= num_records;
+        }
+    }
+
+    return 0.0;
+}
+
+
 Dataset* AggregationVariable::get_dataset() const
 {
     TIMING("AggregationVariable::get_dataset()");

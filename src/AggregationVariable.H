@@ -37,6 +37,9 @@ class AggregationVariable : public AbstractVariable
         virtual vector<Dimension*> get_dims() const;
         virtual vector<Attribute*> get_atts() const;
 
+        virtual bool has_fill_value(int64_t record) const;
+        virtual double get_fill_value(int64_t record) const;
+
         virtual Dataset* get_dataset() const;
 
         virtual DataType get_type() const;

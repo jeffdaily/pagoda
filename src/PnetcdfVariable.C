@@ -166,6 +166,11 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
         }
     }
 
+    // propagate fill value to Array
+    if (has_fill_value()) {
+        dst->set_fill_value(get_fill_value());
+    }
+
     return dst;
 }
 
@@ -256,12 +261,18 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
         }
     }
 
+    // propagate fill value to Array
+    if (has_fill_value(record)) {
+        dst->set_fill_value(get_fill_value(record));
+    }
+
     return dst;
 }
 
 
 bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
-                               const vector<int64_t> &lo, const vector<int64_t> &hi) const
+                               const vector<int64_t> &lo,
+                               const vector<int64_t> &hi) const
 {
     bool found_bit = true;
 
