@@ -4,9 +4,9 @@
 #include <string>
 
 #include "GlobalArray.H"
+#include "IndexHyperslab.H"
 #include "LatLonBox.H"
 #include "Mask.H"
-#include "Slice.H"
 
 using std::string;
 
@@ -31,10 +31,12 @@ class GlobalMask :  public Mask
         virtual void clear();
         virtual void reset();
 
-        virtual void modify(const DimSlice &slice);
+        virtual void modify(const IndexHyperslab &hyperslab);
         virtual void modify(const LatLonBox &box,
                             const Array *lat, const Array *lon);
         virtual void modify(double low, double hi, const Array *var);
+        virtual void modify_gt(double value, const Array *var);
+        virtual void modify_lt(double value, const Array *var);
 
         virtual Array* reindex();
         virtual Array* partial_sum(bool exclude);

@@ -7,9 +7,10 @@
 
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
+#include "CoordHyperslab.H"
 #include "FileFormat.H"
+#include "IndexHyperslab.H"
 #include "LatLonBox.H"
-#include "Slice.H"
 
 using std::set;
 using std::string;
@@ -41,7 +42,8 @@ class GenericCommands
         vector<Attribute*> get_attributes(Dataset *dataset) const;
 
         vector<LatLonBox> get_boxes() const;
-        vector<DimSlice> get_slices() const;
+        vector<IndexHyperslab> get_index_hyperslabs() const;
+        vector<CoordHyperslab> get_coord_hyperslabs() const;
         vector<string> get_input_filenames() const;
         string get_output_filename() const;
         set<string> get_variables() const;
@@ -84,7 +86,8 @@ class GenericCommands
         bool fix_record_dimension;
         int record_dimension_size;
         int header_pad;
-        vector<DimSlice> slices;
+        vector<IndexHyperslab> index_hyperslabs;
+        vector<CoordHyperslab> coord_hyperslabs;
         vector<LatLonBox> boxes;
         FileFormat file_format;
 };

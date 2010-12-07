@@ -408,3 +408,28 @@ const Dataset* GeoGrid::get_dataset() const
 {
     return dataset;
 }
+
+
+Variable* GeoGrid::get_lat()
+{
+    return get_cell_lat();
+}
+
+
+Variable* GeoGrid::get_lon()
+{
+    return get_cell_lon();
+}
+
+
+Dimension* GeoGrid::get_lat_dim()
+{
+    return get_cell_dim();
+}
+
+
+Dimension* GeoGrid::get_lon_dim()
+{
+    return get_cell_dim();
+}
+

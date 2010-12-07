@@ -45,6 +45,11 @@ class GeoGrid : public Grid
 
         virtual const Dataset* get_dataset() const;
 
+        virtual Variable* get_lat();
+        virtual Variable* get_lon();
+        virtual Dimension* get_lat_dim();
+        virtual Dimension* get_lon_dim();
+
     protected:
         GeoGrid();
         GeoGrid(const GeoGrid &that);

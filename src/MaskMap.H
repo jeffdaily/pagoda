@@ -13,8 +13,9 @@ using std::set;
 using std::string;
 using std::vector;
 
+#include "CoordHyperslab.H"
+#include "IndexHyperslab.H"
 #include "LatLonBox.H"
-#include "Slice.H"
 
 class Dataset;
 class Dimension;
@@ -52,8 +53,10 @@ class MaskMap
         void create_masks(const Dataset *dataset);
         void create_masks(const vector<Dimension*> dims);
 
-        void modify(const DimSlice &slice);
-        void modify(const vector<DimSlice> &slices);
+        void modify(const IndexHyperslab &hyperslab);
+        void modify(const vector<IndexHyperslab> &hyperslabs);
+        void modify(const CoordHyperslab &hyperslab, Grid *grid);
+        void modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid);
         void modify(const vector<LatLonBox> &boxes, Grid *grid);
         void modify(const LatLonBox &box, Grid *grid);
 

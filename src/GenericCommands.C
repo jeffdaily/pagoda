@@ -12,6 +12,7 @@
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
 #include "Common.H"
+#include "CoordHyperslab.H"
 #include "Dataset.H"
 #include "Dimension.H"
 #include "Error.H"
@@ -50,7 +51,7 @@ GenericCommands::GenericCommands()
     ,   fix_record_dimension(false)
     ,   record_dimension_size(-1)
     ,   header_pad(-1)
-    ,   slices()
+    ,   index_hyperslabs()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
 {
@@ -80,7 +81,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   fix_record_dimension(false)
     ,   record_dimension_size(-1)
     ,   header_pad(-1)
-    ,   slices()
+    ,   index_hyperslabs()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
 {
@@ -212,7 +213,11 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("dimension")) {
         vector<string> args = parser.get_arguments("dimension");
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
-            slices.push_back(DimSlice(*it));
+            if (it->find(".")) {
+                coord_hyperslabs.push_back(CoordHyperslab(*it));
+            } else {
+                index_hyperslabs.push_back(IndexHyperslab(*it));
+            }
         }
     }
 
@@ -616,10 +621,17 @@ vector<LatLonBox> GenericCommands::get_boxes() const
 }
 
 
-vector<DimSlice> GenericCommands::get_slices() const
+vector<IndexHyperslab> GenericCommands::get_index_hyperslabs() const
 {
-    TIMING("GenericCommands::get_slices()");
-    return slices;
+    TIMING("GenericCommands::get_index_hyperslabs()");
+    return index_hyperslabs;
+}
+
+
+vector<CoordHyperslab> GenericCommands::get_coord_hyperslabs() const
+{
+    TIMING("GenericCommands::get_coord_hyperslabs()");
+    return coord_hyperslabs;
 }
 
 

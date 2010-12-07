@@ -47,14 +47,14 @@ class RegularGrid : public Grid
 
         virtual const Dataset* get_dataset() const;
 
+        virtual Variable* get_lat();
+        virtual Variable* get_lon();
+        virtual Dimension* get_lat_dim();
+        virtual Dimension* get_lon_dim();
+
     protected:
         RegularGrid();
         RegularGrid(const RegularGrid &that);
-
-        Variable* get_coord(const string &att_name,
-                            const string &coord_name, const string &dim_name);
-        Dimension* get_dim(const string &att_name, const string &dim_name);
-        Variable* get_topology(const string &att_name, const string &var_name);
 
         const Dataset *dataset;
         const Variable *grid_var;

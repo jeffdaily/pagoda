@@ -150,11 +150,11 @@ void GlobalMask::reset()
 
 
 /**
- * Set bits based on the given slice notation.
+ * Set bits based on the given hyperslab notation.
  *
- * @param[in] slice the dimension slice
+ * @param[in] hyperslab the dimension hyperslab
  */
-void GlobalMask::modify(const DimSlice &slice)
+void GlobalMask::modify(const IndexHyperslab &hyperslab)
 {
     int64_t slo;
     int64_t shi;
@@ -163,7 +163,7 @@ void GlobalMask::modify(const DimSlice &slice)
     vector<int64_t> lo;
     vector<int64_t> hi;
 
-    TIMING("GlobalMask::modify(DimSlice)");
+    TIMING("GlobalMask::modify(IndexHyperslab)");
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -174,7 +174,22 @@ void GlobalMask::modify(const DimSlice &slice)
         return;
     }
 
-    slice.indices(get_size(), slo, shi, step);
+    if (hyperslab.has_min()) {
+        slo = hyperslab.get_min();
+    } else {
+        slo = 0;
+    }
+    if (hyperslab.has_max()) {
+        shi = hyperslab.get_max();
+    } else {
+        shi = get_size();
+    }
+    if (hyperslab.has_stride()) {
+        step = hyperslab.get_stride();
+    } else {
+        step = 1;
+    }
+
     get_distribution(lo,hi);
     data = (int*)access();
     if (lo[0] <= slo) {
@@ -302,6 +317,108 @@ void GlobalMask::modify(double min, double max, const Array *var)
         TYPE *pdata = (TYPE*)var_data; \
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
             if (pdata[i] >= min && pdata[i] <= max) { \
+                mask_data[i] = 1; \
+            } \
+        } \
+    } else
+    adjust_op(DataType::INT,int)
+    adjust_op(DataType::LONG,long)
+    adjust_op(DataType::LONGLONG,long long)
+    adjust_op(DataType::FLOAT,float)
+    adjust_op(DataType::DOUBLE,double)
+    adjust_op(DataType::LONGDOUBLE,long double) {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef adjust_op
+
+    release_update();
+    var->release();
+}
+
+
+void GlobalMask::modify_gt(double value, const Array *var)
+{
+    int *mask_data;
+    void *var_data;
+    DataType type = var->get_type();
+
+    TIMING("GlobalMask::modify_gt(double,Variable*)");
+
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
+
+    // bail if we don't own any of the data
+    if (!owns_data()) {
+        return;
+    }
+
+    if (get_shape() != var->get_shape()) {
+        pagoda::abort("GlobalMask::modify mask var shape mismatch", 0);
+    }
+
+    // it is assumed that they have the same distributions
+    ASSERT(same_distribution(var));
+    mask_data = (int*)access();
+    var_data = var->access();
+
+#define adjust_op(DTYPE,TYPE) \
+    if (type == DTYPE) { \
+        TYPE *pdata = (TYPE*)var_data; \
+        TYPE pvalue = static_cast<TYPE>(value); \
+        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+            if (pdata[i] > pvalue) { \
+                mask_data[i] = 1; \
+            } \
+        } \
+    } else
+    adjust_op(DataType::INT,int)
+    adjust_op(DataType::LONG,long)
+    adjust_op(DataType::LONGLONG,long long)
+    adjust_op(DataType::FLOAT,float)
+    adjust_op(DataType::DOUBLE,double)
+    adjust_op(DataType::LONGDOUBLE,long double) {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef adjust_op
+
+    release_update();
+    var->release();
+}
+
+
+void GlobalMask::modify_lt(double value, const Array *var)
+{
+    int *mask_data;
+    void *var_data;
+    DataType type = var->get_type();
+
+    TIMING("GlobalMask::modify_gt(double,Variable*)");
+
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
+
+    // bail if we don't own any of the data
+    if (!owns_data()) {
+        return;
+    }
+
+    if (get_shape() != var->get_shape()) {
+        pagoda::abort("GlobalMask::modify mask var shape mismatch", 0);
+    }
+
+    // it is assumed that they have the same distributions
+    ASSERT(same_distribution(var));
+    mask_data = (int*)access();
+    var_data = var->access();
+
+#define adjust_op(DTYPE,TYPE) \
+    if (type == DTYPE) { \
+        TYPE *pdata = (TYPE*)var_data; \
+        TYPE pvalue = static_cast<TYPE>(value); \
+        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+            if (pdata[i] < pvalue) { \
                 mask_data[i] = 1; \
             } \
         } \

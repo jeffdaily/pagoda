@@ -5,8 +5,8 @@
 #include <string>
 
 #include "AbstractArray.H"
+#include "IndexHyperslab.H"
 #include "LatLonBox.H"
-#include "Slice.H"
 
 using std::ostream;
 using std::string;
@@ -68,11 +68,11 @@ class Mask : public AbstractArray
         virtual void reset() = 0;
 
         /**
-         * Set bits to one if they fall within the given slice.
+         * Set bits to one if they fall within the given hyperslab.
          *
-         * @param[in] slice the specified slice to mask
+         * @param[in] hyperslab the specified hyperslab to mask
          */
-        virtual void modify(const DimSlice &slice) = 0;
+        virtual void modify(const IndexHyperslab &hyperslab) = 0;
 
         /**
          * Set bits to one if they fall within the given LatLonBox.
@@ -98,6 +98,28 @@ class Mask : public AbstractArray
          * @param[in] var the values to compare against low and hi
          */
         virtual void modify(double low, double hi, const Array *var) = 0;
+
+        /**
+         * Set bits to one if they fall within the half-open range [value,..].
+         *
+         * Assumes the given Array has the same size as this Mask.
+         * In other words, the given Array is a coordinate Array.
+         *
+         * @param[in] value values must be greater than this value
+         * @param[in] var the values to compare against low and hi
+         */
+        virtual void modify_gt(double value, const Array *var) = 0;
+
+        /**
+         * Set bits to one if they fall within the half-open range [..,value].
+         *
+         * Assumes the given Array has the same size as this Mask.
+         * In other words, the given Array is a coordinate Array.
+         *
+         * @param[in] value values must be less than this value
+         * @param[in] var the values to compare against low and hi
+         */
+        virtual void modify_lt(double value, const Array *var) = 0;
 
         /**
          * Return a new Array containing the enumeration of this Mask.

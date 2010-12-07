@@ -88,62 +88,56 @@ vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
             }
         }
     }
+    if (!results.empty()) {
+        return results;
+    }
 
-    // all else failed, look for 1-dimensional lat and lon coordinate
-    // variables
-    // also at this point assume a single Grid in the Dataset
+    // first look for lat and lon coordinate variables with appropriate units
+    // then look for Y and X axis attributes
+    // then look for "latitude" and "longitude" standard_name attributes
+    found_lat = false;
+    found_lon = false;
     var_it = vars.begin();
     for (; var_it!=var_end; ++var_it) {
         Variable *var = *var_it;
-        //pagoda::println_zero("looking at %s", var->get_name().c_str());
+        
         if (var->get_ndim() == 1
-                && var->get_dims()[0]->get_name() == var->get_name()) {
-            //pagoda::println_zero("\tcoordinate var");
-            atts = var->get_atts();
-            att_end = atts.end();
-            // look for latitude
-            att_it = atts.begin();
-            for (; att_it!=att_end; ++att_it) {
-                Attribute *att = *att_it;
-                if (att->get_name() == "standard_name") {
-                    if (att->get_string() == "latitude") {
-                        found_lat = true;
-                        //pagoda::println_zero("\tstandard_name latitude");
-                        break;
-                    }
+                && var->get_name() == var->get_dims()[0]->get_name()) {
+            Attribute *att = NULL;
+            if ((att = var->get_att("units"))) {
+                if (LATITUDE_UNITS.count(att->get_string())) {
+                    //pagoda::println_zero("units latitude");
+                    found_lat = true;
                 }
-                else if (att->get_name() == "units") {
-                    if (LATITUDE_UNITS.count(att->get_string())) {
-                        found_lat = true;
-                        //pagoda::println_zero("\tunits latitude");
-                        break;
-                    }
+                else if (LONGITUDE_UNITS.count(att->get_string())) {
+                    //pagoda::println_zero("units longitude");
+                    found_lon = true;
                 }
             }
-            // look for longitude
-            att_it = atts.begin();
-            for (; att_it!=att_end; ++att_it) {
-                Attribute *att = *att_it;
-                if (att->get_name() == "standard_name") {
-                    if (att->get_string() == "longitude") {
-                        found_lon = true;
-                        //pagoda::println_zero("\tstandard_name longitude");
-                        break;
-                    }
+            if ((att = var->get_att("units"))) {
+                if (att->get_string() == "Y") {
+                    //pagoda::println_zero("axis latitude");
+                    found_lat = true;
                 }
-                else if (att->get_name() == "units") {
-                    if (LONGITUDE_UNITS.count(att->get_string())) {
-                        found_lon = true;
-                        //pagoda::println_zero("\tunits longitude");
-                        break;
-                    }
+                else if (att->get_string() == "X") {
+                    //pagoda::println_zero("axis longitude");
+                    found_lon = true;
+                }
+            }
+            if ((att = var->get_att("standard_name"))) {
+                if (att->get_string() == "latitude") {
+                    //pagoda::println_zero("standard_name latitude");
+                    found_lat = true;
+                }
+                else if (att->get_string() == "longitude") {
+                    //pagoda::println_zero("standard_name longitude");
+                    found_lon = true;
                 }
             }
         }
-        if (found_lat && found_lon) {
-            results.push_back(new RegularGrid(dataset));
-            break;
-        }
+    }
+    if (found_lat && found_lon) {
+        results.push_back(new RegularGrid(dataset));
     }
 
     return results;
@@ -186,125 +180,39 @@ GridType RegularGrid::get_type() const
 }
 
 
-Variable* RegularGrid::get_coord(const string &att_name,
-                                 const string &coord_name, const string &dim_name)
-{
-    TRACER("RegularGrid::get_coord(%s,%s,%s)\n", att_name.c_str(),
-           coord_name.c_str(), dim_name.c_str());
-    if (grid_var) {
-        Attribute *att = grid_var->get_att(att_name);
-        if (att) {
-            vector<string> parts = pagoda::split(att->get_string());
-            vector<string>::iterator part;
-            if (parts.size() != 2) {
-                EXCEPT(GridException,
-                       "expected " + att_name + " attribute "
-                       "to have two values", parts.size());
-            }
-            for (part=parts.begin(); part!=parts.end(); ++part) {
-                Variable *var = dataset->get_var(*part);
-                StringComparator cmp("", true, true);
-                string standard_name;
-                string long_name;
-                if (!var) {
-                    EXCEPT(GridException,
-                           "could not locate variable " + *part, 0);
-                }
-                standard_name = var->get_standard_name();
-                long_name = var->get_long_name();
-                TRACER("\tcomparing '%s' '%s' '%s'\n",
-                       coord_name.c_str(), standard_name.c_str(),
-                       long_name.c_str());
-                if (!standard_name.empty()) {
-                    cmp.set_value(standard_name);
-                    if (cmp(coord_name)) {
-                        TRACER("\tfound\n");
-                        return var;
-                    }
-                }
-                else if (!long_name.empty()) {
-                    cmp.set_value(long_name);
-                    if (cmp(coord_name)) {
-                        TRACER("\tfound\n");
-                        return var;
-                    }
-                }
-                else {
-                    TRACER("\tNOT FOUND\n");
-                }
-            }
-        }
-    }
-    else {
-        // look for a variable with the given dimension name as its only
-        // dimension and then for a substring match within the "standard_name"
-        // or "long_name" attributes
-        vector<Variable*> vars = get_dataset()->get_vars();
-        vector<Variable*>::iterator var_it;
-        for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
-            Variable *var = *var_it;
-            vector<Dimension*> dims = var->get_dims();
-            if (dims.size() == 1) {
-                /*
-                pagoda::print_zero("found a dim.size() == 1 %s\n",
-                        dims[0]->get_name().c_str());
-                */
-                if (dims[0]->get_name() == dim_name) {
-                    StringComparator cmp(coord_name, true, true);
-                    if (cmp(var->get_standard_name())
-                            || cmp(var->get_long_name())) {
-                        return var;
-                        /*
-                                            } else {
-                        pagoda::print_zero(
-                                "cmp did not match %s to either %s or %s\n",
-                                coord_name.c_str(),
-                                var->get_standard_name().c_str(),
-                                var->get_long_name().c_str());
-                        */
-                    }
-                }
-            }
-        }
-    }
-
-    return NULL;
-}
-
-
 Variable* RegularGrid::get_cell_lat()
 {
-    return get_coord("coordinates_cells", "latitude", "cells");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_cell_lon()
 {
-    return get_coord("coordinates_cells", "longitude", "cells");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_edge_lat()
 {
-    return get_coord("coordinates_edges", "latitude", "edges");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_edge_lon()
 {
-    return get_coord("coordinates_edges", "longitude", "edges");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_corner_lat()
 {
-    return get_coord("coordinates_corners", "latitude", "corners");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_corner_lon()
 {
-    return get_coord("coordinates_corners", "longitude", "corners");
+    return NULL;
 }
 
 
@@ -317,6 +225,8 @@ bool RegularGrid::is_radians()
     funcs.push_back(&RegularGrid::get_edge_lon);
     funcs.push_back(&RegularGrid::get_corner_lat);
     funcs.push_back(&RegularGrid::get_corner_lon);
+    funcs.push_back(&RegularGrid::get_lat);
+    funcs.push_back(&RegularGrid::get_lon);
 
     for (size_t i=0; i<funcs.size(); ++i) {
         Variable *var;
@@ -334,88 +244,39 @@ bool RegularGrid::is_radians()
 }
 
 
-Dimension* RegularGrid::get_dim(const string &att_name, const string &dim_name)
-{
-    if (grid_var) {
-        Attribute *att = grid_var->get_att(att_name);
-        if (att) {
-            vector<string> parts = pagoda::split(att->get_string());
-            if (parts.size() != 2) {
-                EXCEPT(GridException,
-                       "expected " + att_name + " attribute "
-                       "to have two values", parts.size());
-            }
-            else {
-                for (size_t i=0; i<parts.size(); ++i) {
-                    Variable *var = dataset->get_var(parts[i]);
-                    if (!var) {
-                        EXCEPT(GridException,
-                               "could not locate variable" + parts[i], 0);
-                    }
-                    return var->get_dims().at(0);
-                }
-            }
-        }
-    }
-
-    // if all else fails, use hard-coded name...
-    return dataset->get_dim(dim_name);
-}
-
-
 Dimension* RegularGrid::get_cell_dim()
 {
-    return get_dim("coordinates_cells", "cells");
+    return NULL;
 }
 
 
 Dimension* RegularGrid::get_edge_dim()
 {
-    return get_dim("coordinates_edges", "edges");
+    return NULL;
 }
 
 
 Dimension* RegularGrid::get_corner_dim()
 {
-    return get_dim("coordinates_corners", "corners");
-}
-
-
-Variable* RegularGrid::get_topology(const string &att_name, const string &var_name)
-{
-    if (grid_var) {
-        Attribute *att = grid_var->get_att(att_name);
-        if (att) {
-            string var_name = att->get_string();
-            Variable *var = dataset->get_var(var_name);
-            if (!var) {
-                EXCEPT(GridException,
-                       "could not locate variable " + var_name, 0);
-            }
-            return var;
-        }
-    }
-
-    // if all else fails, try given name
-    return dataset->get_var(var_name);
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_cell_cells()
 {
-    return get_topology("cell_cells", "cell_neighbors");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_cell_edges()
 {
-    return get_topology("cell_edges", "cell_edges");
+    return NULL;
 }
 
 
 Variable* RegularGrid::get_cell_corners()
 {
-    return get_topology("cell_corners", "cell_corners");
+    return NULL;
 }
 
 
@@ -433,11 +294,7 @@ Variable* RegularGrid::get_edge_edges()
 
 Variable* RegularGrid::get_edge_corners()
 {
-    Variable *var = get_topology("edge_corners", "edgecorners");
-    if (!var) {
-        var = get_topology("edge_corners", "edge_corners");
-    }
-    return var;
+    return NULL;
 }
 
 
@@ -463,3 +320,99 @@ const Dataset* RegularGrid::get_dataset() const
 {
     return dataset;
 }
+
+
+static Variable* get_lat_or_lon(const Dataset *dataset, bool get_lat)
+{
+    vector<Variable*> vars = dataset->get_vars();
+    vector<Variable*>::const_iterator var_it = vars.begin();
+    vector<Variable*>::const_iterator var_end = vars.end();
+
+    var_it = vars.begin();
+    for (; var_it!=var_end; ++var_it) {
+        Variable *var = *var_it;
+        
+        if (var->get_ndim() == 1
+                && var->get_name() == var->get_dims()[0]->get_name()) {
+            Attribute *att = NULL;
+            if ((att = var->get_att("units"))) {
+                if (get_lat) {
+                    if (LATITUDE_UNITS.count(att->get_string())) {
+                        //pagoda::println_zero("units lat " + var->get_name());
+                        return var;
+                    }
+                } else {
+                    if (LONGITUDE_UNITS.count(att->get_string())) {
+                        //pagoda::println_zero("units lon " + var->get_name());
+                        return var;
+                    }
+                }
+            }
+            if ((att = var->get_att("units"))) {
+                if (get_lat) {
+                    if (att->get_string() == "Y") {
+                        //pagoda::println_zero("axis lat " + var->get_name());
+                        return var;
+                    }
+                } else {
+                    if (att->get_string() == "X") {
+                        //pagoda::println_zero("axis lon " + var->get_name());
+                        return var;
+                    }
+                }
+            }
+            if ((att = var->get_att("standard_name"))) {
+                if (get_lat) {
+                    if (att->get_string() == "latitude") {
+                        //pagoda::println_zero("s_n lat " + var->get_name());
+                        return var;
+                    }
+                } else {
+                    if (att->get_string() == "longitude") {
+                        //pagoda::println_zero("s_n lon " + var->get_name());
+                        return var;
+                    }
+                }
+            }
+        }
+    }
+
+    return NULL;
+}
+
+
+Variable* RegularGrid::get_lat()
+{
+    return get_lat_or_lon(dataset, true);
+}
+
+
+Variable* RegularGrid::get_lon()
+{
+    return get_lat_or_lon(dataset, false);
+}
+
+
+Dimension* RegularGrid::get_lat_dim()
+{
+    Variable *var;
+
+    if ((var = get_lat())) {
+        return var->get_dims().at(0);
+    }
+
+    return NULL;
+}
+
+
+Dimension* RegularGrid::get_lon_dim()
+{
+    Variable *var;
+
+    if ((var = get_lon())) {
+        return var->get_dims().at(0);
+    }
+
+    return NULL;
+}
+

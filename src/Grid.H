@@ -111,6 +111,11 @@ class Grid
 
         virtual const Dataset* get_dataset() const = 0;
 
+        virtual Variable* get_lat() = 0;
+        virtual Variable* get_lon() = 0;
+        virtual Dimension* get_lat_dim() = 0;
+        virtual Dimension* get_lon_dim() = 0;
+
     protected:
         Grid();
 };

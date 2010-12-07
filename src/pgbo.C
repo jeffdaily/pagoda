@@ -98,10 +98,12 @@ int main(int argc, char **argv)
 
         // create masks for dataset and operand
         ds_masks = new MaskMap(dataset);
-        ds_masks->modify(cmd.get_slices());
+        ds_masks->modify(cmd.get_index_hyperslabs());
+        ds_masks->modify(cmd.get_coord_hyperslabs(), grid);
         ds_masks->modify(cmd.get_boxes(), grid);
         op_masks = new MaskMap(operand);
-        op_masks->modify(cmd.get_slices());
+        op_masks->modify(cmd.get_index_hyperslabs());
+        op_masks->modify(cmd.get_coord_hyperslabs(), grid);
         op_masks->modify(cmd.get_boxes(), grid);
 
         // create the output writer

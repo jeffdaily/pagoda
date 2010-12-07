@@ -104,56 +104,133 @@ void MaskMap::create_masks(const vector<Dimension*> dims)
 
 
 /**
- * Calls Mask::modify(DimSlice) for the given slice if associated Mask is
+ * Calls Mask::modify(IndexHyperslab) for the given hyperslab if associated Mask is
  * found.
  *
  * If an associated Mask is not found for the indicated Dimension, it is
  * reported to stderr but otherwise ignored.
  *
- * @param[in] slice the DimSlice to apply to associatd Masks
+ * @param[in] hyperslab the IndexHyperslab to apply to associatd Masks
  */
-void MaskMap::modify(const DimSlice &slice)
+void MaskMap::modify(const IndexHyperslab &hyperslab)
 {
-    string slice_name = slice.get_name();
-    masks_t::const_iterator mask_it = masks.find(slice_name);
+    string hyperslab_name = hyperslab.get_name();
+    masks_t::const_iterator mask_it = masks.find(hyperslab_name);
 
-    TIMING("MaskMap::modify(DimSlice)");
-    TRACER("MaskMap::modify(DimSlice)\n");
+    TIMING("MaskMap::modify(IndexHyperslab)");
+    TRACER("MaskMap::modify(IndexHyperslab)\n");
 
     if (mask_it == masks.end()) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
-                           slice_name.c_str());
+                           hyperslab_name.c_str());
     }
     else {
         // clear the Mask the first time only
-        if (cleared.count(slice_name) == 0) {
-            cleared.insert(slice_name);
+        if (cleared.count(hyperslab_name) == 0) {
+            cleared.insert(hyperslab_name);
             mask_it->second->clear();
         }
         // modify the Mask based on the current Slice
-        mask_it->second->modify(slice);
+        mask_it->second->modify(hyperslab);
     }
 }
 
 
 /**
- * Calls Mask::modify(DimSlice) for each given slice if associated Mask is
+ * Calls Mask::modify(IndexHyperslab) for each given hyperslab if associated Mask is
  * found.
  *
  * If an associated Mask is not found for the indicated Dimension, it is
  * reported to stderr but otherwise ignored.
  *
- * @param[in] slices the DimSlices to apply to associatd Masks
+ * @param[in] hyperslabs the DimSlices to apply to associatd Masks
  */
-void MaskMap::modify(const vector<DimSlice> &slices)
+void MaskMap::modify(const vector<IndexHyperslab> &hyperslabs)
 {
-    vector<DimSlice>::const_iterator slice_it;
+    vector<IndexHyperslab>::const_iterator hyperslab_it;
 
-    TIMING("Dataset::modify(vector<DimSlice>,vector<Dimension*>)");
+    TIMING("Dataset::modify(vector<IndexHyperslab>,vector<Dimension*>)");
 
-    // we're iterating over the command-line specified slices to create masks
-    for (slice_it=slices.begin(); slice_it!=slices.end(); ++slice_it) {
-        modify(*slice_it);
+    // we're iterating over the command-line specified hyperslabs to create masks
+    for (hyperslab_it=hyperslabs.begin(); hyperslab_it!=hyperslabs.end(); ++hyperslab_it) {
+        modify(*hyperslab_it);
+    }
+}
+
+
+/**
+ * Calls Mask::modify(CoordHyperslab) for the given hyperslab if associated Mask is
+ * found.
+ *
+ * If an associated Mask is not found for the indicated Dimension, it is
+ * reported to stderr but otherwise ignored.
+ *
+ * @param[in] hyperslab the CoordHyperslab to apply to associatd Masks
+ */
+void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
+{
+    string hyperslab_name = hyperslab.get_name();
+    masks_t::const_iterator mask_it = masks.find(hyperslab_name);
+
+    TIMING("MaskMap::modify(CoordHyperslab)");
+    TRACER("MaskMap::modify(CoordHyperslab)\n");
+
+    if (mask_it == masks.end()) {
+        pagoda::print_zero("Sliced dimension '%s' does not exist\n",
+                           hyperslab_name.c_str());
+    }
+    else {
+        const Dataset *dataset = grid->get_dataset();
+        Variable *variable = dataset->get_var(hyperslab_name);
+
+        if (variable == NULL) {
+            pagoda::print_zero("coordinate variable '%s' does not exist\n",
+                    hyperslab_name.c_str());
+        } else {
+            Array *data = variable->read();
+
+            ASSERT(variable->get_ndim() == 1);
+            ASSERT(variable->get_dims()[0]->get_name() == hyperslab_name);
+
+            // clear the Mask the first time only
+            if (cleared.count(hyperslab_name) == 0) {
+                cleared.insert(hyperslab_name);
+                mask_it->second->clear();
+            }
+
+            // modify the Mask based on the current Slice
+            ASSERT(hyperslab.has_min() || hyperslab.has_max());
+            if (hyperslab.has_min() && hyperslab.has_max()) {
+                mask_it->second->modify(
+                        hyperslab.get_min(), hyperslab.get_max(), data);
+            } else if (hyperslab.has_min()) {
+                mask_it->second->modify_gt(hyperslab.get_min(), data);
+            } else if (hyperslab.has_max()) {
+                mask_it->second->modify_lt(hyperslab.get_max(), data);
+            }
+        }
+    }
+}
+
+
+/**
+ * Calls Mask::modify(CoordHyperslab) for each given hyperslab if associated Mask is
+ * found.
+ *
+ * If an associated Mask is not found for the indicated Dimension, it is
+ * reported to stderr but otherwise ignored.
+ *
+ * @param[in] hyperslabs the DimSlices to apply to associatd Masks
+ */
+void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
+{
+    vector<CoordHyperslab>::const_iterator hyperslab_it;
+
+    TIMING("Dataset::modify(vector<CoordHyperslab>,vector<Dimension*>)");
+
+    // we're iterating over the command-line specified hyperslabs to create masks
+    for (hyperslab_it=hyperslabs.begin(); hyperslab_it!=hyperslabs.end(); ++hyperslab_it) {
+        modify(*hyperslab_it, grid);
     }
 }
 
@@ -240,6 +317,33 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
             }
             if (!cell_dim) {
                 pagoda::print_zero("grid cell dim missing\n");
+            }
+        }
+    } else {
+        /* for any other grid type, look for generic lat/lon variables */
+        Variable *lat = grid->get_lat();
+        Variable *lon = grid->get_lon();
+        Dimension *lat_dim = grid->get_lat_dim();
+        Dimension *lon_dim = grid->get_lon_dim();
+
+        if (lat && lon && lat_dim && lon_dim) {
+            if (grid->is_radians()) {
+                modify(box*RAD_PER_DEG, lat, lon, lat_dim, lon_dim);
+            } else {
+                modify(box, lat, lon, lat_dim, lon_dim);
+            }
+        } else {
+            if (!lat) {
+                pagoda::println_zero("generic grid lat missing");
+            }
+            if (!lon) {
+                pagoda::println_zero("generic grid lon missing");
+            }
+            if (!lat_dim) {
+                pagoda::println_zero("generic grid lat dim missing");
+            }
+            if (!lon_dim) {
+                pagoda::println_zero("generic grid lon dim missing");
             }
         }
     }

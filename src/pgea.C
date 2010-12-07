@@ -80,7 +80,8 @@ int main(int argc, char **argv)
         // between ensembles
         for (size_t i=0; i<datasets.size(); ++i) {
             masks.push_back(new MaskMap(datasets[i]));
-            masks[i]->modify(cmd.get_slices());
+            masks[i]->modify(cmd.get_index_hyperslabs());
+            masks[i]->modify(cmd.get_coord_hyperslabs(), grids[i]);
             masks[i]->modify(cmd.get_boxes(), grids[i]);
         }
 

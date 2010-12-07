@@ -80,7 +80,8 @@ int main(int argc, char **argv)
         }
 
         masks = new MaskMap(dataset);
-        masks->modify(cmd.get_slices());
+        masks->modify(cmd.get_index_hyperslabs());
+        masks->modify(cmd.get_coord_hyperslabs(), grid);
         masks->modify(cmd.get_boxes(), grid);
 
         writer = cmd.get_output();
