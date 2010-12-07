@@ -19,14 +19,6 @@
 #include <utility>
 #include <vector>
 
-using std::cerr;
-using std::endl;
-using std::map;
-using std::mismatch;
-using std::pair;
-using std::string;
-using std::vector;
-
 #include "Array.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
@@ -35,6 +27,16 @@ using std::vector;
 #include "Dimension.H"
 #include "Values.H"
 #include "Variable.H"
+
+using pagoda::unravel_index;
+using pagoda::vec_to_string;
+using std::cerr;
+using std::endl;
+using std::map;
+using std::mismatch;
+using std::pair;
+using std::string;
+using std::vector;
 
 
 template <class T>
@@ -303,9 +305,14 @@ int main(int argc, char **argv)
 
             if (lhs_array->owns_data()) {
                 int64_t size = lhs_array->get_local_size();
+                vector<int64_t> shape = lhs_array->get_local_shape();
                 DataType type = lhs_array->get_type();
                 void *lhs_data;
                 void *rhs_data;
+                int64_t bad_count = 0;
+                vector<int64_t> first_bad_index;
+                double lhs_bad;
+                double rhs_bad;
 
                 lhs_data = lhs_array->access();
                 rhs_data = rhs_array->access();
@@ -317,25 +324,31 @@ int main(int argc, char **argv)
                         double lhs_d = static_cast<double>(lhs[j]); \
                         double rhs_d = static_cast<double>(rhs[j]); \
                         if (!cmp(lhs_d,rhs_d)) { \
-                            ostringstream str; \
-                            str << "variable '" << name; \
-                            str << "' value mismatch "; \
-                            str << "at local index " << j << ": "; \
-                            str << lhs[j] << "!=" << rhs[j]; \
-                            lhs_array->release(); \
-                            rhs_array->release(); \
-                            if (warn) { \
-                                pagoda::println_zero("WARNING: " + str.str()); \
-                                break; \
-                            } else { \
-                                throw str.str(); \
+                            if (bad_count == 0) { \
+                                first_bad_index = unravel_index(j,shape); \
+                                lhs_bad = lhs_d; \
+                                rhs_bad = rhs_d; \
                             } \
+                            ++bad_count; \
                         } \
                     } \
                 } else
 #include "DataType.def"
                 lhs_array->release();
                 rhs_array->release();
+                if (bad_count > 0) {
+                    ostringstream str;
+                    str << "variable '" << name << "' ";
+                    str << "value mismatch at index ";
+                    str << vec_to_string(first_bad_index) << ": ";
+                    str << lhs_bad << "!=" << rhs_bad << ": ";
+                    str << bad_count << " total mismatched";
+                    if (warn) {
+                        pagoda::println_zero("WARNING: " + str.str());
+                    } else {
+                        throw str.str();
+                    }
+                }
             }
 
             delete lhs_array;
