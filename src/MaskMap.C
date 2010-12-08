@@ -262,13 +262,13 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
         if (corner_lat) {
             corner_dim = corner_lat->get_dims().at(0);
         }
-        else if (corner_lat) {
+        else if (corner_lon) {
             corner_dim = corner_lon->get_dims().at(0);
         }
         if (edge_lat) {
             edge_dim = edge_lat->get_dims().at(0);
         }
-        else if (edge_lat) {
+        else if (edge_lon) {
             edge_dim = edge_lon->get_dims().at(0);
         }
 
