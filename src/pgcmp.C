@@ -65,7 +65,7 @@ string usage(
 
 int main(int argc, char **argv)
 {
-    Dataset *lhs;
+    Dataset *lhs = NULL;
     vector<Attribute*> lhs_atts;
     vector<Dimension*> lhs_dims;
     vector<Variable*>  lhs_vars;
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
     map<string,Dimension*> lhs_dims_m;
     map<string,Variable*>  lhs_vars_m;
 
-    Dataset *rhs;
+    Dataset *rhs = NULL;
     vector<Attribute*> rhs_atts;
     vector<Dimension*> rhs_dims;
     vector<Variable*>  rhs_vars;
