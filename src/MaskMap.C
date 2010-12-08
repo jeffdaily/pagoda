@@ -249,9 +249,9 @@ void MaskMap::modify(const LatLonBox &box, Grid *grid)
         Variable *edge_lon = grid->get_edge_lon();
         Variable *cell_corners = grid->get_cell_corners();
         Variable *cell_edges = grid->get_cell_edges();
-        Dimension *cell_dim;
-        Dimension *corner_dim;
-        Dimension *edge_dim;
+        Dimension *cell_dim = NULL;
+        Dimension *corner_dim = NULL;
+        Dimension *edge_dim = NULL;
 
         if (cell_lat) {
             cell_dim = cell_lat->get_dims().at(0);

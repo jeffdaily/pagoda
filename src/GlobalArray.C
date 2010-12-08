@@ -733,8 +733,8 @@ void GlobalArray::put(void *buffer,
 {
     vector<int64_t> lo_copy(lo.begin(), lo.end());
     vector<int64_t> hi_copy(hi.begin(), hi.end());
-    vector<int64_t> shape_copy(shape.begin(), shape.end());
-    NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape_copy[1]);
+    vector<int64_t> shape = pagoda::get_shape(lo, hi);
+    NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1]);
 }
 
 
