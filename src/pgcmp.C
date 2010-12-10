@@ -56,10 +56,10 @@ bool cmp(double x, double y)
 
 
 string usage(
-    "Usage: pgcmp <filename> <filename> []\n"
+    "Usage: pgcmp [-w] [-a] <filename> <filename>\n"
     "\n"
-    "If the third argument exists, then any mismatch detected results in a hard\n"
-    "failure rather than warning and moving on.\n"
+    "-w\tmake all warnings fatal\n"
+    "-a\treport all mismatched values (default: first mismatch)\n"
 );
 
 
@@ -81,22 +81,34 @@ int main(int argc, char **argv)
     map<string,Dimension*> rhs_dims_m;
     map<string,Variable*>  rhs_vars_m;
 
-    bool warn;
+    bool warn = true;
+    bool all_points = false;
 
     pagoda::initialize(&argc,&argv);
 
     try {
-        if (argc == 3) {
-            lhs = Dataset::open(argv[1]);
-            rhs = Dataset::open(argv[2]);
-            warn = true;
+        int opt;
+        opterr = 0;
+        while ((opt = getopt(argc, argv, "wa")) != -1)
+        {
+            switch (opt) {
+                case 'w':
+                    warn = false;
+                    break;
+                case 'a':
+                    all_points = true;
+                    break;
+            }
         }
-        else if (argc == 4) {
-            lhs = Dataset::open(argv[1]);
-            rhs = Dataset::open(argv[2]);
-            warn = false;
+        if (optind < argc) {
+            lhs = Dataset::open(argv[optind]);
+            ++optind;
         }
-        else {
+        if (optind < argc) {
+            rhs = Dataset::open(argv[optind]);
+            ++optind;
+        }
+        if (optind < argc || !lhs || !rhs) {
             throw usage;
         }
 
@@ -324,10 +336,20 @@ int main(int argc, char **argv)
                         double lhs_d = static_cast<double>(lhs[j]); \
                         double rhs_d = static_cast<double>(rhs[j]); \
                         if (!cmp(lhs_d,rhs_d)) { \
-                            if (bad_count == 0) { \
-                                first_bad_index = unravel_index(j,shape); \
-                                lhs_bad = lhs_d; \
-                                rhs_bad = rhs_d; \
+                            if (all_points) { \
+                                ostringstream str; \
+                                vector<int64_t> index = unravel_index(j,shape);\
+                                str << "variable '" << name << "' "; \
+                                str << "value mismatch at index "; \
+                                str << vec_to_string(index) << ": "; \
+                                str << lhs_bad << "!=" << rhs_bad; \
+                                pagoda::println_zero("WARNING: " + str.str()); \
+                            } else { \
+                                if (bad_count == 0) { \
+                                    first_bad_index = unravel_index(j,shape); \
+                                    lhs_bad = lhs_d; \
+                                    rhs_bad = rhs_d; \
+                                } \
                             } \
                             ++bad_count; \
                         } \
@@ -337,16 +359,27 @@ int main(int argc, char **argv)
                 lhs_array->release();
                 rhs_array->release();
                 if (bad_count > 0) {
-                    ostringstream str;
-                    str << "variable '" << name << "' ";
-                    str << "value mismatch at index ";
-                    str << vec_to_string(first_bad_index) << ": ";
-                    str << lhs_bad << "!=" << rhs_bad << ": ";
-                    str << bad_count << " total mismatched";
-                    if (warn) {
-                        pagoda::println_zero("WARNING: " + str.str());
+                    if (all_points) {
+                        ostringstream str;
+                        str << "variable '" << name << "' ";
+                        str << bad_count << " total mismatched";
+                        if (warn) {
+                            pagoda::println_zero("WARNING: " + str.str());
+                        } else {
+                            throw str.str();
+                        }
                     } else {
-                        throw str.str();
+                        ostringstream str;
+                        str << "variable '" << name << "' ";
+                        str << "value mismatch at index ";
+                        str << vec_to_string(first_bad_index) << ": ";
+                        str << lhs_bad << "!=" << rhs_bad << ": ";
+                        str << bad_count << " total mismatched";
+                        if (warn) {
+                            pagoda::println_zero("WARNING: " + str.str());
+                        } else {
+                            throw str.str();
+                        }
                     }
                 }
             }
