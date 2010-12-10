@@ -183,8 +183,10 @@ int64_t NodeZeroArray<T>::get_ndim() const
 template <class T>
 void NodeZeroArray<T>::fill(void *new_value)
 {
-    T value = *(static_cast<T*>(new_value));
-    std::fill(data, data+size, value);
+    if (owns_data()) {
+        T value = *(static_cast<T*>(new_value));
+        std::fill(data, data+size, value);
+    }
 }
 
 
