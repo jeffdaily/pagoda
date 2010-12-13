@@ -201,7 +201,8 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
  * N-Dimensional packing/subsetting.
  */
 void pagoda::pack(const Array *g_src, Array *g_dst,
-                  const vector<Array*> &g_masks, const vector<Array*> &g_masksums)
+                  const vector<Array*> &g_masks,
+                  const vector<Array*> &g_masksums)
 {
     DataType type_src = g_src->get_type();
     int ndim_src = g_src->get_ndim();
@@ -235,7 +236,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
     }
     else {
         vector<int64_t> elems_src(ndim_src,0);
-        vector<int64_t> index(ndim_src,0);
         vector<int64_t> local_counts(ndim_src,0);
         vector<int*> local_masks(ndim_src,NULL);
         int64_t elems_product_src=1;
@@ -292,30 +292,57 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
             /* Create the destination buffer */
 #define pack_bit_copy(DTYPE,TYPE,FMT) \
             if (type_src == DTYPE) { \
-                int64_t buf_dst_index = 0; \
-                TYPE *buf_src = (TYPE*)g_src->access(); \
+                int64_t okay_count = 0; \
+                TYPE *sptr = (TYPE*)g_src->access(); \
                 TYPE *buf_dst = new TYPE[local_counts_product]; \
-                TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
+                TYPE *dptr = buf_dst; \
+                int64_t nd_m1 = ndim_src-1; \
+                int64_t *coords = new int64_t[ndim_src]; \
+                int64_t *dims_m1 = new int64_t[ndim_src]; \
+                int64_t *strides = new int64_t[ndim_src]; \
+                int64_t *backstrides = new int64_t[ndim_src]; \
+                TRACER("buf_src[0]="#FMT"\n", sptr[0]); \
+                for (int64_t i=nd_m1; i>=0; --i) { \
+                    coords[i] = 0; \
+                    dims_m1[i] = elems_src[i]-1; \
+                    strides[i] = (i == nd_m1) ? 1 : strides[i+1]*elems_src[i+1]; \
+                    backstrides[i] = dims_m1[i]*strides[i]; \
+                } \
                 for (int64_t i=0; i<elems_product_src; ++i) { \
-                    unravel64i(i, ndim_src, &elems_src[0], &index[0]); \
                     int okay = 1; \
                     for (int j=0; j<ndim_src; ++j) { \
                         if (local_masks[j] != NULL) { \
-                            okay *= local_masks[j][index[j]]; \
+                            okay *= local_masks[j][coords[j]]; \
                         } \
                     } \
                     if (0 != okay) { \
-                        buf_dst[buf_dst_index++] = buf_src[i]; \
+                        ++okay_count; \
+                        *(dptr++) = *sptr; \
+                    } \
+                    for (int64_t i=nd_m1; i>=0; --i) { \
+                        if (coords[i] < dims_m1[i]) { \
+                            ++coords[i]; \
+                            sptr += strides[i]; \
+                            break; \
+                        } \
+                        else { \
+                            coords[i] = 0; \
+                            sptr -= backstrides[i]; \
+                        } \
                     } \
                 } \
-                if (buf_dst_index != local_counts_product) { \
-                    printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
-                    pagoda::abort("pack: mismatch", buf_dst_index); \
+                if (okay_count != local_counts_product) { \
+                    printf("%ld != %ld\n", okay_count, local_counts_product); \
+                    pagoda::abort("pack: mismatch", okay_count); \
                 } \
                 TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
                 g_dst->put(buf_dst, lo_dst, hi_dst); \
                 g_src->release(); \
                 delete [] buf_dst; \
+                delete [] coords; \
+                delete [] dims_m1; \
+                delete [] strides; \
+                delete [] backstrides; \
             } else
             pack_bit_copy(DataType::INT,int,%d)
             pack_bit_copy(DataType::LONG,long,%ld)
