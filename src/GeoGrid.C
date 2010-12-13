@@ -96,14 +96,16 @@ vector<Grid*> GeoGrid::get_grids(const Dataset *dataset)
 
 
 GeoGrid::GeoGrid()
-    :   dataset(NULL)
+    :   Grid()
+    ,   dataset(NULL)
 {
     ERR("GeoGrid::GeoGrid() ctor not supported");
 }
 
 
 GeoGrid::GeoGrid(const GeoGrid &that)
-    :   dataset(that.dataset)
+    :   Grid(that)
+    ,   dataset(that.dataset)
 {
     ERR("GeoGrid::GeoGrid() copy ctor not supported");
 }
@@ -113,7 +115,8 @@ GeoGrid::GeoGrid(const GeoGrid &that)
  * Constructor given a "grid" Variable.
  */
 GeoGrid::GeoGrid(const Dataset *dataset, const Variable *grid_var)
-    :   dataset(dataset)
+    :   Grid()
+    ,   dataset(dataset)
     ,   grid_var(grid_var)
 {
 }
