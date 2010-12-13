@@ -33,21 +33,28 @@ using std::vector;
  */
 MaskMap::MaskMap()
     :   masks()
+    ,   sizes()
     ,   cleared()
 {
 }
 
 
 /**
- * Create Masks based on the Dimensions found in the given Dataset.
+ * Create or seed Masks based on the Dimensions found in the given Dataset.
  *
  * @param[in] dataset the Dataset from which to get Dimensions
+ * @param[in] seed whether to create (false) or seed (true) masks
  */
-MaskMap::MaskMap(Dataset *dataset)
+MaskMap::MaskMap(Dataset *dataset, bool seed)
     :   masks()
+    ,   sizes()
     ,   cleared()
 {
-    create_masks(dataset->get_dims());
+    if (seed) {
+        seed_masks(dataset->get_dims());
+    } else {
+        create_masks(dataset->get_dims());
+    }
     dataset->set_masks(this);
 }
 
@@ -62,6 +69,35 @@ MaskMap::~MaskMap()
     for (masks_t::iterator it=masks.begin(); it!= masks.end(); ++it) {
         delete it->second;
     }
+}
+
+
+/**
+ * Create a Mask based on the given Dimension.
+ *
+ * If a Mask does not yet exist for a Dimension, it is initialized to 1.
+ * Otherwise, if a Mask already exists, it is left alone.
+ *
+ * @param[in] dim the Dimension on which to base the Mask
+ */
+void MaskMap::create_mask(const Dimension *dim)
+{
+    assert(get_mask(dim) != NULL);
+}
+
+
+/**
+ * Create a Mask based on the given name and size.
+ *
+ * If a Mask does not yet exist for a Dimension, it is initialized to 1.
+ * Otherwise, if a Mask already exists, it is left alone.
+ *
+ * @param[in] dim the Dimension on which to base the Mask
+ */
+void MaskMap::create_mask(const string &name, int64_t size)
+{
+    seed_mask(name, size);
+    assert(get_mask(name) != NULL);
 }
 
 
@@ -86,9 +122,10 @@ void MaskMap::create_masks(const Dataset *dataset)
  * If a Mask does not yet exist for a Dimension, it is initialized to 1.
  * Otherwise, if a Mask already exists, it is left alone.
  *
- * @param[in] dims the Dimensions for which Masks should be created
+ * @param[in] dims the Dimension instances for which Mask instances should be
+ *                 created
  */
-void MaskMap::create_masks(const vector<Dimension*> dims)
+void MaskMap::create_masks(const vector<Dimension*> &dims)
 {
     vector<Dimension*>::const_iterator dim_it;
     vector<Dimension*>::const_iterator dim_end;
@@ -96,16 +133,68 @@ void MaskMap::create_masks(const vector<Dimension*> dims)
     TIMING("MaskMap::create_masks(vector<Dimension*>)");
 
     for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
-        Dimension *dim = *dim_it;
-        Mask *mask = get_mask(dim);
-        assert(mask != NULL);
+        create_mask(*dim_it);
     }
 }
 
 
 /**
- * Calls Mask::modify(IndexHyperslab) for the given hyperslab if associated Mask is
- * found.
+ * Store information required to create a Mask at a later time.
+ *
+ * @param[in] dim gather Mask info from the given Dimension
+ */
+void MaskMap::seed_mask(const Dimension *dim)
+{
+    if (sizes.find(dim->get_name()) == sizes.end()) {
+        sizes[dim->get_name()] = dim->get_size();
+    }
+}
+
+
+/**
+ * Store information required to create a Mask at a later time.
+ *
+ * @param[in] name the name of the Mask
+ * @param[in] size the size of the Mask
+ */
+void MaskMap::seed_mask(const string &name, int64_t size)
+{
+    if (sizes.find(name) == sizes.end()) {
+        sizes[name] = size;
+    }
+}
+
+
+/**
+ * Store information required to create Mask instances at a later time.
+ *
+ * @param[in] dataset seed Mask isntances for each Dimension in the dataset
+ */
+void MaskMap::seed_masks(const Dataset *dataset)
+{
+    seed_masks(dataset->get_dims());
+}
+
+
+/**
+ * Store information required to create Mask instances at a later time.
+ *
+ * @param[in] dims seed Mask isntances for each Dimension
+ */
+void MaskMap::seed_masks(const vector<Dimension*> &dims)
+{
+    vector<Dimension*>::const_iterator dim_it;
+    vector<Dimension*>::const_iterator dim_end;
+
+    for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
+        seed_mask(*dim_it);
+    }
+}
+
+
+/**
+ * Calls Mask::modify(IndexHyperslab) for the given hyperslab if associated
+ * Mask is found.
  *
  * If an associated Mask is not found for the indicated Dimension, it is
  * reported to stderr but otherwise ignored.
@@ -137,8 +226,8 @@ void MaskMap::modify(const IndexHyperslab &hyperslab)
 
 
 /**
- * Calls Mask::modify(IndexHyperslab) for each given hyperslab if associated Mask is
- * found.
+ * Calls Mask::modify(IndexHyperslab) for each given hyperslab if associated
+ * Mask is found.
  *
  * If an associated Mask is not found for the indicated Dimension, it is
  * reported to stderr but otherwise ignored.
@@ -159,8 +248,8 @@ void MaskMap::modify(const vector<IndexHyperslab> &hyperslabs)
 
 
 /**
- * Calls Mask::modify(CoordHyperslab) for the given hyperslab if associated Mask is
- * found.
+ * Calls Mask::modify(CoordHyperslab) for the given hyperslab if associated
+ * Mask is found.
  *
  * If an associated Mask is not found for the indicated Dimension, it is
  * reported to stderr but otherwise ignored.
@@ -214,8 +303,8 @@ void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
 
 
 /**
- * Calls Mask::modify(CoordHyperslab) for each given hyperslab if associated Mask is
- * found.
+ * Calls Mask::modify(CoordHyperslab) for each given hyperslab if associated
+ * Mask is found.
  *
  * If an associated Mask is not found for the indicated Dimension, it is
  * reported to stderr but otherwise ignored.
@@ -228,7 +317,8 @@ void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
 
     TIMING("Dataset::modify(vector<CoordHyperslab>,vector<Dimension*>)");
 
-    // we're iterating over the command-line specified hyperslabs to create masks
+    // we're iterating over the command-line specified hyperslabs to create
+    // masks
     for (hyperslab_it=hyperslabs.begin(); hyperslab_it!=hyperslabs.end(); ++hyperslab_it) {
         modify(*hyperslab_it, grid);
     }
@@ -523,26 +613,53 @@ void MaskMap::modify(
 }
 
 
-Mask* MaskMap::get_mask(const Dimension *dim)
+bool MaskMap::has_mask(const string &name) const
 {
-    return get_mask(dim->get_name(), dim);
+    return masks.find(name) != masks.end();
 }
 
 
-Mask* MaskMap::get_mask(const string &name, const Dimension *dim)
+Mask* MaskMap::get_mask(const string &name)
 {
-    masks_t::iterator it = masks.find(name);
-    if (it == masks.end()) {
-        return masks.insert(make_pair(name, Mask::create(dim))).first->second;
+    masks_t::iterator masks_it = masks.find(name);
+    if (masks_it == masks.end()) {
+        sizes_t::iterator sizes_it = sizes.find(name);
+        if (sizes_it == sizes.end()) {
+            ERR("cannot create Mask; initial seed was required");
+        } else {
+            return masks.insert(
+                    make_pair(name, Mask::create(name,sizes_it->second)))
+                .first->second;
+        }
     }
     else {
-        return it->second;
+        return masks_it->second;
     }
+}
+
+
+Mask* MaskMap::operator [](const string &name)
+{
+    return get_mask(name);
+}
+
+
+bool MaskMap::has_mask(const Dimension *dim) const
+{
+    return has_mask(dim->get_name());
+}
+
+
+Mask* MaskMap::get_mask(const Dimension *dim)
+{
+    seed_mask(dim);
+    return get_mask(dim->get_name());
 }
 
 
 Mask* MaskMap::operator [](const Dimension *dim)
 {
+    seed_mask(dim);
     return get_mask(dim);
 }
 

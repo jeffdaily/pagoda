@@ -31,6 +31,14 @@ class Mask : public AbstractArray
         /**
          * Factory Mask creation.
          *
+         * @param[in] name the name of the Mask
+         * @param[in] size the size of the Mask
+         */
+        static Mask* create(const string &name, int64_t size);
+
+        /**
+         * Factory Mask creation convenience function.
+         *
          * The returned Mask will have the same number of elements as the
          * given Dimension.
          *

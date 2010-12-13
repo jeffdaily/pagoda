@@ -286,16 +286,18 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
     for (int64_t i=0; i<ndim; ++i) {
         bool current_found_bit = false;
         Mask *mask = get_dataset()->get_masks()->get(adims[i]);
-        int *data = mask->get(lo[i],hi[i]);
+        if (mask) {
+            int *data = mask->get(lo[i],hi[i]);
 
-        for (int64_t j=0,limit=hi[i]-lo[i]+1; j<limit; ++j) {
-            if (data[j] != 0) {
-                current_found_bit = true;
-                break;
+            for (int64_t j=0,limit=hi[i]-lo[i]+1; j<limit; ++j) {
+                if (data[j] != 0) {
+                    current_found_bit = true;
+                    break;
+                }
             }
+            found_bit &= current_found_bit;
+            delete [] data;
         }
-        found_bit &= current_found_bit;
-        delete [] data;
     }
 #endif
 

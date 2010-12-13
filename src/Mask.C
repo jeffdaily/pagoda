@@ -9,29 +9,23 @@
 #include "Timing.H"
 
 
-/**
- * Mask factory create method.
- *
- * Construct Mask based on the size of the given Dimension.
- *
- * @param[in] dim Dimension to base size on
- */
-Mask* Mask::create(const Dimension *dim)
+Mask* Mask::create(const string &name, int64_t size)
 {
     Mask *mask;
 
-    TIMING("Mask::create(Dimension*)");
-    TRACER("Mask::create(Dimension*) size=%ld\n", dim->get_size());
-
-    mask = new GlobalMask(dim);
+    mask = new GlobalMask(name, size);
     mask->reset();
+
     return mask;
 }
 
 
-/**
- * Constructor.
- */
+Mask* Mask::create(const Dimension *dim)
+{
+    return Mask::create(dim->get_name(), dim->get_size());
+}
+
+
 Mask::Mask()
     :   AbstractArray()
 {
@@ -39,9 +33,6 @@ Mask::Mask()
 }
 
 
-/**
- * Destructor.
- */
 Mask::~Mask()
 {
     TIMING("Mask::~Mask()");

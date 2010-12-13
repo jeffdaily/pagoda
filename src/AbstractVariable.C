@@ -63,25 +63,12 @@ int64_t AbstractVariable::get_ndim() const
 vector<int64_t> AbstractVariable::get_shape() const
 {
     vector<int64_t> shape;
+    vector<Dimension*> dims = get_dims();
+    vector<Dimension*>::const_iterator it = dims.begin();
+    vector<Dimension*>::const_iterator end = dims.end();
 
-    TIMING("AbstractVariable::get_shape(bool)");
-
-    if (get_dataset()->get_masks()) {
-        vector<Mask*> masks = get_masks();
-        vector<Mask*>::const_iterator it = masks.begin();
-        vector<Mask*>::const_iterator end = masks.end();
-        for (; it!=end; ++it) {
-            shape.push_back((*it)->get_count());
-        }
-    }
-    else {
-        vector<Dimension*> dims = get_dims();
-        vector<Dimension*>::const_iterator it = dims.begin();
-        vector<Dimension*>::const_iterator end = dims.end();
-
-        for (; it!=end; ++it) {
-            shape.push_back((*it)->get_size());
-        }
+    for (; it!=end; ++it) {
+        shape.push_back((*it)->get_size());
     }
 
     return shape;
@@ -233,7 +220,7 @@ int64_t AbstractVariable::translate_record(int64_t record) const
            record, get_name().c_str());
     TRACER("size=%ld, count=%ld, index=%ld\n", size, count, index);
 
-    if (masks.empty() || !enable_record_translation) {
+    if (masks.empty() || masks.at(0) == NULL || !enable_record_translation) {
         return record;
     }
 
@@ -280,10 +267,13 @@ bool AbstractVariable::needs_subset() const
     }
 
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
-        int64_t count = (*mask_it)->get_count();
-        int64_t size = (*mask_it)->get_size();
-        if (count != size) {
-            return true;
+        Mask *mask = *mask_it;
+        if (mask) {
+            int64_t count = mask->get_count();
+            int64_t size = mask->get_size();
+            if (count != size) {
+                return true;
+            }
         }
     }
 
@@ -303,10 +293,13 @@ bool AbstractVariable::needs_subset_record() const
     masks.erase(masks.begin());
 
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
-        int64_t count = (*mask_it)->get_count();
-        int64_t size = (*mask_it)->get_size();
-        if (count != size) {
-            return true;
+        Mask *mask = *mask_it;
+        if (mask) {
+            int64_t count = mask->get_count();
+            int64_t size = mask->get_size();
+            if (count != size) {
+                return true;
+            }
         }
     }
 
@@ -324,10 +317,12 @@ bool AbstractVariable::needs_renumber() const
         if (grid->is_topology(this)) {
             Dimension *dim = grid->get_topology_dim(this);
             Mask *mask = dim->get_mask();
-            int64_t count = mask->get_count();
-            int64_t size = mask->get_size();
-            if (count != size) {
-                return true;
+            if (mask) {
+                int64_t count = mask->get_count();
+                int64_t size = mask->get_size();
+                if (count != size) {
+                    return true;
+                }
             }
         }
     }
@@ -346,7 +341,9 @@ void AbstractVariable::renumber(Array *array) const
         if (grid->is_topology(this)) {
             Dimension *dim = grid->get_topology_dim(this);
             Mask *mask = dim->get_mask();
-            pagoda::renumber(array, mask->reindex());
+            if (mask) {
+                pagoda::renumber(array, mask->reindex());
+            }
             break;
         }
     }

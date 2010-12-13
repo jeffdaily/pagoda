@@ -48,9 +48,10 @@ string PnetcdfDimension::get_name() const
 
 int64_t PnetcdfDimension::get_size() const
 {
+    Mask *mask = NULL;
     TIMING("PnetcdfDimension::get_size()");
-    if (get_mask()) {
-        return get_mask()->get_count();
+    if ((mask = get_mask())) {
+        return mask->get_count();
     }
     return size;
 }

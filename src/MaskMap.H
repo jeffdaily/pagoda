@@ -24,6 +24,7 @@ class Mask;
 class Variable;
 
 typedef map<string,Mask*> masks_t;
+typedef map<string,int64_t> sizes_t;
 typedef set<string> cleared_t;
 
 
@@ -34,24 +35,36 @@ typedef set<string> cleared_t;
  * The intent is to support multiple containers for Masks which can be set or
  * unset from a Dataset.
  *
- * Masks should not be shared between MaskMaps, if that's even possible.  The
- * destructor will delete all Masks associated with the MaskMap instance.
+ * Masks cannot be shared between MaskMaps.  The destructor will delete all
+ * Masks associated with the MaskMap instance.
  *
- * Masks are initially created with all bits reset (set to 1) effectively the
- * same as having no Mask at all.  This initial condition must be cleared
- * before modifying any Masks, otherwise the operations will simply overwrite
- * the 1s with additional 1s.  The clearing operation happens once by default
- * for the modify functions defined here.
+ * Mask instances are either created up front or can be seeded.  Seeding a
+ * Mask will store the name and size of the Mask without allocating any memory
+ * for it.  A Mask instance will only be created upon request via get_mask()
+ * or the operator[].  A seeded Mask will return false for has_mask().
+ *
+ * Mask instances are initially created with all bits reset (set to 1)
+ * effectively the same as having no Mask at all.  This initial condition must
+ * be cleared before modifying any Masks, otherwise the operations will simply
+ * overwrite the 1s with additional 1s.  The clearing operation happens once
+ * by default for the modify functions defined here.
  */
 class MaskMap
 {
     public:
         MaskMap();
-        MaskMap(Dataset *dataset);
+        MaskMap(Dataset *dataset, bool seed=true);
         virtual ~MaskMap();
 
+        void create_mask(const Dimension *dim);
+        void create_mask(const string &name, int64_t size);
         void create_masks(const Dataset *dataset);
-        void create_masks(const vector<Dimension*> dims);
+        void create_masks(const vector<Dimension*> &dims);
+ 
+        void seed_mask(const Dimension *dim);
+        void seed_mask(const string &name, int64_t size);
+        void seed_masks(const Dataset *dataset);
+        void seed_masks(const vector<Dimension*> &dims);
 
         void modify(const IndexHyperslab &hyperslab);
         void modify(const vector<IndexHyperslab> &hyperslabs);
@@ -60,6 +73,11 @@ class MaskMap
         void modify(const vector<LatLonBox> &boxes, Grid *grid);
         void modify(const LatLonBox &box, Grid *grid);
 
+        bool has_mask(const string &name) const;
+        Mask* get_mask(const string &name);
+        Mask* operator [](const string &name);
+
+        bool has_mask(const Dimension *dim) const;
         Mask* get_mask(const Dimension *dim);
         Mask* operator [](const Dimension *dim);
 
@@ -80,6 +98,7 @@ class MaskMap
                     const Variable *topology);
 
         masks_t masks;
+        sizes_t sizes;
         cleared_t cleared;
 };
 

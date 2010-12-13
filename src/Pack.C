@@ -186,7 +186,11 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
     vector<Mask*>::const_iterator it;
 
     for (it=g_masks.begin(); it!=g_masks.end(); ++it) {
-        sums.push_back((*it)->partial_sum(false));
+        if (*it) {
+            sums.push_back((*it)->partial_sum(false));
+        } else {
+            sums.push_back(NULL);
+        }
     }
 
     pack(g_src, g_dst, masks_copy, sums);
@@ -241,11 +245,16 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         for (int i=0; i<ndim_src; ++i) {
             elems_src[i] = hi_src[i]-lo_src[i]+1;
             elems_product_src *= elems_src[i];
-            local_masks[i] = (int*)g_masks[i]->get(lo_src[i], hi_src[i]);
-            for (int64_t j=0; j<elems_src[i]; ++j) {
-                if (local_masks[i][j]) {
-                    ++(local_counts[i]);
+            if (g_masks[i]) {
+                local_masks[i] = (int*)g_masks[i]->get(lo_src[i], hi_src[i]);
+                for (int64_t j=0; j<elems_src[i]; ++j) {
+                    if (local_masks[i][j]) {
+                        ++(local_counts[i]);
+                    }
                 }
+            } else {
+                local_masks[i] = NULL;
+                local_counts[i] += elems_src[i];
             }
             local_counts_product *= local_counts[i];
         }
@@ -259,10 +268,17 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         else {
             /* determine where the data is to go */
             for (int i=0; i<ndim_src; ++i) {
-                int *tmp = (int*)g_masksums[i]->get(lo_src[i],lo_src[i]);
-                lo_dst[i] = *tmp;
-                hi_dst[i] = *tmp+local_counts[i]-1;
-                delete [] tmp;
+                if (g_masksums[i]) {
+                    int *tmp = (int*)g_masksums[i]->get(lo_src[i],lo_src[i]);
+                    lo_dst[i] = *tmp;
+                    hi_dst[i] = *tmp+local_counts[i]-1;
+                    delete [] tmp;
+                } else {
+                    lo_dst[i] = lo_src[i];
+                    // Not sure which of the following is correct.
+                    //hi_dst[i] = hi_src[i];
+                    hi_dst[i] = lo_src[i]+local_counts[i]-1;
+                }
             }
             //printf("ld_dst=");
             /*
@@ -284,7 +300,9 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                     unravel64i(i, ndim_src, &elems_src[0], &index[0]); \
                     int okay = 1; \
                     for (int j=0; j<ndim_src; ++j) { \
-                        okay *= local_masks[j][index[j]]; \
+                        if (local_masks[j] != NULL) { \
+                            okay *= local_masks[j][index[j]]; \
+                        } \
                     } \
                     if (0 != okay) { \
                         buf_dst[buf_dst_index++] = buf_src[i]; \
@@ -315,8 +333,10 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         /* Remove temporary partial sum arrays */
         for (int i=0; i<ndim_src; ++i) {
             int *tmp = local_masks[i];
-            delete [] tmp;
-            tmp = NULL;
+            if (tmp) {
+                delete [] tmp;
+                tmp = NULL;
+            }
         }
     }
 

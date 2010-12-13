@@ -29,9 +29,10 @@ using std::vector;
 /**
  * Construct GlobalMask based on the size of the given Dimension.
  *
- * @param[in] dim Dimension to base size on
+ * @param[in] name of the Mask
+ * @param[in] size of the Mask
  */
-GlobalMask::GlobalMask(const Dimension *dim)
+GlobalMask::GlobalMask(const string &name, int64_t size)
     :   Mask()
     ,   mask(NULL)
     ,   index(NULL)
@@ -41,12 +42,12 @@ GlobalMask::GlobalMask(const Dimension *dim)
     ,   dirty_index(true)
     ,   dirty_sum(true)
     ,   dirty_count(true)
-    ,   name(dim->get_name())
+    ,   name(name)
 {
     TIMING("GlobalMask::GlobalMask(Dimension*)");
-    TRACER("GlobalMask ctor size=%ld\n", dim->get_size());
+    TRACER("GlobalMask ctor size=%ld\n", size);
 
-    mask = new GlobalArray(C_INT, vector<int64_t>(1,dim->get_size()));
+    mask = new GlobalArray(C_INT, vector<int64_t>(1,size));
     mask->fill_value(1);
 }
 

@@ -18,10 +18,10 @@ class Variable;
 /**
  * A Dimension Mask implemented using a GlobalArray.
  */
-class GlobalMask :  public Mask
+class GlobalMask : public Mask
 {
     public:
-        GlobalMask(const Dimension *dim);
+        GlobalMask(const string &name, int64_t size);
         GlobalMask(const GlobalMask &that);
         virtual ~GlobalMask();
 
