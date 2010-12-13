@@ -522,6 +522,7 @@ Array* GlobalMask::partial_sum(bool excl)
         }
         pagoda::partial_sum(this, sum, excl);
         dirty_sum = false;
+        pagoda::barrier();
     }
 
     return sum;
