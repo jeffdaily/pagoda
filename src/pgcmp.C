@@ -319,12 +319,12 @@ int main(int argc, char **argv)
                 int64_t size = lhs_array->get_local_size();
                 vector<int64_t> shape = lhs_array->get_local_shape();
                 DataType type = lhs_array->get_type();
-                void *lhs_data;
-                void *rhs_data;
+                void *lhs_data = NULL;
+                void *rhs_data = NULL;
                 int64_t bad_count = 0;
                 vector<int64_t> first_bad_index;
-                double lhs_bad;
-                double rhs_bad;
+                double lhs_bad = 0;
+                double rhs_bad = 0;
 
                 lhs_data = lhs_array->access();
                 rhs_data = rhs_array->access();
@@ -342,7 +342,7 @@ int main(int argc, char **argv)
                                 str << "variable '" << name << "' "; \
                                 str << "value mismatch at index "; \
                                 str << vec_to_string(index) << ": "; \
-                                str << lhs_bad << "!=" << rhs_bad; \
+                                str << lhs_d << "!=" << rhs_d; \
                                 pagoda::println_zero("WARNING: " + str.str()); \
                             } else { \
                                 if (bad_count == 0) { \
