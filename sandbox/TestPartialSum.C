@@ -56,21 +56,21 @@ int main(int argc, char **argv)
 
             cout << endl;
 
-            g_src->get(values, ZERO, hi, vector<int64_t>());
+            values = (int*)g_src->get(ZERO, hi, values);
             cout << setw(varw) << "src[i] =";
             for (int i=0; i<size[0]; ++i) {
                 cout << setw(valw) << values[i];
             }
             cout << endl;
 
-            g_dst0->get(values, ZERO, hi, vector<int64_t>());
+            values = (int*)g_dst0->get(ZERO, hi, values);
             cout << setw(varw) << "dst0[i] =";
             for (int i=0; i<size[0]; ++i) {
                 cout << setw(valw) << values[i];
             }
             cout << endl;
 
-            g_dst1->get(values, ZERO, hi, vector<int64_t>());
+            values = (int*)g_dst1->get(ZERO, hi, values);
             cout << setw(varw) << "dst1[i] =";
             for (int i=0; i<size[0]; ++i) {
                 cout << setw(valw) << values[i];

@@ -34,7 +34,6 @@ int main(int argc, char **argv)
     vector<int64_t> data_hi;
     vector<int64_t> lo;
     vector<int64_t> hi;
-    vector<int64_t> ld;
     vector<int64_t> alo;
     vector<int64_t> ahi;
 
@@ -56,7 +55,6 @@ int main(int argc, char **argv)
     lo.push_back(0);
     hi.push_back(14);
     hi.push_back(5);
-    ld.push_back(10);
 
     if (array->owns_data()) {
         data = (int*)array->access();
@@ -96,7 +94,7 @@ int main(int argc, char **argv)
         }
     }
 
-    buf = (int*)array->get(buf, lo, hi, ld);
+    buf = (int*)array->get(lo, hi, buf);
 
     if (0 == pagoda::me) {
         cout << "buffer after get" << endl;

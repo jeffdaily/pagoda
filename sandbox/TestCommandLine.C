@@ -23,7 +23,8 @@ int main(int argc, char **argv)
 
     if (0 == pagoda::me) {
         cout << "boxes=" << pagoda::vec_to_string(cmd.get_boxes(),";") << endl;
-        cout << "slices=" << pagoda::vec_to_string(cmd.get_slices(),";") << endl;
+        cout << "index_hyperslabs=" << pagoda::vec_to_string(cmd.get_index_hyperslabs(),";") << endl;
+        cout << "coord_hyperslabs=" << pagoda::vec_to_string(cmd.get_coord_hyperslabs(),";") << endl;
         cout << "inputs=" << pagoda::vec_to_string(cmd.get_input_filenames(),";") << endl;
         cout << "output=" << cmd.get_output_filename() << endl;
         cout << "variables=" << pagoda::vec_to_string(cmd.get_variables(),";") << endl;

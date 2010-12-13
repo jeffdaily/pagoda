@@ -48,7 +48,7 @@ void check(DataType type)
     g_a->fill_value(0);
     
     // check that it is indeed zero
-    b = (T*)g_a->get(b, lo, hi);
+    b = (T*)g_a->get(lo, hi, b);
 
     for (int i=0; i<n; i++) {
         for (int j=0; j<n; j++) {

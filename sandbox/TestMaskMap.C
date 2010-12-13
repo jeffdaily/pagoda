@@ -15,9 +15,9 @@ using namespace std;
 #include "DataType.H"
 #include "Dimension.H"
 #include "Debug.H"
+#include "IndexHyperslab.H"
 #include "MaskMap.H"
 #include "Mask.H"
-#include "Slice.H"
 #include "Util.H"
 
 
@@ -72,12 +72,12 @@ int main(int argc, char **argv)
 {
     MaskMap *masks = new MaskMap;
     vector<Dimension*> dims;
-    DimSlice slice0("dim10,8");
-    DimSlice slice1("dim10", 5, 7, 1);
-    DimSlice slice2("dim10", 5, 7, 2);
-    DimSlice slice3("dim10,2,5");
-    DimSlice slice4("dim10,9");
-    vector<DimSlice> slices;
+    IndexHyperslab slice0("dim10,8");
+    IndexHyperslab slice1("dim10", 5, 7, 1);
+    IndexHyperslab slice2("dim10", 5, 7, 2);
+    IndexHyperslab slice3("dim10,2,5");
+    IndexHyperslab slice4("dim10,9");
+    vector<IndexHyperslab> slices;
 
     pagoda::initialize(&argc, &argv);
 
