@@ -17,6 +17,7 @@ class Dataset;
 class Dimension;
 class PnetcdfAttribute;
 class PnetcdfDimension;
+class PnetcdfDataset;
 
 
 /**
@@ -44,6 +45,8 @@ class PnetcdfVariable : public AbstractVariable
         PnetcdfDataset* get_netcdf_dataset() const;
         int get_id() const;
 
+        friend class PnetcdfDataset;
+
     protected:
         Array* read(Array *dst, bool nonblocking) const;
         Array* read(int64_t record, Array *dst, bool nonblocking) const;
@@ -52,6 +55,9 @@ class PnetcdfVariable : public AbstractVariable
         void do_read(Array *dst, const vector<MPI_Offset> &start,
                      const vector<MPI_Offset> &count, bool found_bit,
                      bool nonblocking) const;
+
+        virtual bool needs_renumber() const;
+        virtual void renumber(Array *array) const;
 
         PnetcdfDataset *dataset;
         int id;

@@ -15,6 +15,7 @@ using std::vector;
 class Array;
 class Attribute;
 class Dimension;
+class Mask;
 class PnetcdfAttribute;
 class PnetcdfDimension;
 class PnetcdfVariable;
@@ -123,6 +124,9 @@ class PnetcdfDataset : public AbstractDataset
                                             non-blocking IO which need to be
                                             Array::release()'d once the IO is
                                             finished */
+        vector<Array*> arrays_to_pack; /**< arrays associated with
+                                         non-blocking subsets */
+        vector<const PnetcdfVariable*> vars_to_pack;
         bool open; /**< whether this Dataset is open */
 };
 

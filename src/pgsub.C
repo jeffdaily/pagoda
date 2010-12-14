@@ -52,8 +52,8 @@ int main(int argc, char **argv)
     Grid *grid;
     MaskMap *masks;
 #if defined(READ_NONBLOCKING)
-    map<string,Array*> arrays;
-    map<string,Array*>::iterator array;
+    map<string,Array*> nb_arrays;
+    map<string,Array*>::iterator nb_array_it;
 #endif
 
     try {
@@ -98,7 +98,6 @@ int main(int argc, char **argv)
             delete array;
         }
 #elif defined(READ_RECORD)
-        // write all non-record variables first
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             Variable *var = *var_it;
             if (var->has_record()) {
@@ -120,17 +119,30 @@ int main(int argc, char **argv)
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             Variable *var = *var_it;
             if (!var->has_record()) {
-                arrays[var->get_name()] = var->iread();
+                nb_arrays[var->get_name()] = var->iread();
             }
         }
         dataset->wait();
-        // write all non-record variables first
-        /** @todo implement non-blocking read */
+        // write all non-record variables first, blocking
+        /** @todo implement non-blocking write */
         for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
             Variable *var = *var_it;
-            array = arrays.find(var->get_name());
-            if (array != arrays.end()) {
-                writer->write(array->second,array->first);
+            nb_array_it = nb_arrays.find(var->get_name());
+            if (nb_array_it != nb_arrays.end()) {
+                writer->write(nb_array_it->second,nb_array_it->first);
+                delete nb_array_it->second;
+            }
+        }
+        // read/write all record variables record-at-a-time, blocking
+        for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
+            Variable *var = *var_it;
+            if (var->has_record()) {
+                Array *array = NULL; // reuse allocated array each record
+                for (int64_t rec=0,limit=var->get_nrec(); rec<limit; ++rec) {
+                    array = var->read(rec, array);
+                    writer->write(array, var->get_name(), rec);
+                }
+                delete array;
             }
         }
 #endif

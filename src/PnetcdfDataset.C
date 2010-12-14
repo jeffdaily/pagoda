@@ -6,6 +6,7 @@
 
 #include "Array.H"
 #include "Grid.H"
+#include "Pack.H"
 #include "PnetcdfAttribute.H"
 #include "PnetcdfDataset.H"
 #include "PnetcdfDimension.H"
@@ -26,6 +27,8 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     ,   vars()
     ,   requests()
     ,   arrays_to_release()
+    ,   arrays_to_pack()
+    ,   vars_to_pack()
     ,   open(true)
 {
     TIMING("PnetcdfDataset::PnetcdfDataset(string)");
@@ -174,11 +177,31 @@ void PnetcdfDataset::wait()
     if (!requests.empty()) {
         vector<int> statuses(requests.size());
         ncmpi::wait_all(ncid, requests, statuses);
+        requests.clear();
+        // release Array pointers
         for (size_t i=0; i<arrays_to_release.size(); ++i) {
             arrays_to_release[i]->release_update();
         }
+        // now pack where needed
+        for (size_t i=0; i<arrays_to_pack.size(); ++i) {
+            if (arrays_to_pack[i] != NULL) {
+                const PnetcdfVariable *var = vars_to_pack[i];
+                Array *tmp = arrays_to_release[i];
+                Array *dst = arrays_to_pack[i];
+                vector<Mask*> masks = var->get_masks();
+                if (int64_t(masks.size()) == (tmp->get_ndim()+1)) {
+                    // assume this was a record subset
+                    masks.erase(masks.begin());
+                }
+                pagoda::pack(tmp, dst, masks);
+                if (var->needs_renumber()) {
+                    var->renumber(arrays_to_pack[i]);
+                }
+            }
+        }
         arrays_to_release.clear();
-        requests.clear();
+        arrays_to_pack.clear();
+        vars_to_pack.clear();
     }
 }
 

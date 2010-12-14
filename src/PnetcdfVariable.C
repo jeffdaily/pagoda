@@ -157,12 +157,23 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
 
     do_read(tmp, start, count, found_bit, nonblocking);
 
-    // check whether a subset is needed
-    if (needs_subset()) {
-        pagoda::pack(tmp, dst, get_masks());
-        delete tmp;
-        if (needs_renumber()) {
-            renumber(dst);
+    if (nonblocking) {
+        // can't perform subset until read is finished
+        if (needs_subset()) {
+            get_netcdf_dataset()->arrays_to_pack.push_back(dst);
+            get_netcdf_dataset()->vars_to_pack.push_back(this);
+        } else {
+            get_netcdf_dataset()->arrays_to_pack.push_back(NULL);
+            get_netcdf_dataset()->vars_to_pack.push_back(NULL);
+        }
+    } else {
+        // check whether a subset is needed
+        if (needs_subset()) {
+            pagoda::pack(tmp, dst, get_masks());
+            delete tmp;
+            if (needs_renumber()) {
+                renumber(dst);
+            }
         }
     }
 
@@ -250,14 +261,25 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
 
     do_read(tmp, start, count, found_bit, nonblocking);
 
-    // check whether a subset is needed
-    if (needs_subset_record()) {
-        vector<Mask*> masks = get_masks();
-        masks.erase(masks.begin());
-        pagoda::pack(tmp, dst, masks);
-        delete tmp;
-        if (needs_renumber()) {
-            renumber(dst);
+    if (nonblocking) {
+        // can't perform subset until read is finished
+        if (needs_subset_record()) {
+            get_netcdf_dataset()->arrays_to_pack.push_back(dst);
+            get_netcdf_dataset()->vars_to_pack.push_back(this);
+        } else {
+            get_netcdf_dataset()->arrays_to_pack.push_back(NULL);
+            get_netcdf_dataset()->vars_to_pack.push_back(NULL);
+        }
+    } else {
+        // check whether a subset is needed
+        if (needs_subset_record()) {
+            vector<Mask*> masks = get_masks();
+            masks.erase(masks.begin());
+            pagoda::pack(tmp, dst, masks);
+            delete tmp;
+            if (needs_renumber()) {
+                renumber(dst);
+            }
         }
     }
 
@@ -306,7 +328,8 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 
 
 void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
-                              const vector<MPI_Offset> &count, bool found_bit, bool nonblocking) const
+                              const vector<MPI_Offset> &count, bool found_bit,
+                              bool nonblocking) const
 {
     int ncid = get_netcdf_dataset()->get_id();
     DataType type = dst->get_type();
@@ -339,6 +362,18 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef read_var_all
+}
+
+
+bool PnetcdfVariable::needs_renumber() const
+{
+    return AbstractVariable::needs_renumber();
+}
+
+
+void PnetcdfVariable::renumber(Array *array) const
+{
+    AbstractVariable::renumber(array);
 }
 
 
