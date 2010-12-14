@@ -309,13 +309,15 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                     backstrides[i] = dims_m1[i]*strides[i]; \
                 } \
                 for (int64_t i=0; i<elems_product_src; ++i) { \
-                    int okay = 1; \
-                    for (int j=0; j<ndim_src; ++j) { \
+                    int j; \
+                    for (j=0; j<ndim_src; ++j) { \
                         if (local_masks[j] != NULL) { \
-                            okay *= local_masks[j][coords[j]]; \
+                            if (local_masks[j][coords[j]] == 0) { \
+                                break; \
+                            } \
                         } \
                     } \
-                    if (0 != okay) { \
+                    if (j == ndim_src) { \
                         ++okay_count; \
                         *(dptr++) = *sptr; \
                     } \
