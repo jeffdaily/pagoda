@@ -30,8 +30,8 @@ int main(int argc, char **argv)
 
     pagoda::initialize(&argc, &argv);
 
-    if (2 != argc && 3 != argc) {
-        pagoda::println_zero("Usage: TestRead filename [variablename]");
+    if (argc < 2) {
+        pagoda::println_zero("Usage: TestRead filename [variablename] ...");
         pagoda::finalize();
         return EXIT_FAILURE;
     }
@@ -43,14 +43,16 @@ int main(int argc, char **argv)
             Variable *var = vars[i];
             DataType type = var->get_type();
             if (!var->has_record())
-                if (var->get_ndim() >= 1)
+                //if (var->get_ndim() >= 1)
                     //if (type == DataType::INT || type == DataType::FLOAT || type == DataType::DOUBLE)
                     {
                         variables.push_back(vars[i]);
                     }
         }
     } else {
-        variables.push_back(dataset->get_var(argv[2]));
+        for (int i=2; i<argc; ++i) {
+            variables.push_back(dataset->get_var(argv[i]));
+        }
     }
 
     for (size_t i=0; i<variables.size(); ++i) {
