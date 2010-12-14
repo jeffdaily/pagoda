@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <cassert>
 
 #include "CommandException.H"
@@ -40,7 +41,7 @@ void CommandLineParser::push_back(CommandLineOption *option)
 void CommandLineParser::erase(CommandLineOption *option)
 {
     optvec_t::iterator it;
-    it = find(options.begin(), options.end(), option);
+    it = std::find(options.begin(), options.end(), option);
     assert(it != options.end());
     options.erase(it);
 }

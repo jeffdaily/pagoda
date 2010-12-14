@@ -12,6 +12,8 @@
 #   include <config.h>
 #endif
 
+#include <unistd.h>
+
 #include <algorithm>
 #include <iostream>
 #include <map>
