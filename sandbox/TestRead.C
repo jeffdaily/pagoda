@@ -42,11 +42,12 @@ int main(int argc, char **argv)
         for (size_t i=0; i<vars.size(); ++i) {
             Variable *var = vars[i];
             DataType type = var->get_type();
-            if (type == DataType::INT
-                    || type == DataType::FLOAT
-                    || type == DataType::DOUBLE) {
-                variables.push_back(vars[i]);
-            }
+            if (!var->has_record())
+                if (var->get_ndim() >= 1)
+                    //if (type == DataType::INT || type == DataType::FLOAT || type == DataType::DOUBLE)
+                    {
+                        variables.push_back(vars[i]);
+                    }
         }
     } else {
         variables.push_back(dataset->get_var(argv[2]));
@@ -56,10 +57,10 @@ int main(int argc, char **argv)
         Variable *var = variables[i];
         string name = var->get_name();
         pagoda::print_zero("blocking read of " + name + " ... ");
-        arrays.push_back(var->read(int64_t(0)));
+        arrays.push_back(var->read());
         pagoda::println_zero("done");
         pagoda::print_zero("non-blocking read of " + name + " ... ");
-        nbarrays.push_back(var->iread(int64_t(0)));
+        nbarrays.push_back(var->iread());
         pagoda::println_zero("done");
     }
     pagoda::print_zero("wait... ");
