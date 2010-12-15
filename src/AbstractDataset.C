@@ -191,3 +191,25 @@ MaskMap* AbstractDataset::get_masks() const
         return masks.back();
     }
 }
+
+
+int64_t AbstractDataset::get_bytes() const
+{
+    int64_t bytes = 0;
+    vector<Variable*> vars = get_vars();
+    vector<Variable*>::const_iterator vars_it = vars.begin();
+    vector<Variable*>::const_iterator vars_end = vars.end();
+    vector<Attribute*> atts = get_atts();
+    vector<Attribute*>::const_iterator atts_it = atts.begin();
+    vector<Attribute*>::const_iterator atts_end = atts.end();
+
+    for (; vars_it!=vars_end; ++vars_it) {
+        bytes += (*vars_it)->get_bytes();
+    }
+    for (; atts_it!=atts_end; ++atts_it) {
+        bytes += (*atts_it)->get_bytes();
+    }
+
+    return bytes;
+}
+

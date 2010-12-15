@@ -132,6 +132,11 @@ class DataType
         }
 
         /**
+         * Returns the C type size for this DataType.
+         */
+        int64_t get_bytes() const;
+
+        /**
          * Returns the DataType instance for a given C type.
          */
         template <class T> static DataType ctype();

@@ -294,6 +294,59 @@ nc_type DataType::to_nc() const
 }
 
 
+int64_t DataType::get_bytes() const
+{
+    if (operator==(DataType::CHAR)) {
+        return sizeof(char);
+    }
+    else if (operator==(DataType::SHORT)) {
+        return sizeof(short);
+    }
+    else if (operator==(DataType::INT)) {
+        return sizeof(int);
+    }
+    else if (operator==(DataType::LONG)) {
+        return sizeof(long);
+    }
+    else if (operator==(DataType::LONGLONG)) {
+        return sizeof(long long);
+    }
+    else if (operator==(DataType::FLOAT)) {
+        return sizeof(float);
+    }
+    else if (operator==(DataType::DOUBLE)) {
+        return sizeof(double);
+    }
+    else if (operator==(DataType::LONGDOUBLE)) {
+        return sizeof(long double);
+    }
+    else if (operator==(DataType::UCHAR)) {
+        return sizeof(unsigned char);
+    }
+    else if (operator==(DataType::USHORT)) {
+        return sizeof(unsigned short);
+    }
+    else if (operator==(DataType::UINT)) {
+        return sizeof(unsigned int);
+    }
+    else if (operator==(DataType::ULONG)) {
+        return sizeof(unsigned long);
+    }
+    else if (operator==(DataType::ULONGLONG)) {
+        return sizeof(unsigned long long);
+    }
+    else if (operator==(DataType::SCHAR)) {
+        return sizeof(signed char);
+    }
+    else if (operator==(DataType::STRING)) {
+        return sizeof(char);
+    }
+    else {
+        throw DataTypeException("could not determine DataType for C size");
+    }
+}
+
+
 DataType DataType::to_dt(int type)
 {
     TIMING("DataType::to_dt(int)");

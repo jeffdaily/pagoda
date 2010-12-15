@@ -61,6 +61,8 @@ class AbstractVariable : public Variable
 
         virtual ostream& print(ostream &os) const;
 
+        virtual int64_t get_bytes() const;
+
         /**
          * If there is a Mask over the record Dimension, translate the given
          * record from the index space of the mask into the index space of the

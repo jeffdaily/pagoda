@@ -45,6 +45,12 @@ string Attribute::get_string() const
 }
 
 
+int64_t Attribute::get_bytes() const
+{
+    return get_count() * get_type().get_bytes();
+}
+
+
 ostream& Attribute::print(ostream &os) const
 {
     const string name = get_name();

@@ -195,6 +195,13 @@ class Dataset
         virtual FileFormat get_file_format() const = 0;
 
         /**
+         * Returns the approximate number of bytes this Dataset consumes.
+         * 
+         * @return the approximate number of bytes this Dataset consumes
+         */
+        virtual int64_t get_bytes() const = 0;
+
+        /**
          * Writes the Dataset to the given stream.
          *
          * Useful for debugging.  This is the virtual friend function idiom.

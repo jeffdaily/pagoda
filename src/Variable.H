@@ -101,6 +101,8 @@ class Variable
         virtual int64_t translate_record(int64_t record) const = 0;
         virtual void set_translate_record(bool value) = 0;
 
+        virtual int64_t get_bytes() const = 0;
+
     protected:
         Variable();
 };

@@ -396,3 +396,16 @@ ostream& AbstractVariable::print(ostream &os) const
     const string name(get_name());
     return os << "AbstractVariable(" << name << ")";
 }
+
+
+int64_t AbstractVariable::get_bytes() const
+{
+    int64_t bytes = pagoda::shape_to_size(get_shape()) * get_type().get_bytes();
+    vector<Attribute*> atts = get_atts();
+    vector<Attribute*>::iterator atts_it=atts.begin(), atts_end=atts.end();
+    for (; atts_it!=atts_end; ++atts_it) {
+        bytes += (*atts_it)->get_bytes();
+    }
+    return bytes;
+}
+

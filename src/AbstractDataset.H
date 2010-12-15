@@ -70,6 +70,8 @@ class AbstractDataset : public Dataset
 
         virtual FileFormat get_file_format() const = 0;
 
+        virtual int64_t get_bytes() const;
+
         virtual ostream& print(ostream &os) const = 0;
 
     protected:

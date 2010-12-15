@@ -39,6 +39,7 @@ class Attribute
 
         virtual size_t get_count() const;
         virtual string get_string() const;
+        virtual int64_t get_bytes() const;
 
         virtual ostream& print(ostream &os) const;
         friend ostream& operator << (ostream &os, const Attribute *other);
