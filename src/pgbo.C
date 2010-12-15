@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <cstdlib>
 #include <map>
 #include <stdexcept>
 #include <string>

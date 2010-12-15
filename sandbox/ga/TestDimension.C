@@ -10,16 +10,11 @@
 #include <unistd.h>
 
 // C++ includes, std and otherwise
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-
-using std::cout;
-using std::endl;
-using std::ostringstream;
-using std::string;
-using std::vector;
 
 // C++ includes
 #include "Dimension.H"
@@ -27,6 +22,12 @@ using std::vector;
 #include "PnetcdfDataset.H"
 #include "PnetcdfDimension.H"
 #include "Util.H"
+
+using std::cout;
+using std::endl;
+using std::ostringstream;
+using std::string;
+using std::vector;
 
 
 int main(int argc, char **argv)

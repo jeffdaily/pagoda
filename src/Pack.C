@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <cstdio>
 #include <vector>
 
 #include "Array.H"
@@ -12,6 +13,7 @@
 #include "Timing.H"
 #include "Util.H"
 
+using std::printf;
 using std::vector;
 
 
@@ -334,7 +336,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                     } \
                 } \
                 if (okay_count != local_counts_product) { \
-                    printf("%ld != %ld\n", okay_count, local_counts_product); \
                     pagoda::abort("pack: mismatch", okay_count); \
                 } \
                 TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \

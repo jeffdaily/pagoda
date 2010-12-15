@@ -3,7 +3,9 @@
 #endif
 
 #include <algorithm>
+#include <cstdio>
 #include <fstream>
+#include <iterator>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -27,6 +29,7 @@ using std::ifstream;
 using std::istream_iterator;
 using std::istringstream;
 using std::multiplies;
+using std::printf;
 using std::string;
 using std::vector;
 

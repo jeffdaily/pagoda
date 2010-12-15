@@ -3,6 +3,7 @@
 #   include <config.h>
 #endif
 
+#include <cstdlib>
 #include <iostream>
 
 #include "Bootstrap.H"

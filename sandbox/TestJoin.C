@@ -3,6 +3,7 @@
 #endif // HAVE_CONFIG_H
 
 // C++ includes, std and otherwise
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>

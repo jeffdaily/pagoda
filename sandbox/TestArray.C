@@ -2,6 +2,7 @@
 #   include "config.h"
 #endif
 
+#include <cstdlib>
 #include <iostream>
 
 #include "Array.H"
@@ -19,13 +20,13 @@ void check(DataType type)
 {
     Array *g_a;
     int64_t n = 256;
-    int64_t m = n*2;
-    int64_t inc;
-    int64_t ij;
+    //int64_t m = n*2;
+    //int64_t inc;
+    //int64_t ij;
     T *a;
     T *b;
-    T v[m];
-    T w[m];
+    //T v[m];
+    //T w[m];
     vector<int64_t> lo(2,0);
     vector<int64_t> hi(2,n-1);
     vector<int64_t> tlo(2,0);

@@ -8,17 +8,11 @@
 #include <mpi.h>
 
 // C++ includes, std and otherwise
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
-
-using std::cout;
-using std::endl;
-using std::ostream;
-using std::setw;
-using std::string;
-using std::vector;
 
 // C++ includes
 #include "AggregationUnion.H"
@@ -28,6 +22,13 @@ using std::vector;
 #include "Pack.H"
 #include "Util.H"
 #include "Variable.H"
+
+using std::cout;
+using std::endl;
+using std::ostream;
+using std::setw;
+using std::string;
+using std::vector;
 
 
 ostream& operator << (ostream& os, const vector<size_t> &vec)

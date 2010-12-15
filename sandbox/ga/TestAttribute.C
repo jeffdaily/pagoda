@@ -10,15 +10,11 @@
 #include <unistd.h>
 
 // C++ includes, std and otherwise
+#include <cstdlib>
 #include <iostream>
-using std::cout;
-using std::endl;
 #include <sstream>
-using std::ostringstream;
 #include <string>
-using std::string;
 #include <vector>
-using std::vector;
 
 // C++ includes
 #include "Attribute.H"
@@ -28,6 +24,12 @@ using std::vector;
 #include "Util.H"
 #include "Values.H"
 #include "Variable.H"
+
+using std::cout;
+using std::endl;
+using std::ostringstream;
+using std::string;
+using std::vector;
 
 
 int main(int argc, char **argv)

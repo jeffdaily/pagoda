@@ -10,6 +10,7 @@
 #   include <config.h>
 #endif
 
+#include <cstdio>
 #include <cstring> // for memset
 
 #include <ga.h>
@@ -283,7 +284,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
                         } \
                     } \
                     if (buf_dst_index != local_counts_product) { \
-                        printf("%ld != %ld\n", buf_dst_index, local_counts_product); \
                         GA_Error("pack: mismatch", buf_dst_index); \
                     } \
                     TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \

@@ -2,15 +2,16 @@
 #   include <config.h>
 #endif
 
+#include <cstdlib>
 #include <map>
-
-using std::map;
 
 #include "Array.H"
 #include "Bootstrap.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Grid.H"
+
+using std::map;
 
 
 typedef Variable* (Grid::*gridvar_t)(void);

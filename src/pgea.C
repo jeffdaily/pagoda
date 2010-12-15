@@ -3,6 +3,7 @@
 #endif
 
 #include <cassert>
+#include <cstdlib>
 #include <map>
 #include <stdexcept>
 #include <string>

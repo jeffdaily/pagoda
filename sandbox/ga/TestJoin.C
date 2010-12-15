@@ -9,6 +9,7 @@
 #include <pnetcdf.h>
 
 // C++ includes, std and otherwise
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>

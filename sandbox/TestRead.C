@@ -3,6 +3,7 @@
 #   include <config.h>
 #endif
 
+#include <cstdlib>
 #include <iostream>
 
 #include "Array.H"
@@ -42,7 +43,7 @@ int main(int argc, char **argv)
         for (size_t i=0; i<vars.size(); ++i) {
             Variable *var = vars[i];
             DataType type = var->get_type();
-            if (!var->has_record())
+            //if (!var->has_record())
                 //if (var->get_ndim() >= 1)
                     //if (type == DataType::INT || type == DataType::FLOAT || type == DataType::DOUBLE)
                     {
