@@ -93,7 +93,7 @@ class LatLonIdx
             return os.str();
         }
 };
-const bool operator< (const LatLonIdx &ths, const LatLonIdx &that)
+bool operator< (const LatLonIdx &ths, const LatLonIdx &that)
 {
     return ths.lat < that.lat;
 }
@@ -129,7 +129,7 @@ static void write_results(int g_results, int ncid_orig,
 int main(int argc, char **argv)
 {
     int me = -1;
-    int nproc = -1;
+    //int nproc = -1;
     char *name_lat = "grid_center_lat";
     char *name_lon = "grid_center_lon";
 
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
     GA_Initialize();
 
     me = GA_Nodeid();
-    nproc = GA_Nnodes();
+    //nproc = GA_Nnodes();
 
     opterr = 0;
     while ((c = getopt(argc,argv, "go:")) != -1) {
@@ -672,7 +672,7 @@ static void bin_sort(bin_t &bin)
 static void bin_ghost_exchange(bin_t &bin, int g_extents)
 {
     int me;
-    int nproc;
+    //int nproc;
     bin_t extras_lower;
     bin_t extras_upper;
     int64_t extents_lo[2];
@@ -700,7 +700,7 @@ static void bin_ghost_exchange(bin_t &bin, int g_extents)
     MPI_Status recv_status;
 
     me = GA_Nodeid();
-    nproc = GA_Nnodes();
+    //nproc = GA_Nnodes();
 
     NGA_Distribution64(g_extents, me, extents_lo, extents_hi);
     NGA_Inquire64(g_extents, &extents_type, &extents_ndim, extents_dims);

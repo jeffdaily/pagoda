@@ -151,7 +151,11 @@ check_PROGRAMS =
 check_PROGRAMS += tests/FillValue
 
 tests_FillValue_SOURCES = tests/FillValue.C
-tests_FillValue_DEPENDENCIES = data/FillValue.nc libpagoda.la
+tests_FillValue_DEPENDENCIES = 
+if HAVE_NCGEN
+tests_FillValue_DEPENDENCIES += data/FillValue.nc
+endif
+tests_FillValue_DEPENDENCIES += libpagoda.la
 
 AM_V_NCGEN = $(am__v_NCGEN_$(V))
 am__v_NCGEN_ = $(am__v_NCGEN_$(AM_DEFAULT_VERBOSITY))

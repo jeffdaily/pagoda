@@ -40,11 +40,12 @@ bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT) \
 	pgra$(EXEEXT) pgea$(EXEEXT) pgcmp$(EXEEXT)
 check_PROGRAMS = tests/FillValue$(EXEEXT) $(am__EXEEXT_1) \
 	$(am__EXEEXT_2)
+@HAVE_NCGEN_TRUE@am__append_1 = data/FillValue.nc
 
 #############################################################################
 # sandbox
 #
-@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am__append_1 = sandbox/ga/TestAttribute \
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am__append_2 = sandbox/ga/TestAttribute \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestBin \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestDimension \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestDistance \
@@ -60,7 +61,7 @@ check_PROGRAMS = tests/FillValue$(EXEEXT) $(am__EXEEXT_1) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestSort \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestUnion \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestUnpack
-@ENABLE_SANDBOX_TRUE@am__append_2 = sandbox/TestArray sandbox/TestBin \
+@ENABLE_SANDBOX_TRUE@am__append_3 = sandbox/TestArray sandbox/TestBin \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestCommandLine \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestDimension \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestDistance sandbox/TestEnum \
@@ -808,7 +809,7 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractDataset.C \
 	src/StringComparator.C src/SubsetterCommands.C src/Timing.C \
 	src/Util.C src/Values.C src/Variable.C
 tests_FillValue_SOURCES = tests/FillValue.C
-tests_FillValue_DEPENDENCIES = data/FillValue.nc libpagoda.la
+tests_FillValue_DEPENDENCIES = $(am__append_1) libpagoda.la
 AM_V_NCGEN = $(am__v_NCGEN_$(V))
 am__v_NCGEN_ = $(am__v_NCGEN_$(AM_DEFAULT_VERBOSITY))
 am__v_NCGEN_0 = @echo "  NCGEN " $@;

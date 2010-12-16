@@ -22,7 +22,6 @@ int main(int argc, char **argv)
 {
     vector<int64_t> data_shape;
     vector<int64_t> data_local_shape;
-    int64_t data_size;
     Array *array;
     int *data = NULL;
 
@@ -41,7 +40,6 @@ int main(int argc, char **argv)
 
     data_shape.push_back(15);
     data_shape.push_back(10);
-    data_size = pagoda::shape_to_size(data_shape);
     array = Array::create(DataType::INT, data_shape);
     data_local_shape = array->get_local_shape();
     array->get_distribution(alo,ahi);

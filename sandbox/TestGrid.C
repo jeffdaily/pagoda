@@ -71,10 +71,10 @@ int main(int argc, char **argv)
         pagoda::print_zero("Found grid: " + grid->get_type().get_name() + "\n");
         for (var_func_it=var_funcs.begin();
                 var_func_it!=var_funcs.end(); ++var_func_it) {
-            Variable *var = NULL;
             string name = var_func_it->first;
             gridvar_t func = var_func_it->second;
-            if ((var = (grid->*func)())) {
+            Variable *var = (grid->*func)();
+            if (NULL != var) {
                 pagoda::print_zero("found\t");
             } else {
                 pagoda::print_zero("missing\t");
@@ -84,10 +84,10 @@ int main(int argc, char **argv)
 
         for (dim_func_it=dim_funcs.begin();
                 dim_func_it!=dim_funcs.end(); ++dim_func_it) {
-            Dimension *dim = NULL;
             string name = dim_func_it->first;
             griddim_t func = dim_func_it->second;
-            if ((dim = (grid->*func)())) {
+            Dimension *dim = (grid->*func)();
+            if (NULL != dim) {
                 pagoda::print_zero("found\t");
             } else  {
                 pagoda::print_zero("missing\t");
