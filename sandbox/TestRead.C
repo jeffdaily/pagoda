@@ -74,12 +74,12 @@ int main(int argc, char **argv)
     // it is assumed they have the same distributions
     for (size_t i=0; i<arrays.size(); ++i) {
         Variable *var = variables[i];
+        DataType type = var->get_type();
         Array *array = arrays[i];
         Array *nbarray = nbarrays[i];
         bool ok = true;
         string name = var->get_name();
         if (array->owns_data()) {
-            DataType type = array->get_type();
             int64_t size = array->get_local_size();
 #define compare_helper(DT,T) \
             if (type == DT) { \
@@ -102,6 +102,14 @@ int main(int argc, char **argv)
 #undef compare_helper
             array->release();
             nbarray->release();
+        } else {
+            if (!(type == DataType::INT
+                    || type == DataType::FLOAT
+                    || type == DataType::DOUBLE)
+                    ) {
+                pagoda::println_zero("unhandled data type");
+                ok = false;
+            }
         }
         if (ok) {
             pagoda::print_sync(name + " ok\n");
