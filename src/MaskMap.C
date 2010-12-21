@@ -204,12 +204,12 @@ void MaskMap::seed_masks(const vector<Dimension*> &dims)
 void MaskMap::modify(const IndexHyperslab &hyperslab)
 {
     string hyperslab_name = hyperslab.get_name();
-    masks_t::const_iterator mask_it = masks.find(hyperslab_name);
+    Mask *mask = get_mask(hyperslab_name);
 
     TIMING("MaskMap::modify(IndexHyperslab)");
     TRACER("MaskMap::modify(IndexHyperslab)\n");
 
-    if (mask_it == masks.end()) {
+    if (mask == NULL) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
                            hyperslab_name.c_str());
     }
@@ -217,10 +217,10 @@ void MaskMap::modify(const IndexHyperslab &hyperslab)
         // clear the Mask the first time only
         if (cleared.count(hyperslab_name) == 0) {
             cleared.insert(hyperslab_name);
-            mask_it->second->clear();
+            mask->clear();
         }
         // modify the Mask based on the current Slice
-        mask_it->second->modify(hyperslab);
+        mask->modify(hyperslab);
     }
 }
 
@@ -259,12 +259,12 @@ void MaskMap::modify(const vector<IndexHyperslab> &hyperslabs)
 void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
 {
     string hyperslab_name = hyperslab.get_name();
-    masks_t::const_iterator mask_it = masks.find(hyperslab_name);
+    Mask *mask = get_mask(hyperslab_name);
 
     TIMING("MaskMap::modify(CoordHyperslab)");
     TRACER("MaskMap::modify(CoordHyperslab)\n");
 
-    if (mask_it == masks.end()) {
+    if (mask == NULL) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
                            hyperslab_name.c_str());
     }
@@ -284,18 +284,18 @@ void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
             // clear the Mask the first time only
             if (cleared.count(hyperslab_name) == 0) {
                 cleared.insert(hyperslab_name);
-                mask_it->second->clear();
+                mask->clear();
             }
 
             // modify the Mask based on the current Slice
             ASSERT(hyperslab.has_min() || hyperslab.has_max());
             if (hyperslab.has_min() && hyperslab.has_max()) {
-                mask_it->second->modify(
+                mask->modify(
                         hyperslab.get_min(), hyperslab.get_max(), data);
             } else if (hyperslab.has_min()) {
-                mask_it->second->modify_gt(hyperslab.get_min(), data);
+                mask->modify_gt(hyperslab.get_min(), data);
             } else if (hyperslab.has_max()) {
-                mask_it->second->modify_lt(hyperslab.get_max(), data);
+                mask->modify_lt(hyperslab.get_max(), data);
             }
         }
     }
