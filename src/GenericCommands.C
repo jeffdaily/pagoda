@@ -213,10 +213,10 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("dimension")) {
         vector<string> args = parser.get_arguments("dimension");
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
-            if (it->find(".")) {
-                coord_hyperslabs.push_back(CoordHyperslab(*it));
-            } else {
+            if (it->find(".") == string::npos) {
                 index_hyperslabs.push_back(IndexHyperslab(*it));
+            } else {
+                coord_hyperslabs.push_back(CoordHyperslab(*it));
             }
         }
     }

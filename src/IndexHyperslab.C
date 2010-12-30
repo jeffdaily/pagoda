@@ -51,6 +51,13 @@ IndexHyperslab::IndexHyperslab(const string &name,
 
 
 IndexHyperslab::IndexHyperslab(string arg)
+    :   name("")
+    ,   min(0)
+    ,   max(0)
+    ,   stride(0)
+    ,   min_is_set(false)
+    ,   max_is_set(false)
+    ,   stride_is_set(false)
 {
     vector<string> parts;
     istringstream ss(arg);
