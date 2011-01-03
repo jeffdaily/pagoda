@@ -3,6 +3,7 @@
 #   include <config.h>
 #endif
 
+#include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <functional>
@@ -20,6 +21,7 @@ using std::accumulate;
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::find;
 using std::flush;
 using std::multiplies;
 using std::ostringstream;
@@ -59,6 +61,7 @@ static MPI_Offset shape_to_size(const vector<MPI_Offset> &shape)
     return result;
 }
 
+#if 0
 static int nc_sizeof(nc_type type) {
     int size = 1;
     switch (type) {
@@ -74,6 +77,7 @@ static int nc_sizeof(nc_type type) {
     assert(size >= 1);
     return size;
 }
+#endif
 
 static int get_precision()
 {

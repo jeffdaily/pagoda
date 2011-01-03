@@ -283,8 +283,8 @@ uint64_t PnetcdfTiming::get_time()
 
 #if defined(HAVE_CLOCK_GETTIME)
     struct timespec tp;
-    int stat = clock_gettime(CLOCK_MONOTONIC, &tp);
-    //int stat = clock_gettime(CLOCK_REALTIME, &tp);
+    (void)clock_gettime(CLOCK_MONOTONIC, &tp);
+    //(void)clock_gettime(CLOCK_REALTIME, &tp);
     value = tp.tv_sec;
     value *= 1000000000;
     value += tp.tv_nsec;

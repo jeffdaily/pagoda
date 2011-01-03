@@ -20,7 +20,7 @@
 /* Define to 1 if you have the `clock' function. */
 #undef HAVE_CLOCK
 
-/* Define to 1 if you have the `clock_gettime' function. */
+/* Define to 1 if you have the 'clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
 /* Define to 1 if you have the declaration of `ncmpi_inq_format', and to 0 if

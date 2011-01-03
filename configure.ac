@@ -125,9 +125,12 @@ AS_IF([test x$ac_cv_type_MPI_Offset = xyes],
       [AC_CHECK_SIZEOF([MPI_Offset], [], [[#include <mpi.h>]])])
 
 # Checks for C++ library functions.
-AC_CHECK_FUNCS([clock clock_gettime floor gettimeofday memset strtol])
+AC_CHECK_FUNCS([clock floor gettimeofday memset strtol])
 
 # Checks for C++ libraries.
+AC_SEARCH_LIBS([clock_gettime], [rt],
+    [AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [Define to 1 if you have the 'clock_gettime' function.])],
+    [AC_DEFINE([HAVE_CLOCK_GETTIME], [0], [Define to 1 if you have the 'clock_gettime' function.])])
 PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
     [AC_MSG_FAILURE([Could not locate pnetcdf])])
 PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],

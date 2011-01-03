@@ -92,6 +92,7 @@ int main(int argc, char **argv)
         grids = dataset->get_grids();
         if (grids.empty()) {
             pagoda::print_zero("no grid found\n");
+            grid = NULL;
         }
         else {
             grid = grids[0];
