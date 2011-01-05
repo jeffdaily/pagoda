@@ -215,7 +215,7 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
             NGA_Access64(handle,           &clo[0], &chi[0], &src_data, &ld[0]);
             NGA_Access64(dst_array->handle,&clo[0], &chi[0], &dst_data, &ld[0]);
 #define cast_helper(src_mt,src_t,dst_mt,dst_t) \
-            if (type == src_mt && dst_array->type == dst_mt) { \
+            if (type.to_ga() == src_mt && dst_array->type.to_ga() == dst_mt) { \
                 src_t *src = (src_t*)src_data; \
                 dst_t *dst = (dst_t*)dst_data; \
                 copy_cast<dst_t>(src,src+get_size(),dst); \
@@ -308,7 +308,7 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
 void GlobalArray::operate_add(int that_handle)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type == mt) { \
+    if (type.to_ga() == mt) { \
         t alpha = 1, beta = 1; \
         GA_Add(&alpha, handle, &beta, that_handle, handle); \
     } else
@@ -321,7 +321,7 @@ void GlobalArray::operate_add_patch(int that_handle,
                                     vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type == mt) { \
+    if (type.to_ga() == mt) { \
         t alpha = 1, beta = 1; \
         NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
                 &beta, that_handle, &that_lo[0], &that_hi[0], \
@@ -369,7 +369,7 @@ GlobalArray& GlobalArray::operator+=(const ScalarArray &that)
 void GlobalArray::operate_sub(int that_handle)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type == mt) { \
+    if (type.to_ga() == mt) { \
         t alpha = 1, beta = -1; \
         GA_Add(&alpha, handle, &beta, that_handle, handle); \
     } else
@@ -382,7 +382,7 @@ void GlobalArray::operate_sub_patch(int that_handle,
                                     vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type == mt) { \
+    if (type.to_ga() == mt) { \
         t alpha = 1, beta = -1; \
         NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
                 &beta, that_handle, &that_lo[0], &that_hi[0], \
@@ -770,7 +770,7 @@ void* GlobalArray::gather(vector<int64_t> &subscripts, void *buffer) const
 
     if (buffer == NULL) {
 #define GATYPE_EXPAND(mt,t) \
-        if (type == mt) { \
+        if (type.to_ga() == mt) { \
             buffer = new t[n]; \
         } else
 #include "GlobalArray.def"

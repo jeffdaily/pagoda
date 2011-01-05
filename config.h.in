@@ -67,6 +67,9 @@
 #undef HAVE_NCMPI_INQ_FORMAT
 
 /* set to 1 if we have the indicated package */
+#undef HAVE_NETCDF4
+
+/* set to 1 if we have the indicated package */
 #undef HAVE_PNETCDF
 
 /* pnetcdf version >=1.2 */

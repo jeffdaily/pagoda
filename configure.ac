@@ -131,8 +131,13 @@ AC_CHECK_FUNCS([clock floor gettimeofday memset strtol])
 AC_SEARCH_LIBS([clock_gettime], [rt],
     [AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [Define to 1 if you have the 'clock_gettime' function.])],
     [AC_DEFINE([HAVE_CLOCK_GETTIME], [0], [Define to 1 if you have the 'clock_gettime' function.])])
+PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
+    [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
     [AC_MSG_FAILURE([Could not locate pnetcdf])])
+PAGODA_CHECK_PACKAGE([netcdf4], [netcdf.h], [netcdf], [nc_open_par],
+    [-lhdf5_hl -lhdf5 -lz -lm],
+    [NETCDF4_LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz -lm"])
 PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
     [AS_UNSET([ac_cv_search_GA_Initialize])
      save_LIBS="$LIBS"
@@ -141,8 +146,6 @@ PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
         [GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"],
         [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
      LIBS="$save_LIBS"])
-PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
-    [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 
 # Does pnetcdf have the new nonblocking interface?
 PAGODA_PNETCDF_NB_INT

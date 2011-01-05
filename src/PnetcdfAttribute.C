@@ -39,7 +39,7 @@ PnetcdfAttribute::PnetcdfAttribute(
     TIMING("PnetcdfAttribute::PnetcdfAttribute(...)");
 
     name = ncmpi::inq_attname(ncid, varid, attid);
-    type = ncmpi::inq_atttype(ncid, varid, name);
+    type = PnetcdfDataset::to_dt(ncmpi::inq_atttype(ncid, varid, name));
 #define get_attr_values(DATA_TYPE, C_TYPE) \
     if (type == DATA_TYPE) { \
         vector<C_TYPE> data; \

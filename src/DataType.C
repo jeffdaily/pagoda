@@ -7,16 +7,11 @@
 #   include <macommon.h>
 #endif
 
-#if HAVE_PNETCDF
-#   include <pnetcdf.h>
-#elif HAVE_NETCDF
-#   include <netcdf.h>
-#endif
-
 #include "DataType.H"
 #include "Timing.H"
 
 
+int DataType::next_id(1);
 const DataType DataType::CHAR("char");
 const DataType DataType::SHORT("short");
 const DataType DataType::INT("int");
@@ -32,7 +27,6 @@ const DataType DataType::ULONG("unsigned long");
 const DataType DataType::ULONGLONG("unsigned long long");
 const DataType DataType::SCHAR("signed char");
 const DataType DataType::STRING("string");
-int DataType::next_id(1);
 
 
 DataType::DataType(const string &name)
@@ -42,27 +36,10 @@ DataType::DataType(const string &name)
 }
 
 
-DataType::DataType(int type)
-    :   id(-1)
-    ,   name("")
-{
-    DataType dt = DataType::to_dt(type);
-    id = dt.id;
-    name = dt.name;
-}
-
-
 DataType::DataType(const DataType &type)
     :   id(type.id)
     ,   name(type.name)
 {
-}
-
-
-DataType& DataType::operator = (int type)
-{
-    *this = DataType::to_dt(type);
-    return *this;
 }
 
 
@@ -150,7 +127,8 @@ int DataType::to_ga() const
 }
 
 
-nc_type DataType::to_nc() const
+#if 0
+static nc_type to_nc()
 {
     TIMING("DataType::to_nc()");
 
@@ -292,6 +270,7 @@ nc_type DataType::to_nc() const
 
     throw DataTypeException("could not determine nc_type");
 }
+#endif
 
 
 int64_t DataType::get_bytes() const
@@ -347,6 +326,35 @@ int64_t DataType::get_bytes() const
 }
 
 
+DataType DataType::from_ga(int type)
+{
+    TIMING("DataType::from_ga(int)");
+
+    if (C_INT == type) {
+        return DataType::INT;
+    }
+    else if (C_LONG == type) {
+        return DataType::LONG;
+    }
+    else if (C_LONGLONG == type) {
+        return DataType::LONGLONG;
+    }
+    else if (C_FLOAT == type) {
+        return DataType::FLOAT;
+    }
+    else if (C_DBL == type) {
+        return DataType::DOUBLE;
+#ifdef C_LDBL
+    }
+    else if (C_LDBL == type) {
+        return DataType::LONGDOUBLE;
+#endif
+    }
+    throw DataTypeException("could not determine DataType from int");
+}
+
+
+#if 0
 DataType DataType::to_dt(int type)
 {
     TIMING("DataType::to_dt(int)");
@@ -490,6 +498,7 @@ DataType DataType::to_dt(int type)
     }
     throw DataTypeException("could not determine DataType from int");
 }
+#endif
 
 
 template <> DataType DataType::ctype<char>()

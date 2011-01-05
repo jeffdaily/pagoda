@@ -47,6 +47,100 @@ static int file_format_to_nc_format(FileFormat format)
 }
 
 
+nc_type PnetcdfFileWriter::to_nc(const DataType &type)
+{
+    if (type == (DataType::CHAR)) {
+        return NC_CHAR;
+    }
+    else if (type == (DataType::SCHAR)) {
+        return NC_BYTE;
+    }
+    else if (type == (DataType::SHORT)) {
+#if   2 == SIZEOF_SHORT
+        return NC_SHORT;
+#elif 4 == SIZEOF_SHORT
+        return NC_INT;
+#else
+        throw DataTypeException("could not determine nc_type from SHORT");
+#endif
+    }
+    else if (type == (DataType::INT)) {
+#if   2 == SIZEOF_INT
+        return NC_SHORT;
+#elif 4 == SIZEOF_INT
+        return NC_INT;
+#else
+        throw DataTypeException("could not determine nc_type from INT");
+#endif
+    }
+    else if (type == (DataType::LONG)) {
+#if   2 == SIZEOF_LONG
+        return NC_SHORT;
+#elif 4 == SIZEOF_LONG
+        return NC_INT;
+#else
+        throw DataTypeException("could not determine nc_type from LONG");
+#endif
+    }
+    else if (type == (DataType::LONGLONG)) {
+#if   2 == SIZEOF_LONG_LONG
+        return NC_SHORT;
+#elif 4 == SIZEOF_LONG_LONG
+        return NC_INT;
+#else
+        throw DataTypeException("could not determine nc_type from LONGLONG");
+#endif
+    }
+    else if (type == (DataType::FLOAT)) {
+#if   4 == SIZEOF_FLOAT
+        return NC_FLOAT;
+#elif 8 == SIZEOF_FLOAT
+        return NC_DOUBLE;
+#else
+        throw DataTypeException("could not determine nc_type from FLOAT");
+#endif
+    }
+    else if (type == (DataType::DOUBLE)) {
+#if   4 == SIZEOF_DOUBLE
+        return NC_FLOAT;
+#elif 8 == SIZEOF_DOUBLE
+        return NC_DOUBLE;
+#else
+        throw DataTypeException("could not determine nc_type from DOUBLE");
+#endif
+    }
+    else if (type == (DataType::LONGDOUBLE)) {
+#if   4 == SIZEOF_LONG_DOUBLE
+        return NC_FLOAT;
+#elif 8 == SIZEOF_LONG_DOUBLE
+        return NC_DOUBLE;
+#else
+        throw DataTypeException("could not determine nc_type from LONGDOUBLE");
+#endif
+    }
+    else if (type == (DataType::UCHAR)) {
+        throw DataTypeException("could not determine nc_type from UCHAR");
+    }
+    else if (type == (DataType::USHORT)) {
+        throw DataTypeException("could not determine nc_type from USHORT");
+    }
+    else if (type == (DataType::UINT)) {
+        throw DataTypeException("could not determine nc_type from UINT");
+    }
+    else if (type == (DataType::ULONG)) {
+        throw DataTypeException("could not determine nc_type from ULONG");
+    }
+    else if (type == (DataType::ULONGLONG)) {
+        throw DataTypeException("could not determine nc_type from ULONGLONG");
+    }
+    else if (type == (DataType::STRING)) {
+        throw DataTypeException("could not determine nc_type from STRING");
+    }
+
+    throw DataTypeException("could not determine nc_type");
+}
+
+
 PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     :   FileWriter()
     ,   is_in_define_mode(true)
@@ -258,7 +352,7 @@ void PnetcdfFileWriter::def_var(const string &name,
             shape.push_back(get_dim_size(dims.at(i)));
         }
 
-        id = ncmpi::def_var(ncid, name, type.to_nc(), dim_ids);
+        id = ncmpi::def_var(ncid, name, to_nc(type), dim_ids);
         var_id[name] = id;
         var_dims[name] = dim_ids;
         var_shape[name] = shape;

@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 
+#include <pnetcdf.h>
+
 #include "FileFormat.H"
 #include "FileWriter.H"
 
@@ -23,6 +25,8 @@ using std::vector;
 class PnetcdfFileWriter : public FileWriter
 {
     public:
+        static nc_type to_nc(const DataType &type);
+
         PnetcdfFileWriter(const string &filename);
         virtual ~PnetcdfFileWriter();
         virtual void close();

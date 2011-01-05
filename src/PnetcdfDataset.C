@@ -17,6 +17,85 @@
 #include "Util.H"
 
 
+Dataset* pagoda_pnetcdf_open(const string &filename)
+{
+    Dataset *ret = NULL;
+    try {
+        ret = new PnetcdfDataset(filename);
+    } catch (PagodaException &ex) {
+        if (ret != NULL) {
+            delete ret;
+        }
+        ret = NULL;
+    }
+
+    return ret;
+}
+
+
+DataType PnetcdfDataset::to_dt(const nc_type &type)
+{
+    if (NC_NAT == type) {        // Not A Type
+        throw DataTypeException("NC_NAT not supported");
+    }
+    else if (NC_BYTE == type) {   // signed 1 byte integer
+        return DataType::SCHAR;
+    }
+    else if (NC_CHAR == type) {   // ISO/ASCII character
+        return DataType::CHAR;
+    }
+    else if (NC_SHORT == type) {   // signed 2 byte integer
+#if   2 == SIZEOF_SHORT
+        return DataType::SHORT;
+#elif 2 == SIZEOF_INT
+        return DataType::INT;
+#elif 2 == SIZEOF_LONG
+        return DataType::LONG;
+#elif 2 == SIZEOF_LONG_LONG
+        return DataType::LONGLONG;
+#else
+        throw DataTypeException("no corresponding C type for NC_SHORT");
+#endif
+    }
+    else if (NC_INT == type) {   // signed 4 byte integer
+#if   4 == SIZEOF_SHORT
+        return DataType::SHORT;
+#elif 4 == SIZEOF_INT
+        return DataType::INT;
+#elif 4 == SIZEOF_LONG
+        return DataType::LONG;
+#elif 4 == SIZEOF_LONG_LONG
+        return DataType::LONLONG;
+#else
+        throw DataTypeException("no corresponding C type for NC_INT");
+#endif
+    }
+    else if (NC_FLOAT == type) {   // single precision floating point number
+#if   4 == SIZEOF_FLOAT
+        return DataType::FLOAT;
+#elif 4 == SIZEOF_DOUBLE
+        return DataType::DOUBLE;
+#elif 4 == SIZEOF_LONG_DOUBLE
+        return DOUBLE::LONGDOUBLE;
+#else
+        throw DataTypeException("no corresponding C type for NC_FLOAT");
+#endif
+    }
+    else if (NC_DOUBLE == type) {   // double precision floating point number
+#if   8 == SIZEOF_FLOAT
+        return DataType::FLOAT;
+#elif 8 == SIZEOF_DOUBLE
+        return DataType::DOUBLE;
+#elif 8 == SIZEOF_LONG_DOUBLE
+        return DOUBLE::LONGDOUBLE;
+#else
+        throw DataTypeException("no corresponding C type for NC_DOUBLE");
+#endif
+    }
+    throw DataTypeException("could not determine DataType from nc_type");
+}
+
+
 PnetcdfDataset::PnetcdfDataset(const string &filename)
     :   AbstractDataset()
     ,   filename(filename)
@@ -29,13 +108,14 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     ,   arrays_to_release()
     ,   arrays_to_pack()
     ,   vars_to_pack()
-    ,   open(true)
+    ,   is_open(false)
 {
     TIMING("PnetcdfDataset::PnetcdfDataset(string)");
     int ndim;
     int nvar;
     int natt;
     ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_NOWRITE, MPI_INFO_NULL);
+    is_open = true;
     ncmpi::inq(ncid, ndim, nvar, natt, udim);
     for (int attid=0; attid<natt; ++attid) {
         atts.push_back(new PnetcdfAttribute(this, attid));
@@ -65,8 +145,8 @@ PnetcdfDataset::~PnetcdfDataset()
 
 void PnetcdfDataset::close()
 {
-    if (open) {
-        open = false;
+    if (is_open) {
+        is_open = false;
         ncmpi::close(ncid);
     }
 }

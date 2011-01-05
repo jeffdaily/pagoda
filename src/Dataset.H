@@ -27,6 +27,8 @@ class Variable;
 class Dataset
 {
     public:
+        typedef Dataset*(*opener_t)(const string &);
+
         /**
          * Opens the given filename and deduces the appropriate type handler.
          *
@@ -34,6 +36,11 @@ class Dataset
          * @return the Dataset
          */
         static Dataset* open(const string &filename);
+
+        /**
+         * Registers a file format handler.
+         */
+        static void register_opener(opener_t opener);
 
         /**
          * Destructs the Dataset.
@@ -238,6 +245,9 @@ class Dataset
          * Constructs the Dataset abstract base class.
          */
         Dataset();
+
+    private:
+        static vector<opener_t> openers;
 };
 
 #endif // DATASET_H_

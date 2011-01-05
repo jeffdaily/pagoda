@@ -6,12 +6,6 @@
 #include <stdexcept>
 #include <string>
 
-#if HAVE_PNETCDF
-#   include <pnetcdf.h>
-#elif HAVE_NETCDF
-#   include <netcdf.h>
-#endif
-
 #include "Util.H"
 
 using std::ostringstream;
@@ -49,29 +43,11 @@ class DataType
         static const DataType STRING;
 
         /**
-         * Convert either a Global Arrays type or a netcdf type to a DataType.
-         *
-         * Luckily the GA types are integers within 1000 and 1016 and the
-         * netcdf types are from 0 to 6.
-         *
-         * @param[in] type the integer to convert to a DataType
-         */
-        DataType(int type);
-
-        /**
          * Copy constructor.
          *
          * @param[in] type the DataType to copy
          */
         DataType(const DataType &type);
-
-        /**
-         * Assignment to an intger.
-         *
-         * @param[in] type the integer to convert to a DataType
-         * @return this DataType
-         */
-        DataType& operator = (int type);
 
         /**
          * Assignment to another DataType.
@@ -114,11 +90,11 @@ class DataType
         int to_ga() const;
 
         /**
-         * Convert DataType to netcdf type.
+         * Convert Global Arrays type to DataType.
          *
-         * @return the netcdf type
+         * @return the DataType
          */
-        nc_type to_nc() const;
+        static DataType from_ga(int type);
 
         int get_id() const {
             return id;
@@ -142,14 +118,6 @@ class DataType
         template <class T> static DataType ctype();
 
     protected:
-        /**
-         * Convert int to DataType.
-         *
-         * @param[in] type the integer to convert
-         * @return the corresponding DataType
-         */
-        static DataType to_dt(int type);
-
         /**
          * Constructs DataType with a name.
          */

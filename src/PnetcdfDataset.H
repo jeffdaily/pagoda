@@ -21,6 +21,7 @@ class PnetcdfDimension;
 class PnetcdfVariable;
 class Variable;
 
+Dataset* pagoda_pnetcdf_open(const string &filename);
 
 /**
  * The pnetcdf implementation of the Dataset.
@@ -32,6 +33,8 @@ class Variable;
 class PnetcdfDataset : public AbstractDataset
 {
     public:
+        static DataType to_dt(const nc_type &type);
+
         /**
          * Constructs a PnetcdfDataset by opening the given filename.
          *
@@ -127,7 +130,7 @@ class PnetcdfDataset : public AbstractDataset
         vector<Array*> arrays_to_pack; /**< arrays associated with
                                          non-blocking subsets */
         vector<const PnetcdfVariable*> vars_to_pack;
-        bool open; /**< whether this Dataset is open */
+        bool is_open; /**< whether this Dataset is open */
 };
 
 #endif // PNETCDFDATASET_H_

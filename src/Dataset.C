@@ -2,23 +2,44 @@
 #   include <config.h>
 #endif
 
+#include <vector>
+
 #include "Dataset.H"
 #include "Dimension.H"
-#include "PnetcdfDataset.H"
+#include "Error.H"
 #include "Timing.H"
 #include "Util.H"
 #include "Variable.H"
 
+using std::vector;
+
+
+vector<Dataset::opener_t> Dataset::openers;
+
 
 Dataset* Dataset::open(const string &filename)
 {
-    //TIMING("Dataset::open(string)");
     Dataset *dataset = NULL;
-    string EXT_NC(".nc");
-    if (pagoda::ends_with(filename, EXT_NC)) {
-        dataset = new PnetcdfDataset(filename);
+    vector<opener_t>::iterator it = Dataset::openers.begin();
+    vector<opener_t>::iterator end = Dataset::openers.end();
+
+    for (; it != end; ++it) {
+        dataset = (*it)(filename);
+        if (NULL != dataset) {
+            break;
+        }
     }
+    if (NULL == dataset) {
+        ERR("unable to open dataset -- no handler found");
+    }
+
     return dataset;
+}
+
+
+void Dataset::register_opener(opener_t opener)
+{
+    openers.push_back(opener);
 }
 
 

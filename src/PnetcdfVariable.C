@@ -31,7 +31,7 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     ,   name("")
     ,   dims()
     ,   atts()
-    ,   type(NC_CHAR)
+    ,   type(DataType::CHAR)
 {
     TIMING("PnetcdfVariable::PnetcdfVariable(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
@@ -39,7 +39,7 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     nc_type type_tmp;
     int natt;
     ncmpi::inq_var(ncid, varid, name, type_tmp, dim_ids, natt);
-    type = type_tmp;
+    type = PnetcdfDataset::to_dt(type_tmp);
     for (size_t dimidx=0; dimidx<dim_ids.size(); ++dimidx) {
         dims.push_back(dataset->get_dim(dim_ids[dimidx]));
     }

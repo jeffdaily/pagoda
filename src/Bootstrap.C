@@ -10,6 +10,14 @@
 #endif
 
 #include "Bootstrap.H"
+#include "Dataset.H"
+
+#if HAVE_NETCDF4 || HAVE_PNETCDF
+#include <string>
+#   if HAVE_PNETCDF
+extern Dataset* pagoda_pnetcdf_open(const std::string&);
+#   endif
+#endif
 
 
 int pagoda::me = 0;
@@ -30,6 +38,11 @@ void pagoda::initialize(int *argc, char ***argv)
     pagoda_register_stack_memory();
     pagoda::me = GA_Nodeid();
     pagoda::npe = GA_Nnodes();
+#endif
+#if HAVE_PNETCDF
+    Dataset::register_opener(pagoda_pnetcdf_open);
+#endif
+#if HAVE_NETCDF4
 #endif
 }
 

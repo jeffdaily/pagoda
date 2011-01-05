@@ -47,7 +47,7 @@ GlobalMask::GlobalMask(const string &name, int64_t size)
     TIMING("GlobalMask::GlobalMask(Dimension*)");
     TRACER("GlobalMask ctor size=%ld\n", size);
 
-    mask = new GlobalArray(C_INT, vector<int64_t>(1,size));
+    mask = new GlobalArray(DataType::INT, vector<int64_t>(1,size));
     mask->fill_value(1);
 }
 
@@ -485,12 +485,12 @@ Array* GlobalMask::reindex()
 
     if (dirty_index) {
         if (!index) {
-            index = new GlobalArray(C_INT, size);
+            index = new GlobalArray(DataType::INT, size);
         }
 
         if (count[0] > 0) {
             index->fill_value(-1);
-            tmp = new GlobalArray(C_INT, count);
+            tmp = new GlobalArray(DataType::INT, count);
             pagoda::enumerate(tmp, NULL, NULL);
             pagoda::unpack1d(tmp, index, mask);
             delete tmp;
