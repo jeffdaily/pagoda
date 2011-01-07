@@ -110,6 +110,7 @@ class CommandLineOption
         static CommandLineOption NC4;
         static CommandLineOption NC4_CLASSIC;
         static CommandLineOption NO_COORDS;
+        static CommandLineOption NONBLOCKING_IO;
         static CommandLineOption OPERATION;
         static CommandLineOption OP_TYPE;
         static CommandLineOption OUTPUT;

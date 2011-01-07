@@ -68,6 +68,14 @@ class PnetcdfFileWriter : public FileWriter
         virtual void write(Array *array, const string &name,
                            const vector<int64_t> &start);
 
+        virtual void iwrite(Array *array, const string &name);
+        virtual void iwrite(Array *array, const string &name,
+                            int64_t record);
+        virtual void iwrite(Array *array, const string &name,
+                            const vector<int64_t> &start);
+
+        virtual void wait();
+
         virtual ostream& print(ostream &os) const;
 
     protected:
@@ -87,6 +95,14 @@ class PnetcdfFileWriter : public FileWriter
         void write_atts_id(const vector<Attribute*> &atts, int varid);
         void write(int handle, int id, int record=-1);
 
+        void write_wrapper(Array *array, const string &name, bool nonblocking);
+        void write_wrapper(Array *array, const string &name,
+                           int64_t record, bool nonblocking);
+        void write_wrapper(Array *array, const string &name,
+                           const vector<int64_t> &start, bool nonblocking);
+        void do_write(Array *array, int varid, const vector<MPI_Offset> &start,
+                      const vector<MPI_Offset> &count, bool nonblocking);
+
         bool is_in_define_mode;
         string filename;
         int ncid;
@@ -104,6 +120,9 @@ class PnetcdfFileWriter : public FileWriter
         map<string,int>              var_id;
         map<string,vector<int> >     var_dims;
         map<string,vector<int64_t> > var_shape;
+
+        vector<int> requests;
+        vector<Array*> arrays_to_release;
 
         bool open;
 };

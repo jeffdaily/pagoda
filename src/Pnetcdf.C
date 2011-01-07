@@ -951,6 +951,134 @@ int ncmpi::iget_vara(int ncid, int varid,
 }
 
 
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const unsigned char *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_uchar", count, NC_CHAR);
+    ERRNO_CHECK(ncmpi_iput_vara_uchar(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const signed char *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_schar", count, NC_CHAR);
+    ERRNO_CHECK(ncmpi_iput_vara_schar(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const char *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_text", count, NC_CHAR);
+    ERRNO_CHECK(ncmpi_iput_vara_text(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const short *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_short", count, NC_SHORT);
+    ERRNO_CHECK(ncmpi_iput_vara_short(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const int *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_int", count, NC_INT);
+    ERRNO_CHECK(ncmpi_iput_vara_int(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const long *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_long", count, NC_INT);
+    ERRNO_CHECK(ncmpi_iput_vara_long(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const float *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_float", count, NC_FLOAT);
+    ERRNO_CHECK(ncmpi_iput_vara_float(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
+int ncmpi::iput_vara(int ncid, int varid,
+                     const vector<MPI_Offset> &start,
+                     const vector<MPI_Offset> &count, const double *ip)
+{
+#if HAVE_PNETCDF_NEW_NB
+    int request;
+    PNETCDF_TIMING3("ncmpi_iput_vara_double", count, NC_DOUBLE);
+    ERRNO_CHECK(ncmpi_iput_vara_double(ncid, varid, &start[0], &count[0], ip, &request));
+    return request;
+#else
+    put_vara_all(ncid, varid, start, count, ip);
+    return 0;
+#endif
+}
+
+
 void ncmpi::wait_all(int ncid,
                      vector<int> &array_of_requests,
                      vector<int> &array_of_statuses)

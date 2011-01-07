@@ -57,6 +57,7 @@ class GenericCommands
         bool is_appending() const;
         bool is_overwriting() const;
         bool is_fixing_record_dimension() const;
+        bool is_nonblocking() const;
         int get_header_pad() const;
         string get_usage() const;
         FileFormat get_file_format() const;
@@ -90,6 +91,7 @@ class GenericCommands
         vector<CoordHyperslab> coord_hyperslabs;
         vector<LatLonBox> boxes;
         FileFormat file_format;
+        bool nonblocking_io;
 };
 
 #endif // GENERICCOMMANDS_H_

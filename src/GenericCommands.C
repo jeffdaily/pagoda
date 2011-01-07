@@ -54,6 +54,7 @@ GenericCommands::GenericCommands()
     ,   index_hyperslabs()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
+    ,   nonblocking_io(false)
 {
     TIMING("GenericCommands::GenericCommands()");
     init();
@@ -84,6 +85,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   index_hyperslabs()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
+    ,   nonblocking_io(false)
 {
     TIMING("GenericCommands::GenericCommands(int,char**)");
     init();
@@ -100,6 +102,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::NC4);
     parser.push_back(&CommandLineOption::NC4_CLASSIC);
     parser.push_back(&CommandLineOption::FILE_FORMAT);
+    parser.push_back(&CommandLineOption::NONBLOCKING_IO);
     parser.push_back(&CommandLineOption::APPEND);
     parser.push_back(&CommandLineOption::ALPHABETIZE);
     parser.push_back(&CommandLineOption::NO_COORDS);
@@ -290,6 +293,10 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("5")) {
         file_format = FF_PNETCDF_CDF5;
+    }
+
+    if (parser.count("nbio")) {
+        nonblocking_io = true;
     }
 
     if (parser.count("append")) {
@@ -742,4 +749,10 @@ FileFormat GenericCommands::get_file_format() const
 string GenericCommands::get_input_path() const
 {
     return input_path;
+}
+
+
+bool GenericCommands::is_nonblocking() const
+{
+    return nonblocking_io;
 }

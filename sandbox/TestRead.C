@@ -12,6 +12,8 @@
 #include "Debug.H"
 #include "Variable.H"
 
+#include "timer.h"
+
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -28,6 +30,10 @@ int main(int argc, char **argv)
     vector<Variable*> variables;
     vector<Array*> arrays;
     vector<Array*> nbarrays;
+    utimer_t timer_blocking_local;
+    utimer_t timer_blocking_total=0;
+    utimer_t timer_nonblocking_local;
+    utimer_t timer_nonblocking_total=0;
 
     pagoda::initialize(&argc, &argv);
 
@@ -60,14 +66,20 @@ int main(int argc, char **argv)
         Variable *var = variables[i];
         string name = var->get_name();
         pagoda::print_zero("blocking read of " + name + " ... ");
+        timer_blocking_local = timer_start();
         arrays.push_back(var->read());
+        timer_blocking_total += timer_end(timer_blocking_local);
         pagoda::println_zero("done");
+        timer_nonblocking_local = timer_start();
         pagoda::print_zero("non-blocking read of " + name + " ... ");
+        timer_nonblocking_total += timer_end(timer_nonblocking_local);
         nbarrays.push_back(var->iread());
         pagoda::println_zero("done");
     }
     pagoda::print_zero("wait... ");
+    timer_nonblocking_local = timer_start();
     dataset->wait();
+    timer_nonblocking_total += timer_end(timer_nonblocking_local);
     pagoda::println_zero("done");
 
     // compare the arrays
@@ -118,6 +130,11 @@ int main(int argc, char **argv)
         }
     }
 
+    // print timing info
+    pagoda::println_sync("   timer_blocking_total="
+            + pagoda::to_string(timer_blocking_total));
+    pagoda::println_sync("timer_nonblocking_total="
+            + pagoda::to_string(timer_nonblocking_total));
     delete dataset;
     for (size_t i=0; i<arrays.size(); ++i) {
         delete arrays[i];

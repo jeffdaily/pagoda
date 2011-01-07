@@ -17,6 +17,8 @@
 #include <mpi.h>
 #include <pnetcdf.h>
 
+#include "timer.h"
+
 using std::accumulate;
 using std::cerr;
 using std::cout;
@@ -219,6 +221,10 @@ int main(int argc, char **argv)
     vector<MPI_Offset> buf_sizes;
     vector<int> requests;
     vector<int> statuses;
+    utimer_t timer_blocking_local;
+    utimer_t timer_blocking_total=0;
+    utimer_t timer_nonblocking_local;
+    utimer_t timer_nonblocking_total=0;
 
     MPI_Init(&argc, &argv);
 
@@ -357,6 +363,7 @@ int main(int argc, char **argv)
                 break;
         }
         print_zero("blocking read of " + name + " ... ");
+        timer_blocking_local = timer_start();
         switch (type) {
             case NC_BYTE:
                 ERRNO_CHECK(ncmpi_get_vara_schar_all(ncid, varid,
@@ -387,8 +394,10 @@ int main(int argc, char **argv)
                 ERRNO(NC_EBADTYPE);
                 break;
         }
+        timer_blocking_total += timer_end(timer_blocking_local);
         print_zero("done\n");
         print_zero("non-blocking read of " + name + " ... ");
+        timer_nonblocking_local = timer_start();
         switch (type) {
             case NC_BYTE:
                 ERRNO_CHECK(ncmpi_iget_vara_schar(ncid, varid,
@@ -419,6 +428,7 @@ int main(int argc, char **argv)
                 ERRNO(NC_EBADTYPE);
                 break;
         }
+        timer_nonblocking_total += timer_end(timer_nonblocking_local);
         print_zero("done\n");
         buffers.push_back(buf);
         nb_buffers.push_back(nb_buf);
@@ -426,8 +436,10 @@ int main(int argc, char **argv)
     }
     statuses.assign(requests.size(), 0);
     print_zero("wait ... ");
+    timer_nonblocking_local = timer_start();
     ERRNO_CHECK(ncmpi_wait_all(
                 ncid, requests.size(), &requests[0], &statuses[0]));
+    timer_nonblocking_total += timer_end(timer_nonblocking_local);
     print_zero("done\n");
 
     // compare the buffers
@@ -463,6 +475,12 @@ int main(int argc, char **argv)
                 break;
         }
     }
+
+    // print timing info
+    print_sync("   timer_blocking_total="
+            + to_string(timer_blocking_total) + "\n");
+    print_sync("timer_nonblocking_total="
+            + to_string(timer_nonblocking_total) + "\n");
 
     // clean up
     for (size_t i=0; i<var_types.size(); ++i) {

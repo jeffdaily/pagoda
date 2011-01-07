@@ -83,6 +83,9 @@ CommandLineOption CommandLineOption::NC4_CLASSIC(
 CommandLineOption CommandLineOption::NO_COORDS(
     'C', "no-coords", false,
     "associated coordinate variables should not be processed");
+CommandLineOption CommandLineOption::NONBLOCKING_IO(
+    0, "nbio", false,
+    "use non-blocking IO, if possible");
 CommandLineOption CommandLineOption::OPERATION(
     'y', "operation", true,
     "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");

@@ -87,6 +87,14 @@ class FileWriter
         virtual void write(Array *array, const string &name,
                            const vector<int64_t> &start) = 0;
 
+        virtual void iwrite(Array *array, const string &name) = 0;
+        virtual void iwrite(Array *array, const string &name,
+                            int64_t record) = 0;
+        virtual void iwrite(Array *array, const string &name,
+                            const vector<int64_t> &start) = 0;
+
+        virtual void wait() = 0;
+
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const FileWriter *writer);
 };

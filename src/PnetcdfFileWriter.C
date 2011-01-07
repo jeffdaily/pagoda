@@ -157,6 +157,8 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     ,   var_id()
     ,   var_dims()
     ,   var_shape()
+    ,   requests()
+    ,   arrays_to_release()
     ,   open(false)
 {
 }
@@ -564,6 +566,19 @@ void PnetcdfFileWriter::write_atts_id(const vector<Attribute*> &atts, int varid)
 
 void PnetcdfFileWriter::write(Array *array, const string &name)
 {
+    write_wrapper(array, name, false);
+}
+
+
+void PnetcdfFileWriter::iwrite(Array *array, const string &name)
+{
+    write_wrapper(array, name, true);
+}
+
+
+void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
+                                      bool nonblocking)
+{
     vector<int64_t> shape_to_compare = get_var_shape(name);
     vector<int64_t> start(shape_to_compare.size(), 0);
 
@@ -584,11 +599,24 @@ void PnetcdfFileWriter::write(Array *array, const string &name)
         }
     }
 
-    write(array, name, start);
+    write_wrapper(array, name, start, nonblocking);
 }
 
 
 void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
+{
+    write_wrapper(array, name, record, false);
+}
+
+
+void PnetcdfFileWriter::iwrite(Array *array, const string &name, int64_t record)
+{
+    write_wrapper(array, name, record, true);
+}
+
+
+void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
+        int64_t record, bool nonblocking)
 {
     DataType type = array->get_type();
     vector<int64_t> array_shape = array->get_shape();
@@ -596,7 +624,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
     vector<int64_t> shape = get_var_shape(name);
     vector<MPI_Offset> start(shape.size(), 0);
     vector<MPI_Offset> count(shape.size(), 0);
-    int var_id = get_var_id(name);
+    int varid = get_var_id(name);
 
     TIMING("PnetcdfFileWriter::write(Array*,string,int64_t)");
     TRACER("PnetcdfFileWriter::write record %ld %s\n",
@@ -624,33 +652,28 @@ void PnetcdfFileWriter::write(Array *array, const string &name, int64_t record)
         std::copy(lo.begin(), lo.end(), start.begin()+1);
     }
 
-#define write_var_all(TYPE, DT) \
-    if (type == DT) { \
-        TYPE *ptr = NULL; \
-        if (array->owns_data()) { \
-            ptr = (TYPE*)array->access(); \
-        } \
-        ncmpi::put_vara_all(ncid, var_id, start, count, ptr); \
-        if (array->owns_data()) { \
-            array->release(); \
-        } \
-    } else
-    write_var_all(unsigned char, DataType::UCHAR)
-    write_var_all(signed char,   DataType::SCHAR)
-    write_var_all(char,          DataType::CHAR)
-    write_var_all(int,           DataType::INT)
-    write_var_all(long,          DataType::LONG)
-    write_var_all(float,         DataType::FLOAT)
-    write_var_all(double,        DataType::DOUBLE) {
-        EXCEPT(DataTypeException, "DataType not handled", type);
-    }
-#undef write_var_all
+    do_write(array, varid, start, count, nonblocking);
+}
+
+
+void PnetcdfFileWriter::write(Array *array, const string &name,
+                              const vector<int64_t> &start)
+{
+    write_wrapper(array, name, start, false);
+}
+
+
+void PnetcdfFileWriter::iwrite(Array *array, const string &name,
+                               const vector<int64_t> &start)
+{
+    write_wrapper(array, name, start, true);
 }
 
 
 // it's a "patch" write.  the "hi" is implied by the shape of the given array
-void PnetcdfFileWriter::write(Array *array, const string &name,
-                              const vector<int64_t> &start)
+void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
+                                      const vector<int64_t> &start,
+                                      bool nonblocking)
 {
     DataType type = array->get_type();
     vector<int64_t> array_shape = array->get_shape();
@@ -660,7 +683,7 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
     vector<int64_t> shape = get_var_shape(name);
     vector<MPI_Offset> start_copy(start.begin(), start.end());
     vector<MPI_Offset> count(shape.size(), 0);
-    int var_id = get_var_id(name);
+    int varid = get_var_id(name);
 
     TIMING("PnetcdfFileWriter::write(Array*,string,vector<int64_t>)");
     TRACER("PnetcdfFileWriter::write %s\n", name.c_str());
@@ -682,13 +705,31 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
         }
     }
 
+    do_write(array, varid, start_copy, count, nonblocking);
+}
+
+
+void PnetcdfFileWriter::do_write(Array *array, int varid,
+                                 const vector<MPI_Offset> &start,
+                                 const vector<MPI_Offset> &count,
+                                 bool nonblocking)
+{
+    DataType type = array->get_type();
+
 #define write_var_all(TYPE, DT) \
     if (type == DT) { \
         TYPE *ptr = NULL; \
         if (array->owns_data()) { \
             ptr = (TYPE*)array->access(); \
         } \
-        ncmpi::put_vara_all(ncid, var_id, start_copy, count, ptr); \
+        if (nonblocking) { \
+            int request; \
+            request = ncmpi::iput_vara(ncid, varid, start, count, ptr); \
+            requests.push_back(request); \
+            arrays_to_release.push_back(array); \
+        } else { \
+            ncmpi::put_vara_all(ncid, varid, start, count, ptr); \
+        } \
         if (array->owns_data()) { \
             array->release(); \
         } \
@@ -704,3 +745,21 @@ void PnetcdfFileWriter::write(Array *array, const string &name,
     }
 #undef write_var_all
 }
+
+
+void PnetcdfFileWriter::wait()
+{
+    TIMING("PnetcdfFileWriter::wait()");
+
+    if (!requests.empty()) {
+        vector<int> statuses(requests.size());
+        ncmpi::wait_all(ncid, requests, statuses);
+        requests.clear();
+        // release Array pointers
+        for (size_t i=0; i<arrays_to_release.size(); ++i) {
+            arrays_to_release[i]->release();
+        }
+        arrays_to_release.clear();
+    }
+}
+

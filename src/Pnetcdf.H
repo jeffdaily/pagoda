@@ -90,6 +90,7 @@ namespace ncmpi
     void put_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const long *op);
     void put_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const float *op);
     void put_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const double *op);
+
     void put_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const unsigned char *op);
     void put_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const signed char *op);
     void put_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const char *op);
@@ -99,6 +100,15 @@ namespace ncmpi
     void put_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const float *op);
     void put_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const double *op);
 
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const unsigned char *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const signed char *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const char *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const short *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const int *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const long *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const float *op);
+    int iput_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, const double *op);
+
     void get_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, unsigned char *ip);
     void get_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, signed char *ip);
     void get_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, char *ip);
@@ -107,6 +117,7 @@ namespace ncmpi
     void get_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, long *ip);
     void get_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, float *ip);
     void get_vara_all(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, double *ip);
+
     void get_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, unsigned char *ip);
     void get_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, signed char *ip);
     void get_vara(int ncid, int varid, const vector<MPI_Offset> &start, const vector<MPI_Offset> &count, char *ip);
