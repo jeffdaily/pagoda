@@ -25,11 +25,11 @@ CommandLineOption CommandLineOption::AUXILIARY(
 CommandLineOption CommandLineOption::AVG_TYPE(
     'y', "op_typ", true,
     "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
-CommandLineOption CommandLineOption::CDF3(
+CommandLineOption CommandLineOption::CDF1(
     '3', "3", false,
     "output file in netCDF3 CLASSIC (32-bit offset) storage format");
-CommandLineOption CommandLineOption::CDF4(
-    '6', "64", false,
+CommandLineOption CommandLineOption::CDF2(
+    '4', "64bit", false,
     "output file in netCDF3 64-bit offset storage format");
 CommandLineOption CommandLineOption::CDF5(
     '5', "5", false,
@@ -74,6 +74,12 @@ CommandLineOption CommandLineOption::JOIN(
 CommandLineOption CommandLineOption::LATLONBOX(
     'b', "box", true,
     "north,south,east,west lat/lon bounding box");
+CommandLineOption CommandLineOption::NC4(
+    0, "netcdf4", false,
+    "output file in netCDF4 data format");
+CommandLineOption CommandLineOption::NC4_CLASSIC(
+    0, "netcdf4_classic", false,
+    "output file in netCDF4 classic data format");
 CommandLineOption CommandLineOption::NO_COORDS(
     'C', "no-coords", false,
     "associated coordinate variables should not be processed");

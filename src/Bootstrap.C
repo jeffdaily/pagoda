@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <string>
+
 #if HAVE_MPI
 #   include <mpi.h>
 #endif
@@ -12,11 +14,11 @@
 #include "Bootstrap.H"
 #include "Dataset.H"
 
-#if HAVE_NETCDF4 || HAVE_PNETCDF
-#include <string>
-#   if HAVE_PNETCDF
+#if HAVE_PNETCDF
 extern Dataset* pagoda_pnetcdf_open(const std::string&);
-#   endif
+#endif
+#if HAVE_NETCDF4
+extern Dataset* pagoda_netcdf4_open(const std::string&);
 #endif
 
 
@@ -43,6 +45,7 @@ void pagoda::initialize(int *argc, char ***argv)
     Dataset::register_opener(pagoda_pnetcdf_open);
 #endif
 #if HAVE_NETCDF4
+    Dataset::register_opener(pagoda_netcdf4_open);
 #endif
 }
 

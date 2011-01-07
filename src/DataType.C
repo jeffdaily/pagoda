@@ -2,11 +2,6 @@
 #   include <config.h>
 #endif
 
-#if HAVE_GA
-#   include <ga.h>
-#   include <macommon.h>
-#endif
-
 #include "DataType.H"
 #include "Timing.H"
 
@@ -66,64 +61,6 @@ bool DataType::operator != (const DataType &type) const
 ostream& operator << (ostream &os, const DataType &type)
 {
     return os << type.name;
-}
-
-
-int DataType::to_ga() const
-{
-    TIMING("DataType::to_ga()");
-
-    if (false) {
-        /*
-        } else if (operator==(DataType::CHAR)) {
-            return C_CHAR;
-        */
-    }
-    else if (operator==(DataType::SHORT)) {
-        throw DataTypeException("GA does not support C short");
-    }
-    else if (operator==(DataType::INT)) {
-        return C_INT;
-    }
-    else if (operator==(DataType::LONG)) {
-        return C_LONG;
-    }
-    else if (operator==(DataType::LONGLONG)) {
-        return C_LONGLONG;
-    }
-    else if (operator==(DataType::FLOAT)) {
-        return C_FLOAT;
-    }
-    else if (operator==(DataType::DOUBLE)) {
-        return C_DBL;
-    }
-    else if (operator==(DataType::LONGDOUBLE)) {
-#ifdef C_LDBL
-        return C_LDBL;
-#else
-        throw DataTypeException("GA does not support C long double");
-#endif
-    }
-    else if (operator==(DataType::UCHAR)) {
-        throw DataTypeException("GA does not support C unsigned char");
-    }
-    else if (operator==(DataType::USHORT)) {
-        throw DataTypeException("GA does not support C unsigned short");
-    }
-    else if (operator==(DataType::UINT)) {
-        throw DataTypeException("GA does not support C unsigned int");
-    }
-    else if (operator==(DataType::ULONG)) {
-        throw DataTypeException("GA does not support C unsigned long");
-    }
-    else if (operator==(DataType::ULONGLONG)) {
-        throw DataTypeException("GA does not support C unsigned long long");
-    }
-    else if (operator==(DataType::STRING)) {
-        throw DataTypeException("GA does not support C char*");
-    }
-
-    throw DataTypeException("could not determine GA type from DataType");
 }
 
 
@@ -323,34 +260,6 @@ int64_t DataType::get_bytes() const
     else {
         throw DataTypeException("could not determine DataType for C size");
     }
-}
-
-
-DataType DataType::from_ga(int type)
-{
-    TIMING("DataType::from_ga(int)");
-
-    if (C_INT == type) {
-        return DataType::INT;
-    }
-    else if (C_LONG == type) {
-        return DataType::LONG;
-    }
-    else if (C_LONGLONG == type) {
-        return DataType::LONGLONG;
-    }
-    else if (C_FLOAT == type) {
-        return DataType::FLOAT;
-    }
-    else if (C_DBL == type) {
-        return DataType::DOUBLE;
-#ifdef C_LDBL
-    }
-    else if (C_LDBL == type) {
-        return DataType::LONGDOUBLE;
-#endif
-    }
-    throw DataTypeException("could not determine DataType from int");
 }
 
 

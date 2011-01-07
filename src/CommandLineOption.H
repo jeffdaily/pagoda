@@ -93,8 +93,8 @@ class CommandLineOption
         static CommandLineOption APPEND;
         static CommandLineOption AUXILIARY;
         static CommandLineOption AVG_TYPE;
-        static CommandLineOption CDF3;
-        static CommandLineOption CDF4;
+        static CommandLineOption CDF1;
+        static CommandLineOption CDF2;
         static CommandLineOption CDF5;
         static CommandLineOption COORDS;
         static CommandLineOption DIMENSION;
@@ -107,6 +107,8 @@ class CommandLineOption
         static CommandLineOption INPUT_PATH;
         static CommandLineOption JOIN;
         static CommandLineOption LATLONBOX;
+        static CommandLineOption NC4;
+        static CommandLineOption NC4_CLASSIC;
         static CommandLineOption NO_COORDS;
         static CommandLineOption OPERATION;
         static CommandLineOption OP_TYPE;

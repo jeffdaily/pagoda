@@ -41,9 +41,95 @@ static void copy_cast(InputIterator1 first, InputIterator1 last, InputIterator2 
 }
 
 
+int GlobalArray::to_ga(const DataType &type)
+{
+    TIMING("DataType::to_ga()");
+
+    if (false) {
+        /*
+        } else if (operator==(DataType::CHAR)) {
+            return C_CHAR;
+        */
+    }
+    else if (type==(DataType::SHORT)) {
+        throw DataTypeException("GA does not support C short");
+    }
+    else if (type==(DataType::INT)) {
+        return C_INT;
+    }
+    else if (type==(DataType::LONG)) {
+        return C_LONG;
+    }
+    else if (type==(DataType::LONGLONG)) {
+        return C_LONGLONG;
+    }
+    else if (type==(DataType::FLOAT)) {
+        return C_FLOAT;
+    }
+    else if (type==(DataType::DOUBLE)) {
+        return C_DBL;
+    }
+    else if (type==(DataType::LONGDOUBLE)) {
+#ifdef C_LDBL
+        return C_LDBL;
+#else
+        throw DataTypeException("GA does not support C long double");
+#endif
+    }
+    else if (type==(DataType::UCHAR)) {
+        throw DataTypeException("GA does not support C unsigned char");
+    }
+    else if (type==(DataType::USHORT)) {
+        throw DataTypeException("GA does not support C unsigned short");
+    }
+    else if (type==(DataType::UINT)) {
+        throw DataTypeException("GA does not support C unsigned int");
+    }
+    else if (type==(DataType::ULONG)) {
+        throw DataTypeException("GA does not support C unsigned long");
+    }
+    else if (type==(DataType::ULONGLONG)) {
+        throw DataTypeException("GA does not support C unsigned long long");
+    }
+    else if (type==(DataType::STRING)) {
+        throw DataTypeException("GA does not support C char*");
+    }
+
+    throw DataTypeException("could not determine GA type from DataType");
+}
+
+
+DataType GlobalArray::to_dt(int type)
+{
+    TIMING("DataType::to_dt(int)");
+
+    if (C_INT == type) {
+        return DataType::INT;
+    }
+    else if (C_LONG == type) {
+        return DataType::LONG;
+    }
+    else if (C_LONGLONG == type) {
+        return DataType::LONGLONG;
+    }
+    else if (C_FLOAT == type) {
+        return DataType::FLOAT;
+    }
+    else if (C_DBL == type) {
+        return DataType::DOUBLE;
+#ifdef C_LDBL
+    }
+    else if (C_LDBL == type) {
+        return DataType::LONGDOUBLE;
+#endif
+    }
+    throw DataTypeException("could not determine DataType from int");
+}
+
+
 void GlobalArray::create()
 {
-    handle = NGA_Create64(type.to_ga(), shape.size(), &shape[0], "name", NULL);
+    handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name", NULL);
     set_distribution();
 }
 
@@ -215,7 +301,7 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
             NGA_Access64(handle,           &clo[0], &chi[0], &src_data, &ld[0]);
             NGA_Access64(dst_array->handle,&clo[0], &chi[0], &dst_data, &ld[0]);
 #define cast_helper(src_mt,src_t,dst_mt,dst_t) \
-            if (type.to_ga() == src_mt && dst_array->type.to_ga() == dst_mt) { \
+            if (to_ga(type) == src_mt && to_ga(dst_array->type) == dst_mt) { \
                 src_t *src = (src_t*)src_data; \
                 dst_t *dst = (dst_t*)dst_data; \
                 copy_cast<dst_t>(src,src+get_size(),dst); \
@@ -308,7 +394,7 @@ GlobalArray& GlobalArray::operator=(const GlobalArray &that)
 void GlobalArray::operate_add(int that_handle)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type.to_ga() == mt) { \
+    if (to_ga(type) == mt) { \
         t alpha = 1, beta = 1; \
         GA_Add(&alpha, handle, &beta, that_handle, handle); \
     } else
@@ -321,7 +407,7 @@ void GlobalArray::operate_add_patch(int that_handle,
                                     vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type.to_ga() == mt) { \
+    if (to_ga(type) == mt) { \
         t alpha = 1, beta = 1; \
         NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
                 &beta, that_handle, &that_lo[0], &that_hi[0], \
@@ -369,7 +455,7 @@ GlobalArray& GlobalArray::operator+=(const ScalarArray &that)
 void GlobalArray::operate_sub(int that_handle)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type.to_ga() == mt) { \
+    if (to_ga(type) == mt) { \
         t alpha = 1, beta = -1; \
         GA_Add(&alpha, handle, &beta, that_handle, handle); \
     } else
@@ -382,7 +468,7 @@ void GlobalArray::operate_sub_patch(int that_handle,
                                     vector<int64_t> &that_lo, vector<int64_t> &that_hi)
 {
 #define GATYPE_EXPAND(mt,t) \
-    if (type.to_ga() == mt) { \
+    if (to_ga(type) == mt) { \
         t alpha = 1, beta = -1; \
         NGA_Add_patch64(&alpha, handle, &my_lo[0], &my_hi[0], \
                 &beta, that_handle, &that_lo[0], &that_hi[0], \
@@ -770,7 +856,7 @@ void* GlobalArray::gather(vector<int64_t> &subscripts, void *buffer) const
 
     if (buffer == NULL) {
 #define GATYPE_EXPAND(mt,t) \
-        if (type.to_ga() == mt) { \
+        if (to_ga(type) == mt) { \
             buffer = new t[n]; \
         } else
 #include "GlobalArray.def"

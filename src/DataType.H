@@ -18,7 +18,6 @@ using std::string;
  * A common DataType object for translating from various library-specific
  * types.
  *
- * For example, between Global Arrays and netcdf.
  * Implemented as a type-safe enumeration.  There can be multiple instances of
  * a given DataType but there are a fixed set of values that the instances may
  * represent.
@@ -81,20 +80,6 @@ class DataType
          * @return the given stream
          */
         friend ostream& operator << (ostream &os, const DataType &type);
-
-        /**
-         * Convert DataType to Global Arrays type.
-         *
-         * @return the Global Arrays type
-         */
-        int to_ga() const;
-
-        /**
-         * Convert Global Arrays type to DataType.
-         *
-         * @return the DataType
-         */
-        static DataType from_ga(int type);
 
         int get_id() const {
             return id;

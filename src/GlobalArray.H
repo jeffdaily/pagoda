@@ -22,6 +22,20 @@ typedef void (GlobalArray::*GA_op_patch)(int,
 class GlobalArray : public AbstractArray
 {
     public:
+        /**
+         * Convert DataType to Global Arrays type.
+         *
+         * @return the Global Arrays type
+         */
+        static int to_ga(const DataType &type);
+
+        /**
+         * Convert Global Arrays type to DataType.
+         *
+         * @return the DataType
+         */
+        static DataType to_dt(int type);
+
         GlobalArray(DataType type, vector<int64_t> shape);
         GlobalArray(DataType type, vector<Dimension*> dims);
         GlobalArray(const GlobalArray &that);

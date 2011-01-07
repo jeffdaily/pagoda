@@ -94,9 +94,11 @@ GenericCommands::GenericCommands(int argc, char **argv)
 void GenericCommands::init()
 {
     parser.push_back(&CommandLineOption::HELP);
-    parser.push_back(&CommandLineOption::CDF3);
-    parser.push_back(&CommandLineOption::CDF4);
+    parser.push_back(&CommandLineOption::CDF1);
+    parser.push_back(&CommandLineOption::CDF2);
     parser.push_back(&CommandLineOption::CDF5);
+    parser.push_back(&CommandLineOption::NC4);
+    parser.push_back(&CommandLineOption::NC4_CLASSIC);
     parser.push_back(&CommandLineOption::FILE_FORMAT);
     parser.push_back(&CommandLineOption::APPEND);
     parser.push_back(&CommandLineOption::ALPHABETIZE);
@@ -266,6 +268,12 @@ void GenericCommands::parse(int argc, char **argv)
         }
         else if (val == "64data") {
             file_format = FF_PNETCDF_CDF5;
+        }
+        else if (val == "netcdf4") {
+            file_format = FF_NETCDF4;
+        }
+        else if (val == "netcdf4_classic") {
+            file_format = FF_NETCDF4_CLASSIC;
         }
         else {
             throw CommandException("file format string not recognized");
