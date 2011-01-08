@@ -2,6 +2,7 @@
 #   include <config.h>
 #endif
 
+#include <cassert>
 #include <sstream>
 
 #include "AbstractVariable.H"
@@ -353,6 +354,7 @@ void AbstractVariable::renumber(Array *array) const
 Array* AbstractVariable::read_alloc() const
 {
     Array *dst = Array::create(get_type(), get_shape());
+    assert(NULL != dst);
     return read(dst);
 }
 

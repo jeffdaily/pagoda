@@ -5,6 +5,7 @@
 #include <netcdf.h>
 
 #include <algorithm>
+#include <cassert>
 
 #include "Array.H"
 #include "Attribute.H"
@@ -98,7 +99,7 @@ Array* Netcdf4Variable::read(Array *dst) const
     if (dst == NULL) {
         return AbstractVariable::read_alloc();
     }
-    return read(dst);
+    return read_wrapper(dst);
 }
 
 
@@ -126,9 +127,11 @@ Array* Netcdf4Variable::read_wrapper(Array *dst) const
     if (needs_subset()) {
         get_dataset()->push_masks(NULL);
         tmp = Array::create(type, get_shape());
+        assert(NULL != tmp);
         get_dataset()->pop_masks();
     }
     else {
+        assert(NULL != dst);
         tmp = dst;
     }
 
@@ -177,7 +180,7 @@ Array* Netcdf4Variable::read(int64_t record, Array *dst) const
     if (dst == NULL) {
         return AbstractVariable::read_alloc(record);
     }
-    return read(record, dst);
+    return read_wrapper(record, dst);
 }
 
 
@@ -210,8 +213,10 @@ Array* Netcdf4Variable::read_wrapper(int64_t record, Array *dst) const
         get_dataset()->pop_masks();
         shape.erase(shape.begin());
         tmp = Array::create(type, shape);
+        assert(NULL != tmp);
     }
     else {
+        assert(NULL != dst);
         tmp = dst;
     }
 

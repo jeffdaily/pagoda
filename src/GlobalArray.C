@@ -129,7 +129,31 @@ DataType GlobalArray::to_dt(int type)
 
 void GlobalArray::create()
 {
+#if 0
+    /* mpich2 seems to handle distribution of the slowest (first) dimension
+     * better than the fastest (last) dimension
+     * for now, only distribute the first dimension, possibly the first two
+     * since in some cases the first dimension may have a size of 1 */
+    vector<int64_t> chunk = shape;
+    if (pagoda::num_nodes() < chunk.front()) {
+        chunk.front() = -1; /* only distribute first dimension */
+    }
+    else {
+        if (chunk.size() > 2) {
+            /* chunk only the first two dimensions */
+            chunk[0] = -1;
+            chunk[1] = -1;
+        }
+        else {
+            /* remove the custom chunking ie leave it up to GA */
+            chunk.assign(chunk.size(), -1);
+        }
+    }
+    handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name",
+            &chunk[0]);
+#else
     handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name", NULL);
+#endif
     set_distribution();
 }
 
