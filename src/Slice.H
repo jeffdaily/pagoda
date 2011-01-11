@@ -1,6 +1,8 @@
 #ifndef SLICE_H_
 #define SLICE_H_
 
+#include <stdint.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <sstream>

@@ -1,6 +1,8 @@
 #ifndef ATTRIBUTE_H_
 #define ATTRIBUTE_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 

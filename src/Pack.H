@@ -1,6 +1,8 @@
 #ifndef PACK_H_
 #define PACK_H_
 
+#include <stdint.h>
+
 #include <vector>
 
 using std::vector;

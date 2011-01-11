@@ -1,6 +1,8 @@
 #ifndef PNETCDFDIMENSION_H_
 #define PNETCDFDIMENSION_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 

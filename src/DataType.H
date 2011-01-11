@@ -1,6 +1,8 @@
 #ifndef DATATYPE_H_
 #define DATATYPE_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

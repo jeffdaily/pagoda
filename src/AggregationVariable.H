@@ -1,6 +1,8 @@
 #ifndef AGGREGATIONVARIABLE_H_
 #define AGGREGATIONVARIABLE_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

@@ -1,6 +1,8 @@
 #ifndef PNETCDFVARIABLE_H_
 #define PNETCDFVARIABLE_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

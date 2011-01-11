@@ -1,6 +1,8 @@
 #ifndef GAX_H_
 #define GAX_H_
 
+#include <stdint.h>
+
 /**
  * Extensions to the Global Arrays toolkit.
  */

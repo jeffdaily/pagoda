@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <netcdf.h>
 
 #include "Common.H"

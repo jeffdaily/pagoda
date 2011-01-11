@@ -1,5 +1,5 @@
-#ifndef PNETCDF_H
-#define PNETCDF_H
+#ifndef NETCDF4_H
+#define NETCDF4_H
 
 #include <netcdf.h>
 #include <string>
@@ -137,4 +137,4 @@ namespace nc
     */
 }; // namespace ncmpi
 
-#endif // PNETCDF_H
+#endif // NETCDF4_H

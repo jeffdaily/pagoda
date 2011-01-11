@@ -1,6 +1,8 @@
 #ifndef NETCDF4FILEWRITER_H_
 #define NETCDF4FILEWRITER_H_
 
+#include <stdint.h>
+
 #include <string>
 #include <map>
 #include <vector>

@@ -9,7 +9,7 @@
 
 #include "Debug.H"
 #include "PnetcdfError.H"
-#include "Pnetcdf.H"
+#include "PnetcdfNS.H"
 #include "PnetcdfTiming.H"
 
 using std::string;

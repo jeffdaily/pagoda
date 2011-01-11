@@ -1,6 +1,8 @@
 #ifndef ABSTRACTARRAY_H_
 #define ABSTRACTARRAY_H_
 
+#include <stdint.h>
+
 #include <vector>
 
 #include "Array.H"

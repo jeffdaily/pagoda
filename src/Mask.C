@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include "Debug.H"
 #include "Dimension.H"
 #include "GlobalMask.H"

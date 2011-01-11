@@ -1,6 +1,8 @@
 #ifndef MASKMAP_H_
 #define MASKMAP_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <map>
 #include <set>

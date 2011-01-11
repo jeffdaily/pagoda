@@ -1,6 +1,8 @@
 #ifndef DIMENSION_H_
 #define DIMENSION_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

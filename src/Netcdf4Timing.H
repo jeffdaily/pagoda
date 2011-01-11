@@ -1,9 +1,8 @@
 #ifndef NETCDF4TIMING_H
 #define NETCDF4TIMING_H
 
-#ifdef HAVE_STDINT_H
-#   include <stdint.h>
-#endif
+#include <stdint.h>
+
 #ifdef HAVE_INTTYPES_H
 #   include <inttypes.h>
 #endif

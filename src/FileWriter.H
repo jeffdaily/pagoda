@@ -1,6 +1,8 @@
 #ifndef FILEWRITER_H_
 #define FILEWRITER_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

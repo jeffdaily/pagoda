@@ -1,6 +1,8 @@
 #ifndef ABSTRACTDATASET_H_
 #define ABSTRACTDATASET_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

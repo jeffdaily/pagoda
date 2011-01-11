@@ -1,6 +1,8 @@
 #ifndef TIMING_H
 #define TIMING_H
 
+#include <stdint.h>
+
 #include <ctime>
 #include <map>
 #include <string>

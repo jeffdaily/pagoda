@@ -1,6 +1,8 @@
 #ifndef AGGREGATIONDIMENSION_H_
 #define AGGREGATIONDIMENSION_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

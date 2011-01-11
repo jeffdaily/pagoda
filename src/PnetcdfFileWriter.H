@@ -1,6 +1,8 @@
 #ifndef PNETCDFFILEWRITER_H_
 #define PNETCDFFILEWRITER_H_
 
+#include <stdint.h>
+
 #include <string>
 #include <map>
 #include <vector>

@@ -1,6 +1,8 @@
 #ifndef VARIABLE_H_
 #define VARIABLE_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

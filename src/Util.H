@@ -1,6 +1,8 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <cmath>
 #include <functional>

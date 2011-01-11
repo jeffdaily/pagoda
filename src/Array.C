@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include "Array.H"
 #include "GlobalArray.H"
 #include "NodeZeroArray.H"

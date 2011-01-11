@@ -1,6 +1,8 @@
 #ifndef DATASET_H_
 #define DATASET_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

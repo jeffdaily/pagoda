@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <cassert>
 #include <iostream>
 #include <map>

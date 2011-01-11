@@ -1,6 +1,8 @@
 #ifndef NETCDF4VARIABLE_H_
 #define NETCDF4VARIABLE_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 #include <vector>

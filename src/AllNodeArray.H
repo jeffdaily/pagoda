@@ -1,6 +1,8 @@
 #ifndef ALLNODEARRAY_H_
 #define ALLNODEARRAY_H_
 
+#include <stdint.h>
+
 #include <cmath>
 #include <vector>
 

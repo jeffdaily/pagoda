@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #ifdef HAVE_TIME_H
 #   include <time.h>
 #endif
@@ -65,12 +67,12 @@ static int g_times_width = 7;
 static int g_percent_width = 7;
 static int g_bytes_width = 7;
 static int g_log10_adjustment = 3;
-#if defined(HAVE_CLOCK_GETTIME)
+#if HAVE_CLOCK_GETTIME
 // converts bytes/nanosecond to gigabytes/second
 static double g_io_multiplier = 1000000000.0/1073741824.0; // 0.931322575
 static string UNIT_SIZE("bytes");
 static string UNIT_TIME("nanoseconds");
-#elif defined(HAVE_GETTIMEOFDAY)
+#elif HAVE_GETTIMEOFDAY
 // converts bytes/microsecond to gigabytes/second
 static double g_io_multiplier = 1000000.0/1073741824.0; // 0.000931322575
 static string UNIT_SIZE("bytes");
@@ -281,20 +283,20 @@ uint64_t Netcdf4Timing::get_time()
 {
     uint64_t value;
 
-#if defined(HAVE_CLOCK_GETTIME)
+#if HAVE_CLOCK_GETTIME
     struct timespec tp;
     (void)clock_gettime(CLOCK_MONOTONIC, &tp);
     //(void)clock_gettime(CLOCK_REALTIME, &tp);
     value = tp.tv_sec;
     value *= 1000000000;
     value += tp.tv_nsec;
-#elif defined(HAVE_GETTIMEOFDAY)
+#elif HAVE_GETTIMEOFDAY
     struct timeval tv;
     gettimeofday(&tv, NULL);
     value = tv.tv_sec;
     value *= 1000000;
     value += tv.tv_usec;
-#elif defined(HAVE_CLOCK)
+#elif HAVE_CLOCK
     value = (uint64_t)(1.0*clock()/CLOCKS_PER_SEC);
 #else
     value = time(NULL);
@@ -388,7 +390,7 @@ string Netcdf4Timing::get_stats_aggregate()
     // NOTE: There is no MPI_UNSIGNED_LONG_LONG_INT type... :-(
     MPI_Datatype type = MPI_LONG_LONG_INT;
 #else
-#   error Can't determine MPI_Datatype for uint64_t
+#   error "Can't determine MPI_Datatype for uint64_t"
 #endif
 
     // calculate total times

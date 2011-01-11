@@ -12,7 +12,7 @@
 #include "PnetcdfDataset.H"
 #include "PnetcdfError.H"
 #include "PnetcdfVariable.H"
-#include "Pnetcdf.H"
+#include "PnetcdfNS.H"
 #include "Util.H"
 #include "Values.H"
 #include "Timing.H"

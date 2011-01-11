@@ -1,10 +1,15 @@
-#include "IndexHyperslab.H"
+#if HAVE_CONFIG_H
+#   include <config.h>
+#endif
+
+#include <stdint.h>
 
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "IndexHyperslab.H"
 #include "RangeException.H"
 
 using std::istringstream;

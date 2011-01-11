@@ -1,6 +1,8 @@
 #ifndef SCALARARRAY_H_
 #define SCALARARRAY_H_
 
+#include <stdint.h>
+
 #include <vector>
 
 #include "AbstractArray.H"

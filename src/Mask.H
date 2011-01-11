@@ -1,6 +1,8 @@
 #ifndef MASK_H_
 #define MASK_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 

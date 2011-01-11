@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <functional>
 #include <sstream>

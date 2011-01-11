@@ -1,6 +1,8 @@
 #ifndef GLOBALMASK_H_
 #define GLOBALMASK_H_
 
+#include <stdint.h>
+
 #include <string>
 
 #include "GlobalArray.H"

@@ -1,6 +1,8 @@
 #ifndef NETCDF4DIMENSION_H_
 #define NETCDF4DIMENSION_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 

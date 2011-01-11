@@ -1,6 +1,8 @@
 #ifndef NODEZEROARRAY_H_
 #define NODEZEROARRAY_H_
 
+#include <stdint.h>
+
 #include <cmath>
 #include <vector>
 

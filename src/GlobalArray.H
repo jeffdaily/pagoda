@@ -1,6 +1,8 @@
 #ifndef GLOBALARRAY_H_
 #define GLOBALARRAY_H_
 
+#include <stdint.h>
+
 #include <vector>
 
 #include "AbstractArray.H"

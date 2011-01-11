@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include "AbstractArray.H"
 #include "Array.H"
 #include "Timing.H"

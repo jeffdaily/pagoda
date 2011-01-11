@@ -1,6 +1,8 @@
 #ifndef INDEXHYPERSLAB_H_
 #define INDEXHYPERSLAB_H_
 
+#include <stdint.h>
+
 #include <iostream>
 #include <string>
 

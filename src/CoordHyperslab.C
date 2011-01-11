@@ -1,10 +1,13 @@
-#include "CoordHyperslab.H"
+#if HAVE_CONFIG_H
+#   include <config.h>
+#endif
 
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "CoordHyperslab.H"
 #include "RangeException.H"
 
 using std::istringstream;

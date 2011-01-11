@@ -2,6 +2,8 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <cassert>
 #include <exception>
 #include <string>
@@ -19,7 +21,7 @@
 #include "PnetcdfFileWriter.H"
 #include "PnetcdfVariable.H"
 #include "Pack.H"
-#include "Pnetcdf.H"
+#include "PnetcdfNS.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Values.H"
