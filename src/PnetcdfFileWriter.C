@@ -31,6 +31,23 @@ using std::string;
 using std::vector;
 
 
+FileWriter* pagoda_pnetcdf_create(const string &filename)
+{
+    FileWriter *ret = NULL;
+
+    try {
+        ret = new PnetcdfFileWriter(filename);
+    } catch (PagodaException &ex) {
+        if (ret != NULL) {
+            delete ret;
+        }
+        ret = NULL;
+    }
+
+    return ret;
+}
+
+
 static int file_format_to_nc_format(FileFormat format)
 {
     assert(FF_PNETCDF_CDF1 <= format && format <= FF_PNETCDF_CDF5);

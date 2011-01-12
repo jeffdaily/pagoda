@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include <Pnetcdf.H>
+#include "PnetcdfNS.H"
 
 
 int main(int argc, char **argv)

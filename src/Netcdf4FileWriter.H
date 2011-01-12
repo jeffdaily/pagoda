@@ -12,14 +12,15 @@
 #include "FileFormat.H"
 #include "FileWriter.H"
 
-class Dataset;
-class Netcdf4Variable;
-class Variable;
-
 using std::string;
 using std::map;
 using std::vector;
 
+class Dataset;
+class Netcdf4Variable;
+class Variable;
+
+FileWriter* pagoda_netcdf4_create(const string &);
 
 /**
  * Writes a Dataset to a netcdf-4 file using netcdf4.
@@ -69,6 +70,13 @@ class Netcdf4FileWriter : public FileWriter
                            int64_t record);
         virtual void write(Array *array, const string &name,
                            const vector<int64_t> &start);
+
+        virtual void iwrite(Array *array, const string &name);
+        virtual void iwrite(Array *array, const string &name,
+                           int64_t record);
+        virtual void iwrite(Array *array, const string &name,
+                           const vector<int64_t> &start);
+        virtual void wait();
 
         virtual ostream& print(ostream &os) const;
 

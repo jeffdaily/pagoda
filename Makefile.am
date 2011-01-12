@@ -53,7 +53,7 @@ pkginclude_HEADERS += src/Debug.H
 pkginclude_HEADERS += src/Dimension.H
 pkginclude_HEADERS += src/Error.H
 pkginclude_HEADERS += src/FileWriter.H
-pkginclude_HEADERS += src/gax.H
+#pkginclude_HEADERS += src/gax.H
 pkginclude_HEADERS += src/GlobalArray.def
 pkginclude_HEADERS += src/GlobalArray.H
 pkginclude_HEADERS += src/GlobalMask.H
@@ -120,10 +120,7 @@ libpagoda_la_SOURCES += src/DataType.C
 libpagoda_la_SOURCES += src/Debug.C
 libpagoda_la_SOURCES += src/Dimension.C
 libpagoda_la_SOURCES += src/FileWriter.C
-libpagoda_la_SOURCES += src/gax.C
 libpagoda_la_SOURCES += src/GenericAttribute.C
-libpagoda_la_SOURCES += src/GlobalArray.C
-libpagoda_la_SOURCES += src/GlobalMask.C
 libpagoda_la_SOURCES += src/GenericCommands.C
 libpagoda_la_SOURCES += src/GeoGrid.C
 libpagoda_la_SOURCES += src/Grid.C
@@ -131,25 +128,10 @@ libpagoda_la_SOURCES += src/IndexHyperslab.C
 libpagoda_la_SOURCES += src/LatLonBox.C
 libpagoda_la_SOURCES += src/Mask.C
 libpagoda_la_SOURCES += src/MaskMap.C
-libpagoda_la_SOURCES += src/Memory.c
-libpagoda_la_SOURCES += src/Netcdf4Attribute.C
-libpagoda_la_SOURCES += src/Netcdf4.C
-libpagoda_la_SOURCES += src/Netcdf4Dataset.C
-libpagoda_la_SOURCES += src/Netcdf4Dimension.C
-libpagoda_la_SOURCES += src/Netcdf4FileWriter.C
-libpagoda_la_SOURCES += src/Netcdf4Timing.C
-libpagoda_la_SOURCES += src/Netcdf4Variable.C
 libpagoda_la_SOURCES += src/Pack.C
 libpagoda_la_SOURCES += src/PgboCommands.C
 libpagoda_la_SOURCES += src/PgeaCommands.C
 libpagoda_la_SOURCES += src/PgraCommands.C
-libpagoda_la_SOURCES += src/PnetcdfAttribute.C
-libpagoda_la_SOURCES += src/PnetcdfNS.C
-libpagoda_la_SOURCES += src/PnetcdfDataset.C
-libpagoda_la_SOURCES += src/PnetcdfDimension.C
-libpagoda_la_SOURCES += src/PnetcdfFileWriter.C
-libpagoda_la_SOURCES += src/PnetcdfTiming.C
-libpagoda_la_SOURCES += src/PnetcdfVariable.C
 libpagoda_la_SOURCES += src/RegularGrid.C
 libpagoda_la_SOURCES += src/ScalarArray.C
 libpagoda_la_SOURCES += src/StringComparator.C
@@ -158,6 +140,33 @@ libpagoda_la_SOURCES += src/Timing.C
 libpagoda_la_SOURCES += src/Util.C
 libpagoda_la_SOURCES += src/Values.C
 libpagoda_la_SOURCES += src/Variable.C
+
+if HAVE_GA
+#libpagoda_la_SOURCES += src/gax.C
+libpagoda_la_SOURCES += src/GlobalArray.C
+libpagoda_la_SOURCES += src/GlobalMask.C
+libpagoda_la_SOURCES += src/Memory.c
+endif
+
+if HAVE_PNETCDF
+libpagoda_la_SOURCES += src/PnetcdfAttribute.C
+libpagoda_la_SOURCES += src/PnetcdfNS.C
+libpagoda_la_SOURCES += src/PnetcdfDataset.C
+libpagoda_la_SOURCES += src/PnetcdfDimension.C
+libpagoda_la_SOURCES += src/PnetcdfFileWriter.C
+libpagoda_la_SOURCES += src/PnetcdfTiming.C
+libpagoda_la_SOURCES += src/PnetcdfVariable.C
+endif
+
+if HAVE_NETCDF4
+libpagoda_la_SOURCES += src/Netcdf4Attribute.C
+libpagoda_la_SOURCES += src/Netcdf4.C
+libpagoda_la_SOURCES += src/Netcdf4Dataset.C
+libpagoda_la_SOURCES += src/Netcdf4Dimension.C
+libpagoda_la_SOURCES += src/Netcdf4FileWriter.C
+libpagoda_la_SOURCES += src/Netcdf4Timing.C
+libpagoda_la_SOURCES += src/Netcdf4Variable.C
+endif
 
 #############################################################################
 # tests
@@ -213,26 +222,31 @@ check_PROGRAMS += sandbox/ga/TestUnion
 check_PROGRAMS += sandbox/ga/TestUnpack
 endif # ENABLE_SANDBOX_GA
 check_PROGRAMS += sandbox/TestArray
-check_PROGRAMS += sandbox/TestBin
 check_PROGRAMS += sandbox/TestCommandLine
 check_PROGRAMS += sandbox/TestDimension
-check_PROGRAMS += sandbox/TestDistance
 check_PROGRAMS += sandbox/TestEnum
 check_PROGRAMS += sandbox/TestGet
 check_PROGRAMS += sandbox/TestGrid
-check_PROGRAMS += sandbox/TestJoin
-check_PROGRAMS += sandbox/TestPnetcdfAttribute
-check_PROGRAMS += sandbox/TestPnetcdfDataset
 check_PROGRAMS += sandbox/TestMaskMap
 check_PROGRAMS += sandbox/TestPartialSum
 check_PROGRAMS += sandbox/TestRavel
 check_PROGRAMS += sandbox/TestRead
-check_PROGRAMS += sandbox/TestRead2
-check_PROGRAMS += sandbox/TestRead3
 check_PROGRAMS += sandbox/TestScatter
 check_PROGRAMS += sandbox/TestSlice
 check_PROGRAMS += sandbox/TestUnion
 check_PROGRAMS += sandbox/TestWrite
+
+if HAVE_PNETCDF
+check_PROGRAMS += sandbox/TestBin
+check_PROGRAMS += sandbox/TestDistance
+check_PROGRAMS += sandbox/TestJoin
+check_PROGRAMS += sandbox/TestPnetcdfAttribute
+check_PROGRAMS += sandbox/TestPnetcdfDataset
+check_PROGRAMS += sandbox/TestRead2
+endif
+if HAVE_NETCDF4
+check_PROGRAMS += sandbox/TestRead3
+endif
 
 sandbox_ga_TestAttribute_SOURCES      = sandbox/ga/TestAttribute.C
 sandbox_ga_TestBin_SOURCES            = sandbox/ga/TestBin.C

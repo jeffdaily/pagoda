@@ -2,7 +2,7 @@
 # autoconf
 #####################################################3
 AC_PREREQ([2.64])
-AC_INIT([pagoda], [0.2], [pagoda-dev@googlegroups.com], [pagoda],
+AC_INIT([pagoda], [0.6], [pagoda-dev@googlegroups.com], [pagoda],
         [https://svn.pnl.gov/gcrm])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
@@ -131,13 +131,12 @@ AC_CHECK_FUNCS([clock floor gettimeofday memset strtol])
 AC_SEARCH_LIBS([clock_gettime], [rt],
     [AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [Define to 1 if you have the 'clock_gettime' function.])],
     [AC_DEFINE([HAVE_CLOCK_GETTIME], [0], [Define to 1 if you have the 'clock_gettime' function.])])
+
+# MPI is required, probably for the foreseeable future.
 PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
-PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open], [], [],
-    [AC_MSG_FAILURE([Could not locate pnetcdf])])
-PAGODA_CHECK_PACKAGE([netcdf4], [netcdf.h], [netcdf], [nc_open_par],
-    [-lhdf5_hl -lhdf5 -lz -lm],
-    [NETCDF4_LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz -lm"])
+AM_CONDITIONAL([HAVE_MPI], [test "x$pg_cv_mpi_found" = xyes])
+# GA is required, for now.  Perhaps with MPI3 the GA could go...
 PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
     [AS_UNSET([ac_cv_search_GA_Initialize])
      save_LIBS="$LIBS"
@@ -146,6 +145,17 @@ PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
         [GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"],
         [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
      LIBS="$save_LIBS"])
+AM_CONDITIONAL([HAVE_GA], [test "x$pg_cv_ga_found" = xyes])
+
+# We require at least one IO library.
+PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open])
+AM_CONDITIONAL([HAVE_PNETCDF], [test "x$pg_cv_pnetcdf_found" = xyes])
+PAGODA_CHECK_PACKAGE([netcdf4], [netcdf.h], [netcdf], [nc_open_par],
+    [-lhdf5_hl -lhdf5 -lz -lm],
+    [NETCDF4_LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz -lm"])
+AM_CONDITIONAL([HAVE_NETCDF4], [test "x$pg_cv_netcdf4_found" = xyes])
+AS_CASE([$pg_cv_pnetcdf_found:$pg_cv_netcdf4_found], [no:no],
+        [AC_MSG_FAILURE([Could not locate an IO library])])
 
 # Does pnetcdf have the new nonblocking interface?
 PAGODA_PNETCDF_NB_INT

@@ -24,7 +24,7 @@
 #include <iostream>
 
 #include "Debug.H"
-#include "Pnetcdf.H"
+#include "PnetcdfNS.H"
 
 int main(int argc, char **argv)
 {

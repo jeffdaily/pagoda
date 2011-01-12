@@ -3,6 +3,7 @@
 # -----------------------------------------------------------------
 #
 AC_DEFUN([PAGODA_CHECK_PACKAGE], [
+AS_VAR_PUSHDEF([PKG_CACHE],   m4_tolower(m4_translit([pg_cv_$1_found], [-.], [__])))
 AS_VAR_PUSHDEF([HAVE_PKG],    m4_toupper(m4_translit([HAVE_$1], [-.], [__])))
 AS_VAR_PUSHDEF([PKG_LIBS],    m4_toupper(m4_translit([$1_LIBS], [-.], [__])))
 AS_VAR_PUSHDEF([PKG_LDFLAGS], m4_toupper(m4_translit([$1_LDFLAGS], [-.], [__])))
@@ -17,12 +18,13 @@ AC_ARG_WITH([$1],
     [with_$1=yes])
 AS_CASE([$with_$1],
     [yes],  [],
-    [no],   [],
+    [no],   [AS_VAR_SET([PKG_CACHE],[skipped])],
             [PAGODA_ARG_PARSE(
                 [with_$1],
                 [PKG_LIBS],
                 [PKG_LDFLAGS],
                 [PKG_CPPFLAGS])])
+AS_VAR_IF([PKG_CACHE], ["skipped"], [ac_cv_search_$4=no], [
 # Save user variables.
 pagoda_save_CPPFLAGS="$CPPFLAGS"
 pagoda_save_LDFLAGS="$LDFLAGS"
@@ -45,14 +47,18 @@ AS_IF([test "x$ac_res" != xno],
 # Restore user variables.
 LDFLAGS="$pagoda_save_LDFLAGS"
 LIBS="$pagoda_save_LIBS"
+])
 AC_SUBST(PKG_LIBS)
 AC_SUBST(PKG_LDFLAGS)
 AC_SUBST(PKG_CPPFLAGS)
 AS_IF([test "x$ac_cv_search_$4" != xno],
     [$6
      AC_DEFINE([HAVE_PKG], [1],
-        [set to 1 if we have the indicated package])],
-    [$7])
+        [set to 1 if we have the indicated package])
+     AS_VAR_SET([PKG_CACHE],[yes])],
+    [$7
+     AS_VAR_SET([PKG_CACHE],[no])])
+AS_VAR_POPDEF([PKG_CACHE])
 AS_VAR_POPDEF([HAVE_PKG])
 AS_VAR_POPDEF([PKG_LIBS])
 AS_VAR_POPDEF([PKG_LDFLAGS])

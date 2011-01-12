@@ -13,7 +13,6 @@
 #include "FileWriter.H"
 #include "GenericAttribute.H"
 #include "Mask.H"
-#include "PnetcdfFileWriter.H"
 #include "Util.H"
 #include "Timing.H"
 #include "Variable.H"
@@ -23,17 +22,32 @@ using std::string;
 using std::vector;
 
 
+vector<FileWriter::writer_t> FileWriter::writers;
+
+
 FileWriter* FileWriter::open(const string &filename)
 {
     FileWriter *writer = NULL;
+    vector<writer_t>::iterator it = FileWriter::writers.begin();
+    vector<writer_t>::iterator end = FileWriter::writers.end();
 
-    //TIMING("FileWriter::open(string)");
-    string EXT_NC(".nc");
-    if (pagoda::ends_with(filename, EXT_NC)) {
-        writer = new PnetcdfFileWriter(filename);
+    for (; it != end; ++it) {
+        writer = (*it)(filename);
+        if (NULL != writer) {
+            break;
+        }
+    }
+    if (NULL == writer) {
+        ERR("unable to create writer -- no handler found");
     }
 
     return writer;
+}
+
+
+void FileWriter::register_writer(writer_t writer)
+{
+    writers.push_back(writer);
 }
 
 

@@ -60,7 +60,7 @@ using std::vector;
 #include <pnetcdf.h>
 
 #include "Debug.H"
-#include "Pnetcdf.H"
+#include "PnetcdfNS.H"
 
 #define EPSILON 0.0001
 #define N 3

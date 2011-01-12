@@ -38,7 +38,11 @@ using std::vector;
 class FileWriter
 {
     public:
+        typedef FileWriter*(*writer_t)(const string &);
+
         static FileWriter* open(const string &filename);
+
+        static void register_writer(writer_t writer);
 
         FileWriter();
         virtual ~FileWriter();
@@ -99,6 +103,9 @@ class FileWriter
 
         virtual ostream& print(ostream &os) const = 0;
         friend ostream& operator << (ostream &os, const FileWriter *writer);
+
+    private:
+        static vector<writer_t> writers;
 };
 
 #endif // FILEWRITER_H_

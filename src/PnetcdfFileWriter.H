@@ -12,13 +12,15 @@
 #include "FileFormat.H"
 #include "FileWriter.H"
 
+using std::string;
+using std::map;
+using std::vector;
+
 class Dataset;
 class PnetcdfVariable;
 class Variable;
 
-using std::string;
-using std::map;
-using std::vector;
+FileWriter* pagoda_pnetcdf_create(const string &);
 
 
 /**
@@ -75,7 +77,6 @@ class PnetcdfFileWriter : public FileWriter
                             int64_t record);
         virtual void iwrite(Array *array, const string &name,
                             const vector<int64_t> &start);
-
         virtual void wait();
 
         virtual ostream& print(ostream &os) const;

@@ -31,6 +31,23 @@ using std::string;
 using std::vector;
 
 
+FileWriter* pagoda_netcdf4_create(const string &filename)
+{
+    FileWriter *ret = NULL;
+
+    try {
+        ret = new Netcdf4FileWriter(filename);
+    } catch (PagodaException &ex) {
+        if (ret != NULL) {
+            delete ret;
+        }
+        ret = NULL;
+    }
+
+    return ret;
+}
+
+
 static int file_format_to_nc_format(FileFormat format)
 {
     assert(FF_NETCDF4 <= format && format <= FF_NETCDF4_CLASSIC);
@@ -588,6 +605,12 @@ void Netcdf4FileWriter::write(Array *array, const string &name)
 }
 
 
+void Netcdf4FileWriter::iwrite(Array *array, const string &name)
+{
+    write(array, name);
+}
+
+
 void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
 {
     DataType type = array->get_type();
@@ -648,6 +671,12 @@ void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
 }
 
 
+void Netcdf4FileWriter::iwrite(Array *array, const string &name, int64_t record)
+{
+    write(array, name, record);
+}
+
+
 // it's a "patch" write.  the "hi" is implied by the shape of the given array
 void Netcdf4FileWriter::write(Array *array, const string &name,
                               const vector<int64_t> &start)
@@ -703,4 +732,16 @@ void Netcdf4FileWriter::write(Array *array, const string &name,
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
 #undef write_var
+}
+
+
+void Netcdf4FileWriter::iwrite(Array *array, const string &name,
+                               const vector<int64_t> &start)
+{
+    write(array, name, start);
+}
+
+
+void Netcdf4FileWriter::wait()
+{
 }
