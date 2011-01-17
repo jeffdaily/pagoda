@@ -148,21 +148,21 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/AggregationDimension.C src/AggregationJoinExisting.C \
 	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
 	src/Attribute.C src/Bootstrap.C src/CommandLineOption.C \
-	src/CommandLineParser.C src/CoordHyperslab.C src/Dataset.C \
-	src/DataType.C src/Debug.C src/Dimension.C src/FileWriter.C \
-	src/GenericAttribute.C src/GenericCommands.C src/GeoGrid.C \
-	src/Grid.C src/IndexHyperslab.C src/LatLonBox.C src/Mask.C \
-	src/MaskMap.C src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
-	src/PgraCommands.C src/RegularGrid.C src/ScalarArray.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Timing.C \
-	src/Util.C src/Values.C src/Variable.C src/GlobalArray.C \
-	src/GlobalMask.C src/Memory.c src/PnetcdfAttribute.C \
-	src/PnetcdfNS.C src/PnetcdfDataset.C src/PnetcdfDimension.C \
-	src/PnetcdfFileWriter.C src/PnetcdfTiming.C \
-	src/PnetcdfVariable.C src/Netcdf4Attribute.C src/Netcdf4.C \
-	src/Netcdf4Dataset.C src/Netcdf4Dimension.C \
-	src/Netcdf4FileWriter.C src/Netcdf4Timing.C \
-	src/Netcdf4Variable.C
+	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
+	src/Dataset.C src/DataType.C src/Debug.C src/Dimension.C \
+	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
+	src/GeoGrid.C src/Grid.C src/IndexHyperslab.C src/LatLonBox.C \
+	src/Mask.C src/MaskMap.C src/Pack.C src/PgboCommands.C \
+	src/PgeaCommands.C src/PgraCommands.C src/RegularGrid.C \
+	src/ScalarArray.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
+	src/Variable.C src/GlobalArray.C src/GlobalMask.C src/Memory.c \
+	src/PnetcdfAttribute.C src/PnetcdfNS.C src/PnetcdfDataset.C \
+	src/PnetcdfDimension.C src/PnetcdfFileWriter.C \
+	src/PnetcdfTiming.C src/PnetcdfVariable.C \
+	src/Netcdf4Attribute.C src/Netcdf4.C src/Netcdf4Dataset.C \
+	src/Netcdf4Dimension.C src/Netcdf4FileWriter.C \
+	src/Netcdf4Timing.C src/Netcdf4Variable.C
 am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_GA_TRUE@am__objects_1 = src/GlobalArray.lo src/GlobalMask.lo \
 @HAVE_GA_TRUE@	src/Memory.lo
@@ -181,7 +181,7 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractDataset.lo \
 	src/AggregationDimension.lo src/AggregationJoinExisting.lo \
 	src/AggregationUnion.lo src/AggregationVariable.lo \
 	src/Array.lo src/Attribute.lo src/Bootstrap.lo \
-	src/CommandLineOption.lo src/CommandLineParser.lo \
+	src/CommandLineOption.lo src/CommandLineParser.lo src/Copy.lo \
 	src/CoordHyperslab.lo src/Dataset.lo src/DataType.lo \
 	src/Debug.lo src/Dimension.lo src/FileWriter.lo \
 	src/GenericAttribute.lo src/GenericCommands.lo src/GeoGrid.lo \
@@ -874,7 +874,7 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/AggregationUnion.H src/AggregationVariable.H \
 	src/AllNodeArray.H src/Array.H src/Attribute.H src/Bootstrap.H \
 	src/CommandLineOption.H src/CommandLineParser.H src/Common.H \
-	src/CoordHyperslab.H src/Dataset.H src/DataType.def \
+	src/Copy.H src/CoordHyperslab.H src/Dataset.H src/DataType.def \
 	src/DataType.H src/Debug.H src/Dimension.H src/Error.H \
 	src/FileWriter.H src/GlobalArray.def src/GlobalArray.H \
 	src/GlobalMask.H src/GenericCommands.H src/GeoGrid.H \
@@ -897,15 +897,15 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractDataset.C \
 	src/AggregationDimension.C src/AggregationJoinExisting.C \
 	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
 	src/Attribute.C src/Bootstrap.C src/CommandLineOption.C \
-	src/CommandLineParser.C src/CoordHyperslab.C src/Dataset.C \
-	src/DataType.C src/Debug.C src/Dimension.C src/FileWriter.C \
-	src/GenericAttribute.C src/GenericCommands.C src/GeoGrid.C \
-	src/Grid.C src/IndexHyperslab.C src/LatLonBox.C src/Mask.C \
-	src/MaskMap.C src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
-	src/PgraCommands.C src/RegularGrid.C src/ScalarArray.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Timing.C \
-	src/Util.C src/Values.C src/Variable.C $(am__append_1) \
-	$(am__append_2) $(am__append_3)
+	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
+	src/Dataset.C src/DataType.C src/Debug.C src/Dimension.C \
+	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
+	src/GeoGrid.C src/Grid.C src/IndexHyperslab.C src/LatLonBox.C \
+	src/Mask.C src/MaskMap.C src/Pack.C src/PgboCommands.C \
+	src/PgeaCommands.C src/PgraCommands.C src/RegularGrid.C \
+	src/ScalarArray.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
+	src/Variable.C $(am__append_1) $(am__append_2) $(am__append_3)
 tests_FillValue_SOURCES = tests/FillValue.C
 tests_FillValue_DEPENDENCIES = $(am__append_4) libpagoda.la
 AM_V_NCGEN = $(am__v_NCGEN_$(V))
@@ -1064,6 +1064,7 @@ src/CommandLineOption.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/CommandLineParser.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/Copy.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/CoordHyperslab.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/Dataset.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1480,6 +1481,8 @@ mostlyclean-compile:
 	-rm -f src/CommandLineParser.lo
 	-rm -f src/CoordHyperslab.$(OBJEXT)
 	-rm -f src/CoordHyperslab.lo
+	-rm -f src/Copy.$(OBJEXT)
+	-rm -f src/Copy.lo
 	-rm -f src/DataType.$(OBJEXT)
 	-rm -f src/DataType.lo
 	-rm -f src/Dataset.$(OBJEXT)
@@ -1626,6 +1629,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CommandLineOption.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CommandLineParser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CoordHyperslab.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Copy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/DataType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Debug.Plo@am__quote@

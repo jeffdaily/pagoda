@@ -167,7 +167,6 @@ namespace pagoda
         return os.str();
     }
 
-
 } // namespace pagoda
 
 #endif // UTIL_H_

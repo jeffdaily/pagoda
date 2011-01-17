@@ -124,8 +124,9 @@ class PnetcdfFileWriter : public FileWriter
         map<string,vector<int> >     var_dims;
         map<string,vector<int64_t> > var_shape;
 
-        vector<int> requests;
-        vector<Array*> arrays_to_release;
+        vector<int> nb_requests;
+        vector<Array*> nb_arrays_to_release;
+        vector<void*> nb_buffers_to_delete;
 
         bool open;
 };

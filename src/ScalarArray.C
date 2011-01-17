@@ -12,7 +12,7 @@
 
 
 ScalarArray::ScalarArray(DataType type)
-    :   AbstractArray()
+    :   AbstractArray(type)
     ,   type(type)
     ,   value(NULL)
 {

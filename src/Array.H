@@ -55,6 +55,26 @@ class Array
         virtual DataType get_type() const = 0;
 
         /**
+         * Gets the DataType to use when writing the data.
+         */
+        virtual DataType get_write_type() const = 0;
+
+        /**
+         * Sets the DataType to use when writing the data.
+         */
+        virtual void set_write_type(DataType type) = 0;
+
+        /**
+         * Gets the DataType to use when writing the data.
+         */
+        virtual DataType get_read_type() const = 0;
+
+        /**
+         * Sets the DataType to use when writing the data.
+         */
+        virtual void set_read_type(DataType type) = 0;
+
+        /**
          * Returns the shape of the Array.
          *
          * @return the shape

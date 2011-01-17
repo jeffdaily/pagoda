@@ -6,15 +6,18 @@
 
 #include "AbstractArray.H"
 #include "Array.H"
+#include "DataType.H"
 #include "Timing.H"
 #include "Util.H"
 
 
-AbstractArray::AbstractArray()
+AbstractArray::AbstractArray(DataType type)
     :   Array()
     ,   _has_fill_value(false)
     ,   _fill_value(0.0)
     ,   counter(NULL)
+    ,   write_type(type)
+    ,   read_type(type)
 {
     TIMING("AbstractArray::AbstractArray()");
 }
@@ -25,6 +28,8 @@ AbstractArray::AbstractArray(const AbstractArray &that)
     ,   _has_fill_value(that._has_fill_value)
     ,   _fill_value(that._fill_value)
     ,   counter(that.counter)
+    ,   write_type(that.write_type)
+    ,   read_type(that.write_type)
 {
     TIMING("AbstractArray::AbstractArray()");
     /** @todo should counter be deep copied? */
@@ -34,6 +39,30 @@ AbstractArray::AbstractArray(const AbstractArray &that)
 AbstractArray::~AbstractArray()
 {
     TIMING("AbstractArray::~AbstractArray()");
+}
+
+
+DataType AbstractArray::get_write_type() const
+{
+    return write_type;
+}
+
+
+void AbstractArray::set_write_type(DataType type)
+{
+    write_type = type;
+}
+
+
+DataType AbstractArray::get_read_type() const
+{
+    return read_type;
+}
+
+
+void AbstractArray::set_read_type(DataType type)
+{
+    read_type = type;
 }
 
 

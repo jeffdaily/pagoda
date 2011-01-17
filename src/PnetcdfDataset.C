@@ -106,10 +106,6 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     ,   atts()
     ,   dims()
     ,   vars()
-    ,   requests()
-    ,   arrays_to_release()
-    ,   arrays_to_pack()
-    ,   vars_to_pack()
     ,   is_open(false)
 {
     TIMING("PnetcdfDataset::PnetcdfDataset(string)");
@@ -254,12 +250,29 @@ PnetcdfVariable* PnetcdfDataset::get_var(size_t i) const
 
 void PnetcdfDataset::wait()
 {
+    vector<int> requests;
+    vector<PnetcdfVariable*>::iterator var_it;
+    vector<PnetcdfVariable*>::iterator var_end = vars.end();
+
     TIMING("PnetcdfDataset::wait()");
 
+    // gather requests from all Variables
+    for (var_it=vars.begin(); var_it!=var_end; ++var_it) {
+        PnetcdfVariable *var = *var_it;
+        requests.insert(requests.end(),
+                var->nb_requests.begin(), var->nb_requests.end());
+    }
     if (!requests.empty()) {
         vector<int> statuses(requests.size());
         ncmpi::wait_all(ncid, requests, statuses);
         requests.clear();
+        // now post process the Variables
+        for (var_it=vars.begin(); var_it!=var_end; ++var_it) {
+            PnetcdfVariable *var = *var_it;
+            var->after_wait();
+        }
+    }
+#if 0
         // release Array pointers
         for (size_t i=0; i<arrays_to_release.size(); ++i) {
             arrays_to_release[i]->release_update();
@@ -284,7 +297,7 @@ void PnetcdfDataset::wait()
         arrays_to_release.clear();
         arrays_to_pack.clear();
         vars_to_pack.clear();
-    }
+#endif
 }
 
 

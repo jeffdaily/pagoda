@@ -121,15 +121,6 @@ class PnetcdfDataset : public AbstractDataset
         vector<PnetcdfAttribute*> atts; /**< all attributes */
         vector<PnetcdfDimension*> dims; /**< all dimensions */
         vector<PnetcdfVariable*> vars; /**< all variables */
-
-        vector<int> requests; /**< non-blocking io requests */
-        vector<Array*> arrays_to_release; /**< arrays associated with
-                                            non-blocking IO which need to be
-                                            Array::release()'d once the IO is
-                                            finished */
-        vector<Array*> arrays_to_pack; /**< arrays associated with
-                                         non-blocking subsets */
-        vector<const PnetcdfVariable*> vars_to_pack;
         bool is_open; /**< whether this Dataset is open */
 };
 

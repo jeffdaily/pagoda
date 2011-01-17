@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+#include "DataType.H"
 #include "Debug.H"
 #include "Dimension.H"
 #include "GlobalMask.H"
@@ -29,7 +30,7 @@ Mask* Mask::create(const Dimension *dim)
 
 
 Mask::Mask()
-    :   AbstractArray()
+    :   AbstractArray(DataType::NOT_A_TYPE)
 {
     TIMING("Mask::Mask()");
 }

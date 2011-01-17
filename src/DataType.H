@@ -8,8 +8,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "Util.H"
-
 using std::ostringstream;
 using std::ostream;
 using std::runtime_error;
@@ -27,6 +25,7 @@ using std::string;
 class DataType
 {
     public:
+        static const DataType NOT_A_TYPE;
         static const DataType CHAR;
         static const DataType SHORT;
         static const DataType INT;
@@ -95,6 +94,13 @@ class DataType
         }
 
         /**
+         * Cast to an int.
+         */
+        operator int () const {
+            return id;
+        }
+
+        /**
          * Returns the C type size for this DataType.
          */
         int64_t get_bytes() const;
@@ -115,6 +121,8 @@ class DataType
         string name; /**< name of this DataType */
 };
 
+// Yes, this is here on purpose and not at the top of the file.
+#include "Util.H"
 
 /**
  * An exception as a result of a DataType mismatch, conversion problem, etc.

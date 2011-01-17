@@ -9,6 +9,7 @@
 
 
 int DataType::next_id(1);
+const DataType DataType::NOT_A_TYPE("not a type");
 const DataType DataType::CHAR("char");
 const DataType DataType::SHORT("short");
 const DataType DataType::INT("int");
@@ -472,3 +473,4 @@ template <> DataType DataType::ctype<std::string>()
 {
     return DataType::STRING;
 }
+

@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+#include <cassert>
+
 #include "Array.H"
 #include "GlobalArray.H"
 #include "NodeZeroArray.H"
@@ -14,25 +16,37 @@
 
 Array* Array::create(DataType type, vector<int64_t> shape)
 {
-    // GlobalArray doesn't handle all types. Those not handled instantiate a
-    // NodeZeroArray instead.
+    Array *ret = NULL;
+
     TIMING("Array::create(DataType,vector<int64_t>)");
+
+    // GlobalArray doesn't handle all types. Those not handled use a different
+    // read and write types.
     if (shape.empty()) {
-        return new ScalarArray(type);
+        ret = new ScalarArray(type);
     }
     else if (type == DataType::CHAR) {
-        return new NodeZeroArray<char>(shape);
+        ret = new GlobalArray(DataType::INT, shape);
+        ret->set_read_type(DataType::CHAR);
+        ret->set_write_type(DataType::CHAR);
     }
     else if (type == DataType::UCHAR) {
-        return new NodeZeroArray<unsigned char>(shape);
+        ret = new GlobalArray(DataType::INT, shape);
+        ret->set_write_type(DataType::UCHAR);
     }
     else if (type == DataType::SCHAR) {
-        return new NodeZeroArray<signed char>(shape);
+        ret = new GlobalArray(DataType::INT, shape);
+        ret->set_write_type(DataType::SCHAR);
     }
     else if (type == DataType::SHORT) {
-        return new NodeZeroArray<short>(shape);
+        ret = new GlobalArray(DataType::INT, shape);
+        ret->set_write_type(DataType::SHORT);
+    } else {
+        ret = new GlobalArray(type, shape);
     }
-    return new GlobalArray(type, shape);
+    assert(NULL != ret);
+
+    return ret;
 }
 
 
@@ -47,13 +61,7 @@ Array* Array::create(DataType type, vector<Dimension*> dims)
         shape.push_back((*it)->get_size());
     }
 
-    if (dims.empty()) {
-        return new ScalarArray(type);
-    }
-    else if (type == DataType::CHAR) {
-        return new NodeZeroArray<char>(shape);
-    }
-    return new GlobalArray(type, shape);
+    return Array::create(type, shape);
 }
 
 

@@ -12,6 +12,7 @@
 #include <ga.h>
 #include <macdecls.h>
 
+#include "Copy.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Error.H"
@@ -31,15 +32,6 @@ static bool less_than(InputIterator1 first1, InputIterator1 last1, Value value)
         ++first1;
     }
     return true;
-}
-
-
-template <class T, class InputIterator1, class InputIterator2>
-static void copy_cast(InputIterator1 first, InputIterator1 last, InputIterator2 result)
-{
-    while (first!=last) {
-        *result++ = static_cast<T>(*first++);
-    }
 }
 
 
@@ -161,7 +153,7 @@ void GlobalArray::create()
 
 
 GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
-    :   AbstractArray()
+    :   AbstractArray(type)
     ,   handle(0)
     ,   type(type)
     ,   shape(shape)
@@ -173,7 +165,7 @@ GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
 
 
 GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
-    :   AbstractArray()
+    :   AbstractArray(type)
     ,   handle(0)
     ,   type(type)
     ,   shape()
@@ -330,7 +322,7 @@ GlobalArray* GlobalArray::cast(DataType new_type) const
             if (to_ga(type) == src_mt && to_ga(dst_array->type) == dst_mt) { \
                 src_t *src = (src_t*)src_data; \
                 dst_t *dst = (dst_t*)dst_data; \
-                copy_cast<dst_t>(src,src+get_size(),dst); \
+                pagoda::copy_cast<dst_t>(src,src+get_size(),dst); \
             } else
             cast_helper(C_INT,     int,        C_INT,int)
             cast_helper(C_LONG,    long,       C_INT,int)

@@ -28,6 +28,18 @@ class AbstractArray : public Array
         /** @copydoc Array::get_type() const */
         virtual DataType get_type() const = 0;
 
+        /** @copydoc Array::get_write_type() const */
+        virtual DataType get_write_type() const;
+
+        /** @copydoc Array::set_write_type() */
+        virtual void set_write_type(DataType type);
+
+        /** @copydoc Array::get_read_type() const */
+        virtual DataType get_read_type() const;
+
+        /** @copydoc Array::set_read_type() */
+        virtual void set_read_type(DataType type);
+
         /** @copydoc Array::get_shape() const */
         virtual vector<int64_t> get_shape() const = 0;
 
@@ -175,7 +187,7 @@ class AbstractArray : public Array
 
     protected:
         /** Constructs the AbstractArray. */
-        AbstractArray();
+        AbstractArray(DataType type);
 
         /**
          * Constructs the AbstractArray from a copy.
@@ -195,6 +207,8 @@ class AbstractArray : public Array
         bool _has_fill_value; /**< @todo document */
         double _fill_value; /**< @todo document */
         Array *counter; /**< @todo document */
+        DataType write_type;
+        DataType read_type;
 };
 
 #endif /* ABSTRACTARRAY_H_ */

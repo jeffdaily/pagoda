@@ -12,6 +12,7 @@
 #include <pnetcdf.h>
 
 #include "Attribute.H"
+#include "Copy.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
@@ -176,8 +177,9 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     ,   var_id()
     ,   var_dims()
     ,   var_shape()
-    ,   requests()
-    ,   arrays_to_release()
+    ,   nb_requests()
+    ,   nb_arrays_to_release()
+    ,   nb_buffers_to_delete()
     ,   open(false)
 {
 }
@@ -734,23 +736,38 @@ void PnetcdfFileWriter::do_write(Array *array, int varid,
                                  bool nonblocking)
 {
     DataType type = array->get_type();
+    DataType write_type = array->get_write_type();
+    int64_t n = array->get_local_size();
 
 #define write_var_all(TYPE, DT) \
-    if (type == DT) { \
+    if (write_type == DT) { \
         TYPE *ptr = NULL; \
         if (array->owns_data()) { \
-            ptr = (TYPE*)array->access(); \
+            if (write_type == type) { \
+                ptr = (TYPE*)array->access(); \
+            } else { \
+                void *gabuf = array->access(); \
+                ptr = new TYPE[n]; \
+                pagoda::copy(type, gabuf, write_type, ptr, n); \
+                array->release(); \
+            } \
         } \
         if (nonblocking) { \
             int request; \
             request = ncmpi::iput_vara(ncid, varid, start, count, ptr); \
-            requests.push_back(request); \
-            arrays_to_release.push_back(array); \
+            nb_requests.push_back(request); \
+            if (write_type == type) { \
+                nb_arrays_to_release.push_back(array); \
+                nb_buffers_to_delete.push_back(NULL); \
+            } else { \
+                nb_arrays_to_release.push_back(array); \
+                nb_buffers_to_delete.push_back(ptr); \
+            } \
         } else { \
             ncmpi::put_vara_all(ncid, varid, start, count, ptr); \
-        } \
-        if (array->owns_data()) { \
-            array->release(); \
+            if (array->owns_data()) { \
+                array->release(); \
+            } \
         } \
     } else
     write_var_all(unsigned char, DataType::UCHAR)
@@ -760,7 +777,7 @@ void PnetcdfFileWriter::do_write(Array *array, int varid,
     write_var_all(long,          DataType::LONG)
     write_var_all(float,         DataType::FLOAT)
     write_var_all(double,        DataType::DOUBLE) {
-        EXCEPT(DataTypeException, "DataType not handled", type);
+        EXCEPT(DataTypeException, "DataType not handled", write_type);
     }
 #undef write_var_all
 }
@@ -770,15 +787,28 @@ void PnetcdfFileWriter::wait()
 {
     TIMING("PnetcdfFileWriter::wait()");
 
-    if (!requests.empty()) {
-        vector<int> statuses(requests.size());
-        ncmpi::wait_all(ncid, requests, statuses);
-        requests.clear();
+    if (!nb_requests.empty()) {
+        vector<int> statuses(nb_requests.size());
+        ncmpi::wait_all(ncid, nb_requests, statuses);
         // release Array pointers
-        for (size_t i=0; i<arrays_to_release.size(); ++i) {
-            arrays_to_release[i]->release();
+        for (size_t i=0; i<nb_arrays_to_release.size(); ++i) {
+            if (NULL != nb_buffers_to_delete[i]) {
+                DataType type = nb_arrays_to_release[i]->get_write_type();
+#define DATATYPE_EXPAND(DT,T) \
+                if (DT == type) { \
+                    T *buf = static_cast<T*>(nb_buffers_to_delete[i]); \
+                    delete [] buf; \
+                    buf = NULL; \
+                } else
+#include "DataType.def"
+                nb_buffers_to_delete[i] = NULL;
+            } else {
+                nb_arrays_to_release[i]->release();
+            }
         }
-        arrays_to_release.clear();
+        nb_requests.clear();
+        nb_arrays_to_release.clear();
+        nb_buffers_to_delete.clear();
     }
 }
 

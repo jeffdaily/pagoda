@@ -11,6 +11,7 @@
 #include "Array.H"
 #include "Attribute.H"
 #include "Common.H"
+#include "Copy.H"
 #include "Debug.H"
 #include "Mask.H"
 #include "PnetcdfAttribute.H"
@@ -33,7 +34,7 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     ,   name("")
     ,   dims()
     ,   atts()
-    ,   type(DataType::CHAR)
+    ,   type(DataType::NOT_A_TYPE)
 {
     TIMING("PnetcdfVariable::PnetcdfVariable(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
@@ -100,7 +101,7 @@ Array* PnetcdfVariable::read(Array *dst) const
     if (dst == NULL) {
         return AbstractVariable::read_alloc();
     }
-    return read(dst, false);
+    return _read(dst);
 }
 
 
@@ -109,22 +110,41 @@ Array* PnetcdfVariable::iread(Array *dst)
     if (dst == NULL) {
         return AbstractVariable::iread_alloc();
     }
-    return read(dst, true);
+    return _iread(dst);
 }
 
 
-Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
+Array* PnetcdfVariable::read(int64_t record, Array *dst) const
+{
+    if (dst == NULL) {
+        return AbstractVariable::read_alloc(record);
+    }
+    return _read(record, dst);
+}
+
+
+Array* PnetcdfVariable::iread(int64_t record, Array *dst)
+{
+    if (dst == NULL) {
+        return AbstractVariable::iread_alloc(record);
+    }
+    return _iread(record, dst);
+}
+
+
+Array* PnetcdfVariable::read_prep(Array *dst,
+        vector<MPI_Offset> &start, vector<MPI_Offset> &count,
+        bool &found_bit) const
 {
     int64_t ndim = get_ndim();
     vector<int64_t> lo(ndim);
     vector<int64_t> hi(ndim);
-    vector<MPI_Offset> start(ndim);
-    vector<MPI_Offset> count(ndim);
-    bool found_bit = true;
     Array *tmp;
 
-    TRACER("PnetcdfVariable::read(Array*) %s\n", get_name().c_str());
-    TIMING("PnetcdfVariable::read(Array*)");
+    // propagate fill value to Array
+    if (has_fill_value()) {
+        dst->set_fill_value(get_fill_value());
+    }
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into i.e. subset occurs after the fact
@@ -157,68 +177,76 @@ Array* PnetcdfVariable::read(Array *dst, bool nonblocking) const
         fill(count.begin(), count.end(), 0);
     }
 
-    do_read(tmp, start, count, found_bit, nonblocking);
+    return tmp;
+}
 
-    if (nonblocking) {
-        // can't perform subset until read is finished
-        if (needs_subset()) {
-            get_netcdf_dataset()->arrays_to_pack.push_back(dst);
-            get_netcdf_dataset()->vars_to_pack.push_back(this);
-        } else {
-            get_netcdf_dataset()->arrays_to_pack.push_back(NULL);
-            get_netcdf_dataset()->vars_to_pack.push_back(NULL);
-        }
-    } else {
-        // check whether a subset is needed
-        if (needs_subset()) {
-            pagoda::pack(tmp, dst, get_masks());
-            delete tmp;
-            if (needs_renumber()) {
-                renumber(dst);
-            }
-        }
-    }
 
-    // propagate fill value to Array
-    if (has_fill_value()) {
-        dst->set_fill_value(get_fill_value());
+Array* PnetcdfVariable::_read(Array *dst) const
+{
+    int64_t ndim = get_ndim();
+    vector<MPI_Offset> start(ndim);
+    vector<MPI_Offset> count(ndim);
+    bool found_bit = true;
+    Array *tmp;
+
+    TRACER("PnetcdfVariable::_read(Array*) %s\n", get_name().c_str());
+    TIMING("PnetcdfVariable::_read(Array*)");
+
+    tmp = read_prep(dst, start, count, found_bit);
+    do_read(tmp, start, count, found_bit);
+
+    // check whether a subset is needed
+    if (needs_subset()) {
+        pagoda::pack(tmp, dst, get_masks());
+        delete tmp;
+        if (needs_renumber()) {
+            renumber(dst);
+        }
     }
 
     return dst;
 }
 
 
-Array* PnetcdfVariable::read(int64_t record, Array *dst) const
+Array* PnetcdfVariable::_iread(Array *dst)
 {
-    if (dst == NULL) {
-        return AbstractVariable::read_alloc(record);
+    int64_t ndim = get_ndim();
+    vector<MPI_Offset> start(ndim);
+    vector<MPI_Offset> count(ndim);
+    bool found_bit = true;
+    Array *tmp;
+
+    TRACER("PnetcdfVariable::_iread(Array*) %s\n", get_name().c_str());
+    TIMING("PnetcdfVariable::_iread(Array*)");
+
+    tmp = read_prep(dst, start, count, found_bit);
+    do_iread(tmp, start, count, found_bit);
+
+    // can't perform subset until read is finished
+    if (needs_subset()) {
+        nb_arrays_to_pack.push_back(dst);
+    } else {
+        nb_arrays_to_pack.push_back(NULL);
     }
-    return read(record, dst, false);
+
+    return dst;
 }
 
 
-Array* PnetcdfVariable::iread(int64_t record, Array *dst)
-{
-    if (dst == NULL) {
-        return AbstractVariable::iread_alloc(record);
-    }
-    return read(record, dst, true);
-}
-
-
-Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
+Array* PnetcdfVariable::read_prep(Array *dst,
+        vector<MPI_Offset> &start, vector<MPI_Offset> &count,
+        bool &found_bit, int64_t record) const
 {
     int64_t ndim = get_ndim();
     vector<int64_t> lo(ndim);
     vector<int64_t> hi(ndim);
-    vector<MPI_Offset> start(ndim);
-    vector<MPI_Offset> count(ndim);
     vector<Dimension*> adims(dims.begin()+1,dims.end());
-    bool found_bit = true;
     Array *tmp;
 
-    TRACER("PnetcdfVariable::read(int64_t,Array*) %s\n", get_name().c_str());
-    TIMING("PnetcdfVariable::read(int64_t,Array*)");
+    // propagate fill value to Array
+    if (has_fill_value(record)) {
+        dst->set_fill_value(get_fill_value(record));
+    }
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into i.e. subset occurs after the fact
@@ -261,33 +289,58 @@ Array* PnetcdfVariable::read(int64_t record, Array *dst, bool nonblocking) const
         fill(count.begin(), count.end(), 0);
     }
 
-    do_read(tmp, start, count, found_bit, nonblocking);
+    return tmp;
+}
 
-    if (nonblocking) {
-        // can't perform subset until read is finished
-        if (needs_subset_record()) {
-            get_netcdf_dataset()->arrays_to_pack.push_back(dst);
-            get_netcdf_dataset()->vars_to_pack.push_back(this);
-        } else {
-            get_netcdf_dataset()->arrays_to_pack.push_back(NULL);
-            get_netcdf_dataset()->vars_to_pack.push_back(NULL);
-        }
-    } else {
-        // check whether a subset is needed
-        if (needs_subset_record()) {
-            vector<Mask*> masks = get_masks();
-            masks.erase(masks.begin());
-            pagoda::pack(tmp, dst, masks);
-            delete tmp;
-            if (needs_renumber()) {
-                renumber(dst);
-            }
+
+Array* PnetcdfVariable::_read(int64_t record, Array *dst) const
+{
+    int64_t ndim = get_ndim();
+    vector<MPI_Offset> start(ndim);
+    vector<MPI_Offset> count(ndim);
+    bool found_bit = true;
+    Array *tmp;
+
+    TRACER("PnetcdfVariable::_read(int64_t,Array*) %s\n", get_name().c_str());
+    TIMING("PnetcdfVariable::_read(int64_t,Array*)");
+
+    tmp = read_prep(dst, start, count, found_bit, record);
+    do_read(tmp, start, count, found_bit);
+
+    // check whether a subset is needed
+    if (needs_subset_record()) {
+        vector<Mask*> masks = get_masks();
+        masks.erase(masks.begin());
+        pagoda::pack(tmp, dst, masks);
+        delete tmp;
+        if (needs_renumber()) {
+            renumber(dst);
         }
     }
 
-    // propagate fill value to Array
-    if (has_fill_value(record)) {
-        dst->set_fill_value(get_fill_value(record));
+    return dst;
+}
+
+
+Array* PnetcdfVariable::_iread(int64_t record, Array *dst)
+{
+    int64_t ndim = get_ndim();
+    vector<MPI_Offset> start(ndim);
+    vector<MPI_Offset> count(ndim);
+    bool found_bit = true;
+    Array *tmp;
+
+    TRACER("PnetcdfVariable::_read(int64_t,Array*) %s\n", get_name().c_str());
+    TIMING("PnetcdfVariable::_read(int64_t,Array*)");
+
+    tmp = read_prep(dst, start, count, found_bit, record);
+    do_iread(tmp, start, count, found_bit);
+
+    // can't perform subset until read is finished
+    if (needs_subset_record()) {
+        nb_arrays_to_pack.push_back(dst);
+    } else {
+        nb_arrays_to_pack.push_back(NULL);
     }
 
     return dst;
@@ -330,28 +383,33 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 
 
 void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
-                              const vector<MPI_Offset> &count, bool found_bit,
-                              bool nonblocking) const
+                              const vector<MPI_Offset> &count,
+                              bool found_bit) const
 {
     int ncid = get_netcdf_dataset()->get_id();
-    DataType type = dst->get_type();
+    const DataType read_type = dst->get_read_type();
+    const DataType type = dst->get_type();
 
 #define read_var_all(TYPE, DT) \
-    if (type == DT) { \
+    if (read_type == DT) { \
         TYPE *ptr = NULL; \
         if (dst->owns_data() && found_bit) { \
-            ptr = (TYPE*)dst->access(); \
-        } \
-        if (nonblocking) { \
-            int request; \
-            request = ncmpi::iget_vara(ncid, id, start, count, ptr); \
-            get_netcdf_dataset()->requests.push_back(request); \
-            get_netcdf_dataset()->arrays_to_release.push_back(dst); \
-        } else { \
+            int64_t n = dst->get_local_size(); \
+            if (read_type == type) { \
+                ptr = (TYPE*)dst->access(); \
+            } else { \
+                ptr = new TYPE[n]; \
+            } \
             ncmpi::get_vara_all(ncid, id, start, count, ptr); \
-        } \
-        if (dst->owns_data() && found_bit && !nonblocking) { \
-            dst->release_update(); \
+            if (dst->owns_data() && found_bit) { \
+                if (read_type != type) { \
+                    void *gabuf = NULL; \
+                    gabuf = dst->access(); \
+                    pagoda::copy(read_type,ptr,type,gabuf,n); \
+                    delete [] ptr; \
+                } \
+                dst->release_update(); \
+            } \
         } \
     } else
     read_var_all(unsigned char, DataType::UCHAR)
@@ -360,10 +418,101 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
     read_var_all(int,           DataType::INT)
     read_var_all(long,          DataType::LONG)
     read_var_all(float,         DataType::FLOAT)
-    read_var_all(double,        DataType::DOUBLE) {
-        EXCEPT(DataTypeException, "DataType not handled", type);
+    read_var_all(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", read_type);
     }
 #undef read_var_all
+}
+
+
+void PnetcdfVariable::do_iread(Array *dst, const vector<MPI_Offset> &start,
+                               const vector<MPI_Offset> &count,
+                               bool found_bit)
+{
+    int ncid = get_netcdf_dataset()->get_id();
+    const DataType read_type = dst->get_read_type();
+    const DataType type = dst->get_type();
+
+#define read_var_all(TYPE, DT) \
+    if (read_type == DT) { \
+        int request; \
+        TYPE *ptr = NULL; \
+        if (dst->owns_data() && found_bit) { \
+            int64_t n = dst->get_local_size(); \
+            if (read_type == type) { \
+                ptr = (TYPE*)dst->access(); \
+                nb_buffers.push_back(NULL); \
+                nb_arrays_to_release.push_back(dst); \
+            } else {\
+                ptr = new TYPE[n]; \
+                nb_buffers.push_back(ptr); \
+                nb_arrays_to_release.push_back(dst); \
+            } \
+        } \
+        request = ncmpi::iget_vara(ncid, id, start, count, ptr); \
+        nb_requests.push_back(request); \
+    } else
+    read_var_all(unsigned char, DataType::UCHAR)
+    read_var_all(signed char,   DataType::SCHAR)
+    read_var_all(char,          DataType::CHAR)
+    read_var_all(int,           DataType::INT)
+    read_var_all(long,          DataType::LONG)
+    read_var_all(float,         DataType::FLOAT)
+    read_var_all(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", read_type);
+    }
+#undef read_var_all
+}
+
+
+void PnetcdfVariable::after_wait()
+{
+    for (size_t i=0; i<nb_requests.size(); ++i) {
+        if (NULL != nb_buffers[i]) {
+            // the read type differed from the stored type
+            void *buf = nb_buffers[i];
+            Array *dst = nb_arrays_to_release[i];
+            void *gabuf = dst->access();
+            DataType type = dst->get_read_type();
+            DataType ga_type = dst->get_type();
+            int64_t n = dst->get_local_size(); \
+            pagoda::copy(type,buf,ga_type,gabuf,n);
+            dst->release_update();
+#define DATATYPE_EXPAND(DT,T) \
+            if (DT == type) { \
+                T *tbuf = static_cast<T*>(buf); \
+                delete [] tbuf; \
+                tbuf = NULL; \
+            } else
+#include "DataType.def"
+        } else {
+            // read type same as stored type, simple release
+            Array *dst = nb_arrays_to_release[i];
+            dst->release_update();
+        }
+
+        // pack if needed
+        if (NULL != nb_arrays_to_pack[i]) {
+            Array *dst = nb_arrays_to_pack[i];
+            Array *src = nb_arrays_to_release[i];
+            vector<Mask*> masks = get_masks();
+            if (int64_t(masks.size()) == (src->get_ndim()+1)) {
+                // assume this was a record subset
+                masks.erase(masks.begin());
+            }
+            pagoda::pack(src, dst, masks);
+            if (needs_renumber()) {
+                renumber(dst);
+            }
+        }
+    }
+
+    nb_arrays_to_release.clear();
+    nb_arrays_to_pack.clear();
+    nb_buffers.clear();
+    nb_requests.clear();
 }
 
 

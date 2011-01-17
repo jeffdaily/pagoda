@@ -30,7 +30,7 @@ PnetcdfAttribute::PnetcdfAttribute(
     ,   var(var)
     ,   id(attid)
     ,   name("")
-    ,   type(DataType::CHAR)
+    ,   type(DataType::NOT_A_TYPE)
     ,   values(NULL)
 {
     int ncid = dataset->get_id();

@@ -50,13 +50,26 @@ class PnetcdfVariable : public AbstractVariable
         friend class PnetcdfDataset;
 
     protected:
-        Array* read(Array *dst, bool nonblocking) const;
-        Array* read(int64_t record, Array *dst, bool nonblocking) const;
-        bool find_bit(const vector<Dimension*> &adims,
-                      const vector<int64_t> &lo, const vector<int64_t> &hi) const;
+        Array* _read(Array *dst) const;
+        Array* _read(int64_t record, Array *dst) const;
         void do_read(Array *dst, const vector<MPI_Offset> &start,
-                     const vector<MPI_Offset> &count, bool found_bit,
-                     bool nonblocking) const;
+                     const vector<MPI_Offset> &count, bool found_bit) const;
+
+        Array* _iread(Array *dst);
+        Array* _iread(int64_t record, Array *dst);
+        void do_iread(Array *dst, const vector<MPI_Offset> &start,
+                      const vector<MPI_Offset> &count, bool found_bit);
+        void after_wait();
+
+        Array* read_prep(Array *dst,
+                vector<MPI_Offset> &start, vector<MPI_Offset> &count,
+                bool &found_bit) const;
+        Array* read_prep(Array *dst,
+                vector<MPI_Offset> &start, vector<MPI_Offset> &count,
+                bool &found_bit, int64_t record) const;
+        bool find_bit(const vector<Dimension*> &adims,
+                      const vector<int64_t> &lo,
+                      const vector<int64_t> &hi) const;
 
         virtual bool needs_renumber() const;
         virtual void renumber(Array *array) const;
@@ -67,6 +80,11 @@ class PnetcdfVariable : public AbstractVariable
         vector<PnetcdfDimension*> dims;
         vector<PnetcdfAttribute*> atts;
         DataType type;
+
+        vector<int> nb_requests; /**< non-blocking io requests */
+        vector<void*> nb_buffers; /**< when type != read_type */
+        vector<Array*> nb_arrays_to_release;
+        vector<Array*> nb_arrays_to_pack;
 };
 
 #endif // PNETCDFVARIABLE_H_

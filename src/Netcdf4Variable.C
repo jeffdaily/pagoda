@@ -34,7 +34,7 @@ Netcdf4Variable::Netcdf4Variable(Netcdf4Dataset *dataset, int varid)
     ,   name("")
     ,   dims()
     ,   atts()
-    ,   type(DataType::CHAR)
+    ,   type(DataType::NOT_A_TYPE)
 {
     TIMING("Netcdf4Variable::Netcdf4Variable(Netcdf4Dataset*,int)");
     int ncid = dataset->get_id();
