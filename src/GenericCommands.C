@@ -376,6 +376,7 @@ FileWriter* GenericCommands::get_output() const
     ->overwrite(overwrite)
     ->fixed_record_dimension(record_dimension_size)
     ->header_pad(header_pad)
+    ->file_format(file_format)
     ->create();
 
     return writer;
