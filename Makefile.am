@@ -16,11 +16,17 @@ AM_LDFLAGS = $(PROFILE) $(PNETCDF_LDFLAGS) $(NETCDF4_LDFLAGS) $(GA_LDFLAGS)
 LDADD = libpagoda.la $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS) $(FLIBS)
 EXTRA_DIST =
+MOSTLYCLEANFILES =
 CLEANFILES =
 DISTCLEANFILES =
+MAINTAINERCLEANFILES =
 
 bin_PROGRAMS = pgdump pgsub pgbo pgra pgea pgcmp
 lib_LTLIBRARIES = libpagoda.la
+check_PROGRAMS =
+check_DATA =
+pkginclude_HEADERS =
+pagodadir = $(datadir)/pagoda
 
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
@@ -29,7 +35,6 @@ pgra_SOURCES = src/pgra.C
 pgea_SOURCES = src/pgea.C
 pgcmp_SOURCES = src/pgcmp.C
 
-pkginclude_HEADERS =
 pkginclude_HEADERS += src/AbstractArray.H
 pkginclude_HEADERS += src/AbstractDataset.H
 pkginclude_HEADERS += src/AbstractVariable.H
@@ -171,11 +176,89 @@ libpagoda_la_SOURCES += src/Netcdf4Variable.C
 endif
 
 #############################################################################
+# data
+#
+.PHONY: fetch
+if ENABLE_FETCH
+fetch: $(FETCHED)
+else
+fetch:
+	@echo "fetching of data was not enabled, use configure --enable-fetch"
+endif
+
+FETCHED =
+FETCHED += data/cdf1_reg.nc
+FETCHED += data/cdf2_geo.nc
+FETCHED += data/cdf5_geo.nc
+FETCHED += data/nc4_geo.nc
+
+DISTCLEANFILES += data/cdf1_reg.nc
+DISTCLEANFILES += data/cdf2_geo.nc
+DISTCLEANFILES += data/cdf5_geo.nc
+DISTCLEANFILES += data/nc4_geo.nc
+
+CDF1_REG_FILENAME = b30.004.cam2.h0.0001-01.nc
+CDF2_GEO_FILENAME = wind_19010101_000000.nc
+CDF5_GEO_FILENAME = temperature_19010101_000000.nc
+NC4_GEO_FILENAME  = geopotential_19010101_000000.nc
+
+URL_BASE = http://climate.pnl.gov/data
+CDF1_REG_URL = $(URL_BASE)/cdf1/CCSM_b30.004/$(CDF1_REG_FILENAME)
+CDF2_GEO_URL = $(URL_BASE)/cdf2/hydro_r6_12day_5956431/$(CDF2_GEO_FILENAME)
+CDF5_GEO_URL = $(URL_BASE)/cdf5/$(CDF5_GEO_FILENAME)
+NC4_GEO_URL  = $(URL_BASE)/nc4/atmos_r5_6day_jab_6905922/$(NC4_GEO_FILENAME)
+
+
+data/cdf1_reg.nc: data/$(am__dirstamp)
+if HAVE_WGET
+	$(WGET) $(CDF1_REG_URL) && mv $(CDF1_REG_FILENAME) $@ && touch $@
+else
+if HAVE_CURL
+	$(CURL) $(CDF1_REG_URL) -o $@ && touch $@
+else
+	@echo "No means of retrieving $@"
+endif
+endif
+
+data/cdf2_geo.nc: data/$(am__dirstamp)
+if HAVE_WGET
+	$(WGET) $(CDF2_GEO_URL) && mv $(CDF2_GEO_FILENAME) $@ && touch $@
+else
+if HAVE_CURL
+	$(CURL) $(CDF2_GEO_URL) -o $@ && touch $@
+else
+	@echo "No means of retrieving $@"
+endif
+endif
+
+data/cdf5_geo.nc: data/$(am__dirstamp)
+if HAVE_WGET
+	$(WGET) $(CDF5_GEO_URL) && mv $(CDF5_GEO_FILENAME) $@ && touch $@
+else
+if HAVE_CURL
+	$(CURL) $(CDF5_GEO_URL) -o $@ && touch $@
+else
+	@echo "No means of retrieving $@"
+endif
+endif
+
+data/nc4_geo.nc: data/$(am__dirstamp)
+if HAVE_WGET
+	cd data && $(WGET) $(NC4_GEO_URL) && mv $(NC4_GEO_FILENAME) nc4_geo.nc && touch $@
+else
+if HAVE_CURL
+	cd data && $(CURL) $(NC4_GEO_URL) -o nc4_geo.nc && touch $@
+else
+	@echo "No means of retrieving nc4_geo.nc"
+endif
+endif
+
+#############################################################################
 # tests
 #
-check_PROGRAMS =
-check_PROGRAMS += tests/FillValue
 
+## Build additional test programs.
+check_PROGRAMS += tests/FillValue
 tests_FillValue_SOURCES = tests/FillValue.C
 tests_FillValue_DEPENDENCIES = 
 if HAVE_NCGEN
@@ -189,17 +272,18 @@ am__v_NCGEN_0 = @echo "  NCGEN " $@;
 .cdl.nc:
 	$(AM_V_NCGEN)$(NCGEN) -o $@ $<
 
-EXTRA_DIST += data/FillValue.cdl
-
 data/FillValue.nc: data/$(am__dirstamp)
 
-CLEANFILES += data/FillValue.nc
+EXTRA_DIST += data/FillValue.cdl
+MOSTLYCLEANFILES += data/FillValue.nc
+DISTCLEANFILES += data/$(am__dirstamp)
 
 data/$(am__dirstamp):
 	@$(MKDIR_P) data
 	@: > data/$(am__dirstamp)
 
-DISTCLEANFILES += data/$(am__dirstamp)
+## Test suite.
+TESTS = tests/pgra.test
 
 #############################################################################
 # sandbox
@@ -222,33 +306,6 @@ check_PROGRAMS += sandbox/ga/TestScanAdd
 check_PROGRAMS += sandbox/ga/TestSort
 check_PROGRAMS += sandbox/ga/TestUnion
 check_PROGRAMS += sandbox/ga/TestUnpack
-endif # ENABLE_SANDBOX_GA
-check_PROGRAMS += sandbox/TestArray
-check_PROGRAMS += sandbox/TestCommandLine
-check_PROGRAMS += sandbox/TestDimension
-check_PROGRAMS += sandbox/TestEnum
-check_PROGRAMS += sandbox/TestGet
-check_PROGRAMS += sandbox/TestGrid
-check_PROGRAMS += sandbox/TestMaskMap
-check_PROGRAMS += sandbox/TestPartialSum
-check_PROGRAMS += sandbox/TestRavel
-check_PROGRAMS += sandbox/TestRead
-check_PROGRAMS += sandbox/TestScatter
-check_PROGRAMS += sandbox/TestSlice
-check_PROGRAMS += sandbox/TestUnion
-check_PROGRAMS += sandbox/TestWrite
-
-if HAVE_PNETCDF
-check_PROGRAMS += sandbox/TestBin
-check_PROGRAMS += sandbox/TestDistance
-check_PROGRAMS += sandbox/TestJoin
-check_PROGRAMS += sandbox/TestPnetcdfAttribute
-check_PROGRAMS += sandbox/TestPnetcdfDataset
-check_PROGRAMS += sandbox/TestRead2
-endif
-if HAVE_NETCDF4
-check_PROGRAMS += sandbox/TestRead3
-endif
 
 sandbox_ga_TestAttribute_SOURCES      = sandbox/ga/TestAttribute.C
 sandbox_ga_TestBin_SOURCES            = sandbox/ga/TestBin.C
@@ -266,6 +323,36 @@ sandbox_ga_TestScanAdd_SOURCES        = sandbox/ga/TestScanAdd.C
 sandbox_ga_TestSort_SOURCES           = sandbox/ga/TestSort.C
 sandbox_ga_TestUnion_SOURCES          = sandbox/ga/TestUnion.C
 sandbox_ga_TestUnpack_SOURCES         = sandbox/ga/TestUnpack.c
+
+sandbox_ga_TestGet_LDADD = $(LDADD_STANDALONE)
+endif # ENABLE_SANDBOX_GA
+
+check_PROGRAMS += sandbox/TestArray
+check_PROGRAMS += sandbox/TestCommandLine
+check_PROGRAMS += sandbox/TestDimension
+check_PROGRAMS += sandbox/TestEnum
+check_PROGRAMS += sandbox/TestGet
+check_PROGRAMS += sandbox/TestGrid
+check_PROGRAMS += sandbox/TestMaskMap
+check_PROGRAMS += sandbox/TestPartialSum
+check_PROGRAMS += sandbox/TestRavel
+check_PROGRAMS += sandbox/TestRead
+check_PROGRAMS += sandbox/TestScatter
+check_PROGRAMS += sandbox/TestSlice
+check_PROGRAMS += sandbox/TestUnion
+check_PROGRAMS += sandbox/TestWrite
+if HAVE_PNETCDF
+check_PROGRAMS += sandbox/TestBin
+check_PROGRAMS += sandbox/TestDistance
+check_PROGRAMS += sandbox/TestJoin
+check_PROGRAMS += sandbox/TestPnetcdfAttribute
+check_PROGRAMS += sandbox/TestPnetcdfDataset
+check_PROGRAMS += sandbox/TestRead2
+endif
+if HAVE_NETCDF4
+check_PROGRAMS += sandbox/TestRead3
+endif
+
 sandbox_TestArray_SOURCES             = sandbox/TestArray.C
 sandbox_TestBin_SOURCES               = sandbox/TestBin.C
 sandbox_TestCommandLine_SOURCES       = sandbox/TestCommandLine.C
@@ -288,5 +375,4 @@ sandbox_TestSlice_SOURCES             = sandbox/TestSlice.C
 sandbox_TestUnion_SOURCES             = sandbox/TestUnion.C
 sandbox_TestWrite_SOURCES             = sandbox/TestWrite.C
 
-sandbox_ga_TestGet_LDADD = $(LDADD_STANDALONE)
 endif # ENABLE_SANDBOX

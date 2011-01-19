@@ -12,7 +12,7 @@ AC_CONFIG_SRCDIR([src/pagoda.H])
 #####################################################3
 # automake
 #####################################################3
-AM_INIT_AUTOMAKE([foreign silent-rules subdir-objects])
+AM_INIT_AUTOMAKE([foreign parallel-tests silent-rules subdir-objects])
 AM_DISABLE_SHARED
 
 #####################################################3
@@ -103,6 +103,7 @@ PAGODA_CXX_VARIADIC_MACROS([],
 AC_CHECK_SIZEOF([void *])
 AC_CHECK_SIZEOF([char])
 AC_CHECK_SIZEOF([unsigned char])
+AC_CHECK_SIZEOF([signed char])
 AC_CHECK_SIZEOF([short])
 AC_CHECK_SIZEOF([unsigned short])
 AC_CHECK_SIZEOF([int])
@@ -136,6 +137,7 @@ AC_SEARCH_LIBS([clock_gettime], [rt],
 PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
     [AC_MSG_FAILURE([Could not locate Message Passing Interface])])
 AM_CONDITIONAL([HAVE_MPI], [test "x$pg_cv_mpi_found" = xyes])
+
 # GA is required, for now.  Perhaps with MPI3 the GA could go...
 PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
     [AS_UNSET([ac_cv_search_GA_Initialize])
@@ -147,13 +149,19 @@ PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
      LIBS="$save_LIBS"])
 AM_CONDITIONAL([HAVE_GA], [test "x$pg_cv_ga_found" = xyes])
 
-# We require at least one IO library.
+# Check for pnetcdf.
 PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open])
 AM_CONDITIONAL([HAVE_PNETCDF], [test "x$pg_cv_pnetcdf_found" = xyes])
+AC_SUBST([have_pnetcdf], [$pg_cv_pnetcdf_found])
+
+# Check for netcdf4.
 PAGODA_CHECK_PACKAGE([netcdf4], [netcdf.h], [netcdf], [nc_open_par],
     [-lhdf5_hl -lhdf5 -lz -lm],
     [NETCDF4_LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz -lm"])
 AM_CONDITIONAL([HAVE_NETCDF4], [test "x$pg_cv_netcdf4_found" = xyes])
+AC_SUBST([have_netcdf4], [$pg_cv_netcdf4_found])
+
+# We require at least one IO library.
 AS_CASE([$pg_cv_pnetcdf_found:$pg_cv_netcdf4_found], [no:no],
         [AC_MSG_FAILURE([Could not locate an IO library])])
 
@@ -187,18 +195,49 @@ AM_CONDITIONAL([WARNINGS], [test x$enable_warnings = xyes])
 #####################################################3
 # Misc.
 #####################################################3
+
 # Whether to build the sandbox programs.
 AC_ARG_ENABLE([sandbox],
-    [AS_HELP_STRING([--enable-sandbox], [build sandbox programs])])
+    [AS_HELP_STRING([--enable-sandbox], [build sandbox programs])],
+    [],
+    [enable_sandbox=no])
 AM_CONDITIONAL([ENABLE_SANDBOX], [test "x$enable_sandbox" = xyes])
+AC_SUBST([enable_sandbox])
+
 # Whether to build Global Arrays programs within the sandbox.
 AC_ARG_ENABLE([sandbox-ga],
     [AS_HELP_STRING([--enable-sandbox-ga],
-                    [build Global Arrays sandbox programs])])
+                    [build Global Arrays sandbox programs])],
+    [],
+    [enable_sandbox_ga=no])
 AM_CONDITIONAL([ENABLE_SANDBOX_GA], [test "x$enable_sandbox_ga" = xyes])
+AC_SUBST([enable_sandbox_ga])
 
+# Wether to allow fetching of sample data.
+AC_ARG_ENABLE([fetch],
+    [AS_HELP_STRING([--enable-fetch], [fetch sample data for testing])],
+    [],
+    [enable_fetch=no])
+AM_CONDITIONAL([ENABLE_FETCH], [test "x$enable_fetch" = xyes])
+AC_SUBST([enable_fetch])
+
+AC_ARG_VAR([NCGEN], [program to generate *.nc files from *.cdl files])
 AC_PATH_PROG([NCGEN], [ncgen])
 AM_CONDITIONAL([HAVE_NCGEN], [test "x$NCGEN" != x])
+
+AC_ARG_VAR([WGET], [program to retrieve input files for tests])
+AC_PATH_PROG([WGET], [wget])
+AM_CONDITIONAL([HAVE_WGET], [test "x$WGET" != x])
+
+AC_ARG_VAR([CURL],
+    [in the absense of $WGET, program to retrieve input files for tests])
+AC_PATH_PROG([CURL], [curl])
+AM_CONDITIONAL([HAVE_CURL], [test "x$CURL" != x])
+
+AC_ARG_VAR([MPIRUN], [how to launch MPI programs])
+AC_PATH_PROG([MPIRUN], [mpirun])
+AM_CONDITIONAL([HAVE_MPIRUN], [test "x$MPIRUN" != x])
+AC_SUBST([MPIRUN])
 
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but
@@ -216,5 +255,5 @@ LT_INIT
 #####################################################3
 # The End.
 #####################################################3
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile defs])
 AC_OUTPUT

@@ -38,6 +38,8 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT) \
 	pgra$(EXEEXT) pgea$(EXEEXT) pgcmp$(EXEEXT)
+check_PROGRAMS = tests/FillValue$(EXEEXT) $(am__EXEEXT_1) \
+	$(am__EXEEXT_2) $(am__EXEEXT_3) $(am__EXEEXT_4)
 
 #libpagoda_la_SOURCES += src/gax.C
 @HAVE_GA_TRUE@am__append_1 = src/GlobalArray.C src/GlobalMask.C \
@@ -51,8 +53,6 @@ bin_PROGRAMS = pgdump$(EXEEXT) pgsub$(EXEEXT) pgbo$(EXEEXT) \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4Dataset.C src/Netcdf4Dimension.C \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4FileWriter.C src/Netcdf4Timing.C \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4Variable.C
-check_PROGRAMS = tests/FillValue$(EXEEXT) $(am__EXEEXT_1) \
-	$(am__EXEEXT_2) $(am__EXEEXT_3) $(am__EXEEXT_4)
 @HAVE_NCGEN_TRUE@am__append_4 = data/FillValue.nc
 
 #############################################################################
@@ -94,10 +94,11 @@ check_PROGRAMS = tests/FillValue$(EXEEXT) $(am__EXEEXT_1) \
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(top_srcdir)/configure AUTHORS COPYING \
-	INSTALL NEWS THANKS build-aux/compile build-aux/config.guess \
-	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
-	build-aux/ltmain.sh build-aux/missing
+	$(srcdir)/config.h.in $(srcdir)/defs.in \
+	$(top_srcdir)/configure AUTHORS COPYING INSTALL NEWS THANKS \
+	build-aux/compile build-aux/config.guess build-aux/config.sub \
+	build-aux/depcomp build-aux/install-sh build-aux/ltmain.sh \
+	build-aux/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/lt_obsolete.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -116,7 +117,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = defs
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -446,8 +447,7 @@ sandbox_TestWrite_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestAttribute_SOURCES_DIST =  \
 	sandbox/ga/TestAttribute.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestAttribute_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestAttribute.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestAttribute_OBJECTS = sandbox/ga/TestAttribute.$(OBJEXT)
 sandbox_ga_TestAttribute_OBJECTS =  \
 	$(am_sandbox_ga_TestAttribute_OBJECTS)
 sandbox_ga_TestAttribute_LDADD = $(LDADD)
@@ -455,8 +455,7 @@ sandbox_ga_TestAttribute_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestBin_SOURCES_DIST = sandbox/ga/TestBin.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestBin_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestBin.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestBin_OBJECTS = sandbox/ga/TestBin.$(OBJEXT)
 sandbox_ga_TestBin_OBJECTS = $(am_sandbox_ga_TestBin_OBJECTS)
 sandbox_ga_TestBin_LDADD = $(LDADD)
 sandbox_ga_TestBin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
@@ -464,8 +463,7 @@ sandbox_ga_TestBin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestDimension_SOURCES_DIST =  \
 	sandbox/ga/TestDimension.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestDimension_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestDimension.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestDimension_OBJECTS = sandbox/ga/TestDimension.$(OBJEXT)
 sandbox_ga_TestDimension_OBJECTS =  \
 	$(am_sandbox_ga_TestDimension_OBJECTS)
 sandbox_ga_TestDimension_LDADD = $(LDADD)
@@ -473,8 +471,7 @@ sandbox_ga_TestDimension_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestDistance_SOURCES_DIST = sandbox/ga/TestDistance.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestDistance_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestDistance.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestDistance_OBJECTS = sandbox/ga/TestDistance.$(OBJEXT)
 sandbox_ga_TestDistance_OBJECTS =  \
 	$(am_sandbox_ga_TestDistance_OBJECTS)
 sandbox_ga_TestDistance_LDADD = $(LDADD)
@@ -482,24 +479,20 @@ sandbox_ga_TestDistance_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestEnum_SOURCES_DIST = sandbox/ga/TestEnum.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestEnum_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestEnum.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestEnum_OBJECTS = sandbox/ga/TestEnum.$(OBJEXT)
 sandbox_ga_TestEnum_OBJECTS = $(am_sandbox_ga_TestEnum_OBJECTS)
 sandbox_ga_TestEnum_LDADD = $(LDADD)
 sandbox_ga_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestGet_SOURCES_DIST = sandbox/ga/TestGet.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestGet_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestGet.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestGet_OBJECTS = sandbox/ga/TestGet.$(OBJEXT)
 sandbox_ga_TestGet_OBJECTS = $(am_sandbox_ga_TestGet_OBJECTS)
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_DEPENDENCIES =  \
-@ENABLE_SANDBOX_TRUE@	$(am__DEPENDENCIES_2)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestJoin_SOURCES_DIST = sandbox/ga/TestJoin.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestJoin_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestJoin.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestJoin_OBJECTS = sandbox/ga/TestJoin.$(OBJEXT)
 sandbox_ga_TestJoin_OBJECTS = $(am_sandbox_ga_TestJoin_OBJECTS)
 sandbox_ga_TestJoin_LDADD = $(LDADD)
 sandbox_ga_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
@@ -507,8 +500,7 @@ sandbox_ga_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestLocateRegion_SOURCES_DIST =  \
 	sandbox/ga/TestLocateRegion.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestLocateRegion_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestLocateRegion.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestLocateRegion_OBJECTS = sandbox/ga/TestLocateRegion.$(OBJEXT)
 sandbox_ga_TestLocateRegion_OBJECTS =  \
 	$(am_sandbox_ga_TestLocateRegion_OBJECTS)
 sandbox_ga_TestLocateRegion_LDADD = $(LDADD)
@@ -517,8 +509,7 @@ sandbox_ga_TestLocateRegion_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestPartialSum_SOURCES_DIST =  \
 	sandbox/ga/TestPartialSum.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestPartialSum_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestPartialSum.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestPartialSum_OBJECTS = sandbox/ga/TestPartialSum.$(OBJEXT)
 sandbox_ga_TestPartialSum_OBJECTS =  \
 	$(am_sandbox_ga_TestPartialSum_OBJECTS)
 sandbox_ga_TestPartialSum_LDADD = $(LDADD)
@@ -527,8 +518,7 @@ sandbox_ga_TestPartialSum_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestPnetcdfDataset_SOURCES_DIST =  \
 	sandbox/ga/TestPnetcdfDataset.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestPnetcdfDataset_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestPnetcdfDataset.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestPnetcdfDataset_OBJECTS = sandbox/ga/TestPnetcdfDataset.$(OBJEXT)
 sandbox_ga_TestPnetcdfDataset_OBJECTS =  \
 	$(am_sandbox_ga_TestPnetcdfDataset_OBJECTS)
 sandbox_ga_TestPnetcdfDataset_LDADD = $(LDADD)
@@ -536,48 +526,42 @@ sandbox_ga_TestPnetcdfDataset_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestRavel_SOURCES_DIST = sandbox/ga/TestRavel.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestRavel_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestRavel.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestRavel_OBJECTS = sandbox/ga/TestRavel.$(OBJEXT)
 sandbox_ga_TestRavel_OBJECTS = $(am_sandbox_ga_TestRavel_OBJECTS)
 sandbox_ga_TestRavel_LDADD = $(LDADD)
 sandbox_ga_TestRavel_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestRead_SOURCES_DIST = sandbox/ga/TestRead.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestRead_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestRead.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestRead_OBJECTS = sandbox/ga/TestRead.$(OBJEXT)
 sandbox_ga_TestRead_OBJECTS = $(am_sandbox_ga_TestRead_OBJECTS)
 sandbox_ga_TestRead_LDADD = $(LDADD)
 sandbox_ga_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestScanAdd_SOURCES_DIST = sandbox/ga/TestScanAdd.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestScanAdd_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestScanAdd.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestScanAdd_OBJECTS = sandbox/ga/TestScanAdd.$(OBJEXT)
 sandbox_ga_TestScanAdd_OBJECTS = $(am_sandbox_ga_TestScanAdd_OBJECTS)
 sandbox_ga_TestScanAdd_LDADD = $(LDADD)
 sandbox_ga_TestScanAdd_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__sandbox_ga_TestSort_SOURCES_DIST = sandbox/ga/TestSort.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestSort_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestSort.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestSort_OBJECTS = sandbox/ga/TestSort.$(OBJEXT)
 sandbox_ga_TestSort_OBJECTS = $(am_sandbox_ga_TestSort_OBJECTS)
 sandbox_ga_TestSort_LDADD = $(LDADD)
 sandbox_ga_TestSort_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestUnion_SOURCES_DIST = sandbox/ga/TestUnion.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestUnion_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestUnion.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestUnion_OBJECTS = sandbox/ga/TestUnion.$(OBJEXT)
 sandbox_ga_TestUnion_OBJECTS = $(am_sandbox_ga_TestUnion_OBJECTS)
 sandbox_ga_TestUnion_LDADD = $(LDADD)
 sandbox_ga_TestUnion_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__sandbox_ga_TestUnpack_SOURCES_DIST = sandbox/ga/TestUnpack.c
-@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestUnpack_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestUnpack.$(OBJEXT)
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestUnpack_OBJECTS = sandbox/ga/TestUnpack.$(OBJEXT)
 sandbox_ga_TestUnpack_OBJECTS = $(am_sandbox_ga_TestUnpack_OBJECTS)
 sandbox_ga_TestUnpack_LDADD = $(LDADD)
 sandbox_ga_TestUnpack_DEPENDENCIES = libpagoda.la \
@@ -700,6 +684,56 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 HEADERS = $(pkginclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
+am__tty_colors = \
+red=; grn=; lgn=; blu=; std=
+# Restructured Text title and section.
+am__rst_title = sed 's/.*/   &   /;h;s/./=/g;p;x;p;g;p;s/.*//'
+am__rst_section = sed 'p;s/./=/g;p;g'
+# Put stdin (possibly several lines separated by ".  ") in a box.
+am__text_box = $(AWK) '{				\
+  n = split($$0, lines, "\\.  "); max = 0;		\
+  for (i = 1; i <= n; ++i)				\
+    if (max < length(lines[i]))				\
+      max = length(lines[i]);				\
+  for (i = 0; i < max; ++i) line = line "=";		\
+  print line;						\
+  for (i = 1; i <= n; ++i) if (lines[i]) print lines[i];\
+  print line;						\
+}'
+# Solaris 10 'make', and several other traditional 'make' implementations,
+# pass "-e" to $(SHELL).  This contradicts POSIX.  Work around the problem
+# by disabling -e (using the XSI extension "set +e") if it's set.
+am__sh_e_setup = case $$- in *e*) set +e;; esac
+# To be inserted before the command running the test.  Creates the
+# directory for the log if needed.  Stores in $dir the directory
+# containing $f, in $tst the test, in $log the log, and passes
+# TESTS_ENVIRONMENT.  Save and restore TERM around use of
+# TESTS_ENVIRONMENT, in case that unsets it.
+am__check_pre = \
+$(am__sh_e_setup);					\
+$(am__vpath_adj_setup) $(am__vpath_adj)			\
+srcdir=$(srcdir); export srcdir;			\
+rm -f $@-t;						\
+trap 'st=$$?; rm -f '\''$(abs_builddir)/$@-t'\''; (exit $$st); exit $$st' \
+  1 2 13 15;						\
+am__odir=`echo "./$@" | sed 's|/[^/]*$$||'`;		\
+test "x$$am__odir" = x. || $(MKDIR_P) "$$am__odir" || exit $$?;	\
+if test -f "./$$f"; then dir=./;			\
+elif test -f "$$f"; then dir=;				\
+else dir="$(srcdir)/"; fi;				\
+tst=$$dir$$f; log='$@'; __SAVED_TERM=$$TERM;		\
+$(TESTS_ENVIRONMENT)
+RECHECK_LOGS = $(TEST_LOGS)
+AM_RECURSIVE_TARGETS = check check-html recheck recheck-html
+TEST_SUITE_LOG = test-suite.log
+TEST_SUITE_HTML = $(TEST_SUITE_LOG:.log=.html)
+TEST_EXTENSIONS = @EXEEXT@ .test
+am__test_logs1 = $(TESTS:=.log)
+am__test_logs2 = $(am__test_logs1:@EXEEXT@.log=.log)
+TEST_LOGS = $(am__test_logs2:.test.log=.log)
+TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
+	$(TEST_LOG_FLAGS)
+TEST_LOGS_TMP = $(TEST_LOGS:.log=.log-t)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -724,6 +758,7 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CURL = @CURL@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -763,6 +798,7 @@ LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
+MPIRUN = @MPIRUN@
 MPI_CPPFLAGS = @MPI_CPPFLAGS@
 MPI_LDFLAGS = @MPI_LDFLAGS@
 MPI_LIBS = @MPI_LIBS@
@@ -793,6 +829,7 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WGET = @WGET@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -818,7 +855,12 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_fetch = @enable_fetch@
+enable_sandbox = @enable_sandbox@
+enable_sandbox_ga = @enable_sandbox_ga@
 exec_prefix = @exec_prefix@
+have_netcdf4 = @have_netcdf4@
+have_pnetcdf = @have_pnetcdf@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -858,15 +900,13 @@ AM_LDFLAGS = $(PROFILE) $(PNETCDF_LDFLAGS) $(NETCDF4_LDFLAGS) $(GA_LDFLAGS)
 LDADD = libpagoda.la $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS) $(FLIBS)
 LDADD_STANDALONE = $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS) $(FLIBS)
 EXTRA_DIST = data/FillValue.cdl
-CLEANFILES = data/FillValue.nc
-DISTCLEANFILES = data/$(am__dirstamp)
+MOSTLYCLEANFILES = data/FillValue.nc
+CLEANFILES = 
+DISTCLEANFILES = data/cdf1_reg.nc data/cdf2_geo.nc data/cdf5_geo.nc \
+	data/nc4_geo.nc data/$(am__dirstamp)
+MAINTAINERCLEANFILES = 
 lib_LTLIBRARIES = libpagoda.la
-pgdump_SOURCES = src/pgdump.C
-pgsub_SOURCES = src/pgsub.C
-pgbo_SOURCES = src/pgbo.C
-pgra_SOURCES = src/pgra.C
-pgea_SOURCES = src/pgea.C
-pgcmp_SOURCES = src/pgcmp.C
+check_DATA = 
 #pkginclude_HEADERS += src/gax.H
 pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/AbstractVariable.H src/AggregationDimension.H \
@@ -892,6 +932,13 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/ScalarArray.H src/Slice.H src/StringComparator.H \
 	src/SubsetterCommands.H src/Timing.H src/TypedValues.H \
 	src/Util.H src/Values.H src/Variable.H
+pagodadir = $(datadir)/pagoda
+pgdump_SOURCES = src/pgdump.C
+pgsub_SOURCES = src/pgsub.C
+pgbo_SOURCES = src/pgbo.C
+pgra_SOURCES = src/pgra.C
+pgea_SOURCES = src/pgea.C
+pgcmp_SOURCES = src/pgcmp.C
 libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractDataset.C \
 	src/AbstractVariable.C src/Aggregation.C \
 	src/AggregationDimension.C src/AggregationJoinExisting.C \
@@ -906,27 +953,40 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractDataset.C \
 	src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C src/Values.C \
 	src/Variable.C $(am__append_1) $(am__append_2) $(am__append_3)
+FETCHED = data/cdf1_reg.nc data/cdf2_geo.nc data/cdf5_geo.nc \
+	data/nc4_geo.nc
+CDF1_REG_FILENAME = b30.004.cam2.h0.0001-01.nc
+CDF2_GEO_FILENAME = wind_19010101_000000.nc
+CDF5_GEO_FILENAME = temperature_19010101_000000.nc
+NC4_GEO_FILENAME = geopotential_19010101_000000.nc
+URL_BASE = http://climate.pnl.gov/data
+CDF1_REG_URL = $(URL_BASE)/cdf1/CCSM_b30.004/$(CDF1_REG_FILENAME)
+CDF2_GEO_URL = $(URL_BASE)/cdf2/hydro_r6_12day_5956431/$(CDF2_GEO_FILENAME)
+CDF5_GEO_URL = $(URL_BASE)/cdf5/$(CDF5_GEO_FILENAME)
+NC4_GEO_URL = $(URL_BASE)/nc4/atmos_r5_6day_jab_6905922/$(NC4_GEO_FILENAME)
 tests_FillValue_SOURCES = tests/FillValue.C
 tests_FillValue_DEPENDENCIES = $(am__append_4) libpagoda.la
 AM_V_NCGEN = $(am__v_NCGEN_$(V))
 am__v_NCGEN_ = $(am__v_NCGEN_$(AM_DEFAULT_VERBOSITY))
 am__v_NCGEN_0 = @echo "  NCGEN " $@;
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestAttribute_SOURCES = sandbox/ga/TestAttribute.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestBin_SOURCES = sandbox/ga/TestBin.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestDimension_SOURCES = sandbox/ga/TestDimension.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestDistance_SOURCES = sandbox/ga/TestDistance.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestEnum_SOURCES = sandbox/ga/TestEnum.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_SOURCES = sandbox/ga/TestGet.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestJoin_SOURCES = sandbox/ga/TestJoin.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestLocateRegion_SOURCES = sandbox/ga/TestLocateRegion.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestPnetcdfDataset_SOURCES = sandbox/ga/TestPnetcdfDataset.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestPartialSum_SOURCES = sandbox/ga/TestPartialSum.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestRavel_SOURCES = sandbox/ga/TestRavel.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestRead_SOURCES = sandbox/ga/TestRead.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestScanAdd_SOURCES = sandbox/ga/TestScanAdd.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestSort_SOURCES = sandbox/ga/TestSort.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestUnion_SOURCES = sandbox/ga/TestUnion.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestUnpack_SOURCES = sandbox/ga/TestUnpack.c
+TESTS = tests/pgra.test
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestAttribute_SOURCES = sandbox/ga/TestAttribute.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestBin_SOURCES = sandbox/ga/TestBin.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestDimension_SOURCES = sandbox/ga/TestDimension.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestDistance_SOURCES = sandbox/ga/TestDistance.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestEnum_SOURCES = sandbox/ga/TestEnum.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_SOURCES = sandbox/ga/TestGet.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestJoin_SOURCES = sandbox/ga/TestJoin.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestLocateRegion_SOURCES = sandbox/ga/TestLocateRegion.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestPnetcdfDataset_SOURCES = sandbox/ga/TestPnetcdfDataset.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestPartialSum_SOURCES = sandbox/ga/TestPartialSum.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestRavel_SOURCES = sandbox/ga/TestRavel.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestRead_SOURCES = sandbox/ga/TestRead.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestScanAdd_SOURCES = sandbox/ga/TestScanAdd.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestSort_SOURCES = sandbox/ga/TestSort.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestUnion_SOURCES = sandbox/ga/TestUnion.C
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestUnpack_SOURCES = sandbox/ga/TestUnpack.c
+@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_LDADD = $(LDADD_STANDALONE)
 @ENABLE_SANDBOX_TRUE@sandbox_TestArray_SOURCES = sandbox/TestArray.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestBin_SOURCES = sandbox/TestBin.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestCommandLine_SOURCES = sandbox/TestCommandLine.C
@@ -948,12 +1008,11 @@ am__v_NCGEN_0 = @echo "  NCGEN " $@;
 @ENABLE_SANDBOX_TRUE@sandbox_TestSlice_SOURCES = sandbox/TestSlice.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestUnion_SOURCES = sandbox/TestUnion.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestWrite_SOURCES = sandbox/TestWrite.C
-@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_LDADD = $(LDADD_STANDALONE)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .c .cdl .lo .nc .o .obj
+.SUFFIXES: .C .c .cdl .html .lo .log .nc .o .obj .test .test$(EXEEXT)
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -1005,6 +1064,8 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
+defs: $(top_builddir)/config.status $(srcdir)/defs.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
@@ -1819,6 +1880,163 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
+# To be appended to the command running the test.  Handle the stdout
+# and stderr redirection, and catch the exit status.
+am__check_post =					\
+>$@-t 2>&1;						\
+estatus=$$?;						\
+if test -n '$(DISABLE_HARD_ERRORS)'			\
+   && test $$estatus -eq 99; then			\
+  estatus=1;						\
+fi;							\
+TERM=$$__SAVED_TERM; export TERM;			\
+$(am__tty_colors);					\
+xfailed=PASS;						\
+case " $(XFAIL_TESTS) " in				\
+  *[\ \	]$$f[\ \	]* | *[\ \	]$$dir$$f[\ \	]*) \
+    xfailed=XFAIL;;					\
+esac;							\
+case $$estatus:$$xfailed in				\
+    0:XFAIL) col=$$red; res=XPASS;;			\
+    0:*)     col=$$grn; res=PASS ;;			\
+    77:*)    col=$$blu; res=SKIP ;;			\
+    99:*)    col=$$red; res=FAIL ;;			\
+    *:XFAIL) col=$$lgn; res=XFAIL;;			\
+    *:*)     col=$$red; res=FAIL ;;			\
+esac;							\
+echo "$${col}$$res$${std}: $$f";			\
+echo "$$res: $$f (exit: $$estatus)" |			\
+  $(am__rst_section) >$@;				\
+cat $@-t >>$@;						\
+rm -f $@-t
+
+$(TEST_SUITE_LOG): $(TEST_LOGS)
+	@$(am__sh_e_setup);						\
+	list='$(TEST_LOGS)';						\
+	results=`for f in $$list; do					\
+		   read line < $$f && echo "$$line" || echo FAIL;	\
+		 done`;							\
+	all=`echo "$$results" | sed '/^$$/d' | wc -l | sed -e 's/^[	 ]*//'`; \
+	fail=`echo "$$results" | grep -c '^FAIL'`;			\
+	pass=`echo "$$results" | grep -c '^PASS'`;			\
+	skip=`echo "$$results" | grep -c '^SKIP'`;			\
+	xfail=`echo "$$results" | grep -c '^XFAIL'`;			\
+	xpass=`echo "$$results" | grep -c '^XPASS'`;			\
+	failures=`expr $$fail + $$xpass`;				\
+	all=`expr $$all - $$skip`;					\
+	if test "$$all" -eq 1; then tests=test; All=;			\
+	else tests=tests; All="All "; fi;				\
+	case fail=$$fail:xpass=$$xpass:xfail=$$xfail in			\
+	  fail=0:xpass=0:xfail=0)					\
+	    msg="$$All$$all $$tests passed.  ";				\
+	    exit=true;;							\
+	  fail=0:xpass=0:xfail=*)					\
+	    msg="$$All$$all $$tests behaved as expected";		\
+	    if test "$$xfail" -eq 1; then xfailures=failure;		\
+	    else xfailures=failures; fi;				\
+	    msg="$$msg ($$xfail expected $$xfailures).  ";		\
+	    exit=true;;							\
+	  fail=*:xpass=0:xfail=*)					\
+	    msg="$$fail of $$all $$tests failed.  ";			\
+	    exit=false;;						\
+	  fail=*:xpass=*:xfail=*)					\
+	    msg="$$failures of $$all $$tests did not behave as expected"; \
+	    if test "$$xpass" -eq 1; then xpasses=pass;			\
+	    else xpasses=passes; fi;					\
+	    msg="$$msg ($$xpass unexpected $$xpasses).  ";		\
+	    exit=false;;						\
+	  *)								\
+	    echo >&2 "incorrect case"; exit 4;;				\
+	esac;								\
+	if test "$$skip" -ne 0; then					\
+	  if test "$$skip" -eq 1; then					\
+	    msg="$$msg($$skip test was not run).  ";			\
+	  else								\
+	    msg="$$msg($$skip tests were not run).  ";			\
+	  fi;								\
+	fi;								\
+	{								\
+	  echo "$(PACKAGE_STRING): $(subdir)/$(TEST_SUITE_LOG)" |	\
+	    $(am__rst_title);						\
+	  echo "$$msg";							\
+	  echo;								\
+	  echo ".. contents:: :depth: 2";				\
+	  echo;								\
+	  for f in $$list; do						\
+	    read line < $$f;						\
+	    case $$line in						\
+	      PASS:*|XFAIL:*);;						\
+	      *) echo; cat $$f;;					\
+	    esac;							\
+	  done;								\
+	} >$(TEST_SUITE_LOG).tmp;					\
+	mv $(TEST_SUITE_LOG).tmp $(TEST_SUITE_LOG);			\
+	if test "$$failures" -ne 0; then				\
+	  msg="$${msg}See $(subdir)/$(TEST_SUITE_LOG).  ";		\
+	  if test -n "$(PACKAGE_BUGREPORT)"; then			\
+	    msg="$${msg}Please report to $(PACKAGE_BUGREPORT).  ";	\
+	  fi;								\
+	fi;								\
+	test x"$$VERBOSE" = x || $$exit || cat $(TEST_SUITE_LOG);	\
+	$(am__tty_colors);						\
+	if $$exit; then							\
+	  echo $(ECHO_N) "$$grn$(ECHO_C)";				\
+	 else								\
+	  echo $(ECHO_N) "$$red$(ECHO_C)";				\
+	fi;								\
+	echo "$$msg" | $(am__text_box);					\
+	echo $(ECHO_N) "$$std$(ECHO_C)";				\
+	$$exit
+
+# Run all the tests.
+check-TESTS:
+	@list='$(RECHECK_LOGS)'; test -z "$$list" || rm -f $$list
+	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
+	@list='$(TEST_LOGS)';						\
+	list=`for f in $$list; do					\
+	  test .log = $$f || echo $$f;					\
+	done | tr '\012\015' '  '`;					\
+	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) TEST_LOGS="$$list"
+
+.log.html:
+	@list='$(RST2HTML) $$RST2HTML rst2html rst2html.py';		\
+	for r2h in $$list; do						\
+	  if ($$r2h --version) >/dev/null 2>&1; then			\
+	    R2H=$$r2h;							\
+	  fi;								\
+	done;								\
+	if test -z "$$R2H"; then					\
+	  echo >&2 "cannot find rst2html, cannot create $@";		\
+	  exit 2;							\
+	fi;								\
+	$$R2H $< >$@.tmp
+	@mv $@.tmp $@
+
+# Be sure to run check first, and then to convert the result.
+# Beware of concurrent executions.  Run "check" not "check-TESTS", as
+# check-SCRIPTS and other dependencies are rebuilt by the former only.
+# And expect check to fail.
+check-html:
+	@if $(MAKE) $(AM_MAKEFLAGS) check; then			\
+	  rv=0; else rv=$$?;					\
+	fi;							\
+	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_HTML) || exit 4;	\
+	exit $$rv
+recheck recheck-html:
+	@target=`echo $@ | sed 's,^re,,'`;				\
+	list='$(TEST_LOGS)';						\
+	list=`for f in $$list; do					\
+	        test -f $$f || continue;				\
+	        if read line < $$f; then				\
+	          case $$line in FAIL*|XPASS*) echo $$f;; esac;		\
+	        else echo $$f; fi;					\
+	      done | tr '\012\015' '  '`;				\
+	$(MAKE) $(AM_MAKEFLAGS) $$target AM_MAKEFLAGS='$(AM_MAKEFLAGS) TEST_LOGS="'"$$list"'"'
+.test.log:
+	@p='$<'; $(am__check_pre) $(TEST_LOG_COMPILE) "$$tst" $(am__check_post)
+@am__EXEEXT_TRUE@.test$(EXEEXT).log:
+@am__EXEEXT_TRUE@	@p='$<'; $(am__check_pre) $(TEST_LOG_COMPILE) "$$tst" $(am__check_post)
+
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	test -d "$(distdir)" || mkdir "$(distdir)"
@@ -1967,7 +2185,8 @@ distcleancheck: distclean
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_DATA)
+	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h
 install-binPROGRAMS: install-libLTLIBRARIES
@@ -1991,6 +2210,11 @@ install-strip:
 	  `test -z '$(STRIP)' || \
 	    echo "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'"` install
 mostlyclean-generic:
+	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
+	-test -z "$(TEST_LOGS)" || rm -f $(TEST_LOGS)
+	-test -z "$(TEST_LOGS_TMP)" || rm -f $(TEST_LOGS_TMP)
+	-test -z "$(TEST_SUITE_HTML)" || rm -f $(TEST_SUITE_HTML)
+	-test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
@@ -2011,6 +2235,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
@@ -2086,13 +2311,14 @@ ps-am:
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-pkgincludeHEADERS
 
-.MAKE: all check-am install-am install-strip
+.MAKE: all check-am check-html install-am install-strip recheck \
+	recheck-html
 
-.PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
-	clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags dist dist-all \
-	dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ dist-xz \
-	dist-zip distcheck distclean distclean-compile \
+.PHONY: CTAGS GTAGS all all-am am--refresh check check-TESTS check-am \
+	check-html clean clean-binPROGRAMS clean-checkPROGRAMS \
+	clean-generic clean-libLTLIBRARIES clean-libtool ctags dist \
+	dist-all dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ \
+	dist-xz dist-zip distcheck distclean distclean-compile \
 	distclean-generic distclean-hdr distclean-libtool \
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-am \
@@ -2104,10 +2330,38 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
+	pdf pdf-am ps ps-am recheck recheck-html tags uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-pkgincludeHEADERS
 
+
+#############################################################################
+# data
+#
+.PHONY: fetch
+@ENABLE_FETCH_TRUE@fetch: $(FETCHED)
+@ENABLE_FETCH_FALSE@fetch:
+@ENABLE_FETCH_FALSE@	@echo "fetching of data was not enabled, use configure --enable-fetch"
+
+data/cdf1_reg.nc: data/$(am__dirstamp)
+@HAVE_WGET_TRUE@	$(WGET) $(CDF1_REG_URL) && mv $(CDF1_REG_FILENAME) $@ && touch $@
+@HAVE_CURL_TRUE@@HAVE_WGET_FALSE@	$(CURL) $(CDF1_REG_URL) -o $@ && touch $@
+@HAVE_CURL_FALSE@@HAVE_WGET_FALSE@	@echo "No means of retrieving $@"
+
+data/cdf2_geo.nc: data/$(am__dirstamp)
+@HAVE_WGET_TRUE@	$(WGET) $(CDF2_GEO_URL) && mv $(CDF2_GEO_FILENAME) $@ && touch $@
+@HAVE_CURL_TRUE@@HAVE_WGET_FALSE@	$(CURL) $(CDF2_GEO_URL) -o $@ && touch $@
+@HAVE_CURL_FALSE@@HAVE_WGET_FALSE@	@echo "No means of retrieving $@"
+
+data/cdf5_geo.nc: data/$(am__dirstamp)
+@HAVE_WGET_TRUE@	$(WGET) $(CDF5_GEO_URL) && mv $(CDF5_GEO_FILENAME) $@ && touch $@
+@HAVE_CURL_TRUE@@HAVE_WGET_FALSE@	$(CURL) $(CDF5_GEO_URL) -o $@ && touch $@
+@HAVE_CURL_FALSE@@HAVE_WGET_FALSE@	@echo "No means of retrieving $@"
+
+data/nc4_geo.nc: data/$(am__dirstamp)
+@HAVE_WGET_TRUE@	cd data && $(WGET) $(NC4_GEO_URL) && mv $(NC4_GEO_FILENAME) nc4_geo.nc && touch $@
+@HAVE_CURL_TRUE@@HAVE_WGET_FALSE@	cd data && $(CURL) $(NC4_GEO_URL) -o nc4_geo.nc && touch $@
+@HAVE_CURL_FALSE@@HAVE_WGET_FALSE@	@echo "No means of retrieving nc4_geo.nc"
 .cdl.nc:
 	$(AM_V_NCGEN)$(NCGEN) -o $@ $<
 

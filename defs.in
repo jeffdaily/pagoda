@@ -1,0 +1,67 @@
+# -*- shell-script -*-
+# @configure_input@
+#
+# Defines for pagoda testing environment.
+#
+# Be more Bourne compatible.
+# (Snippet copied from configure's initialization in Autoconf 2.64)
+DUALCASE=1; export DUALCASE # for MKS sh
+if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
+  emulate sh
+  NULLCMD=:
+  # Pre-4.2 versions of Zsh do word splitting on ${1+"$@"}, which
+  # is contrary to our usage.  Disable this feature.
+  alias -g '${1+"$@"}'='"$@"'
+  setopt NO_GLOB_SUBST
+else
+  case `(set -o) 2>/dev/null` in *posix*) set -o posix;; esac
+fi
+
+# Ensure we are running from the right directory.
+test -f ./defs || {
+   echo "defs: not found in current directory" 1>&2
+   exit 1
+}
+
+me=`echo "$0" | sed -e 's,.*[\\/],,;s/\.test$//'`
+
+abs_builddir='@abs_builddir@'
+abs_srcdir='@abs_srcdir@'
+abs_top_builddir='@abs_top_builddir@'
+abs_top_srcdir='@abs_top_srcdir@'
+builddir='@builddir@'
+srcdir='@srcdir@'
+top_build_prefix='@top_build_prefix@'
+top_builddir='@top_builddir@'
+top_srcdir='@top_srcdir@'
+enable_fetch='@enable_fetch@'
+enable_sandbox='@enable_sandbox@'
+enable_sandbox_ga='@enable_sandbox_ga@'
+have_pnetcdf='@have_pnetcdf@'
+have_netcdf4='@have_netcdf4@'
+MPIRUN='@MPIRUN@'
+export abs_builddir
+export abs_srcdir
+export abs_top_builddir
+export abs_top_srcdir
+export builddir
+export srcdir
+export top_build_prefix
+export top_builddir
+export top_srcdir
+export enable_fetch
+export enable_sandbox
+export enable_sandbox_ga
+export have_pnetcdf
+export have_netcdf4
+export MPIRUN
+
+# Make sure we override the user shell.
+SHELL='@SHELL@'
+export SHELL
+
+PATH="`pwd`@PATH_SEPARATOR@$PATH"
+echo "PATH=$PATH"
+# Some shells forget to export modified environment variables.
+# (See note about `export' in the Autoconf manual.)
+export PATH

@@ -635,22 +635,38 @@ build_vendor
 build_cpu
 build
 LIBTOOL
+HAVE_MPIRUN_FALSE
+HAVE_MPIRUN_TRUE
+MPIRUN
+HAVE_CURL_FALSE
+HAVE_CURL_TRUE
+CURL
+HAVE_WGET_FALSE
+HAVE_WGET_TRUE
+WGET
 HAVE_NCGEN_FALSE
 HAVE_NCGEN_TRUE
 NCGEN
+enable_fetch
+ENABLE_FETCH_FALSE
+ENABLE_FETCH_TRUE
+enable_sandbox_ga
 ENABLE_SANDBOX_GA_FALSE
 ENABLE_SANDBOX_GA_TRUE
+enable_sandbox
 ENABLE_SANDBOX_FALSE
 ENABLE_SANDBOX_TRUE
 WARNINGS_FALSE
 WARNINGS_TRUE
 PROFILE_FALSE
 PROFILE_TRUE
+have_netcdf4
 HAVE_NETCDF4_FALSE
 HAVE_NETCDF4_TRUE
 NETCDF4_CPPFLAGS
 NETCDF4_LDFLAGS
 NETCDF4_LIBS
+have_pnetcdf
 HAVE_PNETCDF_FALSE
 HAVE_PNETCDF_TRUE
 PNETCDF_CPPFLAGS
@@ -767,7 +783,6 @@ enable_shared
 enable_dependency_tracking
 with_mpi
 with_ga
-with_ga
 with_pnetcdf
 with_netcdf4
 enable_debug
@@ -776,13 +791,13 @@ enable_profile
 enable_warnings
 enable_sandbox
 enable_sandbox_ga
+enable_fetch
 enable_static
 with_pic
 enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
-with_gnu_ld
 '
       ac_precious_vars='build_alias
 host_alias
@@ -793,19 +808,16 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP
-CPPFLAGS
 F77
 FFLAGS
-LDFLAGS
-LIBS
 CXX
 CXXFLAGS
-LDFLAGS
-LIBS
-CPPFLAGS
 CCC
 CXXCPP
-CPPFLAGS'
+NCGEN
+WGET
+CURL
+MPIRUN'
 
 
 # Initialize some variables set by options.
@@ -1437,6 +1449,7 @@ Optional Features:
   --enable-warnings       enable -Wall warnings
   --enable-sandbox        build sandbox programs
   --enable-sandbox-ga     build Global Arrays sandbox programs
+  --enable-fetch          fetch sample data for testing
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
@@ -1471,6 +1484,11 @@ Some influential environment variables:
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
   CXXCPP      C++ preprocessor
+  NCGEN       program to generate *.nc files from *.cdl files
+  WGET        program to retrieve input files for tests
+  CURL        in the absense of $WGET, program to retrieve input files for
+              tests
+  MPIRUN      how to launch MPI programs
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -7758,6 +7776,39 @@ _ACEOF
 # version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
 # declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
 # This bug is HP SR number 8606223364.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of signed char" >&5
+$as_echo_n "checking size of signed char... " >&6; }
+if test "${ac_cv_sizeof_signed_char+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  if ac_fn_cxx_compute_int "$LINENO" "(long int) (sizeof (signed char))" "ac_cv_sizeof_signed_char"        "$ac_includes_default"; then :
+
+else
+  if test "$ac_cv_type_signed_char" = yes; then
+     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error 77 "cannot compute sizeof (signed char)
+See \`config.log' for more details" "$LINENO" 5; }
+   else
+     ac_cv_sizeof_signed_char=0
+   fi
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_signed_char" >&5
+$as_echo "$ac_cv_sizeof_signed_char" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_SIGNED_CHAR $ac_cv_sizeof_signed_char
+_ACEOF
+
+
+# The cast to long int works around a bug in the HP C Compiler
+# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
+# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
+# This bug is HP SR number 8606223364.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking size of short" >&5
 $as_echo_n "checking size of short... " >&6; }
 if test "${ac_cv_sizeof_short+set}" = set; then :
@@ -8511,6 +8562,7 @@ else
   HAVE_MPI_FALSE=
 fi
 
+
 # GA is required, for now.  Perhaps with MPI3 the GA could go...
 
 
@@ -9077,7 +9129,7 @@ else
 fi
 
 
-# We require at least one IO library.
+# Check for pnetcdf.
 
 
 
@@ -9264,6 +9316,10 @@ else
   HAVE_PNETCDF_FALSE=
 fi
 
+have_pnetcdf=$pg_cv_pnetcdf_found
+
+
+# Check for netcdf4.
 
 
 
@@ -9450,6 +9506,10 @@ else
   HAVE_NETCDF4_FALSE=
 fi
 
+have_netcdf4=$pg_cv_netcdf4_found
+
+
+# We require at least one IO library.
 case $pg_cv_pnetcdf_found:$pg_cv_netcdf4_found in #(
   no:no) :
     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
@@ -9634,10 +9694,13 @@ fi
 #####################################################3
 # Misc.
 #####################################################3
+
 # Whether to build the sandbox programs.
 # Check whether --enable-sandbox was given.
 if test "${enable_sandbox+set}" = set; then :
   enableval=$enable_sandbox;
+else
+  enable_sandbox=no
 fi
 
  if test "x$enable_sandbox" = xyes; then
@@ -9648,10 +9711,14 @@ else
   ENABLE_SANDBOX_FALSE=
 fi
 
+
+
 # Whether to build Global Arrays programs within the sandbox.
 # Check whether --enable-sandbox-ga was given.
 if test "${enable_sandbox_ga+set}" = set; then :
   enableval=$enable_sandbox_ga;
+else
+  enable_sandbox_ga=no
 fi
 
  if test "x$enable_sandbox_ga" = xyes; then
@@ -9661,6 +9728,26 @@ else
   ENABLE_SANDBOX_GA_TRUE='#'
   ENABLE_SANDBOX_GA_FALSE=
 fi
+
+
+
+# Wether to allow fetching of sample data.
+# Check whether --enable-fetch was given.
+if test "${enable_fetch+set}" = set; then :
+  enableval=$enable_fetch;
+else
+  enable_fetch=no
+fi
+
+ if test "x$enable_fetch" = xyes; then
+  ENABLE_FETCH_TRUE=
+  ENABLE_FETCH_FALSE='#'
+else
+  ENABLE_FETCH_TRUE='#'
+  ENABLE_FETCH_FALSE=
+fi
+
+
 
 
 # Extract the first word of "ncgen", so it can be a program name with args.
@@ -9710,6 +9797,157 @@ else
   HAVE_NCGEN_TRUE='#'
   HAVE_NCGEN_FALSE=
 fi
+
+
+
+# Extract the first word of "wget", so it can be a program name with args.
+set dummy wget; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_WGET+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $WGET in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_WGET="$WGET" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_WGET="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+WGET=$ac_cv_path_WGET
+if test -n "$WGET"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $WGET" >&5
+$as_echo "$WGET" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ if test "x$WGET" != x; then
+  HAVE_WGET_TRUE=
+  HAVE_WGET_FALSE='#'
+else
+  HAVE_WGET_TRUE='#'
+  HAVE_WGET_FALSE=
+fi
+
+
+
+# Extract the first word of "curl", so it can be a program name with args.
+set dummy curl; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_CURL+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $CURL in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_CURL="$CURL" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_CURL="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+CURL=$ac_cv_path_CURL
+if test -n "$CURL"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CURL" >&5
+$as_echo "$CURL" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ if test "x$CURL" != x; then
+  HAVE_CURL_TRUE=
+  HAVE_CURL_FALSE='#'
+else
+  HAVE_CURL_TRUE='#'
+  HAVE_CURL_FALSE=
+fi
+
+
+
+# Extract the first word of "mpirun", so it can be a program name with args.
+set dummy mpirun; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_MPIRUN+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $MPIRUN in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_MPIRUN="$MPIRUN" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_MPIRUN="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+MPIRUN=$ac_cv_path_MPIRUN
+if test -n "$MPIRUN"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MPIRUN" >&5
+$as_echo "$MPIRUN" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ if test "x$MPIRUN" != x; then
+  HAVE_MPIRUN_TRUE=
+  HAVE_MPIRUN_FALSE='#'
+else
+  HAVE_MPIRUN_TRUE='#'
+  HAVE_MPIRUN_FALSE=
+fi
+
 
 
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
@@ -22853,7 +23091,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #####################################################3
 # The End.
 #####################################################3
-ac_config_files="$ac_config_files Makefile"
+ac_config_files="$ac_config_files Makefile defs"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -23005,8 +23243,24 @@ if test -z "${ENABLE_SANDBOX_GA_TRUE}" && test -z "${ENABLE_SANDBOX_GA_FALSE}"; 
   as_fn_error $? "conditional \"ENABLE_SANDBOX_GA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${ENABLE_FETCH_TRUE}" && test -z "${ENABLE_FETCH_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_FETCH\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_NCGEN_TRUE}" && test -z "${HAVE_NCGEN_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_NCGEN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_WGET_TRUE}" && test -z "${HAVE_WGET_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_WGET\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CURL_TRUE}" && test -z "${HAVE_CURL_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CURL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_MPIRUN_TRUE}" && test -z "${HAVE_MPIRUN_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_MPIRUN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -24082,6 +24336,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "defs") CONFIG_FILES="$CONFIG_FILES defs" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

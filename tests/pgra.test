@@ -1,0 +1,49 @@
+#!/bin/sh
+# Tests all aspects of pgra.
+
+#maybe_time=time
+maybe_time=""
+
+if test -f defs
+then
+    . defs
+else
+    echo "Could not locate defs"
+    exit 1
+fi
+
+echo " "
+echo "Testing on a single input file, no arguments."
+echo " "
+for p in 1 2 3 4
+do
+    check="$MPIRUN -np $p ./pgra ./data/cdf1_reg.nc -O -o ./pgra_cdf1_reg_$p.nc"
+    echo " "
+    echo "$check"
+    echo " "
+    if $maybe_time $check
+    then
+        echo "passed"
+    else
+        echo "failed"
+        exit 1
+    fi
+done
+
+echo " "
+echo "Now compare the outputs and make sure they compare favorably."
+echo " "
+for p in   2 3 4
+do
+    check="$MPIRUN -np 1 ./pgcmp ./pgra_cdf1_reg_1.nc ./pgra_cdf1_reg_$p.nc"
+    echo " "
+    echo "$check"
+    echo " "
+    if $maybe_time $check
+    then
+        echo "passed"
+    else
+        echo "failed"
+        exit 1
+    fi
+done

@@ -169,6 +169,9 @@
 /* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
 
+/* The size of `signed char', as computed by sizeof. */
+#undef SIZEOF_SIGNED_CHAR
+
 /* The size of `uint64_t', as computed by sizeof. */
 #undef SIZEOF_UINT64_T
 
