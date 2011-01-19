@@ -177,7 +177,13 @@ void GenericCommands::parse(int argc, char **argv)
     }
     else if (parser.count("output") == 1) {
         output_filename = parser.get_argument("output");
-        input_filenames = positional_arguments;
+        if (input_path.empty()) {
+            input_filenames = positional_arguments;
+        } else {
+            for (size_t i=0; i<positional_arguments.size(); ++i) {
+                input_filenames.push_back(input_path + positional_arguments[i]);
+            }
+        }
     }
     else if (parser.count("output") > 1) {
         throw CommandException("too many output file arguments");
