@@ -26,7 +26,7 @@ PG_FOR_DATA([file],
             AT_CHECK([$MPIRUN -np $p pgra $file pgra_${p}_$base])
          done
          AT_CHECK([ncra $file ncra_$base])
-         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
             [], [ignore], [ignore])
          for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
@@ -46,7 +46,7 @@ PG_FOR_DATA([file],
          done
          AT_CHECK([ncra    $file ncra_$base])
          AT_CHECK([ncra -O $file ncra_$base])
-         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
             [], [ignore], [ignore])
          for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
@@ -66,7 +66,7 @@ PG_FOR_DATA([file],
          done
          AT_CHECK([ncra    $file ncra_$base])
          AT_CHECK([ncra -A $file ncra_$base], [], [ignore], [ignore])
-         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
             [], [ignore], [ignore])
          for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
@@ -84,7 +84,7 @@ PG_FOR_DATA([file],
             AT_CHECK([$MPIRUN -np $p pgra -o pgra_${p}_$base $file])
          done
          AT_CHECK([ncra -o ncra_$base $file])
-         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
             [], [ignore], [ignore])
          for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
@@ -104,7 +104,7 @@ PG_FOR_DATA([file],
          done
          AT_CHECK([ncra    -o ncra_$base $file])
          AT_CHECK([ncra -O -o ncra_$base $file])
-         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
             [], [ignore], [ignore])
          for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
@@ -124,7 +124,7 @@ PG_FOR_DATA([file],
          done
          AT_CHECK([ncra    -o ncra_$base $file])
          AT_CHECK([ncra -A -o ncra_$base $file], [], [ignore], [ignore])
-         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
             [], [ignore], [ignore])
          for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
