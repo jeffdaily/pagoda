@@ -1,0 +1,69 @@
+# M4 macros used in building Pagoda test suites.
+
+# Programs this package provides or needs during testing.
+AT_TESTED([pgsub pgra pgea pgbo pgcmp ncdump ncra od head])
+
+# Enable colored test output.
+AT_COLOR_TESTS
+
+# PG_BASENAME(INPUT)
+# -----------------------
+# Assign VAR the basename of INPUT. INPUT will be shell expanded.
+m4_define([PG_BASENAME], [echo $1 | sed 's,.*/,,'])
+
+# PG_FILE_TYPE(FILE, RESULT)
+# --------------------------
+# Set RESULT to the type of the file.  Possible values are 'classic',
+# '64-bit offset', '64-bit data', 'hdf'.
+m4_define([PG_FILE_TYPE],
+[dump="`od -c -N 4 $1 | head -n 1`"
+AS_CASE([$dump],
+    [*C*D*F*001*], [AS_VAR_SET([$2], ['classic'])],
+    [*C*D*F*002*], [AS_VAR_SET([$2], ['64-bit offset'])],
+    [*C*D*F*005*], [AS_VAR_SET([$2], ['64-bit data'])],
+    [*H*D*F*],     [AS_VAR_SET([$2], ['hdf'])],
+                   [AS_VAR_SET([$2], ['error'])])])
+
+# PG_HAS_RECORD_IFELSE(FILE, [TRUE], [FALSE])
+# -------------------------------------------
+# Determine whether the given netCDF file has an UNLIMITED dimension, and if
+# so, if it has 1 or more currently.
+m4_define([PG_HAS_RECORD_IFELSE],
+[AS_IF([ncdump -h $1 | grep UNLIMITED | grep -v '(0 currently)'],
+    [m4_default([$3], [:])],
+    [m4_default([$2], [:])])])
+
+# PG_FOR_DATA(VAR, BODY)
+# ----------------------------
+# Use VAR as the for loop variable, setting it to the absolute path to an
+# input file. BASE is set to the basename of VAR. BODY is the action to take
+# for each VAR.
+m4_define([PG_FOR_DATA],
+[AS_IF([ls $datadir/*.nc >/dev/null 2>&1], [skip=no], [skip=yes])
+AT_SKIP_IF([test "x$skip" = xyes])
+for $1 in $datadir/*.nc
+do
+    $2
+done])
+
+# PG_ECHO([WORD])
+# ---------------
+# AS_ECHO([WORD]), but only if enabled.
+m4_define([PG_ECHO],
+[AS_IF([test "x$at_arg_pgprint" != xfalse], [AS_ECHO([$1])])])
+
+
+## ----------------------- ##
+## Launch the test suite.  ##
+## ----------------------- ##
+
+AT_INIT
+
+m4_divert_push([PREPARE_TESTS])dnl
+AS_ECHO([""])
+AS_ECHO(["MPI jobs are launched with $MPIRUN -np"])
+AS_ECHO(["-np varies from `seq --separator=' ' $NP_FIRST $NP_INC $NP_LAST`"])
+AS_ECHO([""])
+AS_ECHO(["NOTE: If you see many skipped tests, make sure you have some input files in"])
+AS_ECHO(["      $datadir"])
+m4_divert_pop([PREPARE_TESTS])dnl

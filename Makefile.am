@@ -176,114 +176,59 @@ libpagoda_la_SOURCES += src/Netcdf4Variable.C
 endif
 
 #############################################################################
-# data
+# tests (autotest suite)
 #
-.PHONY: fetch
-if ENABLE_FETCH
-fetch: $(FETCHED)
-else
-fetch:
-	@echo "fetching of data was not enabled, use configure --enable-fetch"
-endif
+TEST_DIR     = tests
+TESTSUITE_AT = $(TESTSUITE).at
+TESTSUITE    = $(TEST_DIR)/suite
+PACKAGE_M4   = $(TEST_DIR)/package.m4
+ATLOCAL_IN   = $(TEST_DIR)/atlocal.in
+ATCONFIG     = $(TEST_DIR)/atconfig
+ATLOCAL      = $(TEST_DIR)/atlocal
+LOCAL_AT     = $(TEST_DIR)/local.at
+PGRA_AT      = $(TEST_DIR)/pgra.at
+AUTOM4TE     = $(SHELL) $(srcdir)/build-aux/missing --run autom4te
+AUTOTEST     = $(AUTOM4TE) --language=autotest
+EXTRA_DIST  += $(TESTSUITE_AT)
+EXTRA_DIST  += $(PACKAGE_M4)
+EXTRA_DIST  += $(TESTSUITE)
+EXTRA_DIST  += $(ATLOCAL_IN)
+EXTRA_DIST  += $(LOCAL_AT)
+EXTRA_DIST  += $(PGRA_AT)
 
-FETCHED =
-FETCHED += data/cdf1_reg.nc
-FETCHED += data/cdf2_geo.nc
-FETCHED += data/cdf5_geo.nc
-FETCHED += data/nc4_geo.nc
+recheck: $(ATCONFIG) $(ATLOCAL) $(TESTSUITE)
+	$(SHELL) '$(TESTSUITE)' AUTOTEST_PATH='.' -C $(TEST_DIR) $(TESTSUITEFLAGS) --recheck
 
-DISTCLEANFILES += data/cdf1_reg.nc
-DISTCLEANFILES += data/cdf2_geo.nc
-DISTCLEANFILES += data/cdf5_geo.nc
-DISTCLEANFILES += data/nc4_geo.nc
+check-local: $(ATCONFIG) $(ATLOCAL) $(TESTSUITE)
+	$(SHELL) '$(TESTSUITE)' AUTOTEST_PATH='.' -C $(TEST_DIR) $(TESTSUITEFLAGS)
 
-CDF1_REG_FILENAME = b30.004.cam2.h0.0001-01.nc
-CDF2_GEO_FILENAME = wind_19010101_000000.nc
-CDF5_GEO_FILENAME = temperature_19010101_000000.nc
-NC4_GEO_FILENAME  = geopotential_19010101_000000.nc
+installcheck-local: $(ATCONFIG) $(ATLOCAL) $(TESTSUITE)
+	$(SHELL) '$(TESTSUITE)' AUTOTEST_PATH='$(bindir)' $(TESTSUITEFLAGS)
 
-URL_BASE = http://climate.pnl.gov/data
-CDF1_REG_URL = $(URL_BASE)/cdf1/CCSM_b30.004/$(CDF1_REG_FILENAME)
-CDF2_GEO_URL = $(URL_BASE)/cdf2/hydro_r6_12day_5956431/$(CDF2_GEO_FILENAME)
-CDF5_GEO_URL = $(URL_BASE)/cdf5/$(CDF5_GEO_FILENAME)
-NC4_GEO_URL  = $(URL_BASE)/nc4/atmos_r5_6day_jab_6905922/$(NC4_GEO_FILENAME)
+clean-local:
+	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
 
+# The `:;' works around a Bash 3.2 bug when the output is not writeable.
+$(PACKAGE_M4): $(top_srcdir)/configure.ac
+	:;{ \
+	  echo '# Signature of the current package.' && \
+	  echo 'm4_define([AT_PACKAGE_NAME],' && \
+	  echo '  [$(PACKAGE_NAME)])' && \
+	  echo 'm4_define([AT_PACKAGE_TARNAME],' && \
+	  echo '  [$(PACKAGE_TARNAME)])' && \
+	  echo 'm4_define([AT_PACKAGE_VERSION],' && \
+	  echo '  [$(PACKAGE_VERSION)])' && \
+	  echo 'm4_define([AT_PACKAGE_STRING],' && \
+	  echo '  [$(PACKAGE_STRING)])' && \
+	  echo 'm4_define([AT_PACKAGE_BUGREPORT],' && \
+	  echo '  [$(PACKAGE_BUGREPORT)])'; \
+	  echo 'm4_define([AT_PACKAGE_URL],' && \
+	  echo '  [$(PACKAGE_URL)])'; \
+	} >'$(PACKAGE_M4)'
 
-data/cdf1_reg.nc: data/$(am__dirstamp)
-if HAVE_WGET
-	$(WGET) $(CDF1_REG_URL) && mv $(CDF1_REG_FILENAME) $@ && touch $@
-else
-if HAVE_CURL
-	$(CURL) $(CDF1_REG_URL) -o $@ && touch $@
-else
-	@echo "No means of retrieving $@"
-endif
-endif
-
-data/cdf2_geo.nc: data/$(am__dirstamp)
-if HAVE_WGET
-	$(WGET) $(CDF2_GEO_URL) && mv $(CDF2_GEO_FILENAME) $@ && touch $@
-else
-if HAVE_CURL
-	$(CURL) $(CDF2_GEO_URL) -o $@ && touch $@
-else
-	@echo "No means of retrieving $@"
-endif
-endif
-
-data/cdf5_geo.nc: data/$(am__dirstamp)
-if HAVE_WGET
-	$(WGET) $(CDF5_GEO_URL) && mv $(CDF5_GEO_FILENAME) $@ && touch $@
-else
-if HAVE_CURL
-	$(CURL) $(CDF5_GEO_URL) -o $@ && touch $@
-else
-	@echo "No means of retrieving $@"
-endif
-endif
-
-data/nc4_geo.nc: data/$(am__dirstamp)
-if HAVE_WGET
-	cd data && $(WGET) $(NC4_GEO_URL) && mv $(NC4_GEO_FILENAME) nc4_geo.nc && touch $@
-else
-if HAVE_CURL
-	cd data && $(CURL) $(NC4_GEO_URL) -o nc4_geo.nc && touch $@
-else
-	@echo "No means of retrieving nc4_geo.nc"
-endif
-endif
-
-#############################################################################
-# tests
-#
-
-## Build additional test programs.
-check_PROGRAMS += tests/FillValue
-tests_FillValue_SOURCES = tests/FillValue.C
-tests_FillValue_DEPENDENCIES = 
-if HAVE_NCGEN
-tests_FillValue_DEPENDENCIES += data/FillValue.nc
-endif
-tests_FillValue_DEPENDENCIES += libpagoda.la
-
-AM_V_NCGEN = $(am__v_NCGEN_$(V))
-am__v_NCGEN_ = $(am__v_NCGEN_$(AM_DEFAULT_VERBOSITY))
-am__v_NCGEN_0 = @echo "  NCGEN " $@;
-.cdl.nc:
-	$(AM_V_NCGEN)$(NCGEN) -o $@ $<
-
-data/FillValue.nc: data/$(am__dirstamp)
-
-EXTRA_DIST += data/FillValue.cdl
-MOSTLYCLEANFILES += data/FillValue.nc
-DISTCLEANFILES += data/$(am__dirstamp)
-
-data/$(am__dirstamp):
-	@$(MKDIR_P) data
-	@: > data/$(am__dirstamp)
-
-## Test suite.
-TESTS = tests/pgra.test
+$(TESTSUITE): $(TESTSUITE_AT) $(PACKAGE_M4) $(LOCAL_AT) $(PGRA_AT)
+	$(AUTOTEST) -I . -I ./tests -I '$(srcdir)' -I '$(srcdir)/tests' $@.at -o $@.tmp
+	mv $@.tmp $@
 
 #############################################################################
 # sandbox
@@ -374,5 +319,7 @@ sandbox_TestScatter_SOURCES           = sandbox/TestScatter.C
 sandbox_TestSlice_SOURCES             = sandbox/TestSlice.C
 sandbox_TestUnion_SOURCES             = sandbox/TestUnion.C
 sandbox_TestWrite_SOURCES             = sandbox/TestWrite.C
+
+checkprogs: $(check_PROGRAMS)
 
 endif # ENABLE_SANDBOX

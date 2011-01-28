@@ -54,12 +54,16 @@ class GenericCommands
         bool is_processing_coords() const;
         bool is_modifying_history() const;
         bool is_helping() const;
+        bool is_versioning() const;
+        bool is_requesting_info() const;
         bool is_appending() const;
         bool is_overwriting() const;
         bool is_fixing_record_dimension() const;
         bool is_nonblocking() const;
         int get_header_pad() const;
         string get_usage() const;
+        string get_version() const;
+        string get_info() const;
         FileFormat get_file_format() const;
         string get_input_path() const;
 
@@ -82,6 +86,7 @@ class GenericCommands
         bool modify_history;
         bool process_topology;
         bool help;
+        bool version;
         bool append;
         bool overwrite;
         bool fix_record_dimension;

@@ -1,0 +1,7 @@
+# Validation suite for Pagoda
+
+m4_include([tests/pgra.at])
+
+AT_SETUP([true])
+AT_CHECK([true])
+AT_CLEANUP

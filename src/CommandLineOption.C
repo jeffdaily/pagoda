@@ -109,6 +109,9 @@ CommandLineOption CommandLineOption::UNION(
 CommandLineOption CommandLineOption::VARIABLE(
     'v', "variable", true,
     "var1[,var2[,...]] variable(s) to process");
+CommandLineOption CommandLineOption::VERS(
+    'v', "version", false,
+    "print version information and exit");
 
 
 CommandLineOption::CommandLineOption(const int &value, const string &name,
@@ -322,7 +325,7 @@ int CommandLineOption::get_count() const
 string CommandLineOption::get_argument() const
 {
     if (!_arguments.empty()) {
-        return _arguments.front();
+        return _arguments.back();
     }
     return "";
 }

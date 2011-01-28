@@ -1,0 +1,144 @@
+AT_BANNER([pgra])
+
+# Test no arguments.
+AT_SETUP([pgra])
+for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+do
+    AT_CHECK([$MPIRUN -np $p pgra], [1], [ignore], [ignore])
+done
+AT_CLEANUP
+
+# Test too few positional arguments.
+AT_SETUP([pgra foo])
+for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+do
+    AT_CHECK([$MPIRUN -np $p pgra foo], [1], [ignore], [ignore])
+done
+AT_CLEANUP
+
+# Test positional arguments.
+AT_SETUP([pgra <input> <output>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra $file pgra_${p}_$base])
+         done
+         AT_CHECK([ncra $file ncra_$base])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test overwrite, positional arguments.
+AT_SETUP([pgra -O <input> <output>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra    $file pgra_${p}_$base])
+            AT_CHECK([$MPIRUN -np $p pgra -O $file pgra_${p}_$base])
+         done
+         AT_CHECK([ncra    $file ncra_$base])
+         AT_CHECK([ncra -O $file ncra_$base])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test append, positional arguments.
+AT_SETUP([pgra -A <input> <output>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra    $file pgra_${p}_$base])
+            AT_CHECK([$MPIRUN -np $p pgra -A $file pgra_${p}_$base])
+         done
+         AT_CHECK([ncra    $file ncra_$base])
+         AT_CHECK([ncra -A $file ncra_$base], [], [ignore], [ignore])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test positional inputs, output argument.
+AT_SETUP([pgra -o <output> <input>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra -o pgra_${p}_$base $file])
+         done
+         AT_CHECK([ncra -o ncra_$base $file])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test overwrite, positional inputs, output argument.
+AT_SETUP([pgra -O -o <output> <input>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra    -o pgra_${p}_$base $file])
+            AT_CHECK([$MPIRUN -np $p pgra -O -o pgra_${p}_$base $file])
+         done
+         AT_CHECK([ncra    -o ncra_$base $file])
+         AT_CHECK([ncra -O -o ncra_$base $file])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test append, positional inputs, output argument.
+AT_SETUP([pgra -A -o <output> <input>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra    -o pgra_${p}_$base $file])
+            AT_CHECK([$MPIRUN -np $p pgra -A -o pgra_${p}_$base $file])
+         done
+         AT_CHECK([ncra    -o ncra_$base $file])
+         AT_CHECK([ncra -A -o ncra_$base $file], [], [ignore], [ignore])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_1_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test positional inputs, too many output arguments.
+AT_SETUP([pgra -o <output> -o <output> <input>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file], [continue],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra -o foo -o pgra_${p}_$base $file])
+         done])])
+AT_CLEANUP

@@ -51,7 +51,7 @@ void PgraCommands::parse(int argc, char **argv)
 {
     GenericCommands::parse(argc,argv);
 
-    if (is_helping()) {
+    if (is_requesting_info()) {
         return;
     }
 

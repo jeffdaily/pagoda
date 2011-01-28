@@ -60,10 +60,11 @@ bool cmp(double x, double y)
 
 
 string usage(
-    "Usage: pgcmp [-w] [-a] <filename> <filename>\n"
+    "Usage: pgcmp [-w] [-a] [-v] <filename> <filename>\n"
     "\n"
     "-w\tmake all warnings fatal\n"
     "-a\treport all mismatched values (default: first mismatch)\n"
+    "-v\tprint version information\n"
 );
 
 
@@ -93,7 +94,7 @@ int main(int argc, char **argv)
     try {
         int opt;
         opterr = 0;
-        while ((opt = getopt(argc, argv, "wa")) != -1)
+        while ((opt = getopt(argc, argv, "wav")) != -1)
         {
             switch (opt) {
                 case 'w':
@@ -101,6 +102,11 @@ int main(int argc, char **argv)
                     break;
                 case 'a':
                     all_points = true;
+                    break;
+                case 'v':
+                    pagoda::println_zero(stdout, PACKAGE_STRING);
+                    pagoda::finalize();
+                    return EXIT_SUCCESS;
                     break;
             }
         }

@@ -46,6 +46,7 @@ GenericCommands::GenericCommands()
     ,   modify_history(true)
     ,   process_topology(true)
     ,   help(false)
+    ,   version(false)
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
@@ -77,6 +78,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   modify_history(true)
     ,   process_topology(true)
     ,   help(false)
+    ,   version(false)
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
@@ -96,6 +98,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
 void GenericCommands::init()
 {
     parser.push_back(&CommandLineOption::HELP);
+    parser.push_back(&CommandLineOption::VERS);
     parser.push_back(&CommandLineOption::CDF1);
     parser.push_back(&CommandLineOption::CDF2);
     parser.push_back(&CommandLineOption::CDF5);
@@ -143,9 +146,17 @@ void GenericCommands::parse(int argc, char **argv)
     }
     parser.parse(argc,argv);
     positional_arguments = parser.get_positional_arguments();
+    if (positional_arguments.empty()) {
+        throw CommandException("input and output file arguments required");
+    }
 
     if (parser.count("help")) {
         help = true;
+        return; // stop parsing
+    }
+
+    if (parser.count("version")) {
+        version = true;
         return; // stop parsing
     }
 
@@ -156,37 +167,32 @@ void GenericCommands::parse(int argc, char **argv)
             input_path += "/";
         }
     }
+    if (input_path.empty()) {
+        if (parser.count("output") == 0) {
+            input_filenames.assign(positional_arguments.begin(),
+                    positional_arguments.end()-1);
+        } else {
+            input_filenames = positional_arguments;
+        }
+    }
+    else {
+        size_t limit = positional_arguments.size();
+        if (parser.count("output") >= 1) {
+            limit -= 1;
+        }
+        for (size_t i=0; i<limit; ++i) {
+            input_filenames.push_back(input_path + positional_arguments[i]);
+        }
+    }
 
     if (parser.count("output") == 0) {
         if (positional_arguments.size() == 1) {
             throw CommandException("output file argument required");
         }
-        else if (positional_arguments.size() == 0) {
-            throw CommandException("input and output file arguments required");
-        }
         output_filename = positional_arguments.back();
-        if (input_path.empty()) {
-            input_filenames.assign(positional_arguments.begin(),
-                                   positional_arguments.end()-1);
-        }
-        else {
-            for (size_t i=0; i<positional_arguments.size()-1; ++i) {
-                input_filenames.push_back(input_path + positional_arguments[i]);
-            }
-        }
     }
-    else if (parser.count("output") == 1) {
+    else if (parser.count("output") >= 1) {
         output_filename = parser.get_argument("output");
-        if (input_path.empty()) {
-            input_filenames = positional_arguments;
-        } else {
-            for (size_t i=0; i<positional_arguments.size(); ++i) {
-                input_filenames.push_back(input_path + positional_arguments[i]);
-            }
-        }
-    }
-    else if (parser.count("output") > 1) {
-        throw CommandException("too many output file arguments");
     }
 
     if (parser.count("auxiliary")) {
@@ -717,6 +723,18 @@ bool GenericCommands::is_helping() const
 }
 
 
+bool GenericCommands::is_versioning() const
+{
+    return version;
+}
+
+
+bool GenericCommands::is_requesting_info() const
+{
+    return help || version;
+}
+
+
 bool GenericCommands::is_appending() const
 {
     return append;
@@ -744,6 +762,24 @@ int GenericCommands::get_header_pad() const
 string GenericCommands::get_usage() const
 {
     return parser.get_usage();
+}
+
+
+string GenericCommands::get_version() const
+{
+    return PACKAGE_STRING;
+}
+
+
+string GenericCommands::get_info() const
+{
+    if (help) {
+        return get_usage();
+    } else if (version) {
+        return get_version();
+    } else {
+        return "";
+    }
 }
 
 

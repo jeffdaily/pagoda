@@ -3,7 +3,6 @@ PARALLEL ANALYSIS OF GEODESIC DATA
 
 FOR THE IMPATIENT
 =================
-
 The command::
 
     ./configure && make && make install
@@ -16,12 +15,10 @@ instructions are covered later in this file.
 
 QUESTIONS/HELP/SUPPORT/BUG-REPORTS
 ==================================
-
 email: pagoda-dev@googlegroups.com
 
 DEPENDENCIES
 ============
-
 pagoda uses autoconf/automake/libtool to build and has dependencies on
  * Message Passing Interface
  * Global Arrays (http://www.emsl.pnl.gov/docs/global/)
@@ -70,8 +67,8 @@ necessary on portals systems or else global operations within GA will crawl.
 For the recommended envrionment variables on other platforms, please see the
 GA support page http://www.emsl.pnl.gov/docs/global/support.html.
 
-BUILDING GLOBAL ARRAYS 5.0 Beta
-...............................
+BUILDING GLOBAL ARRAYS 5.0
+..........................
 For detailed instructions on building GA 5.x or better (now converted to
 autotools), please see the README file in the GA distribution.  The following
 example will build GA 5.x to use sockets for communication (this is not
@@ -119,3 +116,20 @@ There is a "sandobox" in which small test programs exist, but it should be
 ignored by end users.  It exists mainly for testing certain third party
 library functionality or for developing new ideas outside of the main source.
 You must --enable-sandbox to build the programs (if you are a developer).
+
+TESTING PAGODA
+==============
+The test suite uses autoconf's autotest capabilities.  Running "make check"
+will build all test programs and requires the ability to call the MPI process
+launcher.  The tests confirm, among other things, that the pagoda tools
+produce the same results as their corresponding NetCDF Operators for any
+number of processes.  By default, we test running on 1, 2, 3, and 4 processes.
+The influential environment variables are MPIRUN, NP_START, NP_INC, and
+NP_STOP which control the MPI launcher and the arguments passed to the "seq"
+command-line tool when generating the number of procs to use in the tests' for
+loops.
+
+The input datasets used for the test suite must come from you, the user.
+Place any input files or symbollicaly link to them from within the ./data
+directory.  If you see many skipped tests, make sure you put some input files
+into ./data before running the suite.

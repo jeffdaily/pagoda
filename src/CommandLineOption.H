@@ -118,6 +118,7 @@ class CommandLineOption
         static CommandLineOption TOPOLOGY;
         static CommandLineOption UNION;
         static CommandLineOption VARIABLE;
+        static CommandLineOption VERS;
 
     protected:
         int _value;

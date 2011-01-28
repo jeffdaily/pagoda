@@ -8,6 +8,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/pagoda.H])
+AC_CONFIG_TESTDIR([tests])
 
 #####################################################3
 # automake
@@ -213,31 +214,20 @@ AC_ARG_ENABLE([sandbox-ga],
 AM_CONDITIONAL([ENABLE_SANDBOX_GA], [test "x$enable_sandbox_ga" = xyes])
 AC_SUBST([enable_sandbox_ga])
 
-# Wether to allow fetching of sample data.
-AC_ARG_ENABLE([fetch],
-    [AS_HELP_STRING([--enable-fetch], [fetch sample data for testing])],
-    [],
-    [enable_fetch=no])
-AM_CONDITIONAL([ENABLE_FETCH], [test "x$enable_fetch" = xyes])
-AC_SUBST([enable_fetch])
-
-AC_ARG_VAR([NCGEN], [program to generate *.nc files from *.cdl files])
-AC_PATH_PROG([NCGEN], [ncgen])
-AM_CONDITIONAL([HAVE_NCGEN], [test "x$NCGEN" != x])
-
-AC_ARG_VAR([WGET], [program to retrieve input files for tests])
-AC_PATH_PROG([WGET], [wget])
-AM_CONDITIONAL([HAVE_WGET], [test "x$WGET" != x])
-
-AC_ARG_VAR([CURL],
-    [in the absense of $WGET, program to retrieve input files for tests])
-AC_PATH_PROG([CURL], [curl])
-AM_CONDITIONAL([HAVE_CURL], [test "x$CURL" != x])
-
 AC_ARG_VAR([MPIRUN], [how to launch MPI programs])
 AC_PATH_PROG([MPIRUN], [mpirun])
 AM_CONDITIONAL([HAVE_MPIRUN], [test "x$MPIRUN" != x])
 AC_SUBST([MPIRUN])
+
+AC_ARG_VAR([NP_FIRST], [min number of MPI processes to use (default=1)])
+AC_ARG_VAR([NP_LAST], [max number of MPI processes to use (default=4)])
+AC_ARG_VAR([NP_INC], [increment for number of MPI processes to use (default=1)])
+AS_IF([test "x$NP_FIRST" = x], [NP_FIRST=1])
+AS_IF([test "x$NP_LAST" = x], [NP_LAST=4])
+AS_IF([test "x$NP_INC" = x], [NP_INC=1])
+AC_SUBST([NP_FIRST])
+AC_SUBST([NP_LAST])
+AC_SUBST([NP_INC])
 
 # NERSC's MPI library requires all C++ codes to include mpi.h before any
 # other include files.  I'm not sure if this includes config.h as well, but
@@ -255,5 +245,5 @@ LT_INIT
 #####################################################3
 # The End.
 #####################################################3
-AC_CONFIG_FILES([Makefile defs])
+AC_CONFIG_FILES([Makefile tests/atlocal])
 AC_OUTPUT

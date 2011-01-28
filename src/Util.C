@@ -102,10 +102,10 @@ void pagoda::barrier()
 void pagoda::abort(const char *message)
 {
 #if HAVE_GA
-    GA_Error(const_cast<char*>(message), 0);
+    GA_Error(const_cast<char*>(message), 1);
 #elif HAVE_MPI
     cerr << "[" << nodeid() << "] " << message << endl;
-    MPI_Abort(MPI_COMM_WORLD, 0);
+    MPI_Abort(MPI_COMM_WORLD, 1);
 #else
 #   error
 #endif
