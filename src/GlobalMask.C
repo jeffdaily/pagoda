@@ -578,6 +578,12 @@ void GlobalMask::copy(const Array *src, const vector<int64_t> &src_lo, const vec
 }
 
 
+GlobalMask* GlobalMask::clone() const
+{
+    return new GlobalMask(*this);
+}
+
+
 bool GlobalMask::same_distribution(const Array *other) const
 {
     return mask->same_distribution(other);

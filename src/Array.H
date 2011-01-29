@@ -169,6 +169,16 @@ class Array
                           const vector<int64_t> &dst_hi) = 0;
 
         /**
+         * Duplicates this Array buy as a new type.
+         */
+        virtual Array* cast(DataType new_type) const = 0;
+
+        /**
+         * Duplicates this Array.
+         */
+        virtual Array* clone() const = 0;
+
+        /**
          * Returns true if the distribution of this Array matches the other.
          *
          * @param[in] other the other Array

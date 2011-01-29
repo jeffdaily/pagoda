@@ -38,6 +38,7 @@ class ScalarArray : public AbstractArray
                           const vector<int64_t> &src_hi,
                           const vector<int64_t> &dst_lo,
                           const vector<int64_t> &dst_hi);
+        virtual ScalarArray* clone() const;
 
         virtual bool owns_data() const;
         virtual void get_distribution(

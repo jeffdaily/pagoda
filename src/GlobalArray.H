@@ -56,6 +56,7 @@ class GlobalArray : public AbstractArray
                           const vector<int64_t> &src_hi,
                           const vector<int64_t> &dst_lo,
                           const vector<int64_t> &dst_hi);
+        virtual GlobalArray* clone() const;
 
         virtual bool owns_data() const;
         virtual void get_distribution(

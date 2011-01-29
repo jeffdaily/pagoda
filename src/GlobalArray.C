@@ -282,6 +282,12 @@ void GlobalArray::copy(const Array *src,
 }
 
 
+GlobalArray* GlobalArray::clone() const
+{
+    return new GlobalArray(*this);
+}
+
+
 ostream& operator << (ostream &os, const GlobalArray &array)
 {
     vector<int64_t> shape = array.get_shape();

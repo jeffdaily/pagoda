@@ -108,6 +108,12 @@ void ScalarArray::copy(const Array *src, const vector<int64_t> &src_lo, const ve
 }
 
 
+ScalarArray* ScalarArray::clone() const
+{
+    return new ScalarArray(*this);
+}
+
+
 bool ScalarArray::owns_data() const
 {
     return true;

@@ -4,8 +4,11 @@
 
 #include <stdint.h>
 
+#include <cassert>
+
 #include "AbstractArray.H"
 #include "Array.H"
+#include "Copy.H"
 #include "DataType.H"
 #include "Timing.H"
 #include "Util.H"
@@ -122,6 +125,47 @@ void AbstractArray::copy(const Array *src)
 
         release_update();
     }
+}
+
+
+Array* AbstractArray::cast(DataType new_type) const
+{
+    DataType type = get_type();
+    vector<int64_t> shape = get_shape();
+    Array *dst_array;
+
+    if (type == new_type) {
+        dst_array = clone();
+    }
+    else {
+        // types are different, so this is a cast
+        dst_array = Array::create(new_type, shape);
+        assert(same_distribution(dst_array));
+        if (owns_data()) {
+            DataType type_dst = dst_array->get_type();
+            vector<int64_t> lo;
+            vector<int64_t> hi;
+            vector<int64_t> ld;
+            void *src_data = access();
+            void *dst_data = access();
+            get_distribution(lo, hi);
+            ld.assign(lo.size(), 0);
+#define DATATYPE_EXPAND(src_mt,src_t,dst_mt,dst_t) \
+            if (type == src_mt && type_dst == dst_mt) { \
+                src_t *src = static_cast<src_t*>(src_data); \
+                dst_t *dst = static_cast<dst_t*>(dst_data); \
+                pagoda::copy_cast<dst_t>(src,src+get_size(),dst); \
+            } else
+#include "DataType2.def"
+            release();
+            dst_array->release_update();
+        }
+        else {
+            // we don't own any of the data, do nothing
+        }
+    }
+
+    return dst_array;
 }
 
 

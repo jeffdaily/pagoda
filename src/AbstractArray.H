@@ -71,6 +71,12 @@ class AbstractArray : public Array
                           const vector<int64_t> &dst_lo,
                           const vector<int64_t> &dst_hi) = 0;
 
+        /** @copydoc Array::cast(DataType) const */
+        virtual Array* cast(DataType new_type) const;
+
+        /** @copydoc Array::clone() const */
+        virtual Array* clone() const = 0;
+
         /** @copydoc Array::same_distribution(const Array*) const */
         virtual bool same_distribution(const Array *other) const;
 

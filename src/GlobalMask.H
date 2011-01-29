@@ -57,6 +57,7 @@ class GlobalMask : public Mask
                           const vector<int64_t> &src_hi,
                           const vector<int64_t> &dst_lo,
                           const vector<int64_t> &dst_hi);
+        virtual GlobalMask* clone() const;
 
         virtual bool same_distribution(const Array *other) const;
 
