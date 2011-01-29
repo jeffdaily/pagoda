@@ -870,12 +870,12 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/AllNodeArray.H src/Array.H src/Attribute.H src/Bootstrap.H \
 	src/CommandLineOption.H src/CommandLineParser.H src/Common.H \
 	src/Copy.H src/CoordHyperslab.H src/Dataset.H src/DataType.def \
-	src/DataType.H src/Debug.H src/Dimension.H src/Error.H \
-	src/FileWriter.H src/GlobalArray.def src/GlobalArray.H \
-	src/GlobalMask.H src/GenericCommands.H src/GeoGrid.H \
-	src/Grid.H src/IndexHyperslab.H src/LatLonBox.H src/Mask.H \
-	src/MaskMap.H src/Netcdf4Attribute.H src/Netcdf4Dataset.H \
-	src/Netcdf4Dimension.H src/Netcdf4Error.H \
+	src/DataType2.def src/DataType.H src/Debug.H src/Dimension.H \
+	src/Error.H src/FileWriter.H src/GlobalArray.def \
+	src/GlobalArray.H src/GlobalMask.H src/GenericCommands.H \
+	src/GeoGrid.H src/Grid.H src/IndexHyperslab.H src/LatLonBox.H \
+	src/Mask.H src/MaskMap.H src/Netcdf4Attribute.H \
+	src/Netcdf4Dataset.H src/Netcdf4Dimension.H src/Netcdf4Error.H \
 	src/Netcdf4FileWriter.H src/Netcdf4.H src/Netcdf4Timing.H \
 	src/Netcdf4Variable.H src/NodeZeroArray.H \
 	src/NotImplementedException.H src/pagoda.H src/Pack.H \

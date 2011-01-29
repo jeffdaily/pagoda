@@ -11,6 +11,7 @@
 #include "DataType.H"
 #include "Debug.H"
 #include "Dimension.H"
+#include "ScalarArray.H"
 
 using std::vector;
 

@@ -54,6 +54,7 @@ pkginclude_HEADERS += src/Copy.H
 pkginclude_HEADERS += src/CoordHyperslab.H
 pkginclude_HEADERS += src/Dataset.H
 pkginclude_HEADERS += src/DataType.def
+pkginclude_HEADERS += src/DataType2.def
 pkginclude_HEADERS += src/DataType.H
 pkginclude_HEADERS += src/Debug.H
 pkginclude_HEADERS += src/Dimension.H
