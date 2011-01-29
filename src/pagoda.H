@@ -65,7 +65,7 @@
 #include "PnetcdfDimension.H"
 #include "PnetcdfError.H"
 #include "PnetcdfFileWriter.H"
-#include "Pnetcdf.H"
+#include "PnetcdfNS.H"
 #include "PnetcdfTiming.H"
 #include "PnetcdfVariable.H"
 #include "RangeException.H"

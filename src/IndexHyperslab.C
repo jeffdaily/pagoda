@@ -18,6 +18,18 @@ using std::string;
 using std::vector;
 
 
+IndexHyperslab::IndexHyperslab()
+    :   name("")
+    ,   min(0)
+    ,   max(0)
+    ,   stride(0)
+    ,   min_is_set(false)
+    ,   max_is_set(false)
+    ,   stride_is_set(false)
+{
+}
+
+
 IndexHyperslab::IndexHyperslab(const string &name, int64_t index)
     :   name(name)
     ,   min(index)

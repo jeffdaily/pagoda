@@ -81,7 +81,7 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum sandbox/TestRavel \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead sandbox/TestScatter \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestUnion \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestWrite
+@ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool sandbox/TestWrite
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@am__append_6 =  \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestBin \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestDistance \
@@ -225,6 +225,7 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestUnion$(EXEEXT) \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestWrite$(EXEEXT)
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@am__EXEEXT_3 = sandbox/TestBin$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestDistance$(EXEEXT) \
@@ -436,6 +437,14 @@ sandbox_TestUnion_LDADD = $(LDADD)
 sandbox_TestUnion_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
+am__sandbox_TestVecBool_SOURCES_DIST = sandbox/TestVecBool.C
+@ENABLE_SANDBOX_TRUE@am_sandbox_TestVecBool_OBJECTS =  \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool.$(OBJEXT)
+sandbox_TestVecBool_OBJECTS = $(am_sandbox_TestVecBool_OBJECTS)
+sandbox_TestVecBool_LDADD = $(LDADD)
+sandbox_TestVecBool_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am__sandbox_TestWrite_SOURCES_DIST = sandbox/TestWrite.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestWrite_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestWrite.$(OBJEXT)
@@ -622,7 +631,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestRavel_SOURCES) $(sandbox_TestRead_SOURCES) \
 	$(sandbox_TestRead2_SOURCES) $(sandbox_TestRead3_SOURCES) \
 	$(sandbox_TestScatter_SOURCES) $(sandbox_TestSlice_SOURCES) \
-	$(sandbox_TestUnion_SOURCES) $(sandbox_TestWrite_SOURCES) \
+	$(sandbox_TestUnion_SOURCES) $(sandbox_TestVecBool_SOURCES) \
+	$(sandbox_TestWrite_SOURCES) \
 	$(sandbox_ga_TestAttribute_SOURCES) \
 	$(sandbox_ga_TestBin_SOURCES) \
 	$(sandbox_ga_TestDimension_SOURCES) \
@@ -659,6 +669,7 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestScatter_SOURCES_DIST) \
 	$(am__sandbox_TestSlice_SOURCES_DIST) \
 	$(am__sandbox_TestUnion_SOURCES_DIST) \
+	$(am__sandbox_TestVecBool_SOURCES_DIST) \
 	$(am__sandbox_TestWrite_SOURCES_DIST) \
 	$(am__sandbox_ga_TestAttribute_SOURCES_DIST) \
 	$(am__sandbox_ga_TestBin_SOURCES_DIST) \
@@ -949,6 +960,7 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestScatter_SOURCES = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestSlice_SOURCES = sandbox/TestSlice.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestUnion_SOURCES = sandbox/TestUnion.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestVecBool_SOURCES = sandbox/TestVecBool.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestWrite_SOURCES = sandbox/TestWrite.C
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -1314,6 +1326,11 @@ sandbox/TestUnion.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestUnion$(EXEEXT): $(sandbox_TestUnion_OBJECTS) $(sandbox_TestUnion_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestUnion$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestUnion_OBJECTS) $(sandbox_TestUnion_LDADD) $(LIBS)
+sandbox/TestVecBool.$(OBJEXT): sandbox/$(am__dirstamp) \
+	sandbox/$(DEPDIR)/$(am__dirstamp)
+sandbox/TestVecBool$(EXEEXT): $(sandbox_TestVecBool_OBJECTS) $(sandbox_TestVecBool_DEPENDENCIES) sandbox/$(am__dirstamp)
+	@rm -f sandbox/TestVecBool$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestVecBool_OBJECTS) $(sandbox_TestVecBool_LDADD) $(LIBS)
 sandbox/TestWrite.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestWrite$(EXEEXT): $(sandbox_TestWrite_OBJECTS) $(sandbox_TestWrite_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1428,6 +1445,7 @@ mostlyclean-compile:
 	-rm -f sandbox/TestScatter.$(OBJEXT)
 	-rm -f sandbox/TestSlice.$(OBJEXT)
 	-rm -f sandbox/TestUnion.$(OBJEXT)
+	-rm -f sandbox/TestVecBool.$(OBJEXT)
 	-rm -f sandbox/TestWrite.$(OBJEXT)
 	-rm -f sandbox/ga/TestAttribute.$(OBJEXT)
 	-rm -f sandbox/ga/TestBin.$(OBJEXT)
@@ -1589,6 +1607,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestScatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestSlice.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestUnion.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestVecBool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestWrite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestBin.Po@am__quote@

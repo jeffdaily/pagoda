@@ -285,6 +285,7 @@ check_PROGRAMS += sandbox/TestRead
 check_PROGRAMS += sandbox/TestScatter
 check_PROGRAMS += sandbox/TestSlice
 check_PROGRAMS += sandbox/TestUnion
+check_PROGRAMS += sandbox/TestVecBool
 check_PROGRAMS += sandbox/TestWrite
 if HAVE_PNETCDF
 check_PROGRAMS += sandbox/TestBin
@@ -318,6 +319,7 @@ sandbox_TestRead3_SOURCES             = sandbox/TestRead3.C
 sandbox_TestScatter_SOURCES           = sandbox/TestScatter.C
 sandbox_TestSlice_SOURCES             = sandbox/TestSlice.C
 sandbox_TestUnion_SOURCES             = sandbox/TestUnion.C
+sandbox_TestVecBool_SOURCES           = sandbox/TestVecBool.C
 sandbox_TestWrite_SOURCES             = sandbox/TestWrite.C
 
 checkprogs: $(check_PROGRAMS)

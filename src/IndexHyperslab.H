@@ -15,6 +15,7 @@ using std::string;
 class IndexHyperslab
 {
     public:
+        IndexHyperslab();
         IndexHyperslab(const string &name, int64_t index);
         IndexHyperslab(const string &name, int64_t min, int64_t max);
         IndexHyperslab(const string &name,
