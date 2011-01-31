@@ -194,7 +194,4 @@ DATATYPE_EXPAND(DataType::UINT,      unsigned int,      DataType::SCHAR,signed c
 DATATYPE_EXPAND(DataType::ULONG,     unsigned long,     DataType::SCHAR,signed char)
 DATATYPE_EXPAND(DataType::ULONGLONG, unsigned long long,DataType::SCHAR,signed char)
 DATATYPE_EXPAND(DataType::SCHAR,     signed char,       DataType::SCHAR,signed char)
-{
-    EXCEPT(DataTypeException, "DataType not handled", type);
-}
 #undef DATATYPE_EXPAND

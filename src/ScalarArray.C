@@ -21,6 +21,9 @@ ScalarArray::ScalarArray(DataType type)
         value = static_cast<void*>(new T); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -36,6 +39,9 @@ ScalarArray::ScalarArray(const ScalarArray &that)
         value = static_cast<void*>(tmp); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -46,6 +52,9 @@ ScalarArray::~ScalarArray()
         delete static_cast<T*>(value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -80,6 +89,9 @@ void ScalarArray::fill(void *new_value)
         *static_cast<T*>(value) = *static_cast<T*>(new_value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -98,6 +110,9 @@ void ScalarArray::copy(const Array *src)
             *static_cast<T*>(value) = *static_cast<T*>(sa_src->value); \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
     }
 }
 
@@ -155,21 +170,19 @@ void* ScalarArray::get(void *buffer) const
 {
     void *ret;
 
-    if (buffer == NULL) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            ret = static_cast<void*>(new T); \
-        } else
-#include "DataType.def"
-    } else {
-        ret = buffer;
-    }
-
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
+        if (buffer == NULL) { \
+            ret = static_cast<void*>(new T); \
+        } else { \
+            ret = buffer; \
+        } \
         *static_cast<T*>(ret) = *static_cast<T*>(value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 
     return ret;
 }
@@ -198,6 +211,9 @@ void ScalarArray::put(void *buffer)
         *static_cast<T*>(value) = *static_cast<T*>(buffer); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -217,6 +233,9 @@ void ScalarArray::put(void *buffer,
         *static_cast<T*>(value) = *static_cast<T*>(buffer); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -228,6 +247,9 @@ void ScalarArray::scatter(void *buffer, vector<int64_t> &subscripts)
         *static_cast<T*>(value) = *static_cast<T*>(buffer); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }
 
 
@@ -359,12 +381,15 @@ Array* ScalarArray::imax(const Array *rhs)
     const ScalarArray *array = dynamic_cast<const ScalarArray*>(rhs);
     if (array) {
 #define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        T *this_value = (T*)value; \
-        T that_value = array->as<T>(); \
-        *this_value = (*this_value)>that_value ? *this_value : that_value; \
-    } else
+        if (type == DT) { \
+            T *this_value = (T*)value; \
+            T that_value = array->as<T>(); \
+            *this_value = (*this_value)>that_value ? *this_value : that_value; \
+        } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
         return this;
     }
     ERR("ScalarArray::idiv(Array*) fell through");
@@ -376,12 +401,15 @@ Array* ScalarArray::imin(const Array *rhs)
     const ScalarArray *array = dynamic_cast<const ScalarArray*>(rhs);
     if (array) {
 #define DATATYPE_EXPAND(DT,T) \
-    if (type == DT) { \
-        T *this_value = (T*)value; \
-        T that_value = array->as<T>(); \
-        *this_value = (*this_value)<that_value ? *this_value : that_value; \
-    } else
+        if (type == DT) { \
+            T *this_value = (T*)value; \
+            T that_value = array->as<T>(); \
+            *this_value = (*this_value)<that_value ? *this_value : that_value; \
+        } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
         return this;
     }
     ERR("ScalarArray::idiv(Array*) fell through");
@@ -396,6 +424,9 @@ Array* ScalarArray::ipow(double exponent)
         *this_value = static_cast<T>(std::pow(static_cast<double>(*this_value),exponent)); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return this;
 }
 
@@ -407,6 +438,9 @@ ScalarArray& ScalarArray::operator+=(const ScalarArray &that)
         *((T*)value) += *((T*)that.value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -418,6 +452,9 @@ ScalarArray& ScalarArray::operator-=(const ScalarArray &that)
         *((T*)value) -= *((T*)that.value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -429,6 +466,9 @@ ScalarArray& ScalarArray::operator*=(const ScalarArray &that)
         *((T*)value) *= *((T*)that.value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -440,6 +480,9 @@ ScalarArray& ScalarArray::operator/=(const ScalarArray &that)
         *((T*)value) /= *((T*)that.value); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -460,4 +503,7 @@ void ScalarArray::dump() const
         pagoda::print_zero(os.str()); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }

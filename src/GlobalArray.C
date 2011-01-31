@@ -472,6 +472,9 @@ GlobalArray& GlobalArray::operator+=(const ScalarArray &that)
         GA_Add_constant(handle, &cast); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -533,6 +536,9 @@ GlobalArray& GlobalArray::operator-=(const ScalarArray &that)
         GA_Add_constant(handle, &cast); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -585,6 +591,9 @@ GlobalArray& GlobalArray::operator*=(const ScalarArray &that)
         GA_Scale(handle, &cast); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -638,6 +647,9 @@ GlobalArray& GlobalArray::operator/=(const ScalarArray &that)
         GA_Scale(handle, &cast); \
     } else
 #include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
     return *this;
 }
 
@@ -780,6 +792,9 @@ void* GlobalArray::get(void *buffer) const
             buffer = static_cast<void*>(new T[pagoda::shape_to_size(shape)]); \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
     }
 
     NGA_Get64(handle, &lo[0], &hi[0], buffer, &shape_copy[1]);
@@ -809,6 +824,9 @@ void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
             buffer = static_cast<void*>(new T[pagoda::shape_to_size(shape)]); \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
     }
 
     NGA_Get64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1]);
@@ -1101,6 +1119,9 @@ Array* GlobalArray::imax(const Array *rhs)
                     &GlobalArray::operate_max_patch); \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
     }
     else {
         ERR("GlobalArray::imax(Array*) fell through");
@@ -1155,6 +1176,9 @@ Array* GlobalArray::imin(const Array *rhs)
                     &GlobalArray::operate_min_patch); \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
     }
     else {
         ERR("GlobalArray::imin(Array*) fell through");
@@ -1183,6 +1207,9 @@ Array* GlobalArray::ipow(double exponent)
             } \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
         release_update();
     }
 

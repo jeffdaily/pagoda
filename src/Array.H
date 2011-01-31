@@ -138,6 +138,9 @@ class Array
                 fill(&the_value); \
             } else
 #include "DataType.def"
+            {
+                EXCEPT(DataTypeException, "DataType not handled", type);
+            }
         }
 
         /**

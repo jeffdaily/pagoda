@@ -386,6 +386,9 @@ void init_tally(Array *result, Array *tally, double fill)
             } \
         } else
 #include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
         result->release();
         tally->release_update();
     }

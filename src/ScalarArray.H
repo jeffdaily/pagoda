@@ -92,6 +92,9 @@ class ScalarArray : public AbstractArray
                 return static_cast<cast_type>(the_value); \
             } else
 #include "DataType.def"
+            {
+                EXCEPT(DataTypeException, "DataType not handled", type);
+            }
         }
 
     protected:

@@ -366,6 +366,9 @@ int main(int argc, char **argv)
                     } \
                 } else
 #include "DataType.def"
+                {
+                    EXCEPT(DataTypeException, "DataType not handled", type);
+                }
                 lhs_array->release();
                 rhs_array->release();
                 if (bad_count > 0) {

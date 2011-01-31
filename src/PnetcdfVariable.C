@@ -487,6 +487,9 @@ void PnetcdfVariable::after_wait()
                 tbuf = NULL; \
             } else
 #include "DataType.def"
+            {
+                EXCEPT(DataTypeException, "DataType not handled", type);
+            }
         } else {
             // read type same as stored type, simple release
             Array *dst = nb_arrays_to_release[i];

@@ -47,7 +47,7 @@ class AbstractArray : public Array
         virtual int64_t get_size() const;
 
         /** @copydoc Array::get_local_shape() const */
-        virtual vector<int64_t> get_local_shape() const = 0;
+        virtual vector<int64_t> get_local_shape() const;
 
         /** @copydoc Array::get_local_size() const */
         virtual int64_t get_local_size() const;
@@ -129,46 +129,46 @@ class AbstractArray : public Array
                              void *buffer=NULL) const = 0;
 
         /** @copydoc Array::add(const Array*) const */
-        virtual Array* add(const Array *rhs) const = 0;
+        virtual Array* add(const Array *rhs) const;
 
         /** @copydoc Array::iadd(const Array*) */
-        virtual Array* iadd(const Array *rhs) = 0;
+        virtual Array* iadd(const Array *rhs);
 
         /** @copydoc Array::sub(const Array*) const */
-        virtual Array* sub(const Array *rhs) const = 0;
+        virtual Array* sub(const Array *rhs) const;
 
         /** @copydoc Array::isub(const Array*) */
-        virtual Array* isub(const Array *rhs) = 0;
+        virtual Array* isub(const Array *rhs);
 
         /** @copydoc Array::mul(const Array*) const */
-        virtual Array* mul(const Array *rhs) const = 0;
+        virtual Array* mul(const Array *rhs) const;
 
         /** @copydoc Array::imul(const Array*) */
-        virtual Array* imul(const Array *rhs) = 0;
+        virtual Array* imul(const Array *rhs);
 
         /** @copydoc Array::div(const Array*) const */
-        virtual Array* div(const Array *rhs) const = 0;
+        virtual Array* div(const Array *rhs) const;
 
         /** @copydoc Array::idiv(const Array*) */
-        virtual Array* idiv(const Array *rhs) = 0;
+        virtual Array* idiv(const Array *rhs);
 
         /** @copydoc Array::max(const Array*) const */
-        virtual Array* max(const Array *rhs) const = 0;
+        virtual Array* max(const Array *rhs) const;
 
         /** @copydoc Array::imax(const Array*) */
-        virtual Array* imax(const Array *rhs) = 0;
+        virtual Array* imax(const Array *rhs);
 
         /** @copydoc Array::min(const Array*) const */
-        virtual Array* min(const Array *rhs) const = 0;
+        virtual Array* min(const Array *rhs) const;
 
         /** @copydoc Array::imin(const Array*) */
-        virtual Array* imin(const Array *rhs) = 0;
+        virtual Array* imin(const Array *rhs);
 
         /** @copydoc Array::pow(double) const */
-        virtual Array* pow(double exponent) const = 0;
+        virtual Array* pow(double exponent) const;
 
         /** @copydoc Array::ipow(double) */
-        virtual Array* ipow(double exponent) = 0;
+        virtual Array* ipow(double exponent);
 
         /** @copydoc Array::set_fill_value(double) */
         virtual void set_fill_value(double value);
@@ -209,6 +209,36 @@ class AbstractArray : public Array
          * @return @todo document
          */
         bool broadcast_check(const Array *rhs) const;
+
+        static const int OP_ADD = 1;
+        static const int OP_SUB = 2;
+        static const int OP_MUL = 3;
+        static const int OP_DIV = 4;
+        static const int OP_MAX = 5;
+        static const int OP_MIN = 6;
+        static const int OP_POW = 7;
+
+        /**
+         * @todo TODO document
+         */
+        void operate(const Array *rhs, const int op);
+
+        /**
+         * @todo TODO document
+         */
+        void operate_array(const Array *rhs, const int op);
+
+#if 0
+        /**
+         * @todo TODO document
+         */
+        void operate_array_broadcast(const Array *rhs, const int op);
+#endif
+
+        /**
+         * @todo TODO document
+         */
+        void operate_scalar(void *rhs, DataType rhs_type, const int op);
 
         bool _has_fill_value; /**< @todo document */
         double _fill_value; /**< @todo document */

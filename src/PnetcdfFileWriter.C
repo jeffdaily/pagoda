@@ -801,6 +801,9 @@ void PnetcdfFileWriter::wait()
                     buf = NULL; \
                 } else
 #include "DataType.def"
+                {
+                    EXCEPT(DataTypeException, "DataType not handled", type);
+                }
                 nb_buffers_to_delete[i] = NULL;
             } else {
                 nb_arrays_to_release[i]->release();
