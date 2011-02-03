@@ -12,12 +12,12 @@
 #include "DataType.H"
 #include "Timing.H"
 #include "Util.H"
+#include "Validator.H"
 
 
 AbstractArray::AbstractArray(DataType type)
     :   Array()
-    ,   _has_fill_value(false)
-    ,   _fill_value(0.0)
+    ,   validator(NULL)
     ,   counter(NULL)
     ,   write_type(type)
     ,   read_type(type)
@@ -28,9 +28,8 @@ AbstractArray::AbstractArray(DataType type)
 
 AbstractArray::AbstractArray(const AbstractArray &that)
     :   Array()
-    ,   _has_fill_value(that._has_fill_value)
-    ,   _fill_value(that._fill_value)
-    ,   counter(that.counter)
+    ,   validator(that.validator->clone())
+    ,   counter(that.counter->clone())
     ,   write_type(that.write_type)
     ,   read_type(that.write_type)
 {
@@ -328,29 +327,21 @@ bool AbstractArray::owns_data() const
 }
 
 
-void AbstractArray::set_fill_value(double value)
+void AbstractArray::set_validator(Validator *validator)
 {
-    _fill_value = value;
-    _has_fill_value = true;
+    this->validator = validator;
 }
 
 
-bool AbstractArray::has_fill_value() const
+bool AbstractArray::has_validator() const
 {
-    return _has_fill_value;
+    return NULL != validator;
 }
 
 
-double AbstractArray::get_fill_value() const
+Validator* AbstractArray::get_validator() const
 {
-    return _fill_value;
-}
-
-
-void AbstractArray::clear_fill_value()
-{
-    _fill_value = 0.0;
-    _has_fill_value = false;
+    return validator;
 }
 
 

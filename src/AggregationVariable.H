@@ -19,6 +19,7 @@ class Array;
 class Attribute;
 class AggregationDimension;
 class Dataset;
+class Validator;
 
 
 /**
@@ -39,8 +40,8 @@ class AggregationVariable : public AbstractVariable
         virtual vector<Dimension*> get_dims() const;
         virtual vector<Attribute*> get_atts() const;
 
-        virtual bool has_fill_value(int64_t record) const;
-        virtual double get_fill_value(int64_t record) const;
+        virtual bool has_validator(int64_t record) const;
+        virtual Validator* get_validator(int64_t record) const;
 
         virtual Dataset* get_dataset() const;
 

@@ -169,8 +169,8 @@ Array* Netcdf4Variable::read_wrapper(Array *dst) const
     }
 
     // propagate fill value to Array
-    if (has_fill_value()) {
-        dst->set_fill_value(get_fill_value());
+    if (has_validator()) {
+        dst->set_validator(get_validator());
     }
 
     return dst;
@@ -263,8 +263,8 @@ Array* Netcdf4Variable::read_wrapper(int64_t record, Array *dst) const
     }
 
     // propagate fill value to Array
-    if (has_fill_value(record)) {
-        dst->set_fill_value(get_fill_value(record));
+    if (has_validator(record)) {
+        dst->set_validator(get_validator(record));
     }
 
     return dst;

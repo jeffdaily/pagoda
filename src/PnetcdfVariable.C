@@ -142,8 +142,8 @@ Array* PnetcdfVariable::read_prep(Array *dst,
     Array *tmp;
 
     // propagate fill value to Array
-    if (has_fill_value()) {
-        dst->set_fill_value(get_fill_value());
+    if (has_validator()) {
+        dst->set_validator(get_validator());
     }
 
     // if we are subsetting, then the passed in array is different than the
@@ -244,8 +244,8 @@ Array* PnetcdfVariable::read_prep(Array *dst,
     Array *tmp;
 
     // propagate fill value to Array
-    if (has_fill_value(record)) {
-        dst->set_fill_value(get_fill_value(record));
+    if (has_validator(record)) {
+        dst->set_validator(get_validator(record));
     }
 
     // if we are subsetting, then the passed in array is different than the

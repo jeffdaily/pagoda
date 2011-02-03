@@ -7,7 +7,6 @@
 
 #include "Array.H"
 #include "DataType.H"
-#include "Dimension.H"
 #include "Error.H"
 
 using std::vector;
@@ -170,17 +169,14 @@ class AbstractArray : public Array
         /** @copydoc Array::ipow(double) */
         virtual Array* ipow(double exponent);
 
-        /** @copydoc Array::set_fill_value(double) */
-        virtual void set_fill_value(double value);
+        /** @copydoc Array::set_validator(double) */
+        virtual void set_validator(Validator* value);
 
-        /** @copydoc Array::has_fill_value() const */
-        virtual bool has_fill_value() const;
+        /** @copydoc Array::has_validator() const */
+        virtual bool has_validator() const;
 
-        /** @copydoc Array::get_fill_value() const */
-        virtual double get_fill_value() const;
-
-        /** @copydoc Array::clear_fill_value() */
-        virtual void clear_fill_value();
+        /** @copydoc Array::get_validator() const */
+        virtual Validator* get_validator() const;
 
         /** @copydoc Array::set_counter(Array*) */
         virtual void set_counter(Array *counter);
@@ -240,8 +236,7 @@ class AbstractArray : public Array
          */
         void operate_scalar(void *rhs, DataType rhs_type, const int op);
 
-        bool _has_fill_value; /**< @todo document */
-        double _fill_value; /**< @todo document */
+        Validator *validator; /**< @todo document */
         Array *counter; /**< @todo document */
         DataType write_type;
         DataType read_type;

@@ -20,6 +20,7 @@
 #include "IndexOutOfBoundsException.H"
 #include "Timing.H"
 #include "Variable.H"
+#include "Validator.H"
 
 using std::ostream;
 using std::string;
@@ -81,12 +82,12 @@ vector<Attribute*> AggregationVariable::get_atts() const
 }
 
 
-bool AggregationVariable::has_fill_value(int64_t record) const
+bool AggregationVariable::has_validator(int64_t record) const
 {
     int64_t index_within_var = translate_record(record);
 
     if (record < 0 || record > get_shape().at(0)) {
-        throw IndexOutOfBoundsException("AggregationVariable::has_fill_value");
+        throw IndexOutOfBoundsException("AggregationVariable::has_validator");
     }
 
     for (size_t index_var=0; index_var<vars.size(); ++index_var) {
@@ -97,7 +98,7 @@ bool AggregationVariable::has_fill_value(int64_t record) const
         num_records = var->get_shape().at(0);
         get_dataset()->pop_masks();
         if (index_within_var < num_records) {
-            return var->has_fill_value();
+            return var->has_validator(index_within_var);
         }
         else {
             index_within_var -= num_records;
@@ -108,12 +109,12 @@ bool AggregationVariable::has_fill_value(int64_t record) const
 }
 
 
-double AggregationVariable::get_fill_value(int64_t record) const
+Validator* AggregationVariable::get_validator(int64_t record) const
 {
     int64_t index_within_var = translate_record(record);
 
     if (record < 0 || record > get_shape().at(0)) {
-        throw IndexOutOfBoundsException("AggregationVariable::has_fill_value");
+        throw IndexOutOfBoundsException("AggregationVariable::get_validator");
     }
 
     for (size_t index_var=0; index_var<vars.size(); ++index_var) {
@@ -124,14 +125,14 @@ double AggregationVariable::get_fill_value(int64_t record) const
         num_records = var->get_shape().at(0);
         get_dataset()->pop_masks();
         if (index_within_var < num_records) {
-            return var->get_fill_value();
+            return var->get_validator(index_within_var);
         }
         else {
             index_within_var -= num_records;
         }
     }
 
-    return 0.0;
+    return NULL;
 }
 
 

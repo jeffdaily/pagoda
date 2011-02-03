@@ -33,10 +33,16 @@ class TypedValues : public Values
         virtual void as(size_t n, signed char &val) const;
         virtual void as(size_t n, unsigned char &val) const;
         virtual void as(size_t n, short &val) const;
+        virtual void as(size_t n, unsigned short &val) const;
         virtual void as(size_t n, int &val) const;
+        virtual void as(size_t n, unsigned int &val) const;
         virtual void as(size_t n, long &val) const;
+        virtual void as(size_t n, unsigned long &val) const;
+        virtual void as(size_t n, long long &val) const;
+        virtual void as(size_t n, unsigned long long &val) const;
         virtual void as(size_t n, float &val) const;
         virtual void as(size_t n, double &val) const;
+        virtual void as(size_t n, long double &val) const;
         virtual void as(size_t n, string &val) const;
 
         virtual TypedValues<T>& operator += (const Values *values);
@@ -87,10 +93,16 @@ implement_as(char)
 implement_as(signed char)
 implement_as(unsigned char)
 implement_as(short)
+implement_as(unsigned short)
 implement_as(int)
+implement_as(unsigned int)
 implement_as(long)
+implement_as(unsigned long)
+implement_as(long long)
+implement_as(unsigned long long)
 implement_as(float)
 implement_as(double)
+implement_as(long double)
 #undef implement_as
 
 

@@ -104,6 +104,10 @@ pkginclude_HEADERS += src/SubsetterCommands.H
 pkginclude_HEADERS += src/Timing.H
 pkginclude_HEADERS += src/TypedValues.H
 pkginclude_HEADERS += src/Util.H
+pkginclude_HEADERS += src/Validator.H
+pkginclude_HEADERS += src/ValidMax.H
+pkginclude_HEADERS += src/ValidMin.H
+pkginclude_HEADERS += src/ValidRange.H
 pkginclude_HEADERS += src/Values.H
 pkginclude_HEADERS += src/Variable.H
 
@@ -146,6 +150,7 @@ libpagoda_la_SOURCES += src/StringComparator.C
 libpagoda_la_SOURCES += src/SubsetterCommands.C
 libpagoda_la_SOURCES += src/Timing.C
 libpagoda_la_SOURCES += src/Util.C
+libpagoda_la_SOURCES += src/Validator.C
 libpagoda_la_SOURCES += src/Values.C
 libpagoda_la_SOURCES += src/Variable.C
 

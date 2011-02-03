@@ -18,6 +18,7 @@ class Attribute;
 class Dataset;
 class Dimension;
 class Mask;
+class Validator;
 
 
 /**
@@ -56,13 +57,13 @@ class Variable
          * @param[in] index of the record
          * @return true if this Variable has missing data.
          */
-        virtual bool has_fill_value(int64_t index=-1) const = 0;
+        virtual bool has_validator(int64_t index=-1) const = 0;
 
         /**
          * Returns the fill/missing value.
          *
          * It is an error to call this function without first checking
-         * has_fill_value() == true.
+         * has_validator(index) == true.
          *
          * Sometimes the fill/missing value may change from file to file if
          * this Variable represents an aggregation (or perhaps in the future
@@ -73,7 +74,7 @@ class Variable
          * @param[in] index of the record
          * @return the fill/missing value
          */
-        virtual double get_fill_value(int64_t index=-1) const = 0;
+        virtual Validator* get_validator(int64_t index=-1) const = 0;
 
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const = 0;

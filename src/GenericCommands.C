@@ -110,6 +110,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::ALPHABETIZE);
     parser.push_back(&CommandLineOption::NO_COORDS);
     parser.push_back(&CommandLineOption::COORDS);
+    parser.push_back(&CommandLineOption::TOPOLOGY);
     parser.push_back(&CommandLineOption::DIMENSION);
     parser.push_back(&CommandLineOption::FIX_RECORD_DIMENSION);
     parser.push_back(&CommandLineOption::HEADER_PAD);
@@ -146,9 +147,6 @@ void GenericCommands::parse(int argc, char **argv)
     }
     parser.parse(argc,argv);
     positional_arguments = parser.get_positional_arguments();
-    if (positional_arguments.empty()) {
-        throw CommandException("input and output file arguments required");
-    }
 
     if (parser.count("help")) {
         help = true;
@@ -158,6 +156,10 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("version")) {
         version = true;
         return; // stop parsing
+    }
+
+    if (positional_arguments.empty()) {
+        throw CommandException("input and output file arguments required");
     }
 
     // "path" must come before input filename handling

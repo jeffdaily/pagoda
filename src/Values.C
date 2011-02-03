@@ -44,10 +44,16 @@ implement_as(char)
 implement_as(signed char)
 implement_as(unsigned char)
 implement_as(short)
+implement_as(unsigned short)
 implement_as(int)
+implement_as(unsigned int)
 implement_as(long)
+implement_as(unsigned long)
+implement_as(long long)
+implement_as(unsigned long long)
 implement_as(float)
 implement_as(double)
+implement_as(long double)
 #undef implement_as
 
 

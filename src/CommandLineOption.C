@@ -110,7 +110,7 @@ CommandLineOption CommandLineOption::VARIABLE(
     'v', "variable", true,
     "var1[,var2[,...]] variable(s) to process");
 CommandLineOption CommandLineOption::VERS(
-    'v', "version", false,
+    'V', "version", false,
     "print version information and exit");
 
 

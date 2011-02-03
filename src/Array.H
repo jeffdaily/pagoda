@@ -8,9 +8,10 @@
 using std::vector;
 
 #include "DataType.H"
-#include "Dimension.H"
 #include "Error.H"
 
+class Dimension;
+class Validator;
 
 /**
  * N-dimensional distributed Array interface.
@@ -511,31 +512,23 @@ class Array
         virtual Array* ipow(double exponent) = 0;
 
         /**
-         * Sets the fill value for this Array.
+         * Sets the data Validator for this Array.
          *
-         * All operations adhere to fill value.
+         * All operations adhere to this Validator.
          *
-         * @param[in] value the fill value
+         * @param[in] validator the validator
          */
-        virtual void set_fill_value(double value) = 0;
+        virtual void set_validator(Validator *validator) = 0;
 
         /**
-         * Returns true if a fill value is set for this Array.
+         * Returns true if a Validator is set for this Array.
          */
-        virtual bool has_fill_value() const = 0;
+        virtual bool has_validator() const = 0;
 
         /**
-         * Returns the fill value.
-         *
-         * It is an error to call this function without first checking
-         * has_fill_value().
+         * Returns the data Validator for this Array.
          */
-        virtual double get_fill_value() const = 0;
-
-        /**
-         * Unsets the fill value.
-         */
-        virtual void clear_fill_value() = 0;
+        virtual Validator* get_validator() const = 0;
 
         /**
          * Sets a counter for arithmetic operations (used with fill values).

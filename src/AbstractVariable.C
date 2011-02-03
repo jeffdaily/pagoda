@@ -19,6 +19,10 @@
 #include "Pack.H"
 #include "StringComparator.H"
 #include "Timing.H"
+#include "ValidMax.H"
+#include "ValidMin.H"
+#include "ValidRange.H"
+#include "Validator.H"
 #include "Values.H"
 #include "Variable.H"
 
@@ -113,39 +117,179 @@ string AbstractVariable::get_long_name() const
 }
 
 
-bool AbstractVariable::has_fill_value(int64_t index) const
+bool AbstractVariable::has_validator(int64_t index) const
 {
     vector<string> names;
     names.push_back("_FillValue");
     names.push_back("missing_value");
+    names.push_back("valid_min");
+    names.push_back("valid_max");
+    names.push_back("valid_range");
     return NULL != get_att(names);
 }
 
 
-double AbstractVariable::get_fill_value(int64_t index) const
+Validator* AbstractVariable::get_validator(int64_t index) const
 {
-    double value;
-    Attribute *att;
-    vector<string> names;
-
-    names.push_back("_FillValue");
-    names.push_back("missing_value");
-    att = get_att(names);
-    if (NULL == att) {
-        ERR("no _FillValue nor missing_value attribute\n"
-                "code should test has_fill_value() first");
+    Validator *validator = NULL;
+    DataType type_var = get_type();
+    Attribute *att_valid_range = get_att("valid_range");
+    Attribute *att_valid_min = get_att("valid_min");
+    Attribute *att_valid_max = get_att("valid_max");
+    Attribute *att_fill_value = get_att("_FillValue");
+    if (!att_fill_value) {
+        att_fill_value = get_att("missing_value");
     }
-    if (att->get_type() == DataType::CHAR) {
-        istringstream sin(att->get_string());
-        sin >> value;
-        if (sin.fail()) {
-            ERR("could not convert _FillValue/missing_value from char");
+
+    // look for newer attributes first
+    if(att_valid_range) {
+        bool ok = true;
+        DataType type_att = att_valid_range->get_type();
+        if (att_valid_min) {
+            pagoda::print_zero("WARNING: both valid_min and valid_range");
+            ok = false;
         }
-    } else {
-        att->get_values()->as(0, value);
+        if (att_valid_max) {
+            pagoda::print_zero("WARNING: both valid_max and valid_range");
+            ok = false;
+        }
+        if (att_valid_range->get_count() != 2) {
+            pagoda::print_zero("WARNING: valid_range incorrect count");
+            ok = false;
+        }
+        if (type_att != type_var) {
+            pagoda::print_zero("WARNING: valid_range type mismatch");
+            ok = false;
+        }
+        if (ok) {
+#define DATATYPE_EXPAND(DT,T) \
+            if (type_att == DT) { \
+                T min,max,fill; \
+                if (get_fill_value(att_fill_value, fill)) { \
+                    validator = new ValidRange<T>(min,max,fill); \
+                } else { \
+                    validator = new ValidRange<T>(min,max); \
+                } \
+            } else
+#include "DataType.def"
+            {
+                ERR("DataType not handled");
+            }
+        }
+    } else if (att_valid_min && att_valid_max) {
+        bool ok = true;
+        DataType type_att = att_valid_min->get_type();
+        if (type_att != type_var) {
+            pagoda::print_zero("WARNING: valid_min/var type mismatch");
+            ok = false;
+        }
+        type_att = att_valid_max->get_type();
+        if (type_att != type_var) {
+            pagoda::print_zero("WARNING: valid_max/var type mismatch");
+            ok = false;
+        }
+        if (type_att != att_valid_min->get_type()) {
+            pagoda::print_zero("WARNING: valid_min/valid_max type mismatch");
+            ok = false;
+        }
+        if (att_valid_min->get_count() != 1) {
+            pagoda::print_zero("WARNING: valid_min incorrect count");
+            ok = false;
+        }
+        if (att_valid_max->get_count() != 1) {
+            pagoda::print_zero("WARNING: valid_max incorrect count");
+            ok = false;
+        }
+        if (ok) {
+#define DATATYPE_EXPAND(DT,T) \
+            if (type_att == DT) { \
+                T min,max,fill; \
+                att_valid_min->get_values()->as(size_t(0), min); \
+                att_valid_max->get_values()->as(size_t(0), max); \
+                if (get_fill_value(att_fill_value, fill)) { \
+                    validator = new ValidRange<T>(min,max,fill); \
+                } else { \
+                    validator = new ValidRange<T>(min,max); \
+                } \
+            } else
+#include "DataType.def"
+            {
+                ERR("DataType not handled");
+            }
+        }
+    } else if (att_valid_min) {
+        bool ok = true;
+        DataType type_att = att_valid_min->get_type();
+        if (type_att != type_var) {
+            pagoda::print_zero("WARNING: valid_min/var type mismatch");
+            ok = false;
+        }
+        if (att_valid_min->get_count() != 1) {
+            pagoda::print_zero("WARNING: valid_min incorrect count");
+            ok = false;
+        }
+        if (ok) {
+#define DATATYPE_EXPAND(DT,T) \
+            if (type_att == DT) { \
+                T min,fill; \
+                att_valid_min->get_values()->as(size_t(0), min); \
+                if (get_fill_value(att_fill_value, fill)) { \
+                    validator = new ValidMin<T>(min,fill); \
+                } else { \
+                    validator = new ValidMin<T>(min); \
+                } \
+            } else
+#include "DataType.def"
+            {
+                ERR("DataType not handled");
+            }
+        }
+    } else if (att_valid_max) {
+        bool ok = true;
+        DataType type_att = att_valid_max->get_type();
+        if (type_att != type_var) {
+            pagoda::print_zero("WARNING: valid_max/var type mismatch");
+            ok = false;
+        }
+        if (att_valid_max->get_count() != 1) {
+            pagoda::print_zero("WARNING: valid_max incorrect count");
+            ok = false;
+        }
+        if (ok) {
+#define DATATYPE_EXPAND(DT,T) \
+            if (type_att == DT) { \
+                T max,fill; \
+                att_valid_max->get_values()->as(size_t(0), max); \
+                if (get_fill_value(att_fill_value, fill)) { \
+                    validator = new ValidMax<T>(max,fill); \
+                } else { \
+                    validator = new ValidMax<T>(max); \
+                } \
+            } else
+#include "DataType.def"
+            {
+                ERR("DataType not handled");
+            }
+        }
+    } else if (att_fill_value) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (type_var == DT) { \
+            T fill; \
+            if (get_fill_value(att_fill_value, fill)) { \
+                if (fill > 0) { \
+                    validator = new ValidMax<T>(fill,true); \
+                } else { \
+                    validator = new ValidMin<T>(fill,false); \
+                } \
+            } \
+        } else
+#include "DataType.def"
+        {
+            ERR("DataType not handled");
+        }
     }
 
-    return value;
+    return validator;
 }
 
 

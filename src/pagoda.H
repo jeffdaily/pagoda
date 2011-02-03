@@ -67,6 +67,10 @@
 #include "Timing.H"
 #include "TypedValues.H"
 #include "Util.H"
+#include "Validator.H"
+#include "ValidMax.H"
+#include "ValidMin.H"
+#include "ValidRange.H"
 #include "Values.H"
 #include "Variable.H"
 #endif /* _PAGODA_H_ */

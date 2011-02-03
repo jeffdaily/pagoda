@@ -8,6 +8,7 @@
 using std::vector;
 
 class Array;
+class Mask;
 
 
 /**

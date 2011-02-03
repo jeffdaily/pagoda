@@ -702,7 +702,7 @@ void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
     vector<int64_t> array_lo;
     vector<int64_t> array_hi;
     vector<int64_t> shape = get_var_shape(name);
-    vector<MPI_Offset> start_copy(start.begin(), start.end());
+    vector<MPI_Offset> start_copy(start.size(), 0);
     vector<MPI_Offset> count(shape.size(), 0);
     int varid = get_var_id(name);
 

@@ -173,6 +173,7 @@ int main(int argc, char **argv)
                 }
                 else {
                     Array *array = var->read();
+                    ASSERT(NULL != array);
                     writer->write(array, var->get_name());
                     delete array;
                 }

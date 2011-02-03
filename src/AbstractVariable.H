@@ -4,18 +4,22 @@
 #include <stdint.h>
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
+#include "Attribute.H"
 #include "DataType.H"
+#include "Debug.H"
+#include "Values.H"
 #include "Variable.H"
 
+using std::istringstream;
 using std::ostream;
 using std::string;
 using std::vector;
 
 class Array;
-class Attribute;
 class Dataset;
 class Mask;
 
@@ -43,8 +47,8 @@ class AbstractVariable : public Variable
         virtual int64_t num_atts() const;
         virtual string get_standard_name() const;
         virtual string get_long_name() const;
-        virtual bool has_fill_value(int64_t index=-1) const;
-        virtual double get_fill_value(int64_t index=-1) const;
+        virtual bool has_validator(int64_t index=-1) const;
+        virtual Validator* get_validator(int64_t index=-1) const;
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const;
         virtual Attribute* get_att(const vector<string> &names,
@@ -117,6 +121,9 @@ class AbstractVariable : public Variable
          */
         virtual void renumber(Array *array) const;
 
+        template <class T>
+        static bool get_fill_value(const Attribute *att, T &value);
+
         Array* read_alloc() const;
         Array* read_alloc(int64_t record) const;
 
@@ -125,5 +132,31 @@ class AbstractVariable : public Variable
 
         bool enable_record_translation;
 };
+
+
+template <class T>
+bool AbstractVariable::get_fill_value(const Attribute *att, T &value)
+{
+    if (NULL == att) {
+        return false;
+    } else {
+        DataType type_att = att->get_type();
+        if (type_att == DataType::CHAR) {
+            istringstream sin(att->get_string());
+            sin >> value;
+            if (sin.fail()) {
+                pagoda::print_zero("WARNING: could not convert _FillValue/missing_value from char");
+                return false;
+            }
+        } else {
+            if (att->get_count() != 1) {
+                pagoda::print_zero("WARNING: _FillValue/missing_value incorrect count");
+                return false;
+            }
+            att->get_values()->as(size_t(0), value);
+        }
+        return true;
+    }
+}
 
 #endif // ABSTRACTVARIABLE_H_

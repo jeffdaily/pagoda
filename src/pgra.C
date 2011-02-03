@@ -23,6 +23,7 @@
 #include "PgraCommands.H"
 #include "ScalarArray.H"
 #include "Util.H"
+#include "Validator.H"
 #include "Variable.H"
 
 using std::exception;
@@ -42,7 +43,8 @@ int F77_DUMMY_MAIN()
 #endif
 
 
-void init_tally(Array *result, Array *tally, double fill);
+void initialize_tally(Array *result, Array *tally, Validator *validator);
+void finalize_tally(Array *result, Array *tally, Validator *validator);
 
 
 int main(int argc, char **argv)
@@ -138,11 +140,11 @@ int main(int argc, char **argv)
                 if (nb_results[i]->get_type() == DataType::CHAR) {
                     continue;
                 }
-                if (var->has_fill_value(0)) {
+                if (var->has_validator(0)) {
                     nb_tallys[i] = Array::create(
                                 DataType::INT, nb_results[i]->get_shape());
-                    init_tally(nb_results[i], nb_tallys[i],
-                            var->get_fill_value(0));
+                    initialize_tally(nb_results[i], nb_tallys[i],
+                            var->get_validator(0));
                 }
                 if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
                     // square the values
@@ -192,6 +194,8 @@ int main(int argc, char **argv)
                 if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
                         || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
                     if (NULL != nb_tallys[i]) {
+                        finalize_tally(nb_results[i], nb_tallys[i],
+                                var->get_validator(0));
                         nb_results[i]->idiv(nb_tallys[i]);
                     } else {
                         ScalarArray scalar(nb_results[i]->get_type());
@@ -204,6 +208,8 @@ int main(int argc, char **argv)
                         ScalarArray scalar(nb_tallys[i]->get_type());
                         scalar.fill_value(1);
                         nb_tallys[i]->isub(&scalar);
+                        finalize_tally(nb_results[i], nb_tallys[i],
+                                var->get_validator(0));
                         nb_results[i]->idiv(nb_tallys[i]);
                     } else {
                         ScalarArray scalar(nb_results[i]->get_type());
@@ -252,9 +258,9 @@ int main(int argc, char **argv)
                         continue;
                     }
 
-                    if (var->has_fill_value(0)) {
+                    if (var->has_validator(0)) {
                         tally = Array::create(DataType::INT, result->get_shape());
-                        init_tally(result, tally, var->get_fill_value(0));
+                        initialize_tally(result, tally, var->get_validator(0));
                     }
 
                     if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
@@ -289,6 +295,8 @@ int main(int argc, char **argv)
                     if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
                             || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
                         if (NULL != tally) {
+                            finalize_tally(result, tally,
+                                    var->get_validator(0));
                             result->idiv(tally);
                         } else {
                             ScalarArray scalar(result->get_type());
@@ -301,6 +309,8 @@ int main(int argc, char **argv)
                             ScalarArray scalar(tally->get_type());
                             scalar.fill_value(1);
                             tally->isub(&scalar);
+                            finalize_tally(result, tally,
+                                    var->get_validator(0));
                             result->idiv(tally);
                         } else {
                             ScalarArray scalar(result->get_type());
@@ -326,6 +336,7 @@ int main(int argc, char **argv)
                 }
                 else {
                     Array *array = var->read();
+                    ASSERT(NULL != array);
                     writer->write(array, var->get_name());
                     delete array;
                 }
@@ -364,25 +375,28 @@ int main(int argc, char **argv)
 }
 
 
-void init_tally(Array *result, Array *tally, double fill)
+void initialize_tally(Array *result, Array *tally, Validator *validator)
 {
     void *ptr_result;
-    int *ptr_tally;
-    DataType type = result->get_type();
     
     // result and tally arrays are assumed to have same distributions
     ASSERT(result->same_distribution(tally));
 
     ptr_result = result->access();
-    ptr_tally = static_cast<int*>(tally->access());
     if (NULL != ptr_result) {
-        ASSERT(NULL != ptr_tally);
+        int *buf_tally = static_cast<int*>(tally->access());
+        DataType type = result->get_type();
+        ASSERT(NULL != buf_tally);
 #define DATATYPE_EXPAND(DT,T) \
         if (DT == type) { \
-            T *data = static_cast<T*>(ptr_result); \
-            T _fill = static_cast<T>(fill); \
+            T *buf_result = static_cast<T*>(ptr_result); \
             for (int64_t i=0,limit=result->get_local_size(); i<limit; ++i) { \
-                ptr_tally[i] = (data[i] == _fill) ? 0 : 1; \
+                if (validator->is_valid(&buf_result[i])) { \
+                    buf_tally[i] = 1; \
+                } else { \
+                    buf_tally[i] = 0; \
+                    buf_result[i] = 0; \
+                } \
             } \
         } else
 #include "DataType.def"
@@ -394,3 +408,33 @@ void init_tally(Array *result, Array *tally, double fill)
     }
 }
 
+void finalize_tally(Array *result, Array *tally, Validator *validator)
+{
+    void *ptr_result;
+    
+    // result and tally arrays are assumed to have same distributions
+    ASSERT(result->same_distribution(tally));
+
+    ptr_result = result->access();
+    if (NULL != ptr_result) {
+        int *buf_tally = static_cast<int*>(tally->access());
+        DataType type = result->get_type();
+        ASSERT(NULL != buf_tally);
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            T *buf_result = static_cast<T*>(ptr_result); \
+            for (int64_t i=0,limit=result->get_local_size(); i<limit; ++i) { \
+                if (buf_tally[i] <= 0) { \
+                    buf_tally[i] = 1; \
+                    buf_result[i] = *static_cast<const T*>(validator->get_fill_value()); \
+                } \
+            } \
+        } else
+#include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
+        result->release_update();
+        tally->release_update();
+    }
+}
