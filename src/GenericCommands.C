@@ -8,6 +8,7 @@
 #include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
 #include "Attribute.H"
+#include "Bootstrap.H"
 #include "CommandException.H"
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
@@ -601,10 +602,18 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
         Attribute *history = NULL;
         size_t pos;
         size_t limit;
-        time_t time_result = time(NULL);
-        string date_cmdline = ctime(&time_result);
+        time_t time_result;
+        string date_cmdline;
         TypedValues<char> *history_complete;
         vector<char> history_copy;
+
+        if (pagoda::me == 0) {
+            time_result = time(NULL);
+        } else {
+            time_result = 0;
+        }
+        pagoda::gop_sum(time_result);
+        date_cmdline = ctime(&time_result);
 
         // replace newline added by ctime with colon space
         date_cmdline.replace(date_cmdline.size()-1, 1, ": ");

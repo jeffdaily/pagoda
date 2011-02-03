@@ -107,7 +107,7 @@ int main(int argc, char **argv)
                     pagoda::println_zero(stdout, PACKAGE_STRING);
                     pagoda::finalize();
                     return EXIT_SUCCESS;
-                    break;
+                    /*break; unreachable*/
             }
         }
         if (optind < argc) {

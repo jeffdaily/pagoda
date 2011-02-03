@@ -360,7 +360,7 @@ int main(int argc, char **argv)
             case NC_NAT:
             default:
                 ERRNO(NC_EBADTYPE);
-                break;
+                /*break; unreachable */
         }
         print_zero("blocking read of " + name + " ... ");
         timer_blocking_local = timer_start();
@@ -392,7 +392,7 @@ int main(int argc, char **argv)
             case NC_NAT:
             default:
                 ERRNO(NC_EBADTYPE);
-                break;
+                /*break; unreachable */
         }
         timer_blocking_total += timer_end(timer_blocking_local);
         print_zero("done\n");
@@ -426,7 +426,7 @@ int main(int argc, char **argv)
             case NC_NAT:
             default:
                 ERRNO(NC_EBADTYPE);
-                break;
+                /*break; unreachable */
         }
         timer_nonblocking_total += timer_end(timer_nonblocking_local);
         print_zero("done\n");
@@ -472,7 +472,7 @@ int main(int argc, char **argv)
             case NC_NAT:
             default:
                 ERRNO(NC_EBADTYPE);
-                break;
+                /*break; unreachable */
         }
     }
 
@@ -512,7 +512,7 @@ int main(int argc, char **argv)
             case NC_NAT:
             default:
                 ERRNO(NC_EBADTYPE);
-                break;
+                /*break; unreachable */
         }
     }
 
