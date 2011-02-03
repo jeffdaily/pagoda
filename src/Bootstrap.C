@@ -18,6 +18,9 @@
 #if HAVE_PNETCDF
 extern Dataset* pagoda_pnetcdf_open(const std::string&);
 extern FileWriter* pagoda_pnetcdf_create(const std::string&);
+#   include "Debug.H"
+#   include "PnetcdfTiming.H"
+#   include "Util.H"
 #endif
 #if HAVE_NETCDF4
 extern Dataset* pagoda_netcdf4_open(const std::string&);
@@ -55,11 +58,26 @@ void pagoda::initialize(int *argc, char ***argv)
     Dataset::register_opener(pagoda_netcdf4_open);
     FileWriter::register_writer(pagoda_netcdf4_create);
 #endif
+#if HAVE_PNETCDF && defined(GATHER_PNETCDF_TIMING)
+    PnetcdfTiming::start_global = PnetcdfTiming::get_time();
+#endif
 }
 
 
 void pagoda::finalize()
 {
+#if HAVE_PNETCDF && defined(GATHER_PNETCDF_TIMING)
+    PnetcdfTiming::end_global = PnetcdfTiming::get_time();
+    pagoda::println_zero("PnetcdfTiming::end_global  ="
+            + pagoda::to_string(PnetcdfTiming::end_global));
+    pagoda::println_zero("PnetcdfTiming::start_global="
+            + pagoda::to_string(PnetcdfTiming::start_global));
+    pagoda::println_zero("                diff_global="
+            + pagoda::to_string(PnetcdfTiming::end_global
+                -PnetcdfTiming::start_global));
+    pagoda::println_zero(PnetcdfTiming::get_stats_calls());
+    pagoda::println_zero(PnetcdfTiming::get_stats_aggregate());
+#endif
 #if HAVE_GA
     GA_Terminate();
 #endif

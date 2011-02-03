@@ -14,19 +14,9 @@
 #   include <unistd.h>
 #endif
 
-#if HAVE_GA
-#   include <ga.h>
-#endif
-
 #define USE_BARRIERS
 #ifdef USE_BARRIERS
-#   if HAVE_GA
-#       define BARRIER() GA_Sync()
-#   elif HAVE_MPI
-#       define BARRIER() MPI_Barrier()
-#   else
-#       define BARRIER()
-#   endif
+#   define BARRIER() pagoda::barrier()
 #else
 #   define BARRIER()
 #endif
