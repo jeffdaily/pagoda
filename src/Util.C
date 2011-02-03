@@ -284,6 +284,137 @@ void pagoda::gop_sum(vector<long double> &values)
 }
 
 
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(int &value)
+{
+#if HAVE_GA
+    GA_Igop(&value, 1, "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(long &value)
+{
+#if HAVE_GA
+    GA_Lgop(&value, 1, "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(long long &value)
+{
+#if HAVE_GA && HAVE_GA_LLGOP
+    GA_Llgop(&value, 1, "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+#if NEED_VECTOR_INT64_T_GOP
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(int64_t &value)
+{
+#   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
+    GA_Llgop(&value, 1, "+");
+#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG
+    GA_Lgop(&value, 1, "+");
+#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
+    GA_Igop(&value, 1, "+");
+#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
+    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
+    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_INT
+    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+#   else
+#       error
+#   endif
+}
+#endif /* NEED_VECTOR_INT64_T_GOP */
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(float &value)
+{
+#if HAVE_GA
+    GA_Fgop(&value, 1, "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&value, &value, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(double &value)
+{
+#if HAVE_GA
+    GA_Dgop(&value, 1, "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&value, &value, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the sum of all values from all processes.
+ *
+ * @param[in,out] values the values to take the sums of
+ */
+void pagoda::gop_sum(long double &value)
+{
+#if HAVE_GA && HAVE_GA_LDGOP
+    GA_Ldgop(&value, 1, "+");
+#elif HAVE_MPI
+    MPI_Allreduce(&value, &value, 1, MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#else
+#   error
+#endif
+}
+
+
+
+
 static int64_t op_lohi_diff(int64_t lo, int64_t hi)
 {
     return hi-lo+1;

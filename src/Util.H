@@ -46,6 +46,15 @@ namespace pagoda
     void gop_sum(vector<float> &values);
     void gop_sum(vector<double> &values);
     void gop_sum(vector<long double> &values);
+    void gop_sum(int &value);
+    void gop_sum(long &value);
+    void gop_sum(long long &value);
+#if NEED_VECTOR_INT64_T_GOP
+    void gop_sum(int64_t &value);
+#endif
+    void gop_sum(float &value);
+    void gop_sum(double &value);
+    void gop_sum(long double &value);
     vector<int64_t> get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi);
     int64_t shape_to_size(const vector<int64_t> &shape);
     bool ends_with(const string &str, const string &end);
