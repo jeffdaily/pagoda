@@ -612,7 +612,7 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
         } else {
             time_result = 0;
         }
-        pagoda::gop_sum(time_result);
+        pagoda::broadcast(time_result, 0);
         date_cmdline = ctime(&time_result);
 
         // replace newline added by ctime with colon space

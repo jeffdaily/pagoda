@@ -55,6 +55,18 @@ namespace pagoda
     void gop_sum(float &value);
     void gop_sum(double &value);
     void gop_sum(long double &value);
+    void broadcast(vector<int> &values, int root);
+    void broadcast(vector<long> &values, int root);
+    void broadcast(vector<long long> &values, int root);
+    void broadcast(vector<float> &values, int root);
+    void broadcast(vector<double> &values, int root);
+    void broadcast(vector<long double> &values, int root);
+    void broadcast(int &value, int root);
+    void broadcast(long &value, int root);
+    void broadcast(long long &value, int root);
+    void broadcast(float &value, int root);
+    void broadcast(double &value, int root);
+    void broadcast(long double &value, int root);
     vector<int64_t> get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi);
     int64_t shape_to_size(const vector<int64_t> &shape);
     bool ends_with(const string &str, const string &end);

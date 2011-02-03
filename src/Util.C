@@ -413,6 +413,54 @@ void pagoda::gop_sum(long double &value)
 }
 
 
+#if HAVE_GA
+#   define broadcast_impl(T)                              \
+void pagoda::broadcast(vector<T> &values, int root)       \
+{                                                         \
+    GA_Brdcst(&values[0], values.size()*sizeof(T), root); \
+}
+#elif HAVE_MPI
+#   define broadcast_impl(T)                              \
+void pagoda::broadcast(vector<T> &values, int root)       \
+{                                                         \
+    MPI_Bcast(&values[0], values.size()*sizeof(T),        \
+            MPI_CHAR, root, MPI_COMM_WORLD);              \
+}
+#else
+#   error
+#endif
+broadcast_impl(int)
+broadcast_impl(long)
+broadcast_impl(long long)
+broadcast_impl(float)
+broadcast_impl(double)
+broadcast_impl(long double)
+#undef broadcast_impl
+
+
+#if HAVE_GA
+#   define broadcast_impl(T)                              \
+void pagoda::broadcast(T &value, int root)                \
+{                                                         \
+    GA_Brdcst(&value, sizeof(T), root);                   \
+}
+#elif HAVE_MPI
+#   define broadcast_impl(T)                              \
+void pagoda::broadcast(T &value, int root)                \
+{                                                         \
+    MPI_Bcast(&value, sizeof(T),                          \
+            MPI_CHAR, root, MPI_COMM_WORLD);              \
+}
+#else
+#   error
+#endif
+broadcast_impl(int)
+broadcast_impl(long)
+broadcast_impl(long long)
+broadcast_impl(float)
+broadcast_impl(double)
+broadcast_impl(long double)
+#undef broadcast_impl
 
 
 static int64_t op_lohi_diff(int64_t lo, int64_t hi)
