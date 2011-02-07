@@ -92,7 +92,7 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     int me = pagoda::nodeid();
     DataType type_src = g_src->get_type();
     DataType type_dst = g_dst->get_type();
-    void *ptr_src;
+    const void *ptr_src;
     void *ptr_dst;
     int64_t elems;
 
@@ -117,8 +117,8 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
         if (DTYPE_SRC == type_src && DTYPE_DST == type_dst) { \
             TYPE_DST value = 0; \
             vector<TYPE_DST> values(nproc,0); \
-            TYPE_DST *dst = (TYPE_DST*)ptr_dst; \
-            TYPE_SRC *src = (TYPE_SRC*)ptr_src; \
+            TYPE_DST *dst = static_cast<TYPE_DST*>(ptr_dst); \
+            const TYPE_SRC *src = static_cast<const TYPE_SRC*>(ptr_src); \
             if (!excl) { \
                 dst[0] = 0; \
                 for (int64_t i=1; i<elems; ++i) { \
@@ -297,7 +297,7 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
 #define pack_bit_copy(DTYPE,TYPE,FMT) \
             if (type_src == DTYPE) { \
                 int64_t okay_count = 0; \
-                TYPE *sptr = (TYPE*)g_src->access(); \
+                const TYPE *sptr = static_cast<const TYPE*>(g_src->access()); \
                 TYPE *buf_dst = new TYPE[local_counts_product]; \
                 TYPE *dptr = buf_dst; \
                 int64_t nd_m1 = ndim_src-1; \
@@ -416,14 +416,14 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
     if (src->owns_data()) {
 #define enumerate_op(DTYPE,TYPE) \
         if (DTYPE == type) { \
-            TYPE *src_data = (TYPE*)src->access(); \
+            TYPE *src_data = static_cast<TYPE*>(src->access()); \
             TYPE start = 0; \
             TYPE inc = 1; \
             if (start_val) { \
-                start = *((TYPE*)start_val); \
+                start = *static_cast<TYPE*>(start_val); \
             } \
             if (inc_val) { \
-                inc = *((TYPE*)inc_val); \
+                inc = *static_cast<TYPE*>(inc_val); \
             } \
             for (int64_t i=0,limit=src->get_local_size(); i<limit; ++i) { \
                 src_data[i] = (lo[0]+i)*inc + start; \
@@ -481,7 +481,7 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         return; // this process doesn't participate
     }
     else {
-        mask = (int*)msk->access();
+        mask = static_cast<int*>(msk->access());
         for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) {
             if (0 != mask[i]) {
                 ++(counts[me]);
@@ -507,10 +507,11 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     // assumption is that dst array has same distribution as msk array
 #define unpack1d_op(DTYPE,TYPE) \
     if (type_src == DTYPE) { \
-        TYPE *src_data = (TYPE*)src->get(lo_src, hi_src); \
-        TYPE *dst_data = (TYPE*)dst->access(); \
-        TYPE *src_origin = src_data; \
-        int  *msk_data = (int*)msk->access(); \
+        const TYPE *src_data = static_cast<const TYPE*>( \
+                src->get(lo_src, hi_src)); \
+        TYPE *dst_data = static_cast<TYPE*>(dst->access()); \
+        const TYPE *src_origin = src_data; \
+        int  *msk_data = static_cast<int*>(msk->access()); \
         for (int64_t i=0,limit=msk->get_local_size(); i<limit; ++i) \
         { \
             if (msk_data[i] != 0) { \
@@ -561,7 +562,7 @@ void pagoda::renumber(Array *array, const Array *index)
         return;
     }
 
-    buf = (int*)array->access();
+    buf = static_cast<int*>(array->access());
     for (int64_t i=0,limit=array->get_local_size(); i<limit; ++i) {
         m[buf[i]] = -1;
     }

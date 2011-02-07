@@ -13,7 +13,7 @@ class ValidRange : public Validator
         virtual ~ValidRange();
 
         virtual ValidRange<T>* clone() const;
-        virtual bool is_valid(void *value) const;
+        virtual bool is_valid(const void *value) const;
         virtual const void* get_fill_value() const;
 
     protected:
@@ -74,9 +74,9 @@ ValidRange<T>* ValidRange<T>::clone() const
 
 
 template <class T>
-bool ValidRange<T>::is_valid(void *value) const
+bool ValidRange<T>::is_valid(const void *value) const
 {
-    T tval = *static_cast<T*>(value);
+    const T tval = *static_cast<const T*>(value);
     return min <= tval && tval <= max;
 }
 

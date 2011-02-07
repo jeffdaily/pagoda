@@ -316,7 +316,7 @@ void Netcdf4Variable::do_read(Array *dst, const vector<size_t> &start,
     if (type == DT) { \
         TYPE *ptr = NULL; \
         if (dst->owns_data() && found_bit) { \
-            ptr = (TYPE*)dst->access(); \
+            ptr = static_cast<TYPE*>(dst->access()); \
         } \
         nc::get_vara(ncid, id, start, count, ptr); \
         if (dst->owns_data() && found_bit) { \

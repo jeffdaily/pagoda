@@ -12,7 +12,7 @@ class ValidMax : public Validator
         ValidMax(const ValidMax<T> &that);
         virtual ~ValidMax();
 
-        virtual bool is_valid(void *value) const;
+        virtual bool is_valid(const void *value) const;
         virtual ValidMax<T>* clone() const;
         virtual const void* get_fill_value() const;
 
@@ -77,9 +77,9 @@ ValidMax<T>* ValidMax<T>::clone() const
 
 
 template <class T>
-bool ValidMax<T>::is_valid(void *value) const
+bool ValidMax<T>::is_valid(const void *value) const
 {
-    return range_value >= *static_cast<T*>(value);
+    return range_value >= *static_cast<const T*>(value);
 }
 
 

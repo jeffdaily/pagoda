@@ -113,7 +113,7 @@ int64_t GlobalMask::get_count()
         vector<int64_t> counts(pagoda::num_nodes(), ZERO);
 
         if (owns_data()) {
-            int *data = (int*)access();
+            int *data = static_cast<int*>(access());
             for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
                 if (data[i] != 0) {
                     ++(counts[pagoda::nodeid()]);
@@ -194,7 +194,7 @@ void GlobalMask::modify(const IndexHyperslab &hyperslab)
     }
 
     get_distribution(lo,hi);
-    data = (int*)access();
+    data = static_cast<int*>(access());
     if (lo[0] <= slo) {
         int64_t start = slo-lo[0];
         if (hi[0] >= shi) {
@@ -231,8 +231,8 @@ void GlobalMask::modify(const IndexHyperslab &hyperslab)
 void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon)
 {
     int *mask_data;
-    void *lat_data;
-    void *lon_data;
+    const void *lat_data;
+    const void *lon_data;
     int64_t size = get_local_size();
     DataType type = lat->get_type();
 
@@ -259,14 +259,14 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
         pagoda::abort("GlobalMask::modify lat lon types differ", 0);
     }
 
-    mask_data = (int*)access();
+    mask_data = static_cast<int*>(access());
     lat_data = lat->access();
     lon_data = lon->access();
 
 #define adjust_op(DTYPE,TYPE) \
     if (type == DTYPE) { \
-        TYPE *plat = (TYPE*)lat_data; \
-        TYPE *plon = (TYPE*)lon_data; \
+        const TYPE *plat = static_cast<const TYPE*>(lat_data); \
+        const TYPE *plon = static_cast<const TYPE*>(lon_data); \
         for (int64_t i=0; i<size; ++i) { \
             if (box.contains(plat[i], plon[i])) { \
                 mask_data[i] = 1; \
@@ -292,7 +292,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
 void GlobalMask::modify(double min, double max, const Array *var)
 {
     int *mask_data;
-    void *var_data;
+    const void *var_data;
     DataType type = var->get_type();
 
     TIMING("GlobalMask::modify(double,double,Variable*,bool)");
@@ -312,12 +312,12 @@ void GlobalMask::modify(double min, double max, const Array *var)
         pagoda::abort("GlobalMask::modify mask var shape mismatch", 0);
     }
 
-    mask_data = (int*)access();
+    mask_data = static_cast<int*>(access());
     var_data = var->access();
 
 #define adjust_op(DTYPE,TYPE) \
     if (type == DTYPE) { \
-        TYPE *pdata = (TYPE*)var_data; \
+        const TYPE *pdata = static_cast<const TYPE*>(var_data); \
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
             if (pdata[i] >= min && pdata[i] <= max) { \
                 mask_data[i] = 1; \
@@ -342,7 +342,7 @@ void GlobalMask::modify(double min, double max, const Array *var)
 void GlobalMask::modify_gt(double value, const Array *var)
 {
     int *mask_data;
-    void *var_data;
+    const void *var_data;
     DataType type = var->get_type();
 
     TIMING("GlobalMask::modify_gt(double,Variable*)");
@@ -362,12 +362,12 @@ void GlobalMask::modify_gt(double value, const Array *var)
 
     // it is assumed that they have the same distributions
     ASSERT(same_distribution(var));
-    mask_data = (int*)access();
+    mask_data = static_cast<int*>(access());
     var_data = var->access();
 
 #define adjust_op(DTYPE,TYPE) \
     if (type == DTYPE) { \
-        TYPE *pdata = (TYPE*)var_data; \
+        const TYPE *pdata = static_cast<const TYPE*>(var_data); \
         TYPE pvalue = static_cast<TYPE>(value); \
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
             if (pdata[i] > pvalue) { \
@@ -393,7 +393,7 @@ void GlobalMask::modify_gt(double value, const Array *var)
 void GlobalMask::modify_lt(double value, const Array *var)
 {
     int *mask_data;
-    void *var_data;
+    const void *var_data;
     DataType type = var->get_type();
 
     TIMING("GlobalMask::modify_gt(double,Variable*)");
@@ -413,12 +413,12 @@ void GlobalMask::modify_lt(double value, const Array *var)
 
     // it is assumed that they have the same distributions
     ASSERT(same_distribution(var));
-    mask_data = (int*)access();
+    mask_data = static_cast<int*>(access());
     var_data = var->access();
 
 #define adjust_op(DTYPE,TYPE) \
     if (type == DTYPE) { \
-        TYPE *pdata = (TYPE*)var_data; \
+        const TYPE *pdata = static_cast<const TYPE*>(var_data); \
         TYPE pvalue = static_cast<TYPE>(value); \
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
             if (pdata[i] < pvalue) { \
@@ -450,7 +450,7 @@ void GlobalMask::normalize()
     TRACER("GlobalMask::normalize()");
 
     if (owns_data()) {
-        int *mask_data = (int*)access();
+        int *mask_data = static_cast<int*>(access());
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
             if (mask_data[i] != 0) {
                 mask_data[i] = 1;
@@ -609,7 +609,7 @@ void* GlobalMask::access()
 }
 
 
-void* GlobalMask::access() const
+const void* GlobalMask::access() const
 {
     return mask->access();
 }

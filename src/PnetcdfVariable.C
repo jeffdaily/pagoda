@@ -396,7 +396,7 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
         if (dst->owns_data() && found_bit) { \
             int64_t n = dst->get_local_size(); \
             if (read_type == type) { \
-                ptr = (TYPE*)dst->access(); \
+                ptr = static_cast<TYPE*>(dst->access()); \
             } else { \
                 ptr = new TYPE[n]; \
             } \
@@ -441,7 +441,7 @@ void PnetcdfVariable::do_iread(Array *dst, const vector<MPI_Offset> &start,
         if (dst->owns_data() && found_bit) { \
             int64_t n = dst->get_local_size(); \
             if (read_type == type) { \
-                ptr = (TYPE*)dst->access(); \
+                ptr = static_cast<TYPE*>(dst->access()); \
                 nb_buffers.push_back(NULL); \
                 nb_arrays_to_release.push_back(dst); \
             } else {\

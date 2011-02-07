@@ -744,7 +744,7 @@ void PnetcdfFileWriter::do_write(Array *array, int varid,
         TYPE *ptr = NULL; \
         if (array->owns_data()) { \
             if (write_type == type) { \
-                ptr = (TYPE*)array->access(); \
+                ptr = static_cast<TYPE*>(array->access()); \
             } else { \
                 void *gabuf = array->access(); \
                 ptr = new TYPE[n]; \

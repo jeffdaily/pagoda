@@ -62,7 +62,7 @@ class GlobalArray : public AbstractArray
         virtual void get_distribution(
             vector<int64_t> &lo, vector<int64_t> &hi) const;
         virtual void* access();
-        virtual void* access() const;
+        virtual const void* access() const;
         virtual void release() const;
         virtual void release_update();
 

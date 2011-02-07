@@ -28,8 +28,8 @@ AbstractArray::AbstractArray(DataType type)
 
 AbstractArray::AbstractArray(const AbstractArray &that)
     :   Array()
-    ,   validator(that.validator->clone())
-    ,   counter(that.counter->clone())
+    ,   validator(that.validator == NULL ? NULL : that.validator->clone())
+    ,   counter(that.counter == NULL ? NULL : that.counter->clone())
     ,   write_type(that.write_type)
     ,   read_type(that.write_type)
 {
@@ -137,6 +137,9 @@ void AbstractArray::fill(void *value)
 
 void AbstractArray::copy(const Array *src)
 {
+    /** @todo TODO implement */
+    ERR("Not implemented");
+#if 0
     void *data = access();
 
     ASSERT(same_distribution(src));
@@ -145,6 +148,7 @@ void AbstractArray::copy(const Array *src)
 
         release_update();
     }
+#endif
 }
 
 
@@ -164,7 +168,7 @@ Array* AbstractArray::cast(DataType new_type) const
             vector<int64_t> lo;
             vector<int64_t> hi;
             void *dst_data = NULL;
-            void *src_data = NULL;
+            const void *src_data = NULL;
             DataType type_dst = dst_array->get_type();
             dst_array->get_distribution(lo, hi);
             if (same_distribution(dst_array)) {
@@ -175,7 +179,7 @@ Array* AbstractArray::cast(DataType new_type) const
             dst_data = dst_array->access();
 #define DATATYPE_EXPAND(src_mt,src_t,dst_mt,dst_t) \
             if (type == src_mt && type_dst == dst_mt) { \
-                src_t *src = static_cast<src_t*>(src_data); \
+                const src_t *src = static_cast<const src_t*>(src_data); \
                 dst_t *dst = static_cast<dst_t*>(dst_data); \
                 pagoda::copy_cast<dst_t>(src,src+get_size(),dst); \
             } else
@@ -189,7 +193,7 @@ Array* AbstractArray::cast(DataType new_type) const
             } else {
 #define DATATYPE_EXPAND(mt,t) \
                 if (type_dst == mt) { \
-                    t *src = static_cast<t*>(src_data); \
+                    const t *src = static_cast<const t*>(src_data); \
                     delete [] src; \
                 } else 
 #include "DataType.def"
@@ -304,7 +308,13 @@ Array* AbstractArray::imin(const Array *rhs)
 
 Array* AbstractArray::ipow(double exponent)
 {
-    operate_scalar(&exponent, DataType::DOUBLE, OP_POW);
+    if (NULL != validator && NULL != counter) {
+        operate_scalar_validator_counter(&exponent, DataType::DOUBLE, OP_POW);
+    } else if (NULL != validator) {
+        operate_scalar_validator(&exponent, DataType::DOUBLE, OP_POW);
+    } else {
+        operate_scalar(&exponent, DataType::DOUBLE, OP_POW);
+    }
     return this;
 }
 
@@ -385,301 +395,35 @@ bool AbstractArray::broadcast_check(const Array *rhs) const
 
 void AbstractArray::operate(const Array *rhs, const int op)
 {
-    if (rhs->get_ndim() == 0) {
+    if (rhs->is_scalar()) {
         void *val = rhs->get();
-        operate_scalar(val, rhs->get_type(), op);
-    } else if (broadcast_check(rhs)) {
-        ERR("operate_array_broadcast not implemented");
-    } else {
-        operate_array(rhs, op);
-    }
-}
-
-
-template <class L, class R>
-static void op_iadd(L *lhs, R *rhs, int64_t count)
-{
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] += static_cast<L>(rhs[i]);
-    }
-}
-
-
-template <class L, class R>
-static void op_isub(L *lhs, R *rhs, int64_t count)
-{
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] -= static_cast<L>(rhs[i]);
-    }
-}
-
-
-template <class L, class R>
-static void op_imul(L *lhs, R *rhs, int64_t count)
-{
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] *= static_cast<L>(rhs[i]);
-    }
-}
-
-
-template <class L, class R>
-static void op_idiv(L *lhs, R *rhs, int64_t count)
-{
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] /= static_cast<L>(rhs[i]);
-    }
-}
-
-
-template <class L, class R>
-static void op_imax(L *lhs, R *rhs, int64_t count)
-{
-    for (int64_t i=0; i<count; ++i) {
-        L rval = static_cast<L>(rhs[i]);
-        lhs[i] = lhs[i]>rval ? lhs[i] : rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_imin(L *lhs, R *rhs, int64_t count)
-{
-    for (int64_t i=0; i<count; ++i) {
-        L rval = static_cast<L>(rhs[i]);
-        lhs[i] = lhs[i]<rval ? lhs[i] : rval;
-    }
-}
-
-
-void AbstractArray::operate_array(const Array *rhs, const int op)
-{
-    // first, make sure input arrays are compatible
-    if (!broadcast_check(rhs)) {
-        ERR("incompatible arrays for operation");
-    }
-    void *lhs_ptr = access();
-    if (NULL != lhs_ptr) {
-        DataType lhs_type = get_type();
-        DataType rhs_type = rhs->get_type();
-        void *rhs_ptr = NULL;
-        if (same_distribution(rhs)) {
-            rhs_ptr = rhs->access();
+        DataType type = rhs->get_type();
+        if (NULL != validator && NULL != counter) {
+            operate_scalar_validator_counter(val, type, op);
+        } else if (NULL != validator) {
+            operate_scalar_validator(val, type, op);
         } else {
-            vector<int64_t> lo,hi;
-            get_distribution(lo,hi);
-            rhs_ptr = rhs->get(lo,hi);
-        }
-#define DATATYPE_EXPAND(DT_L,T_L,DT_R,T_R) \
-        if (DT_L == lhs_type && DT_R == rhs_type) { \
-            T_L *lhs_buf = static_cast<T_L*>(lhs_ptr); \
-            T_R *rhs_buf = static_cast<T_R*>(rhs_ptr); \
-            switch (op) { \
-                case OP_ADD: op_iadd(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_SUB: op_isub(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_MUL: op_imul(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_DIV: op_idiv(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_MAX: op_imax(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_MIN: op_imin(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                default: ERRCODE("operation not supported", op); \
-            } \
-        } else
-#include "DataType2.def"
-        {
-            EXCEPT(DataTypeException, "DataType not handled", lhs_type);
+            operate_scalar(val, type, op);
         }
         // clean up
-        if (same_distribution(rhs)) {
-            rhs->release();
-        } else {
-            DataType rhs_type = rhs->get_type();
-#define DATATYPE_EXPAND(DT_R,T_R) \
-            if (rhs_type == DT_R) { \
-                T_R *a = static_cast<T_R*>(rhs_ptr); \
-                delete [] a; \
-            } else 
-#include "DataType.def"
-            {
-                EXCEPT(DataTypeException, "DataType not handled", rhs_type);
-            }
-        }
-        release_update();
-    }
-}
-
-
-// too complicated to implement now, see if need arises in future
-#if 0
-void AbstractArray::operate_array_broadcast(const Array *rhs, const int op)
-{
-    void *lhs_ptr = access();
-    if (NULL != lhs_ptr) {
-        DataType lhs_type = get_type();
-        DataType rhs_type = rhs->get_type();
-        void *rhs_ptr = rhs->get();
-#define DATATYPE_EXPAND(DT_L,T_L,DT_R,T_R) \
-        if (DT_L == lhs_type && DT_R == rhs_type) { \
-            T_L *lhs_buf = static_cast<T_L*>(lhs_ptr); \
-            T_R *rhs_buf = static_cast<T_R*>(rhs_ptr); \
-            switch (op) { \
-                case OP_ADD: op_iadd(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_SUB: op_isub(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_MUL: op_imul(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_DIV: op_idiv(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_MAX: op_imax(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                case OP_MIN: op_imin(lhs_buf, rhs_buf, get_local_size()); \
-                             break; \
-                default: ERRCODE("operation not supported", op); \
-            } \
-        } else
-#include "DataType2.def"
-        {
-            EXCEPT(DataTypeException, "DataType not handled", lhs_type);
-        }
-        // clean up
-        if (same_distribution(rhs)) {
-            rhs->release();
-        } else {
-            DataType rhs_type = rhs->get_type();
-#define DATATYPE_EXPAND(DT_R,T_R) \
-            if (rhs_type == DT_R) { \
-                T_R *a = static_cast<T_R*>(rhs_ptr); \
-                delete [] a; \
-            } else 
-#include "DataType.def"
-            {
-                EXCEPT(DataTypeException, "DataType not handled", rhs_type);
-            }
-        }
-        release_update();
-    }
-}
-#endif
-
-
-template <class L, class R>
-static void op_iadd(L *lhs, R val, int64_t count)
-{
-    L rval = static_cast<L>(val);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] += rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_isub(L *lhs, R val, int64_t count)
-{
-    L rval = static_cast<L>(val);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] -= rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_imul(L *lhs, R val, int64_t count)
-{
-    L rval = static_cast<L>(val);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] *= rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_idiv(L *lhs, R val, int64_t count)
-{
-    L rval = static_cast<L>(val);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] /= rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_imax(L *lhs, R val, int64_t count)
-{
-    L rval = static_cast<L>(val);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] = lhs[i]>rval ? lhs[i] : rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_imin(L *lhs, R val, int64_t count)
-{
-    L rval = static_cast<L>(val);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] = lhs[i]<rval ? lhs[i] : rval;
-    }
-}
-
-
-template <class L, class R>
-static void op_ipow(L *lhs, R exponent, int64_t count)
-{
-    double exp = static_cast<double>(exponent);
-    for (int64_t i=0; i<count; ++i) {
-        lhs[i] = static_cast<L>(std::pow(static_cast<double>(lhs[i]),exp));
-    }
-}
-
-
-void AbstractArray::operate_scalar(void *rhs_ptr, DataType rhs_type,
-                                   const int op)
-{
-    void *lhs_ptr = access();
-    if (NULL != lhs_ptr) {
-        DataType lhs_type = get_type();
-#define DATATYPE_EXPAND(DT_L,T_L,DT_R,T_R) \
-        if (DT_L == lhs_type && DT_R == rhs_type) { \
-            T_L *lhs_buf =  static_cast<T_L*>(lhs_ptr); \
-            T_R  rhs_val = *static_cast<T_R*>(rhs_ptr); \
-            switch (op) { \
-                case OP_ADD: op_iadd(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                case OP_SUB: op_isub(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                case OP_MUL: op_imul(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                case OP_DIV: op_idiv(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                case OP_MAX: op_imax(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                case OP_MIN: op_imin(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                case OP_POW: op_ipow(lhs_buf, rhs_val, get_local_size()); \
-                             break; \
-                default: ERRCODE("operation not supported", op); \
-            } \
-        } else
-#include "DataType2.def"
-        {
-            EXCEPT(DataTypeException, "DataType not handled", lhs_type);
-        }
-        // clean up
-#define DATATYPE_EXPAND(DT_R,T_R) \
-        if (rhs_type == DT_R) { \
-            T_R *a = static_cast<T_R*>(rhs_ptr); \
-            delete a; \
+#define DATATYPE_EXPAND(DT,T)               \
+        if (type == DT) {                   \
+            T *aval = static_cast<T*>(val); \
+            delete [] aval;                 \
         } else 
 #include "DataType.def"
         {
-            EXCEPT(DataTypeException, "DataType not handled", rhs_type);
+            EXCEPT(DataTypeException, "DataType not handled", type);
         }
-        release_update();
+    } else if (get_shape() == rhs->get_shape()) {
+        if (NULL != validator && NULL != counter) {
+            operate_array_validator_counter(rhs, op);
+        } else if (NULL != validator) {
+            operate_array_validator(rhs, op);
+        } else {
+            operate_array(rhs, op);
+        }
+    } else if (broadcast_check(rhs)) {
+        ERR("operate_array_broadcast not implemented");
     }
 }

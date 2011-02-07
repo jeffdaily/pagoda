@@ -12,7 +12,7 @@ class ValidMin : public Validator
         ValidMin(const ValidMin<T> &that);
         virtual ~ValidMin();
 
-        virtual bool is_valid(void *value) const;
+        virtual bool is_valid(const void *value) const;
         virtual ValidMin<T>* clone() const;
         virtual const void* get_fill_value() const;
 
@@ -77,9 +77,9 @@ ValidMin<T>* ValidMin<T>::clone() const
 
 
 template <class T>
-bool ValidMin<T>::is_valid(void *value) const
+bool ValidMin<T>::is_valid(const void *value) const
 {
-    return range_value <= *static_cast<T*>(value);
+    return range_value <= *static_cast<const T*>(value);
 }
 
 

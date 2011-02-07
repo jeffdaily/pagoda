@@ -144,7 +144,11 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libpagoda_la_LIBADD =
 am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
-	src/AbstractDataset.C src/AbstractVariable.C src/Aggregation.C \
+	src/AbstractArray_op.C src/AbstractArray_op_v.C \
+	src/AbstractArray_op_vc.C src/AbstractArray_op_scalar.C \
+	src/AbstractArray_op_scalar_v.C \
+	src/AbstractArray_op_scalar_vc.C src/AbstractDataset.C \
+	src/AbstractVariable.C src/Aggregation.C \
 	src/AggregationDimension.C src/AggregationJoinExisting.C \
 	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
 	src/Attribute.C src/Bootstrap.C src/CommandLineOption.C \
@@ -177,7 +181,11 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_NETCDF4_TRUE@	src/Netcdf4Dimension.lo \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4FileWriter.lo \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4Timing.lo src/Netcdf4Variable.lo
-am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractDataset.lo \
+am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
+	src/AbstractArray_op_v.lo src/AbstractArray_op_vc.lo \
+	src/AbstractArray_op_scalar.lo \
+	src/AbstractArray_op_scalar_v.lo \
+	src/AbstractArray_op_scalar_vc.lo src/AbstractDataset.lo \
 	src/AbstractVariable.lo src/Aggregation.lo \
 	src/AggregationDimension.lo src/AggregationJoinExisting.lo \
 	src/AggregationUnion.lo src/AggregationVariable.lo \
@@ -896,7 +904,10 @@ pgbo_SOURCES = src/pgbo.C
 pgra_SOURCES = src/pgra.C
 pgea_SOURCES = src/pgea.C
 pgcmp_SOURCES = src/pgcmp.C
-libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractDataset.C \
+libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
+	src/AbstractArray_op_v.C src/AbstractArray_op_vc.C \
+	src/AbstractArray_op_scalar.C src/AbstractArray_op_scalar_v.C \
+	src/AbstractArray_op_scalar_vc.C src/AbstractDataset.C \
 	src/AbstractVariable.C src/Aggregation.C \
 	src/AggregationDimension.C src/AggregationJoinExisting.C \
 	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
@@ -1061,6 +1072,18 @@ src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/$(DEPDIR)
 	@: > src/$(DEPDIR)/$(am__dirstamp)
 src/AbstractArray.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractArray_op.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractArray_op_v.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractArray_op_vc.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractArray_op_scalar.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractArray_op_scalar_v.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractArray_op_scalar_vc.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/AbstractDataset.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -1469,6 +1492,18 @@ mostlyclean-compile:
 	-rm -f sandbox/ga/TestUnpack.$(OBJEXT)
 	-rm -f src/AbstractArray.$(OBJEXT)
 	-rm -f src/AbstractArray.lo
+	-rm -f src/AbstractArray_op.$(OBJEXT)
+	-rm -f src/AbstractArray_op.lo
+	-rm -f src/AbstractArray_op_scalar.$(OBJEXT)
+	-rm -f src/AbstractArray_op_scalar.lo
+	-rm -f src/AbstractArray_op_scalar_v.$(OBJEXT)
+	-rm -f src/AbstractArray_op_scalar_v.lo
+	-rm -f src/AbstractArray_op_scalar_vc.$(OBJEXT)
+	-rm -f src/AbstractArray_op_scalar_vc.lo
+	-rm -f src/AbstractArray_op_v.$(OBJEXT)
+	-rm -f src/AbstractArray_op_v.lo
+	-rm -f src/AbstractArray_op_vc.$(OBJEXT)
+	-rm -f src/AbstractArray_op_vc.lo
 	-rm -f src/AbstractDataset.$(OBJEXT)
 	-rm -f src/AbstractDataset.lo
 	-rm -f src/AbstractVariable.$(OBJEXT)
@@ -1632,6 +1667,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestUnion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestUnpack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_scalar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_scalar_v.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_scalar_vc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_v.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_vc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractDataset.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Aggregation.Plo@am__quote@

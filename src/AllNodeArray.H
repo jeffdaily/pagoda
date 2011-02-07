@@ -45,7 +45,7 @@ class AllNodeArray : public AbstractArray
         virtual void get_distribution(
             vector<int64_t> &lo, vector<int64_t> &hi) const;
         virtual void* access();
-        virtual void* access() const;
+        virtual const void* access() const;
         virtual void release() const;
         virtual void release_update();
 
@@ -214,7 +214,7 @@ void* AllNodeArray<T>::access()
 
 
 template <class T>
-void* AllNodeArray<T>::access() const
+const void* AllNodeArray<T>::access() const
 {
     return data;
 }
@@ -233,28 +233,50 @@ void AllNodeArray<T>::release_update()
 
 
 template <class T>
-void* AllNodeArray<T>::get() const
+void* AllNodeArray<T>::get(void *buffer) const
 {
     return data;
 }
 
 
 template <class T>
-void* AllNodeArray<T>::get(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld) const
+void* AllNodeArray<T>::get(int64_t lo, int64_t hi, void *buffer) const
 {
-    ASSERT(lo.empty());
-    ASSERT(hi.empty());
-    ASSERT(ld.empty());
     ERR("Not Implemented");
 }
 
 
 template <class T>
-void AllNodeArray<T>::put(void *buffer, const vector<int64_t> &lo, const vector<int64_t> &hi, const vector<int64_t> &ld)
+void* AllNodeArray<T>::get(const vector<int64_t> &lo,
+                           const vector<int64_t> &hi, void *buffer) const
 {
     ASSERT(lo.empty());
     ASSERT(hi.empty());
-    ASSERT(ld.empty());
+    ERR("Not Implemented");
+}
+
+
+template <class T>
+void AllNodeArray<T>::put(void *buffer)
+{
+    ERR("Not Implemented");
+}
+
+
+template <class T>
+void AllNodeArray<T>::put(void *buffer, int64_t lo, int64_t hi)
+{
+    ERR("Not Implemented");
+}
+
+
+template <class T>
+void AllNodeArray<T>::put(void *buffer,
+                          const vector<int64_t> &lo,
+                          const vector<int64_t> &hi)
+{
+    ASSERT(lo.empty());
+    ASSERT(hi.empty());
     ERR("Not Implemented");
 }
 

@@ -230,7 +230,7 @@ class Array
          *
          * @return the starting address of the local data
          */
-        virtual void* access() const = 0;
+        virtual const void* access() const = 0;
 
         /**
          * Indicate the pointer returned by access() const is no longer in
@@ -531,7 +531,7 @@ class Array
         virtual Validator* get_validator() const = 0;
 
         /**
-         * Sets a counter for arithmetic operations (used with fill values).
+         * Sets a counter for arithmetic operations (used with validators).
          *
          * @param[in] counter
          */

@@ -148,7 +148,7 @@ void* ScalarArray::access()
 }
 
 
-void* ScalarArray::access() const
+const void* ScalarArray::access() const
 {
     return value;
 }

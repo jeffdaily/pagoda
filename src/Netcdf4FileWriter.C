@@ -651,7 +651,7 @@ void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
     if (type == DT) { \
         TYPE *ptr = NULL; \
         if (array->owns_data()) { \
-            ptr = (TYPE*)array->access(); \
+            ptr = static_cast<TYPE*>(array->access()); \
         } \
         nc::put_vara(ncid, var_id, start, count, ptr); \
         if (array->owns_data()) { \
@@ -715,7 +715,7 @@ void Netcdf4FileWriter::write(Array *array, const string &name,
     if (type == DT) { \
         TYPE *ptr = NULL; \
         if (array->owns_data()) { \
-            ptr = (TYPE*)array->access(); \
+            ptr = static_cast<TYPE*>(array->access()); \
         } \
         nc::put_vara(ncid, var_id, start_copy, count, ptr); \
         if (array->owns_data()) { \

@@ -747,7 +747,7 @@ void* GlobalArray::access()
 }
 
 
-void* GlobalArray::access() const
+const void* GlobalArray::access() const
 {
     if (owns_data()) {
         void *tmp;

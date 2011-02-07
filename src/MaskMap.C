@@ -591,10 +591,11 @@ void MaskMap::modify(
     topology_hi[1] = connections-1;
 
     // get portion of the topology local to the mask
-    topology_data = (int*)topology_array->get(topology_lo, topology_hi);
+    topology_data = static_cast<int*>(
+            topology_array->get(topology_lo, topology_hi));
 
     // iterate over the topology indices and place into set
-    mask_data = (int*)mask->access();
+    mask_data = static_cast<int*>(mask->access());
     for (int64_t idx=0; idx<mask_local_size; ++idx) {
         if (mask_data[idx] != 0) {
             int64_t local_offset = idx * connections;

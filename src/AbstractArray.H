@@ -90,7 +90,7 @@ class AbstractArray : public Array
         virtual void* access() = 0;
 
         /** @copydoc Array::access() const */
-        virtual void* access() const = 0;
+        virtual const void* access() const = 0;
 
         /** @copydoc Array::release() const */
         virtual void release() const = 0;
@@ -224,6 +224,16 @@ class AbstractArray : public Array
          */
         void operate_array(const Array *rhs, const int op);
 
+        /**
+         * @todo TODO document
+         */
+        void operate_array_validator(const Array *rhs, const int op);
+
+        /**
+         * @todo TODO document
+         */
+        void operate_array_validator_counter(const Array *rhs, const int op);
+
 #if 0
         /**
          * @todo TODO document
@@ -234,7 +244,17 @@ class AbstractArray : public Array
         /**
          * @todo TODO document
          */
-        void operate_scalar(void *rhs, DataType rhs_type, const int op);
+        void operate_scalar(const void *rhs, DataType rhs_type, const int op);
+
+        /**
+         * @todo TODO document
+         */
+        void operate_scalar_validator(const void *rhs, DataType rhs_type, const int op);
+
+        /**
+         * @todo TODO document
+         */
+        void operate_scalar_validator_counter(const void *rhs, DataType rhs_type, const int op);
 
         Validator *validator; /**< @todo document */
         Array *counter; /**< @todo document */

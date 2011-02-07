@@ -113,6 +113,12 @@ pkginclude_HEADERS += src/Variable.H
 
 libpagoda_la_SOURCES =
 libpagoda_la_SOURCES += src/AbstractArray.C
+libpagoda_la_SOURCES += src/AbstractArray_op.C
+libpagoda_la_SOURCES += src/AbstractArray_op_v.C
+libpagoda_la_SOURCES += src/AbstractArray_op_vc.C
+libpagoda_la_SOURCES += src/AbstractArray_op_scalar.C
+libpagoda_la_SOURCES += src/AbstractArray_op_scalar_v.C
+libpagoda_la_SOURCES += src/AbstractArray_op_scalar_vc.C
 libpagoda_la_SOURCES += src/AbstractDataset.C
 libpagoda_la_SOURCES += src/AbstractVariable.C
 libpagoda_la_SOURCES += src/Aggregation.C
