@@ -663,6 +663,8 @@ HAVE_PNETCDF_TRUE
 PNETCDF_CPPFLAGS
 PNETCDF_LDFLAGS
 PNETCDF_LIBS
+GA_USES_FLIBS_FALSE
+GA_USES_FLIBS_TRUE
 HAVE_GA_FALSE
 HAVE_GA_TRUE
 GA_CPPFLAGS
@@ -8631,7 +8633,84 @@ if test "x$ac_cv_header_ga_h" = x""yes; then :
 
 else
   { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
-     save_LIBS="$LIBS"
+
+
+
+
+
+
+GA_LIBS=
+GA_LDFLAGS=
+GA_CPPFLAGS=
+
+# Check whether --with-ga was given.
+if test "${with_ga+set}" = set; then :
+  withval=$with_ga;
+else
+  with_ga=yes
+fi
+
+case $with_ga in #(
+  yes) :
+     ;; #(
+  no) :
+    pg_cv_ga_found=skipped ;; #(
+  *) :
+    for arg in $with_ga ; do
+    case $arg in #(
+  yes) :
+     ;; #(
+  no) :
+     ;; #(
+  -l*) :
+    GA_LIBS="$GA_LIBS $arg" ;; #(
+  -L*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -WL*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -Wl*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -I*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  -*lib*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  *lib*) :
+    if test -d $arg; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg"
+fi ;; #(
+  -*include*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  *include*) :
+    if test -d $arg; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg"
+fi ;; #(
+  *) :
+    if test -d $arg/lib; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg/lib"
+fi
+                         if test -d $arg/include; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg/include"
+fi ;;
+esac
+done ;;
+esac
+if test "x$pg_cv_ga_found" = x"""skipped"; then :
+  ac_cv_search_GA_Initialize=no
+else
+
+# Save user variables.
+pagoda_save_CPPFLAGS="$CPPFLAGS"
+pagoda_save_LDFLAGS="$LDFLAGS"
+pagoda_save_LIBS="$LIBS"
+# Check for header.
+# Always add user-supplied PKG_CPPFLAGS to CPPFLAGS first.
+CPPFLAGS="$CPPFLAGS $GA_CPPFLAGS"
+ac_fn_cxx_check_header_mongrel "$LINENO" "ga.h" "ac_cv_header_ga_h" "$ac_includes_default"
+if test "x$ac_cv_header_ga_h" = x""yes; then :
+
+else
+  { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
+         save_LIBS="$LIBS"
 
 
 
@@ -8818,7 +8897,298 @@ fi
 
 
 
-     LIBS="$save_LIBS"
+         LIBS="$save_LIBS"
+fi
+
+
+# Restore user variable.
+CPPFLAGS="$pagoda_save_CPPFLAGS"
+# Check for library.
+# Always add user-supplied PKG_LDFLAGS and PKG_LIBS.
+LDFLAGS="$LDFLAGS $GA_LDFLAGS"
+LIBS="$GA_LIBS $LIBS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing GA_Initialize" >&5
+$as_echo_n "checking for library containing GA_Initialize... " >&6; }
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char GA_Initialize ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return GA_Initialize ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' ga; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_GA_Initialize=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  break
+fi
+done
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+
+else
+  ac_cv_search_GA_Initialize=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_GA_Initialize" >&5
+$as_echo "$ac_cv_search_GA_Initialize" >&6; }
+ac_res=$ac_cv_search_GA_Initialize
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+# If a library was required and found, ac_res is set appropriately.
+if test "x$ac_res" != xno; then :
+  if test "x$ac_res" != "none required"; then :
+  GA_LIBS="$ac_res"
+fi
+fi
+# Restore user variables.
+LDFLAGS="$pagoda_save_LDFLAGS"
+LIBS="$pagoda_save_LIBS"
+
+fi
+
+
+
+if test "x$ac_cv_search_GA_Initialize" != xno; then :
+  pg_ga_uses_flibs=no
+
+$as_echo "#define HAVE_GA 1" >>confdefs.h
+
+     pg_cv_ga_found=yes
+else
+  { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
+         save_LIBS="$LIBS"
+
+
+
+
+
+
+GA_LIBS=
+GA_LDFLAGS=
+GA_CPPFLAGS=
+
+# Check whether --with-ga was given.
+if test "${with_ga+set}" = set; then :
+  withval=$with_ga;
+else
+  with_ga=yes
+fi
+
+case $with_ga in #(
+  yes) :
+     ;; #(
+  no) :
+    pg_cv_ga_found=skipped ;; #(
+  *) :
+    for arg in $with_ga ; do
+    case $arg in #(
+  yes) :
+     ;; #(
+  no) :
+     ;; #(
+  -l*) :
+    GA_LIBS="$GA_LIBS $arg" ;; #(
+  -L*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -WL*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -Wl*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -I*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  -*lib*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  *lib*) :
+    if test -d $arg; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg"
+fi ;; #(
+  -*include*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  *include*) :
+    if test -d $arg; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg"
+fi ;; #(
+  *) :
+    if test -d $arg/lib; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg/lib"
+fi
+                         if test -d $arg/include; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg/include"
+fi ;;
+esac
+done ;;
+esac
+if test "x$pg_cv_ga_found" = x"""skipped"; then :
+  ac_cv_search_GA_Initialize=no
+else
+
+# Save user variables.
+pagoda_save_CPPFLAGS="$CPPFLAGS"
+pagoda_save_LDFLAGS="$LDFLAGS"
+pagoda_save_LIBS="$LIBS"
+# Check for header.
+# Always add user-supplied PKG_CPPFLAGS to CPPFLAGS first.
+CPPFLAGS="$CPPFLAGS $GA_CPPFLAGS"
+ac_fn_cxx_check_header_mongrel "$LINENO" "ga.h" "ac_cv_header_ga_h" "$ac_includes_default"
+if test "x$ac_cv_header_ga_h" = x""yes; then :
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Could not locate Global Arrays 5.x nor 4.x
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+# Restore user variable.
+CPPFLAGS="$pagoda_save_CPPFLAGS"
+# Check for library.
+# Always add user-supplied PKG_LDFLAGS and PKG_LIBS.
+LDFLAGS="$LDFLAGS $GA_LDFLAGS"
+LIBS="$GA_LIBS $LIBS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing GA_Initialize" >&5
+$as_echo_n "checking for library containing GA_Initialize... " >&6; }
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char GA_Initialize ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return GA_Initialize ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' global; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib -lpario -lglobal -lma -larmci -llinalg $FLIBS $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_GA_Initialize=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  break
+fi
+done
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+
+else
+  ac_cv_search_GA_Initialize=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_GA_Initialize" >&5
+$as_echo "$ac_cv_search_GA_Initialize" >&6; }
+ac_res=$ac_cv_search_GA_Initialize
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+# If a library was required and found, ac_res is set appropriately.
+if test "x$ac_res" != xno; then :
+  if test "x$ac_res" != "none required"; then :
+  GA_LIBS="$ac_res"
+fi
+fi
+# Restore user variables.
+LDFLAGS="$pagoda_save_LDFLAGS"
+LIBS="$pagoda_save_LIBS"
+
+fi
+
+
+
+if test "x$ac_cv_search_GA_Initialize" != xno; then :
+  GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"
+
+$as_echo "#define HAVE_GA 1" >>confdefs.h
+
+     pg_cv_ga_found=yes
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Could not locate Global Arrays 5.x nor 4.x
+See \`config.log' for more details" "$LINENO" 5; }
+     pg_cv_ga_found=no
+fi
+
+
+
+
+
+
+         LIBS="$save_LIBS"
+     pg_cv_ga_found=no
+fi
+
+
+
+
+
+
 fi
 
 
@@ -8907,14 +9277,91 @@ fi
 
 
 if test "x$ac_cv_search_GA_Initialize" != xno; then :
-
+  pg_ga_uses_flibs=yes
 
 $as_echo "#define HAVE_GA 1" >>confdefs.h
 
      pg_cv_ga_found=yes
 else
   { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
-     save_LIBS="$LIBS"
+
+
+
+
+
+
+GA_LIBS=
+GA_LDFLAGS=
+GA_CPPFLAGS=
+
+# Check whether --with-ga was given.
+if test "${with_ga+set}" = set; then :
+  withval=$with_ga;
+else
+  with_ga=yes
+fi
+
+case $with_ga in #(
+  yes) :
+     ;; #(
+  no) :
+    pg_cv_ga_found=skipped ;; #(
+  *) :
+    for arg in $with_ga ; do
+    case $arg in #(
+  yes) :
+     ;; #(
+  no) :
+     ;; #(
+  -l*) :
+    GA_LIBS="$GA_LIBS $arg" ;; #(
+  -L*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -WL*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -Wl*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -I*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  -*lib*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  *lib*) :
+    if test -d $arg; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg"
+fi ;; #(
+  -*include*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  *include*) :
+    if test -d $arg; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg"
+fi ;; #(
+  *) :
+    if test -d $arg/lib; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg/lib"
+fi
+                         if test -d $arg/include; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg/include"
+fi ;;
+esac
+done ;;
+esac
+if test "x$pg_cv_ga_found" = x"""skipped"; then :
+  ac_cv_search_GA_Initialize=no
+else
+
+# Save user variables.
+pagoda_save_CPPFLAGS="$CPPFLAGS"
+pagoda_save_LDFLAGS="$LDFLAGS"
+pagoda_save_LIBS="$LIBS"
+# Check for header.
+# Always add user-supplied PKG_CPPFLAGS to CPPFLAGS first.
+CPPFLAGS="$CPPFLAGS $GA_CPPFLAGS"
+ac_fn_cxx_check_header_mongrel "$LINENO" "ga.h" "ac_cv_header_ga_h" "$ac_includes_default"
+if test "x$ac_cv_header_ga_h" = x""yes; then :
+
+else
+  { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
+         save_LIBS="$LIBS"
 
 
 
@@ -9101,7 +9548,298 @@ fi
 
 
 
-     LIBS="$save_LIBS"
+         LIBS="$save_LIBS"
+fi
+
+
+# Restore user variable.
+CPPFLAGS="$pagoda_save_CPPFLAGS"
+# Check for library.
+# Always add user-supplied PKG_LDFLAGS and PKG_LIBS.
+LDFLAGS="$LDFLAGS $GA_LDFLAGS"
+LIBS="$GA_LIBS $LIBS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing GA_Initialize" >&5
+$as_echo_n "checking for library containing GA_Initialize... " >&6; }
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char GA_Initialize ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return GA_Initialize ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' ga; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_GA_Initialize=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  break
+fi
+done
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+
+else
+  ac_cv_search_GA_Initialize=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_GA_Initialize" >&5
+$as_echo "$ac_cv_search_GA_Initialize" >&6; }
+ac_res=$ac_cv_search_GA_Initialize
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+# If a library was required and found, ac_res is set appropriately.
+if test "x$ac_res" != xno; then :
+  if test "x$ac_res" != "none required"; then :
+  GA_LIBS="$ac_res"
+fi
+fi
+# Restore user variables.
+LDFLAGS="$pagoda_save_LDFLAGS"
+LIBS="$pagoda_save_LIBS"
+
+fi
+
+
+
+if test "x$ac_cv_search_GA_Initialize" != xno; then :
+  pg_ga_uses_flibs=no
+
+$as_echo "#define HAVE_GA 1" >>confdefs.h
+
+     pg_cv_ga_found=yes
+else
+  { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
+         save_LIBS="$LIBS"
+
+
+
+
+
+
+GA_LIBS=
+GA_LDFLAGS=
+GA_CPPFLAGS=
+
+# Check whether --with-ga was given.
+if test "${with_ga+set}" = set; then :
+  withval=$with_ga;
+else
+  with_ga=yes
+fi
+
+case $with_ga in #(
+  yes) :
+     ;; #(
+  no) :
+    pg_cv_ga_found=skipped ;; #(
+  *) :
+    for arg in $with_ga ; do
+    case $arg in #(
+  yes) :
+     ;; #(
+  no) :
+     ;; #(
+  -l*) :
+    GA_LIBS="$GA_LIBS $arg" ;; #(
+  -L*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -WL*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -Wl*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  -I*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  -*lib*) :
+    GA_LDFLAGS="$GA_LDFLAGS $arg" ;; #(
+  *lib*) :
+    if test -d $arg; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg"
+fi ;; #(
+  -*include*) :
+    GA_CPPFLAGS="$GA_CPPFLAGS $arg" ;; #(
+  *include*) :
+    if test -d $arg; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg"
+fi ;; #(
+  *) :
+    if test -d $arg/lib; then :
+  GA_LDFLAGS="$GA_LDFLAGS -L$arg/lib"
+fi
+                         if test -d $arg/include; then :
+  GA_CPPFLAGS="$GA_CPPFLAGS -I$arg/include"
+fi ;;
+esac
+done ;;
+esac
+if test "x$pg_cv_ga_found" = x"""skipped"; then :
+  ac_cv_search_GA_Initialize=no
+else
+
+# Save user variables.
+pagoda_save_CPPFLAGS="$CPPFLAGS"
+pagoda_save_LDFLAGS="$LDFLAGS"
+pagoda_save_LIBS="$LIBS"
+# Check for header.
+# Always add user-supplied PKG_CPPFLAGS to CPPFLAGS first.
+CPPFLAGS="$CPPFLAGS $GA_CPPFLAGS"
+ac_fn_cxx_check_header_mongrel "$LINENO" "ga.h" "ac_cv_header_ga_h" "$ac_includes_default"
+if test "x$ac_cv_header_ga_h" = x""yes; then :
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Could not locate Global Arrays 5.x nor 4.x
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+
+# Restore user variable.
+CPPFLAGS="$pagoda_save_CPPFLAGS"
+# Check for library.
+# Always add user-supplied PKG_LDFLAGS and PKG_LIBS.
+LDFLAGS="$LDFLAGS $GA_LDFLAGS"
+LIBS="$GA_LIBS $LIBS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing GA_Initialize" >&5
+$as_echo_n "checking for library containing GA_Initialize... " >&6; }
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char GA_Initialize ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return GA_Initialize ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' global; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib -lpario -lglobal -lma -larmci -llinalg $FLIBS $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_GA_Initialize=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+  break
+fi
+done
+if test "${ac_cv_search_GA_Initialize+set}" = set; then :
+
+else
+  ac_cv_search_GA_Initialize=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_GA_Initialize" >&5
+$as_echo "$ac_cv_search_GA_Initialize" >&6; }
+ac_res=$ac_cv_search_GA_Initialize
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+# If a library was required and found, ac_res is set appropriately.
+if test "x$ac_res" != xno; then :
+  if test "x$ac_res" != "none required"; then :
+  GA_LIBS="$ac_res"
+fi
+fi
+# Restore user variables.
+LDFLAGS="$pagoda_save_LDFLAGS"
+LIBS="$pagoda_save_LIBS"
+
+fi
+
+
+
+if test "x$ac_cv_search_GA_Initialize" != xno; then :
+  GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"
+
+$as_echo "#define HAVE_GA 1" >>confdefs.h
+
+     pg_cv_ga_found=yes
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "Could not locate Global Arrays 5.x nor 4.x
+See \`config.log' for more details" "$LINENO" 5; }
+     pg_cv_ga_found=no
+fi
+
+
+
+
+
+
+         LIBS="$save_LIBS"
+     pg_cv_ga_found=no
+fi
+
+
+
+
+
+
      pg_cv_ga_found=no
 fi
 
@@ -9116,6 +9854,14 @@ fi
 else
   HAVE_GA_TRUE='#'
   HAVE_GA_FALSE=
+fi
+
+ if test "x$pg_ga_uses_flibs" = xyes; then
+  GA_USES_FLIBS_TRUE=
+  GA_USES_FLIBS_FALSE='#'
+else
+  GA_USES_FLIBS_TRUE='#'
+  GA_USES_FLIBS_FALSE=
 fi
 
 
@@ -23055,6 +23801,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_GA_TRUE}" && test -z "${HAVE_GA_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_GA\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${GA_USES_FLIBS_TRUE}" && test -z "${GA_USES_FLIBS_FALSE}"; then
+  as_fn_error $? "conditional \"GA_USES_FLIBS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_PNETCDF_TRUE}" && test -z "${HAVE_PNETCDF_FALSE}"; then

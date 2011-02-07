@@ -140,15 +140,20 @@ PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
 AM_CONDITIONAL([HAVE_MPI], [test "x$pg_cv_mpi_found" = xyes])
 
 # GA is required, for now.  Perhaps with MPI3 the GA could go...
-PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS], [],
+PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [$FLIBS],
+    [pg_ga_uses_flibs=yes],
     [AS_UNSET([ac_cv_search_GA_Initialize])
-     save_LIBS="$LIBS"
-     PAGODA_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize],
-        [-lpario -lglobal -lma -larmci -llinalg $FLIBS],
-        [GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"],
-        [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
-     LIBS="$save_LIBS"])
+     PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize], [],
+        [pg_ga_uses_flibs=no],
+        [AS_UNSET([ac_cv_search_GA_Initialize])
+         save_LIBS="$LIBS"
+         PAGODA_CHECK_PACKAGE([ga], [ga.h], [global], [GA_Initialize],
+            [-lpario -lglobal -lma -larmci -llinalg $FLIBS],
+            [GA_LIBS="-lpario -lglobal -lma -larmci -llinalg"],
+            [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
+         LIBS="$save_LIBS"])])
 AM_CONDITIONAL([HAVE_GA], [test "x$pg_cv_ga_found" = xyes])
+AM_CONDITIONAL([GA_USES_FLIBS], [test "x$pg_ga_uses_flibs" = xyes])
 
 # Check for pnetcdf.
 PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open])
