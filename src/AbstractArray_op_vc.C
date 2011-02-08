@@ -8,57 +8,126 @@
 
 #include "AbstractArray.H"
 #include "DataType.H"
+#include "Error.H"
 #include "Validator.H"
 
-#define op_impl(name,symbol)                                                  \
-template <class L, class R>                                                   \
-static void op_i##name(L *lhs, const R *rhs, int64_t count,                   \
-        Validator *validator, int *tally)                                     \
-{                                                                             \
-    ASSERT(lhs != NULL);                                                      \
-    ASSERT(rhs != NULL);                                                      \
-    ASSERT(validator != NULL);                                                \
-    ASSERT(tally != NULL);                                                    \
-    const L fill_value = *static_cast<const L*>(validator->get_fill_value()); \
-    for (int64_t i=0; i<count; ++i) {                                         \
-        const L rhs_cast = static_cast<const L>(rhs[i]);                      \
-        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rhs_cast)) { \
-            lhs[i] symbol##= rhs_cast;                                        \
-            ++tally[i];                                                       \
-        } else {                                                              \
-            lhs[i] = fill_value;                                              \
-        }                                                                     \
-    }                                                                         \
+template <class L, class R>
+static void op_iadd(L *lhs, const R *rhs, int64_t count,
+        Validator *validator, int *tally)
+{
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+    ASSERT(validator != NULL);
+    ASSERT(tally != NULL);
+    const L fill_value = *static_cast<const L*>(validator->get_fill_value());
+    for (int64_t i=0; i<count; ++i) {
+        const L rhs_cast = static_cast<const L>(rhs[i]);
+        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rhs_cast)) {
+            lhs[i] += rhs_cast;
+            ++tally[i];
+        } else {
+            lhs[i] = fill_value;
+        }
+    }
 }
-op_impl(add,+)
-op_impl(sub,-)
-op_impl(mul,*)
-op_impl(div,/)
-#undef op_impl
+template <class L, class R>
+static void op_isub(L *lhs, const R *rhs, int64_t count,
+        Validator *validator, int *tally)
+{
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+    ASSERT(validator != NULL);
+    ASSERT(tally != NULL);
+    const L fill_value = *static_cast<const L*>(validator->get_fill_value());
+    for (int64_t i=0; i<count; ++i) {
+        const L rhs_cast = static_cast<const L>(rhs[i]);
+        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rhs_cast)) {
+            lhs[i] -= rhs_cast;
+            ++tally[i];
+        } else {
+            lhs[i] = fill_value;
+        }
+    }
+}
+template <class L, class R>
+static void op_imul(L *lhs, const R *rhs, int64_t count,
+        Validator *validator, int *tally)
+{
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+    ASSERT(validator != NULL);
+    ASSERT(tally != NULL);
+    const L fill_value = *static_cast<const L*>(validator->get_fill_value());
+    for (int64_t i=0; i<count; ++i) {
+        const L rhs_cast = static_cast<const L>(rhs[i]);
+        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rhs_cast)) {
+            lhs[i] *= rhs_cast;
+            ++tally[i];
+        } else {
+            lhs[i] = fill_value;
+        }
+    }
+}
+template <class L, class R>
+static void op_idiv(L *lhs, const R *rhs, int64_t count,
+        Validator *validator, int *tally)
+{
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+    ASSERT(validator != NULL);
+    ASSERT(tally != NULL);
+    const L fill_value = *static_cast<const L*>(validator->get_fill_value());
+    for (int64_t i=0; i<count; ++i) {
+        const L rhs_cast = static_cast<const L>(rhs[i]);
+        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rhs_cast)) {
+            lhs[i] /= rhs_cast;
+            ++tally[i];
+        } else {
+            lhs[i] = fill_value;
+        }
+    }
+}
 
-#define op_impl(name,symbol)                                                  \
-template <class L, class R>                                                   \
-static void op_i##name(L *lhs, const R *rhs, int64_t count,                   \
-        Validator *validator, int *tally)                                     \
-{                                                                             \
-    ASSERT(lhs != NULL);                                                      \
-    ASSERT(rhs != NULL);                                                      \
-    ASSERT(validator != NULL);                                                \
-    ASSERT(tally != NULL);                                                    \
-    const L fill_value = *static_cast<const L*>(validator->get_fill_value()); \
-    for (int64_t i=0; i<count; ++i) {                                         \
-        const L rval = static_cast<const L>(rhs[i]);                          \
-        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rval)) {     \
-            lhs[i] = lhs[i] symbol rval ? lhs[i] : rval;                      \
-            ++tally[i];                                                       \
-        } else {                                                              \
-            lhs[i] = fill_value;                                              \
-        }                                                                     \
-    }                                                                         \
+template <class L, class R>
+static void op_imax(L *lhs, const R *rhs, int64_t count,
+        Validator *validator, int *tally)
+{
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+    ASSERT(validator != NULL);
+    ASSERT(tally != NULL);
+    const L fill_value = *static_cast<const L*>(validator->get_fill_value());
+    for (int64_t i=0; i<count; ++i) {
+        const L rval = static_cast<const L>(rhs[i]);
+        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rval)) {
+            lhs[i] = lhs[i] > rval ? lhs[i] : rval;
+            ++tally[i];
+        } else {
+            lhs[i] = fill_value;
+        }
+    }
 }
-op_impl(max,>)
-op_impl(min,<)
-#undef op_impl
+
+
+template <class L, class R>
+static void op_imin(L *lhs, const R *rhs, int64_t count,
+        Validator *validator, int *tally)
+{
+    ASSERT(lhs != NULL);
+    ASSERT(rhs != NULL);
+    ASSERT(validator != NULL);
+    ASSERT(tally != NULL);
+    const L fill_value = *static_cast<const L*>(validator->get_fill_value());
+    for (int64_t i=0; i<count; ++i) {
+        const L rval = static_cast<const L>(rhs[i]);
+        if (validator->is_valid(&lhs[i]) && validator->is_valid(&rval)) {
+            lhs[i] = lhs[i] < rval ? lhs[i] : rval;
+            ++tally[i];
+        } else {
+            lhs[i] = fill_value;
+        }
+    }
+}
 
 
 void AbstractArray::operate_array_validator_counter(const Array *rhs, const int op)

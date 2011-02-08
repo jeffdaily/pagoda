@@ -24,7 +24,7 @@ AS_CASE([$with_$1],
                 [PKG_LIBS],
                 [PKG_LDFLAGS],
                 [PKG_CPPFLAGS])])
-AS_VAR_IF([PKG_CACHE], ["skipped"], [ac_cv_search_$4=no], [
+AS_VAR_IF([PKG_CACHE], [skipped], [ac_cv_search_$4=no], [
 # Save user variables.
 pagoda_save_CPPFLAGS="$CPPFLAGS"
 pagoda_save_LDFLAGS="$LDFLAGS"
