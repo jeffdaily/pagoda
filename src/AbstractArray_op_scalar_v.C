@@ -17,7 +17,7 @@ static void op_iadd(L *lhs, const R &val, int64_t count,
 {
     ASSERT(NULL != lhs);
     ASSERT(NULL != validator);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     const L fill_value = *static_cast<const L*>(validator->get_fill_value());
     for (int64_t i=0; i<count; ++i) {
         if (validator->is_valid(&lhs[i])) {
@@ -33,7 +33,7 @@ static void op_isub(L *lhs, const R &val, int64_t count,
 {
     ASSERT(NULL != lhs);
     ASSERT(NULL != validator);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     const L fill_value = *static_cast<const L*>(validator->get_fill_value());
     for (int64_t i=0; i<count; ++i) {
         if (validator->is_valid(&lhs[i])) {
@@ -49,7 +49,7 @@ static void op_imul(L *lhs, const R &val, int64_t count,
 {
     ASSERT(NULL != lhs);
     ASSERT(NULL != validator);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     const L fill_value = *static_cast<const L*>(validator->get_fill_value());
     for (int64_t i=0; i<count; ++i) {
         if (validator->is_valid(&lhs[i])) {
@@ -65,7 +65,7 @@ static void op_idiv(L *lhs, const R &val, int64_t count,
 {
     ASSERT(NULL != lhs);
     ASSERT(NULL != validator);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     const L fill_value = *static_cast<const L*>(validator->get_fill_value());
     for (int64_t i=0; i<count; ++i) {
         if (validator->is_valid(&lhs[i])) {
@@ -81,7 +81,7 @@ static void op_imax(L *lhs, const R &val, int64_t count,
 {
     ASSERT(NULL != lhs);
     ASSERT(NULL != validator);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     const L fill_value = *static_cast<const L*>(validator->get_fill_value());
     for (int64_t i=0; i<count; ++i) {
         if (validator->is_valid(&lhs[i])) {
@@ -97,7 +97,7 @@ static void op_imin(L *lhs, const R &val, int64_t count,
 {
     ASSERT(NULL != lhs);
     ASSERT(NULL != validator);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     const L fill_value = *static_cast<const L*>(validator->get_fill_value());
     for (int64_t i=0; i<count; ++i) {
         if (validator->is_valid(&lhs[i])) {

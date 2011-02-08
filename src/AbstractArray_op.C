@@ -17,7 +17,7 @@ static inline void op_iadd(L *lhs, const R *rhs, int64_t count)
     ASSERT(lhs != NULL);
     ASSERT(rhs != NULL);
     for (int64_t i=0; i<count; ++i) {
-        lhs[i] += static_cast<const L>(rhs[i]);
+        lhs[i] += static_cast<L>(rhs[i]);
     }
 }
 template <class L, class R>
@@ -26,7 +26,7 @@ static inline void op_isub(L *lhs, const R *rhs, int64_t count)
     ASSERT(lhs != NULL);
     ASSERT(rhs != NULL);
     for (int64_t i=0; i<count; ++i) {
-        lhs[i] -= static_cast<const L>(rhs[i]);
+        lhs[i] -= static_cast<L>(rhs[i]);
     }
 }
 template <class L, class R>
@@ -35,7 +35,7 @@ static inline void op_imul(L *lhs, const R *rhs, int64_t count)
     ASSERT(lhs != NULL);
     ASSERT(rhs != NULL);
     for (int64_t i=0; i<count; ++i) {
-        lhs[i] *= static_cast<const L>(rhs[i]);
+        lhs[i] *= static_cast<L>(rhs[i]);
     }
 }
 template <class L, class R>
@@ -44,7 +44,7 @@ static inline void op_idiv(L *lhs, const R *rhs, int64_t count)
     ASSERT(lhs != NULL);
     ASSERT(rhs != NULL);
     for (int64_t i=0; i<count; ++i) {
-        lhs[i] /= static_cast<const L>(rhs[i]);
+        lhs[i] /= static_cast<L>(rhs[i]);
     }
 }
 
@@ -54,7 +54,7 @@ static inline void op_imax(L *lhs, const R *rhs, int64_t count)
     ASSERT(lhs != NULL);
     ASSERT(rhs != NULL);
     for (int64_t i=0; i<count; ++i) {
-        const L rval = static_cast<const L>(rhs[i]);
+        const L rval = static_cast<L>(rhs[i]);
         lhs[i] = lhs[i] > rval ? lhs[i] : rval;
     }
 }
@@ -64,7 +64,7 @@ static inline void op_imin(L *lhs, const R *rhs, int64_t count)
     ASSERT(lhs != NULL);
     ASSERT(rhs != NULL);
     for (int64_t i=0; i<count; ++i) {
-        const L rval = static_cast<const L>(rhs[i]);
+        const L rval = static_cast<L>(rhs[i]);
         lhs[i] = lhs[i] < rval ? lhs[i] : rval;
     }
 }

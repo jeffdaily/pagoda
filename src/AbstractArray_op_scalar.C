@@ -15,7 +15,7 @@ template <class L, class R>
 static inline void op_iadd(L *lhs, const R &val, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] += rval;
     }
@@ -24,7 +24,7 @@ template <class L, class R>
 static inline void op_isub(L *lhs, const R &val, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] -= rval;
     }
@@ -33,7 +33,7 @@ template <class L, class R>
 static inline void op_imul(L *lhs, const R &val, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] *= rval;
     }
@@ -42,7 +42,7 @@ template <class L, class R>
 static inline void op_idiv(L *lhs, const R &val, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] /= rval;
     }
@@ -51,7 +51,7 @@ template <class L, class R>
 static inline void op_imax(L *lhs, const R &val, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] = lhs[i] > rval ? lhs[i] : rval;
     }
@@ -60,7 +60,7 @@ template <class L, class R>
 static inline void op_imin(L *lhs, const R &val, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const L rval = static_cast<const L>(val);
+    const L rval = static_cast<L>(val);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] = lhs[i] < rval ? lhs[i] : rval;
     }
@@ -69,7 +69,7 @@ template <class L, class R>
 static void op_ipow(L *lhs, const R &exponent, int64_t count)
 {
     ASSERT(NULL != lhs);
-    const double exp = static_cast<const double>(exponent);
+    const double exp = static_cast<double>(exponent);
     for (int64_t i=0; i<count; ++i) {
         lhs[i] = static_cast<L>(std::pow(static_cast<double>(lhs[i]),exp));
     }
