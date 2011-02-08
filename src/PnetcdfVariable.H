@@ -84,7 +84,8 @@ class PnetcdfVariable : public AbstractVariable
         vector<int> nb_requests; /**< non-blocking io requests */
         vector<void*> nb_buffers; /**< when type != read_type */
         vector<Array*> nb_arrays_to_release;
-        vector<Array*> nb_arrays_to_pack;
+        vector<Array*> nb_arrays_to_pack_src;
+        vector<Array*> nb_arrays_to_pack_dst;
 };
 
 #endif // PNETCDFVARIABLE_H_

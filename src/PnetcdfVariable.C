@@ -13,6 +13,7 @@
 #include "Common.H"
 #include "Copy.H"
 #include "Debug.H"
+#include "Error.H"
 #include "Mask.H"
 #include "PnetcdfAttribute.H"
 #include "PnetcdfDataset.H"
@@ -35,6 +36,11 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     ,   dims()
     ,   atts()
     ,   type(DataType::NOT_A_TYPE)
+    ,   nb_requests()
+    ,   nb_buffers()
+    ,   nb_arrays_to_release()
+    ,   nb_arrays_to_pack_src()
+    ,   nb_arrays_to_pack_dst()
 {
     TIMING("PnetcdfVariable::PnetcdfVariable(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
@@ -224,9 +230,11 @@ Array* PnetcdfVariable::_iread(Array *dst)
 
     // can't perform subset until read is finished
     if (needs_subset()) {
-        nb_arrays_to_pack.push_back(dst);
+        nb_arrays_to_pack_dst.push_back(dst);
+        nb_arrays_to_pack_src.push_back(tmp);
     } else {
-        nb_arrays_to_pack.push_back(NULL);
+        nb_arrays_to_pack_dst.push_back(NULL);
+        nb_arrays_to_pack_src.push_back(NULL);
     }
 
     return dst;
@@ -338,9 +346,11 @@ Array* PnetcdfVariable::_iread(int64_t record, Array *dst)
 
     // can't perform subset until read is finished
     if (needs_subset_record()) {
-        nb_arrays_to_pack.push_back(dst);
+        nb_arrays_to_pack_dst.push_back(dst);
+        nb_arrays_to_pack_src.push_back(tmp);
     } else {
-        nb_arrays_to_pack.push_back(NULL);
+        nb_arrays_to_pack_dst.push_back(NULL);
+        nb_arrays_to_pack_src.push_back(NULL);
     }
 
     return dst;
@@ -393,23 +403,23 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
 #define read_var_all(TYPE, DT) \
     if (read_type == DT) { \
         TYPE *ptr = NULL; \
+        int64_t n = dst->get_local_size(); \
         if (dst->owns_data() && found_bit) { \
-            int64_t n = dst->get_local_size(); \
             if (read_type == type) { \
                 ptr = static_cast<TYPE*>(dst->access()); \
             } else { \
                 ptr = new TYPE[n]; \
             } \
-            ncmpi::get_vara_all(ncid, id, start, count, ptr); \
-            if (dst->owns_data() && found_bit) { \
-                if (read_type != type) { \
-                    void *gabuf = NULL; \
-                    gabuf = dst->access(); \
-                    pagoda::copy(read_type,ptr,type,gabuf,n); \
-                    delete [] ptr; \
-                } \
-                dst->release_update(); \
+        } \
+        ncmpi::get_vara_all(ncid, id, start, count, ptr); \
+        if (dst->owns_data() && found_bit) { \
+            if (read_type != type) { \
+                void *gabuf = NULL; \
+                gabuf = dst->access(); \
+                pagoda::copy(read_type,ptr,type,gabuf,n); \
+                delete [] ptr; \
             } \
+            dst->release_update(); \
         } \
     } else
     read_var_all(unsigned char, DataType::UCHAR)
@@ -440,15 +450,17 @@ void PnetcdfVariable::do_iread(Array *dst, const vector<MPI_Offset> &start,
         TYPE *ptr = NULL; \
         if (dst->owns_data() && found_bit) { \
             int64_t n = dst->get_local_size(); \
+            nb_arrays_to_release.push_back(dst); \
             if (read_type == type) { \
                 ptr = static_cast<TYPE*>(dst->access()); \
                 nb_buffers.push_back(NULL); \
-                nb_arrays_to_release.push_back(dst); \
             } else {\
                 ptr = new TYPE[n]; \
                 nb_buffers.push_back(ptr); \
-                nb_arrays_to_release.push_back(dst); \
             } \
+        } else { \
+            nb_buffers.push_back(NULL); \
+            nb_arrays_to_release.push_back(NULL); \
         } \
         request = ncmpi::iget_vara(ncid, id, start, count, ptr); \
         nb_requests.push_back(request); \
@@ -490,16 +502,17 @@ void PnetcdfVariable::after_wait()
             {
                 EXCEPT(DataTypeException, "DataType not handled", type);
             }
-        } else {
+        } else if (NULL != nb_arrays_to_release[i]) {
             // read type same as stored type, simple release
             Array *dst = nb_arrays_to_release[i];
             dst->release_update();
         }
 
         // pack if needed
-        if (NULL != nb_arrays_to_pack[i]) {
-            Array *dst = nb_arrays_to_pack[i];
-            Array *src = nb_arrays_to_release[i];
+        if (NULL != nb_arrays_to_pack_dst[i]) {
+            Array *dst = nb_arrays_to_pack_dst[i];
+            Array *src = nb_arrays_to_pack_src[i];
+            ASSERT(NULL != src);
             vector<Mask*> masks = get_masks();
             if (int64_t(masks.size()) == (src->get_ndim()+1)) {
                 // assume this was a record subset
@@ -513,7 +526,8 @@ void PnetcdfVariable::after_wait()
     }
 
     nb_arrays_to_release.clear();
-    nb_arrays_to_pack.clear();
+    nb_arrays_to_pack_dst.clear();
+    nb_arrays_to_pack_src.clear();
     nb_buffers.clear();
     nb_requests.clear();
 }
