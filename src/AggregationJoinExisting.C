@@ -189,6 +189,11 @@ void AggregationJoinExisting::wait()
             it!=end; ++it) {
         (*it)->wait();
     }
+
+    for (map<string,AggregationVariable*>::iterator it=agg_vars.begin(),
+            end=agg_vars.end(); it!=end; ++it) {
+        it->second->after_wait();
+    }
 }
 
 

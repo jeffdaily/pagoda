@@ -55,14 +55,9 @@ class AggregationVariable : public AbstractVariable
 
         virtual ostream& print(ostream &os) const;
 
-    protected:
-        const Aggregation *agg;
-        AggregationDimension *agg_dim;
-        vector<Variable*> vars; /**< Variables we are concatenating */
-        vector<Array*> arrays_to_copy; /**< when non-blocking completes */
-        Array *array_to_fill; /**< when non-blocking completes */
+        friend class AggregationJoinExisting;
 
-    private:
+    protected:
         /**
          * Reads one timestep at a time and copies to dst Array.
          */
@@ -72,6 +67,17 @@ class AggregationVariable : public AbstractVariable
          * Reads one aggregated Variable at a time and copies to dst Array.
          */
         Array* read_per_variable(Array *dst) const;
+
+        /**
+         * @todo TODO doc
+         */
+        void after_wait();
+
+        const Aggregation *agg;
+        AggregationDimension *agg_dim;
+        vector<Variable*> vars; /**< Variables we are concatenating */
+        vector<Array*> arrays_to_copy; /**< when non-blocking completes */
+        Array *array_to_fill; /**< when non-blocking completes */
 };
 
 #endif // AGGREGATIONVARIABLE_H_

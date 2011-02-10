@@ -404,10 +404,9 @@ void AbstractVariable::set_translate_record(bool value)
 }
 
 
-bool AbstractVariable::needs_subset() const
+static bool needs_subset_common(const vector<Mask*> &masks)
 {
-    vector<Mask*> masks = get_masks();
-    vector<Mask*>::iterator mask_it;
+    vector<Mask*>::const_iterator mask_it;
 
     if (masks.empty()) {
         return false;
@@ -428,29 +427,19 @@ bool AbstractVariable::needs_subset() const
 }
 
 
+bool AbstractVariable::needs_subset() const
+{
+    return needs_subset_common(get_masks());
+}
+
+
 bool AbstractVariable::needs_subset_record() const
 {
     vector<Mask*> masks = get_masks();
-    vector<Mask*>::iterator mask_it;
-
-    if (masks.empty()) {
-        return false;
+    if (!masks.empty()) {
+        masks.erase(masks.begin());
     }
-
-    masks.erase(masks.begin());
-
-    for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
-        Mask *mask = *mask_it;
-        if (mask) {
-            int64_t count = mask->get_count();
-            int64_t size = mask->get_size();
-            if (count != size) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return needs_subset_common(masks);
 }
 
 

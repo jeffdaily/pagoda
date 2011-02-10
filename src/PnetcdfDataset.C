@@ -272,32 +272,6 @@ void PnetcdfDataset::wait()
             var->after_wait();
         }
     }
-#if 0
-        // release Array pointers
-        for (size_t i=0; i<arrays_to_release.size(); ++i) {
-            arrays_to_release[i]->release_update();
-        }
-        // now pack where needed
-        for (size_t i=0; i<arrays_to_pack.size(); ++i) {
-            if (arrays_to_pack[i] != NULL) {
-                const PnetcdfVariable *var = vars_to_pack[i];
-                Array *tmp = arrays_to_release[i];
-                Array *dst = arrays_to_pack[i];
-                vector<Mask*> masks = var->get_masks();
-                if (int64_t(masks.size()) == (tmp->get_ndim()+1)) {
-                    // assume this was a record subset
-                    masks.erase(masks.begin());
-                }
-                pagoda::pack(tmp, dst, masks);
-                if (var->needs_renumber()) {
-                    var->renumber(arrays_to_pack[i]);
-                }
-            }
-        }
-        arrays_to_release.clear();
-        arrays_to_pack.clear();
-        vars_to_pack.clear();
-#endif
 }
 
 
