@@ -20,7 +20,7 @@ AT_CLEANUP
 AT_SETUP([pgra <input> <output>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra $file pgra_${p}_$base])
@@ -38,7 +38,7 @@ AT_CLEANUP
 AT_SETUP([pgra -O <input> <output>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra    $file pgra_${p}_$base])
@@ -58,7 +58,7 @@ AT_CLEANUP
 AT_SETUP([pgra -A <input> <output>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra    $file pgra_${p}_$base])
@@ -78,7 +78,7 @@ AT_CLEANUP
 AT_SETUP([pgra -o <output> <input>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra -o pgra_${p}_$base $file])
@@ -96,7 +96,7 @@ AT_CLEANUP
 AT_SETUP([pgra -O -o <output> <input>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra    -o pgra_${p}_$base $file])
@@ -116,7 +116,7 @@ AT_CLEANUP
 AT_SETUP([pgra -A -o <output> <input>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra    -o pgra_${p}_$base $file])
@@ -136,7 +136,7 @@ AT_CLEANUP
 AT_SETUP([pgra -o <output> -o <output> <input>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
-     PG_HAS_RECORD_IFELSE([$file], [continue],
+     PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
             AT_CHECK([$MPIRUN -np $p pgra -o foo -o pgra_${p}_$base $file])

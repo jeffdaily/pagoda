@@ -1,7 +1,7 @@
 # M4 macros used in building Pagoda test suites.
 
 # Programs this package provides or needs during testing.
-AT_TESTED([pgsub pgra pgea pgbo pgcmp ncdump ncra od head])
+AT_TESTED([pgsub pgra pgea pgbo pgcmp pgdump ncra od head])
 
 # Enable colored test output.
 AT_COLOR_TESTS
@@ -29,9 +29,9 @@ AS_CASE([$dump],
 # Determine whether the given netCDF file has an UNLIMITED dimension, and if
 # so, if it has 1 or more currently.
 m4_define([PG_HAS_RECORD_IFELSE],
-[AS_IF([ncdump -h $1 | grep UNLIMITED | grep -v '(0 currently)'],
-    [m4_default([$3], [:])],
-    [m4_default([$2], [:])])])
+[AS_IF([pgdump --has_record $1],
+    [m4_default([$2], [:])],
+    [m4_default([$3], [:])])])
 
 # PG_FOR_DATA(VAR, BODY)
 # ----------------------------
