@@ -150,10 +150,11 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/AbstractArray_op_vc.C src/AbstractArray_op_scalar.C \
 	src/AbstractArray_op_scalar_v.C \
 	src/AbstractArray_op_scalar_vc.C src/AbstractDataset.C \
-	src/AbstractVariable.C src/Aggregation.C \
-	src/AggregationDimension.C src/AggregationJoinExisting.C \
-	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
-	src/Attribute.C src/Bootstrap.C src/CommandLineOption.C \
+	src/AbstractFileWriter.C src/AbstractVariable.C \
+	src/Aggregation.C src/AggregationDimension.C \
+	src/AggregationJoinExisting.C src/AggregationUnion.C \
+	src/AggregationVariable.C src/Array.C src/Attribute.C \
+	src/Bootstrap.C src/CommandLineOption.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
 	src/Dataset.C src/DataType.C src/Debug.C src/Dimension.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
@@ -188,15 +189,16 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/AbstractArray_op_scalar.lo \
 	src/AbstractArray_op_scalar_v.lo \
 	src/AbstractArray_op_scalar_vc.lo src/AbstractDataset.lo \
-	src/AbstractVariable.lo src/Aggregation.lo \
-	src/AggregationDimension.lo src/AggregationJoinExisting.lo \
-	src/AggregationUnion.lo src/AggregationVariable.lo \
-	src/Array.lo src/Attribute.lo src/Bootstrap.lo \
-	src/CommandLineOption.lo src/CommandLineParser.lo src/Copy.lo \
-	src/CoordHyperslab.lo src/Dataset.lo src/DataType.lo \
-	src/Debug.lo src/Dimension.lo src/FileWriter.lo \
-	src/GenericAttribute.lo src/GenericCommands.lo src/GeoGrid.lo \
-	src/Grid.lo src/IndexHyperslab.lo src/LatLonBox.lo src/Mask.lo \
+	src/AbstractFileWriter.lo src/AbstractVariable.lo \
+	src/Aggregation.lo src/AggregationDimension.lo \
+	src/AggregationJoinExisting.lo src/AggregationUnion.lo \
+	src/AggregationVariable.lo src/Array.lo src/Attribute.lo \
+	src/Bootstrap.lo src/CommandLineOption.lo \
+	src/CommandLineParser.lo src/Copy.lo src/CoordHyperslab.lo \
+	src/Dataset.lo src/DataType.lo src/Debug.lo src/Dimension.lo \
+	src/FileWriter.lo src/GenericAttribute.lo \
+	src/GenericCommands.lo src/GeoGrid.lo src/Grid.lo \
+	src/IndexHyperslab.lo src/LatLonBox.lo src/Mask.lo \
 	src/MaskMap.lo src/Pack.lo src/PgboCommands.lo \
 	src/PgeaCommands.lo src/PgraCommands.lo src/RegularGrid.lo \
 	src/ScalarArray.lo src/StringComparator.lo \
@@ -878,12 +880,13 @@ lib_LTLIBRARIES = libpagoda.la
 check_DATA = 
 #pkginclude_HEADERS += src/gax.H
 pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
-	src/AbstractVariable.H src/AggregationDimension.H \
-	src/Aggregation.H src/AggregationJoinExisting.H \
-	src/AggregationUnion.H src/AggregationVariable.H \
-	src/AllNodeArray.H src/Array.H src/Attribute.H src/Bootstrap.H \
-	src/CommandLineOption.H src/CommandLineParser.H src/Common.H \
-	src/Copy.H src/CoordHyperslab.H src/Dataset.H src/DataType.def \
+	src/AbstractFileWriter.H src/AbstractVariable.H \
+	src/AggregationDimension.H src/Aggregation.H \
+	src/AggregationJoinExisting.H src/AggregationUnion.H \
+	src/AggregationVariable.H src/AllNodeArray.H src/Array.H \
+	src/Attribute.H src/Bootstrap.H src/CommandLineOption.H \
+	src/CommandLineParser.H src/Common.H src/Copy.H \
+	src/CoordHyperslab.H src/Dataset.H src/DataType.def \
 	src/DataType2.def src/DataType.H src/Debug.H src/Dimension.H \
 	src/Error.H src/FileWriter.H src/GlobalArray.def \
 	src/GlobalArray.H src/GlobalMask.H src/GenericCommands.H \
@@ -913,10 +916,11 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/AbstractArray_op_v.C src/AbstractArray_op_vc.C \
 	src/AbstractArray_op_scalar.C src/AbstractArray_op_scalar_v.C \
 	src/AbstractArray_op_scalar_vc.C src/AbstractDataset.C \
-	src/AbstractVariable.C src/Aggregation.C \
-	src/AggregationDimension.C src/AggregationJoinExisting.C \
-	src/AggregationUnion.C src/AggregationVariable.C src/Array.C \
-	src/Attribute.C src/Bootstrap.C src/CommandLineOption.C \
+	src/AbstractFileWriter.C src/AbstractVariable.C \
+	src/Aggregation.C src/AggregationDimension.C \
+	src/AggregationJoinExisting.C src/AggregationUnion.C \
+	src/AggregationVariable.C src/Array.C src/Attribute.C \
+	src/Bootstrap.C src/CommandLineOption.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
 	src/Dataset.C src/DataType.C src/Debug.C src/Dimension.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
@@ -1091,6 +1095,8 @@ src/AbstractArray_op_scalar_v.lo: src/$(am__dirstamp) \
 src/AbstractArray_op_scalar_vc.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/AbstractDataset.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/AbstractFileWriter.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/AbstractVariable.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -1511,6 +1517,8 @@ mostlyclean-compile:
 	-rm -f src/AbstractArray_op_vc.lo
 	-rm -f src/AbstractDataset.$(OBJEXT)
 	-rm -f src/AbstractDataset.lo
+	-rm -f src/AbstractFileWriter.$(OBJEXT)
+	-rm -f src/AbstractFileWriter.lo
 	-rm -f src/AbstractVariable.$(OBJEXT)
 	-rm -f src/AbstractVariable.lo
 	-rm -f src/Aggregation.$(OBJEXT)
@@ -1679,6 +1687,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_v.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractArray_op_vc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractDataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractFileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AbstractVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Aggregation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AggregationDimension.Plo@am__quote@

@@ -11,11 +11,13 @@
 
 #include <pnetcdf.h>
 
+#include "AbstractFileWriter.H"
 #include "Attribute.H"
 #include "Copy.H"
 #include "Dataset.H"
 #include "Debug.H"
 #include "Dimension.H"
+#include "FileWriter.H"
 #include "Mask.H"
 #include "PnetcdfDimension.H"
 #include "PnetcdfError.H"
@@ -162,7 +164,7 @@ nc_type PnetcdfFileWriter::to_nc(const DataType &type)
 
 
 PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
-    :   FileWriter()
+    :   AbstractFileWriter()
     ,   is_in_define_mode(true)
     ,   filename(filename)
     ,   ncid(-1)
@@ -342,13 +344,13 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 
 void PnetcdfFileWriter::def_dim(Mask *mask)
 {
-    FileWriter::def_dim(mask);
+    AbstractFileWriter::def_dim(mask);
 }
 
 
 void PnetcdfFileWriter::def_dim(Dimension *dim)
 {
-    FileWriter::def_dim(dim);
+    AbstractFileWriter::def_dim(dim);
 }
 
 
@@ -389,7 +391,7 @@ void PnetcdfFileWriter::def_var(const string &name,
                                 const DataType &type,
                                 const vector<Attribute*> &atts)
 {
-    FileWriter::def_var(name, dims, type, atts);
+    AbstractFileWriter::def_var(name, dims, type, atts);
 }
 
 
@@ -398,13 +400,13 @@ void PnetcdfFileWriter::def_var(const string &name,
                                 const DataType &type,
                                 const vector<Attribute*> &atts)
 {
-    FileWriter::def_var(name, dims, type, atts);
+    AbstractFileWriter::def_var(name, dims, type, atts);
 }
 
 
 void PnetcdfFileWriter::def_var(Variable *var)
 {
-    FileWriter::def_var(var);
+    AbstractFileWriter::def_var(var);
 }
 
 
@@ -534,7 +536,7 @@ void PnetcdfFileWriter::write_att(const string &name, Values *values,
                                   DataType type,
                                   const string &var_name)
 {
-    FileWriter::write_att(name, values, type, var_name);
+    AbstractFileWriter::write_att(name, values, type, var_name);
 }
 
 

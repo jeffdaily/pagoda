@@ -41,6 +41,7 @@ pgcmp_SOURCES = src/pgcmp.C
 
 pkginclude_HEADERS += src/AbstractArray.H
 pkginclude_HEADERS += src/AbstractDataset.H
+pkginclude_HEADERS += src/AbstractFileWriter.H
 pkginclude_HEADERS += src/AbstractVariable.H
 pkginclude_HEADERS += src/AggregationDimension.H
 pkginclude_HEADERS += src/Aggregation.H
@@ -124,6 +125,7 @@ libpagoda_la_SOURCES += src/AbstractArray_op_scalar.C
 libpagoda_la_SOURCES += src/AbstractArray_op_scalar_v.C
 libpagoda_la_SOURCES += src/AbstractArray_op_scalar_vc.C
 libpagoda_la_SOURCES += src/AbstractDataset.C
+libpagoda_la_SOURCES += src/AbstractFileWriter.C
 libpagoda_la_SOURCES += src/AbstractVariable.C
 libpagoda_la_SOURCES += src/Aggregation.C
 libpagoda_la_SOURCES += src/AggregationDimension.C

@@ -9,8 +9,8 @@
 
 #include <pnetcdf.h>
 
+#include "AbstractFileWriter.H"
 #include "FileFormat.H"
-#include "FileWriter.H"
 
 using std::string;
 using std::map;
@@ -26,7 +26,7 @@ FileWriter* pagoda_pnetcdf_create(const string &);
 /**
  * Writes a Dataset to a netcdf-3 file using pnetcdf.
  */
-class PnetcdfFileWriter : public FileWriter
+class PnetcdfFileWriter : public AbstractFileWriter
 {
     public:
         static nc_type to_nc(const DataType &type);
