@@ -4,7 +4,7 @@
  * Replicate the functionality of ncdump/ncmpidump while supporting
  * aggregation.
  *
- * We wouldn't normally need yet another ncump, but this program will allow
+ * We wouldn't normally need yet another ncdump, but this program will allow
  * any supported data format to be dumped as well as support aggregation
  * through (hopefully) NcML or some other form of aggregation.
  */
@@ -25,13 +25,107 @@ using std::vector;
 
 #include "Attribute.H"
 #include "Bootstrap.H"
+#include "CommandLineOption.H"
+#include "CommandLineParser.H"
 #include "Dataset.H"
+#include "Debug.H"
 #include "Dimension.H"
 #include "Values.H"
 #include "Variable.H"
 
 
+static CommandLineOption TYPE(0, "type", false,
+        "print the type of file to stdout");
+static CommandLineOption HAS_RECORD(0, "has_record", false,
+        "exit with 0 if file has a record dimension > 0");
+
+static int dump_type(const string &filename);
+static int has_record(const string &filename);
+static int dump_header(const string &filename);
+
+
 int main(int argc, char **argv)
+{
+    CommandLineParser parser;
+    string filename;
+    int status;
+
+    pagoda::initialize(&argc,&argv);
+
+    parser.push_back(&TYPE);
+    parser.push_back(&HAS_RECORD);
+    parser.parse(argc,argv);
+
+    if (parser.get_positional_arguments().empty()) {
+        pagoda::println_zero("Usage: pgdump [--type] <filename>");
+        pagoda::finalize();
+        return EXIT_FAILURE;
+    } else {
+        filename = parser.get_positional_arguments().back();
+    }
+
+    if (!pagoda::file_exists(filename)) {
+        pagoda::println_zero("pgdump: file not found: " + filename);
+        pagoda::finalize();
+        return EXIT_FAILURE;
+    }
+
+    if (parser.count("type")) {
+        status = dump_type(filename);
+    } else if (parser.count("has_record")) {
+        status = has_record(filename);
+    } else {
+        status = dump_header(filename);
+    }
+
+    pagoda::finalize();
+
+    return EXIT_SUCCESS;
+}
+
+
+static int dump_type(const string &filename)
+{
+    Dataset *dataset = Dataset::open(filename);
+    FileFormat format = dataset->get_file_format();
+    string name;
+    switch (format) {
+        case FF_NETCDF3_CDF1: name = "CDF1"; break;
+        case FF_NETCDF3_CDF2: name = "CDF2"; break;
+        case FF_NETCDF4: name = "NC4"; break;
+        case FF_NETCDF4_CLASSIC: name = "NC4_CLASSIC"; break;
+        case FF_PNETCDF_CDF1: name = "CDF1"; break;
+        case FF_PNETCDF_CDF2: name = "CDF2"; break;
+        case FF_PNETCDF_CDF5: name = "CDF5"; break;
+        case FF_UNKNOWN:
+        default: name = "UNKNOWN"; break;
+    }
+    delete dataset;
+    pagoda::println_zero(name);
+    return EXIT_SUCCESS;
+}
+
+
+/* return EXIT_SUCCESS if the file has at least one record */
+static int has_record(const string &filename)
+{
+    Dataset *dataset = Dataset::open(filename);
+    int status = EXIT_FAILURE;
+    Dimension *dim;
+
+    if (NULL != (dim = dataset->get_udim())) {
+        if (dim->get_size() > 0) {
+            status = EXIT_SUCCESS;
+        }
+    }
+    
+    delete dataset;
+
+    return status;
+}
+
+
+static int dump_header(const string &filename)
 {
     Dataset *dataset;
     vector<Attribute*> atts;
@@ -41,20 +135,12 @@ int main(int argc, char **argv)
     vector<Dimension*>::const_iterator dim_it,dim_end;
     vector<Variable*>::const_iterator var_it,var_end;
 
-    pagoda::initialize(&argc,&argv);
-
-    if (argc != 2) {
-        cerr << "Usage: pgdump <filename>" << endl;
-        pagoda::finalize();
-        return EXIT_FAILURE;
-    }
-
-    dataset = Dataset::open(argv[1]);
+    dataset = Dataset::open(filename);
     atts = dataset->get_atts();
     dims = dataset->get_dims();
     vars = dataset->get_vars();
 
-    cout << argv[1] << " {" << endl;
+    cout << filename << " {" << endl;
 
     cout << "dimensions:" << endl;
     for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
@@ -109,8 +195,6 @@ int main(int argc, char **argv)
     cout << "}" << endl;
 
     delete dataset;
-
-    pagoda::finalize();
 
     return EXIT_SUCCESS;
 }
