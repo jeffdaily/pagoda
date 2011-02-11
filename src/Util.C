@@ -648,7 +648,7 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
 
 bool pagoda::file_exists(const string &filename)
 {
-    vector<long> values;
+    vector<long> values(1, 0); // vector size 1 initialized to 0
 
     // we don't want all processors hammering the file system simply to test
     // if the file exists, so we let process 0 do it
@@ -657,16 +657,10 @@ bool pagoda::file_exists(const string &filename)
         // true if the file exists; the file is automatically closed at the
         // end of its scope
         if ((ifstream(filename.c_str()))) {
-            values.push_back(1);
-        }
-        else {
-            values.push_back(0);
+            values[0] = 1;
         }
     }
-    else {
-        values.push_back(0);
-    }
-    pagoda::gop_sum(values);
+    pagoda::broadcast(values, 0);
 
     return values.front() == 1;
 }

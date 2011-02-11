@@ -29,6 +29,7 @@
 
 using std::sort;
 
+#include "Debug.H"
 
 GenericCommands::GenericCommands()
     :   parser()
@@ -160,42 +161,50 @@ void GenericCommands::parse(int argc, char **argv)
     }
 
     if (positional_arguments.empty()) {
-        throw CommandException("input and output file arguments required");
-    }
-
-    // "path" must come before input filename handling
-    if (parser.count("path")) {
-        input_path = parser.get_argument("path");
-        if (!input_path.empty() && !pagoda::ends_with(input_path, "/")) {
-            input_path += "/";
-        }
-    }
-    if (input_path.empty()) {
-        if (parser.count("output") == 0) {
-            input_filenames.assign(positional_arguments.begin(),
-                    positional_arguments.end()-1);
+        if (parser.count("output")) {
+            throw CommandException("input file(s) required");
         } else {
-            input_filenames = positional_arguments;
+            throw CommandException("input and output file arguments required");
         }
+    }
+    else if (1 == positional_arguments.size() && 0 == parser.count("output")) {
+        throw CommandException("output file argument required");
     }
     else {
-        size_t limit = positional_arguments.size();
-        if (parser.count("output") >= 1) {
-            limit -= 1;
-        }
-        for (size_t i=0; i<limit; ++i) {
-            input_filenames.push_back(input_path + positional_arguments[i]);
+        input_filenames = positional_arguments;
+        if (parser.count("output") == 0) {
+            input_filenames.resize(input_filenames.size()-1); // pop
         }
     }
 
-    if (parser.count("output") == 0) {
-        if (positional_arguments.size() == 1) {
-            throw CommandException("output file argument required");
-        }
+    if (parser.count("output")) {
+        output_filename = parser.get_argument("output");
+    } else {
         output_filename = positional_arguments.back();
     }
-    else if (parser.count("output") >= 1) {
-        output_filename = parser.get_argument("output");
+
+    if (parser.count("path")) {
+        input_path = parser.get_argument("path");
+        if (input_path.empty()) {
+            throw CommandException("empty input path");
+        }
+        if (!pagoda::ends_with(input_path, "/")) {
+            input_path += "/";
+        }
+        // prepend the input path
+        for (size_t i=0,limit=input_filenames.size(); i<limit; ++i)  {
+            input_filenames[i] = input_path + input_filenames[i];
+        }
+    }
+
+    // sanity check -- also for a more readble error message
+    // this might not be efficient since it internally involves a broadcast
+    // but it's better to know this early instead of the verbose error message
+    // produced by the Dataset::open() later.
+    for (size_t i=0,limit=input_filenames.size(); i<limit; ++i)  {
+        if (!pagoda::file_exists(input_filenames[i])) {
+            throw CommandException("file does not exist: "+input_filenames[i]);
+        }
     }
 
     if (parser.count("auxiliary")) {
