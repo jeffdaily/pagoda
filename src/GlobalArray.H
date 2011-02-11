@@ -80,6 +80,7 @@ class GlobalArray : public AbstractArray
         virtual void* gather(vector<int64_t> &subscripts,
                              void *buffer=NULL) const;
 
+#if 0
         virtual Array* add(const Array *rhs) const;
         virtual Array* sub(const Array *rhs) const;
         virtual Array* mul(const Array *rhs) const;
@@ -95,6 +96,7 @@ class GlobalArray : public AbstractArray
         virtual Array* imax(const Array *rhs);
         virtual Array* imin(const Array *rhs);
         virtual Array* ipow(double exponent);
+#endif
 
         virtual ostream& print(ostream &os) const;
 

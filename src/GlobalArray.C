@@ -910,6 +910,7 @@ void* GlobalArray::gather(vector<int64_t> &subscripts, void *buffer) const
 }
 
 
+#if 0
 Array* GlobalArray::add(const Array *rhs) const
 {
     const GlobalArray *array;
@@ -1072,6 +1073,7 @@ Array* GlobalArray::idiv(const Array *rhs)
 
     return this;
 }
+#endif
 
 
 void GlobalArray::operate_max(int that_handle)
@@ -1091,6 +1093,7 @@ void GlobalArray::operate_max_patch(int that_handle,
 }
 
 
+#if 0
 Array* GlobalArray::max(const Array *rhs) const
 {
     GlobalArray *self_copy = new GlobalArray(*this);
@@ -1129,6 +1132,7 @@ Array* GlobalArray::imax(const Array *rhs)
 
     return this;
 }
+#endif
 
 
 void GlobalArray::operate_min(int that_handle)
@@ -1148,6 +1152,7 @@ void GlobalArray::operate_min_patch(int that_handle,
 }
 
 
+#if 0
 Array* GlobalArray::min(const Array *rhs) const
 {
     GlobalArray *self_copy = new GlobalArray(*this);
@@ -1215,6 +1220,7 @@ Array* GlobalArray::ipow(double exponent)
 
     return this;
 }
+#endif
 
 
 ostream& GlobalArray::print(ostream &os) const
