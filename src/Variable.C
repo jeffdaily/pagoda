@@ -90,3 +90,24 @@ Variable::find(const vector<Variable*> &vars, const Variable *var)
 
     return NULL;
 }
+
+
+/**
+ * Splits a vector of Variable instances into record and nonrecord vectors.
+ */
+void Variable::split(const vector<Variable*> &vars,
+                     vector<Variable*> &record_vars,
+                     vector<Variable*> &nonrecord_vars)
+{
+    record_vars.clear();
+    nonrecord_vars.clear();
+    for (vector<Variable*>::const_iterator it=vars.begin(), end=vars.end();
+            it!=end; ++it) {
+        Variable *var = *it;
+        if (var->has_record()) {
+            record_vars.push_back(var);
+        } else {
+            nonrecord_vars.push_back(var);
+        }
+    }
+}

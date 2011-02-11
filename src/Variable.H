@@ -100,6 +100,9 @@ class Variable
                           const vector<Variable*> &right);
         static Variable* find(const vector<Variable*> &vars,
                               const Variable *var);
+        static void split(const vector<Variable*> &vars,
+                          vector<Variable*> &record_vars,
+                          vector<Variable*> &nonrecord_vars);
 
         virtual int64_t translate_record(int64_t record) const = 0;
         virtual void set_translate_record(bool value) = 0;

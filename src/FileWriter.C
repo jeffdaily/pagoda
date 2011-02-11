@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,7 @@
 #include "Variable.H"
 
 using std::ostream;
+using std::set;
 using std::string;
 using std::vector;
 
@@ -168,6 +170,44 @@ void FileWriter::write_atts(const vector<Attribute*> &atts, const string &name)
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
         write_att(*att_it, name);
+    }
+}
+
+
+void FileWriter::copy_vars(const vector<Variable*> &vars)
+{
+    for (vector<Variable*>::const_iterator it=vars.begin(), end=vars.end();
+            it!=end; ++it) {
+        Variable *var = *it;
+        Array *array = var->read();
+        write(array, var->get_name());
+        delete array;
+    }
+}
+
+
+void FileWriter::icopy_vars(const vector<Variable*> &vars)
+{
+    set<Dataset*> datasets;
+    vector<Array*> arrays;
+    vector<string> names;
+    for (vector<Variable*>::const_iterator it=vars.begin(), end=vars.end();
+            it!=end; ++it) {
+        Variable *var = *it;
+        arrays.push_back(var->iread());
+        names.push_back(var->get_name());
+        datasets.insert(var->get_dataset());
+    }
+    for (set<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
+            it!=end; ++it) {
+        (*it)->wait();
+    }
+    for (size_t i=0,limit=arrays.size(); i<limit; ++i) {
+        iwrite(arrays[i], names[i]);
+    }
+    wait();
+    for (size_t i=0,limit=arrays.size(); i<limit; ++i) {
+        delete arrays[i];
     }
 }
 

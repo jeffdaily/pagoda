@@ -102,28 +102,8 @@ int main(int argc, char **argv)
         if (cmd.is_nonblocking()) {
             Dimension *udim = dataset->get_udim();
             int64_t nrec = NULL != udim ? udim->get_size() : 0;
-
-            // read all non-record variables first, cache record vars
-            for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
-                Variable *var = *var_it;
-                if (var->has_record()) {
-                    record_vars.push_back(var);
-                } else {
-                    nonrecord_vars.push_back(var);
-                    nb_arrays.push_back(var->iread());
-                }
-            }
-            dataset->wait();
-            // write all non-record variables first
-            for (size_t i=0; i<nonrecord_vars.size(); ++i) {
-                writer->iwrite(nb_arrays[i],nonrecord_vars[i]->get_name());
-            }
-            writer->wait();
-            // delete all the non-blocking arrays
-            for (size_t i=0; i<nb_arrays.size(); ++i) {
-                delete nb_arrays[i];
-            }
-            nb_arrays.clear(); // probably not needed since assign later
+            Variable::split(vars, record_vars, nonrecord_vars);
+            writer->icopy_vars(nonrecord_vars);
             // read/write all record variables, record-at-a-time
             // prefill/size nb_XXX vectors
             nb_arrays.assign(record_vars.size(), NULL);

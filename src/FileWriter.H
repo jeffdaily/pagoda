@@ -99,6 +99,9 @@ class FileWriter
         virtual void iwrite(Array *array, const string &name,
                             const vector<int64_t> &start) = 0;
 
+        virtual void copy_vars(const vector<Variable*> &vars);
+        virtual void icopy_vars(const vector<Variable*> &vars);
+
         virtual void wait() = 0;
 
         virtual ostream& print(ostream &os) const = 0;
