@@ -35,8 +35,21 @@ class GenericCommands
 
         void parse(int argc, char **argv);
 
-        Dataset* get_dataset();
+        void get_inputs_and_outputs(Dataset* &dataset,
+                                    vector<Variable*> &vars,
+                                    FileWriter* &writer);
+        void get_inputs_and_outputs(Dataset* &dataset,
+                                    vector<Variable*> &vars,
+                                    vector<Dimension*> &dims,
+                                    vector<Attribute*> &atts,
+                                    FileWriter* &writer);
+        void get_inputs(Dataset* &dataset,
+                        vector<Variable*> &vars,
+                        vector<Dimension*> &dims,
+                        vector<Attribute*> &atts);
         FileWriter* get_output() const;
+
+        Dataset* get_dataset();
         vector<Variable*> get_variables(Dataset *dataset);
         vector<Dimension*> get_dimensions(Dataset *dataset);
         vector<Attribute*> get_attributes(Dataset *dataset) const;
@@ -53,8 +66,6 @@ class GenericCommands
         bool is_processing_all_coords() const;
         bool is_processing_coords() const;
         bool is_modifying_history() const;
-        bool is_helping() const;
-        bool is_versioning() const;
         bool is_requesting_info() const;
         bool is_appending() const;
         bool is_overwriting() const;
@@ -85,8 +96,6 @@ class GenericCommands
         bool process_coords;
         bool modify_history;
         bool process_topology;
-        bool help;
-        bool version;
         bool append;
         bool overwrite;
         bool fix_record_dimension;

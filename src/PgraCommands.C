@@ -51,10 +51,6 @@ void PgraCommands::parse(int argc, char **argv)
 {
     GenericCommands::parse(argc,argv);
 
-    if (is_requesting_info()) {
-        return;
-    }
-
     if (parser.count("op_typ")) {
         op_type = parser.get_argument("op_typ");
         if (find(VALID.begin(),VALID.end(),op_type) == VALID.end()) {

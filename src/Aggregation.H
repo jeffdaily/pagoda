@@ -55,7 +55,12 @@ class Aggregation : public AbstractDataset
          *
          * @return all Dataset instances aggregated here
          */
-        virtual vector<Dataset*> get_datasets() const = 0;
+        virtual vector<Dataset*> get_datasets() const;
+
+        
+        virtual vector<Attribute*> get_atts() const;
+        virtual vector<Dimension*> get_dims() const;
+        virtual vector<Variable*> get_vars() const;
 
         /**
          * @copybrief Dataset::set_masks(MaskMap*)
@@ -81,11 +86,26 @@ class Aggregation : public AbstractDataset
          */
         virtual MaskMap* pop_masks();
 
+        /**
+         * @copybrief Dataset::wait()
+         * @copydetails Dataset::wait()
+         *
+         * Sequentially waits on all aggregated Dataset instances.
+         */
+        virtual void wait();
+        
+        virtual FileFormat get_file_format() const;
+
     protected:
         /**
          * Constructs an Aggregation abstract base class.
          */
         Aggregation();
+
+        vector<Dataset*> datasets; /**< aggregated Dataset instances */
+        vector<Attribute*> atts; /**< aggregated Attribute instances */
+        vector<Dimension*> dims; /**< aggregated Dimension instances */
+        vector<Variable*> vars; /**< aggregated Variable instances */
 };
 
 #endif // AGGREGATION_H_

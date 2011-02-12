@@ -173,7 +173,7 @@ void* ScalarArray::get(void *buffer) const
 #define DATATYPE_EXPAND(DT,T) \
     if (DT == type) { \
         if (buffer == NULL) { \
-            ret = static_cast<void*>(new T); \
+            ret = static_cast<void*>(new T[1]); \
         } else { \
             ret = buffer; \
         } \

@@ -51,10 +51,6 @@ void PgboCommands::parse(int argc, char **argv)
 {
     GenericCommands::parse(argc,argv);
 
-    if (is_requesting_info()) {
-        return;
-    }
-
     if (input_filenames.size() != 2) {
         throw CommandException("two and only input files required");
     }

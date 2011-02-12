@@ -21,10 +21,6 @@ using std::vector;
 
 AggregationUnion::AggregationUnion()
     :   Aggregation()
-    ,   datasets()
-    ,   atts()
-    ,   dims()
-    ,   vars()
 {
     TIMING("AggregationUnion::AggregationUnion()");
 }
@@ -32,33 +28,7 @@ AggregationUnion::AggregationUnion()
 
 AggregationUnion::~AggregationUnion()
 {
-    // deleting the datasets should also delete their associate members
-    // and close any open files
     TIMING("AggregationUnion::~AggregationUnion()");
-
-    transform(datasets.begin(), datasets.end(), datasets.begin(),
-              pagoda::ptr_deleter<Dataset*>);
-}
-
-
-vector<Attribute*> AggregationUnion::get_atts() const
-{
-    TIMING("AggregationUnion::get_atts()");
-    return atts;
-}
-
-
-vector<Dimension*> AggregationUnion::get_dims() const
-{
-    TIMING("AggregationUnion::get_dims()");
-    return dims;
-}
-
-
-vector<Variable*> AggregationUnion::get_vars() const
-{
-    TIMING("AggregationUnion::get_vars()");
-    return vars;
 }
 
 
@@ -111,32 +81,6 @@ void AggregationUnion::add(Dataset *dataset)
 void AggregationUnion::add(const vector<Dataset*> &datasets)
 {
     Aggregation::add(datasets);
-}
-
-
-vector<Dataset*> AggregationUnion::get_datasets() const
-{
-    return datasets;
-}
-
-
-void AggregationUnion::wait()
-{
-    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
-            it!=end; ++it) {
-        (*it)->wait();
-    }
-}
-
-
-FileFormat AggregationUnion::get_file_format() const
-{
-    if (datasets.empty()) {
-        return FF_UNKNOWN;
-    }
-    else {
-        return datasets.front()->get_file_format();
-    }
 }
 
 

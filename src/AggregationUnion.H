@@ -44,31 +44,10 @@ class AggregationUnion : public Aggregation
          */
         virtual ~AggregationUnion();
 
-        virtual vector<Attribute*> get_atts() const;
-        virtual vector<Dimension*> get_dims() const;
-        virtual vector<Variable*> get_vars() const;
-
         virtual void add(Dataset *dataset);
         virtual void add(const vector<Dataset*> &datasets);
-        virtual vector<Dataset*> get_datasets() const;
-
-        /**
-         * @copybrief Dataset::wait()
-         * @copydetails Dataset::wait()
-         *
-         * Sequentially waits on all aggregated Dataset instances.
-         */
-        virtual void wait();
-
-        virtual FileFormat get_file_format() const;
 
         virtual ostream& print(ostream &os) const;
-
-    private:
-        vector<Dataset*> datasets; /**< aggregated Dataset instances */
-        vector<Attribute*> atts; /**< aggregated Attribute instances */
-        vector<Dimension*> dims; /**< aggregated Dimension instances */
-        vector<Variable*> vars; /**< aggregated Variable instances */
 };
 
 #endif // AGGREGATIONUNION_H_

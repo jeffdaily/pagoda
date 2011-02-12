@@ -43,25 +43,12 @@ class AggregationJoinExisting : public Aggregation
         AggregationJoinExisting(const string& name);
         virtual ~AggregationJoinExisting();
 
-        virtual vector<Attribute*> get_atts() const;
-        virtual vector<Dimension*> get_dims() const;
-        virtual vector<Variable*> get_vars() const;
-
         virtual void add(Dataset *dataset);
         virtual void add(const vector<Dataset*> &datasets);
-        virtual vector<Dataset*> get_datasets() const;
-
-        /**
-         * @copybrief Dataset::wait()
-         * @copydetails Dataset::wait()
-         *
-         * Sequentially waits on all aggregated Dataset instances.
-         */
-        virtual void wait();
-
-        virtual FileFormat get_file_format() const;
 
         virtual ostream& print(ostream &os) const;
+
+        virtual void wait();
 
     private:
         string agg_dim_name; /**< name of Dimension joining over */
@@ -69,12 +56,6 @@ class AggregationJoinExisting : public Aggregation
         map<string,AggregationVariable*> agg_vars; /**< cache of joined
 Variable instances i.e. Variable instances which have the joined Dimension as
 their outer-most Dimension */
-        vector<Dataset*> datasets; /**< aggregated Dataset instances */
-        vector<Attribute*> atts; /**< aggregated Attribute instances */
-        vector<Dimension*> dims; /**< aggregated Dimension instances; this also
-contains the AggregationDimension instance */
-        vector<Variable*> vars; /**< aggregated Variable instances; this also
-contains any AggregationVariable instances */
 };
 
 #endif // AGGREGATIONJOINEXISTING_H_

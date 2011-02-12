@@ -75,12 +75,6 @@ int main(int argc, char **argv)
 
         cmd.parse(argc,argv);
 
-        if (cmd.is_requesting_info()) {
-            pagoda::print_zero(cmd.get_info());
-            pagoda::finalize();
-            return EXIT_SUCCESS;
-        }
-
         dataset = cmd.get_dataset();
         operand = cmd.get_operand();
         op_type = cmd.get_operator();

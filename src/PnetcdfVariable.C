@@ -522,6 +522,7 @@ void PnetcdfVariable::after_wait()
             if (needs_renumber()) {
                 renumber(dst);
             }
+            delete src;
         }
     }
 

@@ -30,6 +30,8 @@ AbstractDataset::~AbstractDataset()
     TIMING("AbstractDataset::~AbstractDataset()");
     transform(grids.begin(), grids.end(), grids.begin(),
               pagoda::ptr_deleter<Grid*>);
+    transform(masks.begin(), masks.end(), masks.begin(),
+              pagoda::ptr_deleter<MaskMap*>);
 }
 
 

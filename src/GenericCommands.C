@@ -3,6 +3,7 @@
 #endif
 
 #include <algorithm>
+#include <vector>
 
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"
@@ -21,15 +22,18 @@
 #include "GenericAttribute.H"
 #include "GenericCommands.H"
 #include "Grid.H"
+#include "MaskMap.H"
 #include "PagodaException.H"
 #include "Timing.H"
 #include "TypedValues.H"
 #include "Util.H"
 #include "Variable.H"
 
-using std::sort;
-
 #include "Debug.H"
+
+using std::sort;
+using std::vector;
+
 
 GenericCommands::GenericCommands()
     :   parser()
@@ -47,8 +51,6 @@ GenericCommands::GenericCommands()
     ,   process_coords(true)
     ,   modify_history(true)
     ,   process_topology(true)
-    ,   help(false)
-    ,   version(false)
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
@@ -79,8 +81,6 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   process_coords(true)
     ,   modify_history(true)
     ,   process_topology(true)
-    ,   help(false)
-    ,   version(false)
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
@@ -151,13 +151,15 @@ void GenericCommands::parse(int argc, char **argv)
     positional_arguments = parser.get_positional_arguments();
 
     if (parser.count("help")) {
-        help = true;
-        return; // stop parsing
+        pagoda::print_zero(get_usage());
+        pagoda::finalize();
+        exit(EXIT_SUCCESS);
     }
 
     if (parser.count("version")) {
-        version = true;
-        return; // stop parsing
+        pagoda::print_zero(get_version());
+        pagoda::finalize();
+        exit(EXIT_SUCCESS);
     }
 
     if (positional_arguments.empty()) {
@@ -343,6 +345,58 @@ void GenericCommands::parse(int argc, char **argv)
             throw CommandException("invalid header pad argument: " + arg);
         }
     }
+}
+
+
+/* often we don't need the dims and atts returned... */
+void GenericCommands::get_inputs_and_outputs(Dataset *&dataset,
+        vector<Variable*> &vars, FileWriter* &writer)
+{
+    vector<Attribute*> atts;
+    vector<Dimension*> dims;
+
+    get_inputs(dataset, vars, dims, atts);
+    writer = get_output();
+    writer->write_atts(atts);
+    writer->def_dims(dims);
+    writer->def_vars(vars);
+}
+
+
+void GenericCommands::get_inputs_and_outputs(Dataset *&dataset,
+        vector<Variable*> &vars, vector<Dimension*> &dims,
+        vector<Attribute*> &atts, FileWriter* &writer)
+{
+    get_inputs(dataset, vars, dims, atts);
+    writer = get_output();
+    writer->write_atts(atts);
+    writer->def_dims(dims);
+    writer->def_vars(vars);
+}
+
+
+void GenericCommands::get_inputs(Dataset *&dataset, vector<Variable*> &vars,
+        vector<Dimension*> &dims, vector<Attribute*> &atts)
+{
+    Grid *grid = NULL;
+    vector<Grid*> grids;
+    MaskMap *masks = NULL;
+
+    dataset = get_dataset();
+    vars = get_variables(dataset);
+    dims = get_dimensions(dataset);
+    grids = dataset->get_grids();
+    if (grids.empty()) {
+        pagoda::println_zero("no grid found");
+    } else {
+        grid = grids[0];
+    }
+
+    masks = new MaskMap(dataset);
+    masks->modify(get_index_hyperslabs());
+    masks->modify(get_coord_hyperslabs(), grid);
+    masks->modify(get_boxes(), grid);
+    dataset->set_masks(masks);
 }
 
 
@@ -737,24 +791,6 @@ bool GenericCommands::is_modifying_history() const
 }
 
 
-bool GenericCommands::is_helping() const
-{
-    return help;
-}
-
-
-bool GenericCommands::is_versioning() const
-{
-    return version;
-}
-
-
-bool GenericCommands::is_requesting_info() const
-{
-    return help || version;
-}
-
-
 bool GenericCommands::is_appending() const
 {
     return append;
@@ -788,18 +824,6 @@ string GenericCommands::get_usage() const
 string GenericCommands::get_version() const
 {
     return PACKAGE_STRING;
-}
-
-
-string GenericCommands::get_info() const
-{
-    if (help) {
-        return get_usage();
-    } else if (version) {
-        return get_version();
-    } else {
-        return "";
-    }
 }
 
 

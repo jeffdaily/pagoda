@@ -29,10 +29,6 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
     ,   agg_dim_name(name)
     ,   agg_dim(NULL)
     ,   agg_vars()
-    ,   datasets()
-    ,   atts()
-    ,   dims()
-    ,   vars()
 {
     TIMING("AggregationJoinExisting::AggregationJoinExisting(string)");
     TRACER("AggregationJoinExisting::ctor(%s)\n", name.c_str());
@@ -52,31 +48,7 @@ AggregationJoinExisting::~AggregationJoinExisting()
         agg_var = NULL;
     }
 
-    transform(datasets.begin(), datasets.end(), datasets.begin(),
-              pagoda::ptr_deleter<Dataset*>);
-
     delete agg_dim;
-}
-
-
-vector<Attribute*> AggregationJoinExisting::get_atts() const
-{
-    TIMING("AggregationJoinExisting::get_atts()");
-    return atts;
-}
-
-
-vector<Dimension*> AggregationJoinExisting::get_dims() const
-{
-    TIMING("AggregationJoinExisting::get_dims()");
-    return dims;
-}
-
-
-vector<Variable*> AggregationJoinExisting::get_vars() const
-{
-    TIMING("AggregationJoinExisting::get_vars()");
-    return vars;
 }
 
 
@@ -177,33 +149,13 @@ void AggregationJoinExisting::add(const vector<Dataset*> &dataset)
 }
 
 
-vector<Dataset*> AggregationJoinExisting::get_datasets() const
-{
-    return datasets;
-}
-
-
 void AggregationJoinExisting::wait()
 {
-    for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
-            it!=end; ++it) {
-        (*it)->wait();
-    }
+    Aggregation::wait();
 
     for (map<string,AggregationVariable*>::iterator it=agg_vars.begin(),
             end=agg_vars.end(); it!=end; ++it) {
         it->second->after_wait();
-    }
-}
-
-
-FileFormat AggregationJoinExisting::get_file_format() const
-{
-    if (datasets.empty()) {
-        return FF_UNKNOWN;
-    }
-    else {
-        return datasets.front()->get_file_format();
     }
 }
 

@@ -42,6 +42,12 @@ AbstractArray::AbstractArray(const AbstractArray &that)
 AbstractArray::~AbstractArray()
 {
     TIMING("AbstractArray::~AbstractArray()");
+    // delete validator since it is an inherent property acquired from the
+    // associated Variable
+    if (NULL != validator) {
+        delete validator;
+    }
+    // don't delete counter; they are transient and set by caller
 }
 
 

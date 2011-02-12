@@ -57,7 +57,6 @@ MaskMap::MaskMap(Dataset *dataset, bool seed)
     } else {
         create_masks(dataset->get_dims());
     }
-    dataset->set_masks(this);
 }
 
 
@@ -299,6 +298,8 @@ void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
             } else if (hyperslab.has_max()) {
                 mask->modify_lt(hyperslab.get_max(), data);
             }
+
+            delete data;
         }
     }
 }
