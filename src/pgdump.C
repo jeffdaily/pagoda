@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     pagoda::finalize();
 
-    return EXIT_SUCCESS;
+    return status;
 }
 
 

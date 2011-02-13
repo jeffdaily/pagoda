@@ -115,6 +115,7 @@ class CommandLineOption
         static CommandLineOption OP_TYPE;
         static CommandLineOption OUTPUT;
         static CommandLineOption OVERWRITE;
+        static CommandLineOption READ_ALL_RECORDS;
         static CommandLineOption TOPOLOGY;
         static CommandLineOption UNION;
         static CommandLineOption VARIABLE;

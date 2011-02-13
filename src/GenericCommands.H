@@ -71,6 +71,7 @@ class GenericCommands
         bool is_overwriting() const;
         bool is_fixing_record_dimension() const;
         bool is_nonblocking() const;
+        bool is_reading_all_records() const;
         int get_header_pad() const;
         string get_usage() const;
         string get_version() const;
@@ -106,6 +107,7 @@ class GenericCommands
         vector<LatLonBox> boxes;
         FileFormat file_format;
         bool nonblocking_io;
+        bool reading_all_records;
 };
 
 #endif // GENERICCOMMANDS_H_

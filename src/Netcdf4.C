@@ -276,7 +276,7 @@ void nc::def_var_chunking(int ncid, int varid, int storage,
         const vector<size_t> &chunksizes)
 {
     NETCDF4_TIMING1("nc_def_var_chunking");
-    assert(nc::inq_varndims(ncid, varid)==chunksizes.size());
+    assert(nc::inq_varndims(ncid, varid)==int(chunksizes.size()));
     ERRNO_CHECK(nc_def_var_chunking(ncid, varid, storage, &chunksizes[0]));
 }
 

@@ -60,6 +60,7 @@ GenericCommands::GenericCommands()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
     ,   nonblocking_io(false)
+    ,   reading_all_records(false)
 {
     TIMING("GenericCommands::GenericCommands()");
     init();
@@ -90,6 +91,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
     ,   nonblocking_io(false)
+    ,   reading_all_records(false)
 {
     TIMING("GenericCommands::GenericCommands(int,char**)");
     init();
@@ -108,6 +110,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::NC4_CLASSIC);
     parser.push_back(&CommandLineOption::FILE_FORMAT);
     parser.push_back(&CommandLineOption::NONBLOCKING_IO);
+    parser.push_back(&CommandLineOption::READ_ALL_RECORDS);
     parser.push_back(&CommandLineOption::APPEND);
     parser.push_back(&CommandLineOption::ALPHABETIZE);
     parser.push_back(&CommandLineOption::NO_COORDS);
@@ -323,6 +326,10 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("nbio")) {
         nonblocking_io = true;
+    }
+
+    if (parser.count("allrec")) {
+        reading_all_records = true;
     }
 
     if (parser.count("append")) {
@@ -842,4 +849,10 @@ string GenericCommands::get_input_path() const
 bool GenericCommands::is_nonblocking() const
 {
     return nonblocking_io;
+}
+
+
+bool GenericCommands::is_reading_all_records() const
+{
+    return reading_all_records;
 }

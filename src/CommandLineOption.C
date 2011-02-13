@@ -100,6 +100,9 @@ CommandLineOption CommandLineOption::OVERWRITE(
     'O', "overwrite", false,
     "overwrite existing output file, if any",
     "ovr");
+CommandLineOption CommandLineOption::READ_ALL_RECORDS(
+    0, "allrec", false,
+    "read all records per variable rather than record-at-a-time");
 CommandLineOption CommandLineOption::TOPOLOGY(
     'T', "topology", false,
     "do not process toplogy variables");
