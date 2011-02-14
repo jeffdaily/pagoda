@@ -44,17 +44,28 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4)
 
 #libpagoda_la_SOURCES += src/gax.C
-@HAVE_GA_TRUE@am__append_3 = src/GlobalArray.C src/GlobalMask.C \
-@HAVE_GA_TRUE@	src/Memory.c
+#libpagoda_la_SOURCES += src/gax.H
+@HAVE_GA_TRUE@am__append_3 = src/GlobalArray.C src/GlobalArray.H \
+@HAVE_GA_TRUE@	src/GlobalArray.def src/GlobalMask.C \
+@HAVE_GA_TRUE@	src/GlobalMask.H src/Memory.c
 @HAVE_PNETCDF_TRUE@am__append_4 = src/PnetcdfAttribute.C \
-@HAVE_PNETCDF_TRUE@	src/PnetcdfNS.C src/PnetcdfDataset.C \
-@HAVE_PNETCDF_TRUE@	src/PnetcdfDimension.C \
-@HAVE_PNETCDF_TRUE@	src/PnetcdfFileWriter.C src/PnetcdfTiming.C \
-@HAVE_PNETCDF_TRUE@	src/PnetcdfVariable.C
-@HAVE_NETCDF4_TRUE@am__append_5 = src/Netcdf4Attribute.C src/Netcdf4.C \
-@HAVE_NETCDF4_TRUE@	src/Netcdf4Dataset.C src/Netcdf4Dimension.C \
-@HAVE_NETCDF4_TRUE@	src/Netcdf4FileWriter.C src/Netcdf4Timing.C \
-@HAVE_NETCDF4_TRUE@	src/Netcdf4Variable.C
+@HAVE_PNETCDF_TRUE@	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfDataset.H src/PnetcdfDimension.C \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfDimension.H src/PnetcdfError.H \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfFileWriter.C \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfFileWriter.H src/PnetcdfNS.C \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfNS.H src/PnetcdfTiming.C \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfTiming.H src/PnetcdfVariable.C \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfVariable.H
+@HAVE_NETCDF4_TRUE@am__append_5 = src/Netcdf4.C src/Netcdf4.H \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Attribute.C \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Attribute.H src/Netcdf4Dataset.C \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Dataset.H src/Netcdf4Dimension.C \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Dimension.H src/Netcdf4Error.H \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4FileWriter.C \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4FileWriter.H src/Netcdf4Timing.C \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Timing.H src/Netcdf4Variable.C \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Variable.H
 
 #############################################################################
 # sandbox
@@ -156,31 +167,41 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/AggregationVariable.C src/Array.C src/Attribute.C \
 	src/Bootstrap.C src/CommandLineOption.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
-	src/Dataset.C src/DataType.C src/Debug.C src/Dimension.C \
-	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
-	src/GeoGrid.C src/Grid.C src/IndexHyperslab.C src/LatLonBox.C \
-	src/Mask.C src/MaskMap.C src/Pack.C src/PgboCommands.C \
-	src/PgeaCommands.C src/PgraCommands.C src/RegularGrid.C \
+	src/Dataset.C src/DataType.C src/Dimension.C src/FileWriter.C \
+	src/GenericAttribute.C src/GenericCommands.C src/GeoGrid.C \
+	src/Grid.C src/IndexHyperslab.C src/LatLonBox.C src/Mask.C \
+	src/MaskMap.C src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
+	src/PgraCommands.C src/Print.C src/RegularGrid.C \
 	src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C \
 	src/Validator.C src/Values.C src/Variable.C src/GlobalArray.C \
-	src/GlobalMask.C src/Memory.c src/PnetcdfAttribute.C \
-	src/PnetcdfNS.C src/PnetcdfDataset.C src/PnetcdfDimension.C \
-	src/PnetcdfFileWriter.C src/PnetcdfTiming.C \
-	src/PnetcdfVariable.C src/Netcdf4Attribute.C src/Netcdf4.C \
-	src/Netcdf4Dataset.C src/Netcdf4Dimension.C \
-	src/Netcdf4FileWriter.C src/Netcdf4Timing.C \
-	src/Netcdf4Variable.C
+	src/GlobalArray.H src/GlobalArray.def src/GlobalMask.C \
+	src/GlobalMask.H src/Memory.c src/PnetcdfAttribute.C \
+	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
+	src/PnetcdfDataset.H src/PnetcdfDimension.C \
+	src/PnetcdfDimension.H src/PnetcdfError.H \
+	src/PnetcdfFileWriter.C src/PnetcdfFileWriter.H \
+	src/PnetcdfNS.C src/PnetcdfNS.H src/PnetcdfTiming.C \
+	src/PnetcdfTiming.H src/PnetcdfVariable.C \
+	src/PnetcdfVariable.H src/Netcdf4.C src/Netcdf4.H \
+	src/Netcdf4Attribute.C src/Netcdf4Attribute.H \
+	src/Netcdf4Dataset.C src/Netcdf4Dataset.H \
+	src/Netcdf4Dimension.C src/Netcdf4Dimension.H \
+	src/Netcdf4Error.H src/Netcdf4FileWriter.C \
+	src/Netcdf4FileWriter.H src/Netcdf4Timing.C \
+	src/Netcdf4Timing.H src/Netcdf4Variable.C \
+	src/Netcdf4Variable.H
 am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_GA_TRUE@am__objects_1 = src/GlobalArray.lo src/GlobalMask.lo \
 @HAVE_GA_TRUE@	src/Memory.lo
 @HAVE_PNETCDF_TRUE@am__objects_2 = src/PnetcdfAttribute.lo \
-@HAVE_PNETCDF_TRUE@	src/PnetcdfNS.lo src/PnetcdfDataset.lo \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfDataset.lo \
 @HAVE_PNETCDF_TRUE@	src/PnetcdfDimension.lo \
-@HAVE_PNETCDF_TRUE@	src/PnetcdfFileWriter.lo \
+@HAVE_PNETCDF_TRUE@	src/PnetcdfFileWriter.lo src/PnetcdfNS.lo \
 @HAVE_PNETCDF_TRUE@	src/PnetcdfTiming.lo src/PnetcdfVariable.lo
-@HAVE_NETCDF4_TRUE@am__objects_3 = src/Netcdf4Attribute.lo \
-@HAVE_NETCDF4_TRUE@	src/Netcdf4.lo src/Netcdf4Dataset.lo \
+@HAVE_NETCDF4_TRUE@am__objects_3 = src/Netcdf4.lo \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Attribute.lo \
+@HAVE_NETCDF4_TRUE@	src/Netcdf4Dataset.lo \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4Dimension.lo \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4FileWriter.lo \
 @HAVE_NETCDF4_TRUE@	src/Netcdf4Timing.lo src/Netcdf4Variable.lo
@@ -195,13 +216,13 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/AggregationVariable.lo src/Array.lo src/Attribute.lo \
 	src/Bootstrap.lo src/CommandLineOption.lo \
 	src/CommandLineParser.lo src/Copy.lo src/CoordHyperslab.lo \
-	src/Dataset.lo src/DataType.lo src/Debug.lo src/Dimension.lo \
+	src/Dataset.lo src/DataType.lo src/Dimension.lo \
 	src/FileWriter.lo src/GenericAttribute.lo \
 	src/GenericCommands.lo src/GeoGrid.lo src/Grid.lo \
 	src/IndexHyperslab.lo src/LatLonBox.lo src/Mask.lo \
 	src/MaskMap.lo src/Pack.lo src/PgboCommands.lo \
-	src/PgeaCommands.lo src/PgraCommands.lo src/RegularGrid.lo \
-	src/ScalarArray.lo src/StringComparator.lo \
+	src/PgeaCommands.lo src/PgraCommands.lo src/Print.lo \
+	src/RegularGrid.lo src/ScalarArray.lo src/StringComparator.lo \
 	src/SubsetterCommands.lo src/Timing.lo src/Util.lo \
 	src/Validator.lo src/Values.lo src/Variable.lo \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3)
@@ -878,7 +899,6 @@ DISTCLEANFILES =
 MAINTAINERCLEANFILES = 
 lib_LTLIBRARIES = libpagoda.la
 check_DATA = 
-#pkginclude_HEADERS += src/gax.H
 pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/AbstractFileWriter.H src/AbstractVariable.H \
 	src/AggregationDimension.H src/Aggregation.H \
@@ -888,23 +908,16 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/CommandLineParser.H src/Common.H src/Copy.H \
 	src/CoordHyperslab.H src/Dataset.H src/DataType.def \
 	src/DataType2.def src/DataType.H src/Debug.H src/Dimension.H \
-	src/Error.H src/FileWriter.H src/GlobalArray.def \
-	src/GlobalArray.H src/GlobalMask.H src/GenericCommands.H \
+	src/Error.H src/FileWriter.H src/GenericCommands.H \
 	src/GeoGrid.H src/Grid.H src/IndexHyperslab.H src/LatLonBox.H \
-	src/Mask.H src/MaskMap.H src/Netcdf4Attribute.H \
-	src/Netcdf4Dataset.H src/Netcdf4Dimension.H src/Netcdf4Error.H \
-	src/Netcdf4FileWriter.H src/Netcdf4.H src/Netcdf4Timing.H \
-	src/Netcdf4Variable.H src/NodeZeroArray.H \
+	src/Mask.H src/MaskMap.H src/NodeZeroArray.H \
 	src/NotImplementedException.H src/pagoda.H src/Pack.H \
 	src/PgboCommands.H src/PgeaCommands.H src/PgraCommands.H \
-	src/PagodaException.H src/PnetcdfAttribute.H \
-	src/PnetcdfDataset.H src/PnetcdfDimension.H src/PnetcdfError.H \
-	src/PnetcdfFileWriter.H src/PnetcdfNS.H src/PnetcdfTiming.H \
-	src/PnetcdfVariable.H src/RangeException.H src/RegularGrid.H \
-	src/ScalarArray.H src/Slice.H src/StringComparator.H \
-	src/SubsetterCommands.H src/Timing.H src/TypedValues.H \
-	src/Util.H src/Validator.H src/ValidMax.H src/ValidMin.H \
-	src/ValidRange.H src/Values.H src/Variable.H
+	src/PagodaException.H src/Print.H src/RangeException.H \
+	src/RegularGrid.H src/ScalarArray.H src/Slice.H \
+	src/StringComparator.H src/SubsetterCommands.H src/Timing.H \
+	src/TypedValues.H src/Util.H src/Validator.H src/ValidMax.H \
+	src/ValidMin.H src/ValidRange.H src/Values.H src/Variable.H
 pagodadir = $(datadir)/pagoda
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
@@ -922,11 +935,11 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/AggregationVariable.C src/Array.C src/Attribute.C \
 	src/Bootstrap.C src/CommandLineOption.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
-	src/Dataset.C src/DataType.C src/Debug.C src/Dimension.C \
-	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
-	src/GeoGrid.C src/Grid.C src/IndexHyperslab.C src/LatLonBox.C \
-	src/Mask.C src/MaskMap.C src/Pack.C src/PgboCommands.C \
-	src/PgeaCommands.C src/PgraCommands.C src/RegularGrid.C \
+	src/Dataset.C src/DataType.C src/Dimension.C src/FileWriter.C \
+	src/GenericAttribute.C src/GenericCommands.C src/GeoGrid.C \
+	src/Grid.C src/IndexHyperslab.C src/LatLonBox.C src/Mask.C \
+	src/MaskMap.C src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
+	src/PgraCommands.C src/Print.C src/RegularGrid.C \
 	src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Timing.C src/Util.C \
 	src/Validator.C src/Values.C src/Variable.C $(am__append_3) \
@@ -1121,7 +1134,6 @@ src/CoordHyperslab.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/Dataset.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/DataType.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/Debug.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Dimension.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/FileWriter.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/GenericAttribute.lo: src/$(am__dirstamp) \
@@ -1139,6 +1151,7 @@ src/Pack.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PgboCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PgeaCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PgraCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Print.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/RegularGrid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ScalarArray.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/StringComparator.lo: src/$(am__dirstamp) \
@@ -1155,20 +1168,20 @@ src/GlobalMask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Memory.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfAttribute.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/PnetcdfNS.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfDataset.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfDimension.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfFileWriter.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/PnetcdfNS.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfTiming.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfVariable.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/Netcdf4.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Netcdf4Attribute.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/Netcdf4.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Netcdf4Dataset.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/Netcdf4Dimension.lo: src/$(am__dirstamp) \
@@ -1549,8 +1562,6 @@ mostlyclean-compile:
 	-rm -f src/DataType.lo
 	-rm -f src/Dataset.$(OBJEXT)
 	-rm -f src/Dataset.lo
-	-rm -f src/Debug.$(OBJEXT)
-	-rm -f src/Debug.lo
 	-rm -f src/Dimension.$(OBJEXT)
 	-rm -f src/Dimension.lo
 	-rm -f src/FileWriter.$(OBJEXT)
@@ -1613,6 +1624,8 @@ mostlyclean-compile:
 	-rm -f src/PnetcdfTiming.lo
 	-rm -f src/PnetcdfVariable.$(OBJEXT)
 	-rm -f src/PnetcdfVariable.lo
+	-rm -f src/Print.$(OBJEXT)
+	-rm -f src/Print.lo
 	-rm -f src/RegularGrid.$(OBJEXT)
 	-rm -f src/RegularGrid.lo
 	-rm -f src/ScalarArray.$(OBJEXT)
@@ -1703,7 +1716,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Copy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/DataType.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dataset.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Debug.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Dimension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/FileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GenericAttribute.Plo@am__quote@
@@ -1735,6 +1747,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfNS.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Print.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/RegularGrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ScalarArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/StringComparator.Plo@am__quote@

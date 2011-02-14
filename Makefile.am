@@ -65,10 +65,6 @@ pkginclude_HEADERS += src/Debug.H
 pkginclude_HEADERS += src/Dimension.H
 pkginclude_HEADERS += src/Error.H
 pkginclude_HEADERS += src/FileWriter.H
-#pkginclude_HEADERS += src/gax.H
-pkginclude_HEADERS += src/GlobalArray.def
-pkginclude_HEADERS += src/GlobalArray.H
-pkginclude_HEADERS += src/GlobalMask.H
 pkginclude_HEADERS += src/GenericCommands.H
 pkginclude_HEADERS += src/GeoGrid.H
 pkginclude_HEADERS += src/Grid.H
@@ -76,14 +72,6 @@ pkginclude_HEADERS += src/IndexHyperslab.H
 pkginclude_HEADERS += src/LatLonBox.H
 pkginclude_HEADERS += src/Mask.H
 pkginclude_HEADERS += src/MaskMap.H
-pkginclude_HEADERS += src/Netcdf4Attribute.H
-pkginclude_HEADERS += src/Netcdf4Dataset.H
-pkginclude_HEADERS += src/Netcdf4Dimension.H
-pkginclude_HEADERS += src/Netcdf4Error.H
-pkginclude_HEADERS += src/Netcdf4FileWriter.H
-pkginclude_HEADERS += src/Netcdf4.H
-pkginclude_HEADERS += src/Netcdf4Timing.H
-pkginclude_HEADERS += src/Netcdf4Variable.H
 pkginclude_HEADERS += src/NodeZeroArray.H
 pkginclude_HEADERS += src/NotImplementedException.H
 pkginclude_HEADERS += src/pagoda.H
@@ -92,14 +80,7 @@ pkginclude_HEADERS += src/PgboCommands.H
 pkginclude_HEADERS += src/PgeaCommands.H
 pkginclude_HEADERS += src/PgraCommands.H
 pkginclude_HEADERS += src/PagodaException.H
-pkginclude_HEADERS += src/PnetcdfAttribute.H
-pkginclude_HEADERS += src/PnetcdfDataset.H
-pkginclude_HEADERS += src/PnetcdfDimension.H
-pkginclude_HEADERS += src/PnetcdfError.H
-pkginclude_HEADERS += src/PnetcdfFileWriter.H
-pkginclude_HEADERS += src/PnetcdfNS.H
-pkginclude_HEADERS += src/PnetcdfTiming.H
-pkginclude_HEADERS += src/PnetcdfVariable.H
+pkginclude_HEADERS += src/Print.H
 pkginclude_HEADERS += src/RangeException.H
 pkginclude_HEADERS += src/RegularGrid.H
 pkginclude_HEADERS += src/ScalarArray.H
@@ -141,7 +122,6 @@ libpagoda_la_SOURCES += src/Copy.C
 libpagoda_la_SOURCES += src/CoordHyperslab.C
 libpagoda_la_SOURCES += src/Dataset.C
 libpagoda_la_SOURCES += src/DataType.C
-libpagoda_la_SOURCES += src/Debug.C
 libpagoda_la_SOURCES += src/Dimension.C
 libpagoda_la_SOURCES += src/FileWriter.C
 libpagoda_la_SOURCES += src/GenericAttribute.C
@@ -156,6 +136,7 @@ libpagoda_la_SOURCES += src/Pack.C
 libpagoda_la_SOURCES += src/PgboCommands.C
 libpagoda_la_SOURCES += src/PgeaCommands.C
 libpagoda_la_SOURCES += src/PgraCommands.C
+libpagoda_la_SOURCES += src/Print.C
 libpagoda_la_SOURCES += src/RegularGrid.C
 libpagoda_la_SOURCES += src/ScalarArray.C
 libpagoda_la_SOURCES += src/StringComparator.C
@@ -168,29 +149,49 @@ libpagoda_la_SOURCES += src/Variable.C
 
 if HAVE_GA
 #libpagoda_la_SOURCES += src/gax.C
+#libpagoda_la_SOURCES += src/gax.H
 libpagoda_la_SOURCES += src/GlobalArray.C
+libpagoda_la_SOURCES += src/GlobalArray.H
+libpagoda_la_SOURCES += src/GlobalArray.def
 libpagoda_la_SOURCES += src/GlobalMask.C
+libpagoda_la_SOURCES += src/GlobalMask.H
 libpagoda_la_SOURCES += src/Memory.c
 endif
 
 if HAVE_PNETCDF
 libpagoda_la_SOURCES += src/PnetcdfAttribute.C
-libpagoda_la_SOURCES += src/PnetcdfNS.C
+libpagoda_la_SOURCES += src/PnetcdfAttribute.H
 libpagoda_la_SOURCES += src/PnetcdfDataset.C
+libpagoda_la_SOURCES += src/PnetcdfDataset.H
 libpagoda_la_SOURCES += src/PnetcdfDimension.C
+libpagoda_la_SOURCES += src/PnetcdfDimension.H
+libpagoda_la_SOURCES += src/PnetcdfError.H
 libpagoda_la_SOURCES += src/PnetcdfFileWriter.C
+libpagoda_la_SOURCES += src/PnetcdfFileWriter.H
+libpagoda_la_SOURCES += src/PnetcdfNS.C
+libpagoda_la_SOURCES += src/PnetcdfNS.H
 libpagoda_la_SOURCES += src/PnetcdfTiming.C
+libpagoda_la_SOURCES += src/PnetcdfTiming.H
 libpagoda_la_SOURCES += src/PnetcdfVariable.C
+libpagoda_la_SOURCES += src/PnetcdfVariable.H
 endif
 
 if HAVE_NETCDF4
-libpagoda_la_SOURCES += src/Netcdf4Attribute.C
 libpagoda_la_SOURCES += src/Netcdf4.C
+libpagoda_la_SOURCES += src/Netcdf4.H
+libpagoda_la_SOURCES += src/Netcdf4Attribute.C
+libpagoda_la_SOURCES += src/Netcdf4Attribute.H
 libpagoda_la_SOURCES += src/Netcdf4Dataset.C
+libpagoda_la_SOURCES += src/Netcdf4Dataset.H
 libpagoda_la_SOURCES += src/Netcdf4Dimension.C
+libpagoda_la_SOURCES += src/Netcdf4Dimension.H
+libpagoda_la_SOURCES += src/Netcdf4Error.H
 libpagoda_la_SOURCES += src/Netcdf4FileWriter.C
+libpagoda_la_SOURCES += src/Netcdf4FileWriter.H
 libpagoda_la_SOURCES += src/Netcdf4Timing.C
+libpagoda_la_SOURCES += src/Netcdf4Timing.H
 libpagoda_la_SOURCES += src/Netcdf4Variable.C
+libpagoda_la_SOURCES += src/Netcdf4Variable.H
 endif
 
 #############################################################################
