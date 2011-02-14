@@ -26,7 +26,6 @@ using std::vector;
 #include "MaskMap.H"
 #include "NotImplementedException.H"
 #include "Slice.H"
-#include "Timing.H"
 #include "Variable.H"
 
 

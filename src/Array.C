@@ -10,7 +10,6 @@
 #include "GlobalArray.H"
 #include "NodeZeroArray.H"
 #include "ScalarArray.H"
-#include "Timing.H"
 #include "Util.H"
 
 

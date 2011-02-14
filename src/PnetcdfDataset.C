@@ -15,7 +15,6 @@
 #include "PnetcdfError.H"
 #include "PnetcdfVariable.H"
 #include "PnetcdfNS.H"
-#include "Timing.H"
 #include "Util.H"
 
 

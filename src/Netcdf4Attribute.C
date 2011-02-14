@@ -15,7 +15,6 @@
 #include "Netcdf4.H"
 #include "Util.H"
 #include "Values.H"
-#include "Timing.H"
 #include "TypedValues.H"
 
 using std::vector;

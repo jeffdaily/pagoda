@@ -26,7 +26,6 @@
 #include "Pack.H"
 #include "PnetcdfNS.H"
 #include "Util.H"
-#include "Timing.H"
 #include "Values.H"
 
 using std::invalid_argument;

@@ -12,7 +12,6 @@ using std::fprintf;
 using std::string;
 
 #include "Print.H"
-#include "Timing.H"
 #include "Util.H"
 
 

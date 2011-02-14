@@ -21,7 +21,6 @@
 #include "Netcdf4Variable.H"
 #include "Pack.H"
 #include "Netcdf4.H"
-#include "Timing.H"
 #include "Util.H"
 
 using std::fill;

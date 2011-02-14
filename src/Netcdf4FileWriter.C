@@ -25,7 +25,6 @@
 #include "Pack.H"
 #include "Netcdf4.H"
 #include "Util.H"
-#include "Timing.H"
 #include "Values.H"
 
 using std::invalid_argument;

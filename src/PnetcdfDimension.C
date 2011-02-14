@@ -14,7 +14,6 @@
 #include "PnetcdfDimension.H"
 #include "PnetcdfError.H"
 #include "PnetcdfNS.H"
-#include "Timing.H"
 
 
 PnetcdfDimension::PnetcdfDimension(PnetcdfDataset *dataset, int dimid)

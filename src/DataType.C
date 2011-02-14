@@ -5,7 +5,6 @@
 #include <stdint.h>
 
 #include "DataType.H"
-#include "Timing.H"
 
 
 int DataType::next_id(1);

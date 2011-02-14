@@ -18,7 +18,6 @@
 #include "Error.H"
 #include "GlobalArray.H"
 #include "ScalarArray.H"
-#include "Timing.H"
 #include "Util.H"
 
 

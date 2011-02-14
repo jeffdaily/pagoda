@@ -18,7 +18,6 @@
 #include "Dimension.H"
 #include "Error.H"
 #include "IndexOutOfBoundsException.H"
-#include "Timing.H"
 #include "Variable.H"
 #include "Validator.H"
 

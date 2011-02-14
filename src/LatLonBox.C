@@ -10,7 +10,6 @@
 
 #include "LatLonBox.H"
 #include "RangeException.H"
-#include "Timing.H"
 
 using std::ceil;
 using std::floor;

@@ -14,7 +14,6 @@
 #include "Netcdf4Dimension.H"
 #include "Netcdf4Error.H"
 #include "Netcdf4.H"
-#include "Timing.H"
 
 
 Netcdf4Dimension::Netcdf4Dimension(Netcdf4Dataset *dataset, int dimid)

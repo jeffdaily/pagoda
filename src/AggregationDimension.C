@@ -9,7 +9,6 @@
 
 #include "AggregationDimension.H"
 #include "Dimension.H"
-#include "Timing.H"
 
 using std::string;
 using std::vector;

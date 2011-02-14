@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "Timing.H"
 #include "Values.H"
 
 using std::ostream;

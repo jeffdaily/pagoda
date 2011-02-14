@@ -15,7 +15,6 @@
 #include "GenericAttribute.H"
 #include "Mask.H"
 #include "Util.H"
-#include "Timing.H"
 #include "Variable.H"
 
 using std::ostream;

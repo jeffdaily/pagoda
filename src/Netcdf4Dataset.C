@@ -13,7 +13,6 @@
 #include "Netcdf4Error.H"
 #include "Netcdf4Variable.H"
 #include "Netcdf4.H"
-#include "Timing.H"
 #include "Util.H"
 
 

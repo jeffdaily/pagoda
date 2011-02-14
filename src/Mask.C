@@ -9,7 +9,6 @@
 #include "Dimension.H"
 #include "GlobalMask.H"
 #include "Mask.H"
-#include "Timing.H"
 
 
 Mask* Mask::create(const string &name, int64_t size)

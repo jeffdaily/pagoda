@@ -27,7 +27,6 @@ extern void armci_msg_dgop(double*, int, char*);
 #include "gax.H"
 
 #include "Debug.H"
-#include "Timing.H"
 #include "Util.H"
 
 using namespace gax;

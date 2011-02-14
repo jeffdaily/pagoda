@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <cstdio>
+#include <map>
 #include <vector>
 
 #include "Array.H"
@@ -12,10 +13,10 @@
 #include "Error.H"
 #include "Mask.H"
 #include "Pack.H"
-#include "Timing.H"
 #include "Util.H"
 
 using std::printf;
+using std::map;
 using std::vector;
 
 

@@ -10,7 +10,6 @@
 #include "DataType.H"
 #include "Util.H"
 #include "Values.H"
-#include "Timing.H"
 #include "TypedValues.H"
 
 using std::ostringstream;

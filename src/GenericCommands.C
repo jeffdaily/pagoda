@@ -24,7 +24,6 @@
 #include "Grid.H"
 #include "MaskMap.H"
 #include "PagodaException.H"
-#include "Timing.H"
 #include "TypedValues.H"
 #include "Util.H"
 #include "Variable.H"

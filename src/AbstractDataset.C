@@ -11,7 +11,6 @@
 #include "Grid.H"
 #include "MaskMap.H"
 #include "StringComparator.H"
-#include "Timing.H"
 #include "Util.H"
 #include "Variable.H"
 

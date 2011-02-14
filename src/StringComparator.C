@@ -6,7 +6,6 @@
 #include <cctype>
 
 #include "StringComparator.H"
-#include "Timing.H"
 
 using std::tolower;
 using std::transform;

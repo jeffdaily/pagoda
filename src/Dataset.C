@@ -7,7 +7,6 @@
 #include "Dataset.H"
 #include "Dimension.H"
 #include "Error.H"
-#include "Timing.H"
 #include "Util.H"
 #include "Variable.H"
 

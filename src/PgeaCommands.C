@@ -14,7 +14,6 @@
 #include "FileWriter.H"
 #include "GenericCommands.H"
 #include "PgeaCommands.H"
-#include "Timing.H"
 
 using std::find;
 

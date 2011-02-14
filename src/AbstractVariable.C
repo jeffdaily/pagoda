@@ -18,7 +18,6 @@
 #include "Mask.H"
 #include "Pack.H"
 #include "StringComparator.H"
-#include "Timing.H"
 #include "ValidMax.H"
 #include "ValidMin.H"
 #include "ValidRange.H"

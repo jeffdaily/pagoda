@@ -20,7 +20,6 @@
 #include "NotImplementedException.H"
 #include "Pack.H"
 #include "Slice.H"
-#include "Timing.H"
 #include "Util.H"
 #include "Variable.H"
 

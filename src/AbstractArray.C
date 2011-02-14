@@ -11,7 +11,6 @@
 #include "Copy.H"
 #include "DataType.H"
 #include "Error.H"
-#include "Timing.H"
 #include "Util.H"
 #include "Validator.H"
 

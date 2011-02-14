@@ -10,7 +10,6 @@
 #include "Error.H"
 #include "GenericCommands.H"
 #include "PgboCommands.H"
-#include "Timing.H"
 
 using std::find;
 

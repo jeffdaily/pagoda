@@ -64,7 +64,6 @@
 #include "Slice.H"
 #include "StringComparator.H"
 #include "SubsetterCommands.H"
-#include "Timing.H"
 #include "TypedValues.H"
 #include "Util.H"
 #include "Validator.H"

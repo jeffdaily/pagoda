@@ -6,7 +6,6 @@
 #include "Dimension.H"
 #include "Mask.H"
 #include "MaskMap.H"
-#include "Timing.H"
 
 
 Dimension::Dimension()

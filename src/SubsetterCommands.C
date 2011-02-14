@@ -4,7 +4,6 @@
 
 #include "GenericCommands.H"
 #include "SubsetterCommands.H"
-#include "Timing.H"
 
 
 SubsetterCommands::SubsetterCommands()

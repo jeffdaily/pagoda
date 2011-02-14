@@ -22,7 +22,6 @@
 #include "PnetcdfVariable.H"
 #include "Pack.H"
 #include "PnetcdfNS.H"
-#include "Timing.H"
 #include "Util.H"
 
 using std::fill;
