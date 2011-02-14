@@ -9,19 +9,16 @@
 
 Variable::Variable()
 {
-    TIMING("Variable::Variable()");
 }
 
 
 Variable::~Variable()
 {
-    TIMING("Variable::~Variable()");
 }
 
 
 ostream& operator << (ostream &os, const Variable *other)
 {
-    TIMING("operator<<(ostream,Variable*)");
     return other->print(os);
 }
 

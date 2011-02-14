@@ -96,7 +96,6 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     void *ptr_dst;
     int64_t elems;
 
-    TIMING("partial_sum(Array*,Array*,bool)");
     TRACER("partial_sum(Array*,Array*,bool)");
 
     if (! g_src->same_distribution(g_dst)) {
@@ -221,8 +220,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
     vector<int64_t> hi_dst(ndim_dst,0);
     //vector<int64_t> ld_dst(ndim_dst-1,0);
 
-    TIMING("pack(Array*,Array*,vector<Array*>)");
-    TIMING("pack(Array*,Array*,vector<Array*>) BEGIN");
 
     if (ndim_src != ndim_dst) {
         pagoda::abort("pack: src and dst ndims don't match", ndim_src-ndim_dst);
@@ -378,7 +375,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
 
 void pagoda::unravel64(int64_t x, int ndim, int64_t *dims, int64_t *result)
 {
-    TIMING("unravel64(int64_t,int,int64_t*,int64_t*)");
     unravel64i(x,ndim,dims,result);
 }
 
@@ -388,7 +384,6 @@ void pagoda::unravel64(
     const vector<int64_t> &dims,
     vector<int64_t> &result)
 {
-    TIMING("unravel64(int64_t,int,int64_t*,int64_t*)");
     unravel64i(x,dims,result);
 }
 
@@ -404,7 +399,6 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
     vector<int64_t> hi;
     DataType type = src->get_type();
 
-    TIMING("enumerate(Array*,void*,void*)");
     TRACER("enumerate BEGIN\n");
 
     src->get_distribution(lo,hi);
@@ -459,7 +453,6 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     vector<int64_t> hi_src(1,0);
     DataType type_src = src->get_type();
 
-    TIMING("unpack1d(Array*,Array*,Array*)");
     TRACER("unpack1d BEGIN\n");
 
     if (!dst->same_distribution(msk)) {

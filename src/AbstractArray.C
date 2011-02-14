@@ -23,7 +23,6 @@ AbstractArray::AbstractArray(DataType type)
     ,   write_type(type)
     ,   read_type(type)
 {
-    TIMING("AbstractArray::AbstractArray()");
 }
 
 
@@ -34,14 +33,12 @@ AbstractArray::AbstractArray(const AbstractArray &that)
     ,   write_type(that.write_type)
     ,   read_type(that.write_type)
 {
-    TIMING("AbstractArray::AbstractArray()");
     /** @todo should counter be deep copied? */
 }
 
 
 AbstractArray::~AbstractArray()
 {
-    TIMING("AbstractArray::~AbstractArray()");
     // delete validator since it is an inherent property acquired from the
     // associated Variable
     if (NULL != validator) {
@@ -77,7 +74,6 @@ void AbstractArray::set_read_type(DataType type)
 
 int64_t AbstractArray::get_size() const
 {
-    TIMING("AbstractArray::get_size()");
     return pagoda::shape_to_size(get_shape());
 }
 
@@ -102,7 +98,6 @@ vector<int64_t> AbstractArray::get_local_shape() const
 
 int64_t AbstractArray::get_local_size() const
 {
-    TIMING("AbstractArray::get_local_size()");
     return pagoda::shape_to_size(get_local_shape());
 }
 
@@ -331,7 +326,6 @@ bool AbstractArray::same_distribution(const Array *other) const
     vector<long> values(
             1, (get_local_shape() == other->get_local_shape()) ? 1 : 0);
 
-    TIMING("AbstractArray::same_distribution(Array*)");
 
     pagoda::gop_min(values);
     return (values.at(0) == 1) ? true : false;
@@ -370,7 +364,6 @@ void AbstractArray::set_counter(Array *counter)
 
 ostream& AbstractArray::print(ostream &os) const
 {
-    TIMING("AbstractArray::print(ostream&)");
     os << "AbstractArray";
     return os;
 }

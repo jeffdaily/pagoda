@@ -189,7 +189,6 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
 
 PnetcdfFileWriter::~PnetcdfFileWriter()
 {
-    TIMING("PnetcdfFileWriter::~PnetcdfFileWriter()");
     close();
 }
 
@@ -207,7 +206,6 @@ FileWriter* PnetcdfFileWriter::create()
 {
     MPI_Info info;
 
-    TIMING("PnetcdfFileWriter::create()");
     TRACER("PnetcdfFileWriter create %s\n", filename.c_str());
 
     MPI_Info_create(&info);
@@ -307,7 +305,6 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 {
     int id;
 
-    TIMING("PnetcdfFileWriter::def_dim(Dimension*)");
 
     maybe_redef();
 
@@ -363,7 +360,6 @@ void PnetcdfFileWriter::def_var(const string &name,
     vector<int64_t> shape;
     int id;
 
-    TIMING("PnetcdfFileWriter::def_var(string,vector<string>)");
 
     maybe_redef();
 
@@ -412,7 +408,6 @@ void PnetcdfFileWriter::def_var(Variable *var)
 
 ostream& PnetcdfFileWriter::print(ostream &os) const
 {
-    TIMING("PnetcdfFileWriter::print(ostream)");
     return os << "PnetcdfFileWriter(" << filename << ")";
 }
 
@@ -422,7 +417,6 @@ int PnetcdfFileWriter::get_dim_id(const string &name) const
     ostringstream strerr;
     map<string,int>::const_iterator it = dim_id.find(name);
 
-    TIMING("PnetcdfFileWriter::get_dim_id(string)");
 
     if (it != dim_id.end()) {
         return it->second;
@@ -438,7 +432,6 @@ int64_t PnetcdfFileWriter::get_dim_size(const string &name) const
     ostringstream strerr;
     map<string,int64_t>::const_iterator it = dim_size.find(name);
 
-    TIMING("PnetcdfFileWriter::get_dim_size(string)");
 
     if (it != dim_size.end()) {
         return it->second;
@@ -454,7 +447,6 @@ int PnetcdfFileWriter::get_var_id(const string &name) const
     ostringstream strerr;
     map<string,int>::const_iterator it = var_id.find(name);
 
-    TIMING("PnetcdfFileWriter::get_var_id(string)");
 
     if (it != var_id.end()) {
         return it->second;
@@ -470,7 +462,6 @@ vector<int> PnetcdfFileWriter::get_var_dims(const string &name) const
     ostringstream strerr;
     map<string,vector<int> >::const_iterator it = var_dims.find(name);
 
-    TIMING("PnetcdfFileWriter::get_var_dims(string)");
 
     if (it != var_dims.end()) {
         return it->second;
@@ -486,7 +477,6 @@ vector<int64_t> PnetcdfFileWriter::get_var_shape(const string &name) const
     ostringstream strerr;
     map<string,vector<int64_t> >::const_iterator it = var_shape.find(name);
 
-    TIMING("PnetcdfFileWriter::get_var_shape(string)");
 
     if (it != var_shape.end()) {
         return it->second;
@@ -500,7 +490,6 @@ vector<int64_t> PnetcdfFileWriter::get_var_shape(const string &name) const
 #if 0
 void PnetcdfFileWriter::def_check() const
 {
-    TIMING("PnetcdfFileWriter::def_check()");
     if (!is_in_define_mode) {
         ostringstream strerr;
         strerr << "cannot (re)define output file after writing begins";
@@ -512,7 +501,6 @@ void PnetcdfFileWriter::def_check() const
 
 void PnetcdfFileWriter::maybe_redef()
 {
-    TIMING("PnetcdfFileWriter::maybe_redef()");
     if (!is_in_define_mode) {
         is_in_define_mode = true;
         ncmpi::redef(ncid);
@@ -523,7 +511,6 @@ void PnetcdfFileWriter::maybe_redef()
 
 void PnetcdfFileWriter::maybe_enddef()
 {
-    TIMING("PnetcdfFileWriter::maybe_enddef()");
     if (is_in_define_mode) {
         is_in_define_mode = false;
         ncmpi::enddef(ncid);
@@ -542,7 +529,6 @@ void PnetcdfFileWriter::write_att(const string &name, Values *values,
 
 void PnetcdfFileWriter::write_att(Attribute *att, const string &name)
 {
-    TIMING("PnetcdfFileWriter::write_att(Attribute*,string)");
     write_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
 }
 
@@ -552,7 +538,6 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
 
-    TIMING("PnetcdfFileWriter::write_att_id(Attribute*,int)");
     TRACER("PnetcdfFileWriter::write_att_id %s\n", attr->get_name().c_str());
 
     maybe_redef();
@@ -649,7 +634,6 @@ void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
     vector<MPI_Offset> count(shape.size(), 0);
     int varid = get_var_id(name);
 
-    TIMING("PnetcdfFileWriter::write(Array*,string,int64_t)");
     TRACER("PnetcdfFileWriter::write record %ld %s\n",
            (long)record, name.c_str());
 
@@ -708,7 +692,6 @@ void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
     vector<MPI_Offset> count(shape.size(), 0);
     int varid = get_var_id(name);
 
-    TIMING("PnetcdfFileWriter::write(Array*,string,vector<int64_t>)");
     TRACER("PnetcdfFileWriter::write %s\n", name.c_str());
 
     if (start.size() != shape.size()) {
@@ -787,7 +770,6 @@ void PnetcdfFileWriter::do_write(Array *array, int varid,
 
 void PnetcdfFileWriter::wait()
 {
-    TIMING("PnetcdfFileWriter::wait()");
 
     if (!nb_requests.empty()) {
         vector<int> statuses(nb_requests.size());

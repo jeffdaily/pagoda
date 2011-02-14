@@ -112,7 +112,6 @@ void MaskMap::create_mask(const string &name, int64_t size)
  */
 void MaskMap::create_masks(const Dataset *dataset)
 {
-    TIMING("MaskMap::create_masks(Dataset*)");
     create_masks(dataset->get_dims());
 }
 
@@ -131,7 +130,6 @@ void MaskMap::create_masks(const vector<Dimension*> &dims)
     vector<Dimension*>::const_iterator dim_it;
     vector<Dimension*>::const_iterator dim_end;
 
-    TIMING("MaskMap::create_masks(vector<Dimension*>)");
 
     for (dim_it=dims.begin(),dim_end=dims.end(); dim_it!=dim_end; ++dim_it) {
         create_mask(*dim_it);
@@ -207,7 +205,6 @@ void MaskMap::modify(const IndexHyperslab &hyperslab)
     string hyperslab_name = hyperslab.get_name();
     Mask *mask = get_mask(hyperslab_name);
 
-    TIMING("MaskMap::modify(IndexHyperslab)");
     TRACER("MaskMap::modify(IndexHyperslab)\n");
 
     if (mask == NULL) {
@@ -239,7 +236,6 @@ void MaskMap::modify(const vector<IndexHyperslab> &hyperslabs)
 {
     vector<IndexHyperslab>::const_iterator hyperslab_it;
 
-    TIMING("Dataset::modify(vector<IndexHyperslab>,vector<Dimension*>)");
 
     // we're iterating over the command-line specified hyperslabs to create masks
     for (hyperslab_it=hyperslabs.begin(); hyperslab_it!=hyperslabs.end(); ++hyperslab_it) {
@@ -262,7 +258,6 @@ void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
     string hyperslab_name = hyperslab.get_name();
     Mask *mask = get_mask(hyperslab_name);
 
-    TIMING("MaskMap::modify(CoordHyperslab)");
     TRACER("MaskMap::modify(CoordHyperslab)\n");
 
     if (mask == NULL) {
@@ -318,7 +313,6 @@ void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
 {
     vector<CoordHyperslab>::const_iterator hyperslab_it;
 
-    TIMING("Dataset::modify(vector<CoordHyperslab>,vector<Dimension*>)");
 
     // we're iterating over the command-line specified hyperslabs to create
     // masks
@@ -330,7 +324,6 @@ void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
 
 void MaskMap::modify(const LatLonBox &box, Grid *grid)
 {
-    TIMING("MaskMap::modify(LatLonBox,Grid)");
     TRACER("MaskMap::modify(LatLonBox,Grid)\n");
 
     if (grid->get_type() == GridType::GEODESIC) {
@@ -472,7 +465,6 @@ void MaskMap::modify(const LatLonBox &box,
     Array *lat_array;
     Array *lon_array;
 
-    TIMING("MaskMap::modify(LatLonBox,Variable,Variable,Dimension)");
     TRACER("MaskMap::modify(LatLonBox,Variable,Variable,Dimension)\n");
 
     lat->get_dataset()->push_masks(NULL);

@@ -26,7 +26,6 @@ PgeaCommands::PgeaCommands()
     :   GenericCommands()
     ,   op_type("")
 {
-    TIMING("PgeaCommands::PgeaCommands()");
     init();
 }
 
@@ -35,7 +34,6 @@ PgeaCommands::PgeaCommands(int argc, char **argv)
     :   GenericCommands()
     ,   op_type("")
 {
-    TIMING("PgeaCommands::PgeaCommands(int,char**)");
     init();
     parse(argc, argv);
 }
@@ -43,7 +41,6 @@ PgeaCommands::PgeaCommands(int argc, char **argv)
 
 PgeaCommands::~PgeaCommands()
 {
-    TIMING("PgeaCommands::~PgeaCommands()");
 }
 
 

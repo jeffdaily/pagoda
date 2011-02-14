@@ -30,7 +30,6 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
     ,   agg_dim(NULL)
     ,   agg_vars()
 {
-    TIMING("AggregationJoinExisting::AggregationJoinExisting(string)");
     TRACER("AggregationJoinExisting::ctor(%s)\n", name.c_str());
 }
 
@@ -40,7 +39,6 @@ AggregationJoinExisting::~AggregationJoinExisting()
     map<string,AggregationVariable*>::iterator agg_var_it = agg_vars.begin();
     map<string,AggregationVariable*>::iterator agg_var_end = agg_vars.end();
 
-    TIMING("AggregationJoinExisting::~AggregationJoinExisting()");
 
     for (; agg_var_it!=agg_var_end; ++agg_var_it) {
         AggregationVariable *agg_var = agg_var_it->second;
@@ -54,7 +52,6 @@ AggregationJoinExisting::~AggregationJoinExisting()
 
 void AggregationJoinExisting::add(Dataset *dataset)
 {
-    TIMING("AggregationJoinExisting::add(Dataset*)");
     TRACER("AggregationJoinExisting::add BEGIN\n");
     datasets.push_back(dataset);
 
@@ -162,6 +159,5 @@ void AggregationJoinExisting::wait()
 
 ostream& AggregationJoinExisting::print(ostream &os) const
 {
-    TIMING("AggregationJoinExisting::print(ostream)");
     return os << "AggregationJoinExisting()";
 }

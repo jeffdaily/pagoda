@@ -16,13 +16,11 @@ using std::vector;
 
 Values::Values()
 {
-    TIMING("Values::Values()");
 }
 
 
 Values::~Values()
 {
-    TIMING("Values::~Values()");
 }
 
 
@@ -31,7 +29,6 @@ void Values::as(vector<TYPE> &values) const \
 { \
     size_t i = 0; \
     size_t limit = size(); \
-    TIMING("Values::as(vector<" #TYPE ">)"); \
     values.clear(); \
     values.reserve(limit); \
     for (i=0; i<limit; ++i) { \
@@ -61,7 +58,6 @@ void Values::as(string &values) const
 {
     size_t i = 0;
     size_t limit = size();
-    TIMING("Values::as(string)");
     values.clear();
     values.reserve(limit);
     for (i=0; i<limit; ++i) {
@@ -74,6 +70,5 @@ void Values::as(string &values) const
 
 ostream& operator << (ostream &os, const Values *values)
 {
-    TIMING("operator<<(ostream,Values*)");
     return values->print(os);
 }

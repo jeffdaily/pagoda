@@ -36,7 +36,6 @@ Netcdf4Attribute::Netcdf4Attribute(
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
 
-    TIMING("Netcdf4Attribute::Netcdf4Attribute(...)");
 
     name = nc::inq_attname(ncid, varid, attid);
     type = Netcdf4Dataset::to_dt(nc::inq_atttype(ncid, varid, name));
@@ -62,28 +61,24 @@ Netcdf4Attribute::Netcdf4Attribute(
 
 Netcdf4Attribute::~Netcdf4Attribute()
 {
-    TIMING("Netcdf4Attribute::~Netcdf4Attribute()");
     delete values;
 }
 
 
 string Netcdf4Attribute::get_name() const
 {
-    TIMING("Netcdf4Attribute::get_name()");
     return name;
 }
 
 
 DataType Netcdf4Attribute::get_type() const
 {
-    TIMING("Netcdf4Attribute::get_type()");
     return type;
 }
 
 
 Values* Netcdf4Attribute::get_values() const
 {
-    TIMING("Netcdf4Attribute::get_values()");
     return values;
 }
 
@@ -102,20 +97,17 @@ Variable* Netcdf4Attribute::get_var() const
 
 Netcdf4Dataset* Netcdf4Attribute::get_netcdf_dataset() const
 {
-    TIMING("Netcdf4Attribute::get_netcdf_dataset()");
     return dataset;
 }
 
 
 Netcdf4Variable* Netcdf4Attribute::get_netcdf_var() const
 {
-    TIMING("Netcdf4Attribute::get_netcdf_var()");
     return var;
 }
 
 
 int Netcdf4Attribute::get_id() const
 {
-    TIMING("Netcdf4Attribute::get_id()");
     return id;
 }

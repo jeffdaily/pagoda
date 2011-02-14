@@ -10,19 +10,16 @@
 SubsetterCommands::SubsetterCommands()
     :   GenericCommands()
 {
-    TIMING("SubsetterCommands::SubsetterCommands()");
 }
 
 
 SubsetterCommands::SubsetterCommands(int argc, char **argv)
     :   GenericCommands()
 {
-    TIMING("SubsetterCommands::SubsetterCommands(int,char**)");
     parse(argc, argv);
 }
 
 
 SubsetterCommands::~SubsetterCommands()
 {
-    TIMING("SubsetterCommands::~SubsetterCommands()");
 }

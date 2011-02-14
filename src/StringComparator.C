@@ -17,7 +17,6 @@ StringComparator::StringComparator()
     ,   ignore_case(true)
     ,   within(false)
 {
-    TIMING("StringComparator::StringComparator()");
 }
 
 
@@ -29,7 +28,6 @@ StringComparator::StringComparator(
     ,   ignore_case(ignore_case)
     ,   within(within)
 {
-    TIMING("StringComparator::StringComparator(...)");
 }
 
 
@@ -38,13 +36,11 @@ StringComparator::StringComparator(const StringComparator &copy)
     ,   ignore_case(copy.ignore_case)
     ,   within(copy.within)
 {
-    TIMING("StringComparator::StringComparator(StringComparator)");
 }
 
 
 StringComparator& StringComparator::operator= (const StringComparator &copy)
 {
-    TIMING("StringComparator::operator=(StringComparator)");
     if (&copy != this) {
         value = copy.value;
         ignore_case = copy.ignore_case;
@@ -56,13 +52,11 @@ StringComparator& StringComparator::operator= (const StringComparator &copy)
 
 StringComparator::~StringComparator()
 {
-    TIMING("StringComparator::~StringComparator()");
 }
 
 
 bool StringComparator::operator()(const string &that) const
 {
-    TIMING("StringComparator::operator()(string)");
     string mine = value;
     string theirs = that;
     if (ignore_case) {
@@ -83,7 +77,6 @@ bool StringComparator::operator()(const string &that) const
  */
 bool StringComparator::operator()(const vector<string> &that) const
 {
-    TIMING("StringComparator::operator()(vector<string>)");
     vector<string>::const_iterator it = that.begin();
     vector<string>::const_iterator end = that.end();
 
@@ -99,41 +92,35 @@ bool StringComparator::operator()(const vector<string> &that) const
 
 void StringComparator::set_value(const string &value)
 {
-    TIMING("StringComparator::set_value(string)");
     this->value = value;
 }
 
 
 void StringComparator::set_ignore_case(bool ignore_case)
 {
-    TIMING("StringComparator::set_ignore_case(bool)");
     this->ignore_case = ignore_case;
 }
 
 
 void StringComparator::set_within(bool within)
 {
-    TIMING("StringComparator::set_within(bool)");
     this->within = within;
 }
 
 
 string StringComparator::get_value() const
 {
-    TIMING("StringComparator::get_value()");
     return value;
 }
 
 
 bool StringComparator::get_ignore_case() const
 {
-    TIMING("StringComparator::get_ignore_case()");
     return ignore_case;
 }
 
 
 bool StringComparator::get_within() const
 {
-    TIMING("StringComparator::get_within()");
     return within;
 }

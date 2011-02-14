@@ -36,7 +36,6 @@ Netcdf4Variable::Netcdf4Variable(Netcdf4Dataset *dataset, int varid)
     ,   atts()
     ,   type(DataType::NOT_A_TYPE)
 {
-    TIMING("Netcdf4Variable::Netcdf4Variable(Netcdf4Dataset*,int)");
     int ncid = dataset->get_id();
     vector<int> dim_ids;
     nc_type type_tmp;
@@ -54,7 +53,6 @@ Netcdf4Variable::Netcdf4Variable(Netcdf4Dataset *dataset, int varid)
 
 Netcdf4Variable::~Netcdf4Variable()
 {
-    TIMING("Netcdf4Variable::~Netcdf4Variable()");
 
     transform(atts.begin(), atts.end(), atts.begin(),
               pagoda::ptr_deleter<Netcdf4Attribute*>);
@@ -63,35 +61,30 @@ Netcdf4Variable::~Netcdf4Variable()
 
 string Netcdf4Variable::get_name() const
 {
-    TIMING("Netcdf4Variable::get_name()");
     return name;
 }
 
 
 vector<Dimension*> Netcdf4Variable::get_dims() const
 {
-    TIMING("Netcdf4Variable::get_dims()");
     return vector<Dimension*>(dims.begin(), dims.end());
 }
 
 
 vector<Attribute*> Netcdf4Variable::get_atts() const
 {
-    TIMING("Netcdf4Variable::get_atts()");
     return vector<Attribute*>(atts.begin(), atts.end());
 }
 
 
 Dataset* Netcdf4Variable::get_dataset() const
 {
-    TIMING("Netcdf4Variable::get_dataset()");
     return dataset;
 }
 
 
 DataType Netcdf4Variable::get_type() const
 {
-    TIMING("Netcdf4Variable::get_type()");
     return type;
 }
 
@@ -122,7 +115,6 @@ Array* Netcdf4Variable::read_wrapper(Array *dst) const
     Array *tmp;
 
     TRACER("Netcdf4Variable::read_wrapper(Array*) %s\n", get_name().c_str());
-    TIMING("Netcdf4Variable::read_wrapper(Array*)");
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into i.e. subset occurs after the fact
@@ -204,7 +196,6 @@ Array* Netcdf4Variable::read_wrapper(int64_t record, Array *dst) const
     Array *tmp;
 
     TRACER("Netcdf4Variable::read_wrapper(int64_t,Array*) %s\n", get_name().c_str());
-    TIMING("Netcdf4Variable::read_wrapper(int64_t,Array*)");
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into i.e. subset occurs after the fact
@@ -350,7 +341,6 @@ void Netcdf4Variable::renumber(Array *array) const
 
 ostream& Netcdf4Variable::print(ostream &os) const
 {
-    TIMING("Netcdf4Variable::print(ostream)");
     os << "Netcdf4Variable(" << name << ")";
     return os;
 }
@@ -358,13 +348,11 @@ ostream& Netcdf4Variable::print(ostream &os) const
 
 Netcdf4Dataset* Netcdf4Variable::get_netcdf_dataset() const
 {
-    TIMING("Netcdf4Variable::get_netcdf_dataset()");
     return dataset;
 }
 
 
 int Netcdf4Variable::get_id() const
 {
-    TIMING("Netcdf4Variable::get_id()");
     return id;
 }

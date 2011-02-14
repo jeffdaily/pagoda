@@ -42,7 +42,6 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
     ,   nb_arrays_to_pack_src()
     ,   nb_arrays_to_pack_dst()
 {
-    TIMING("PnetcdfVariable::PnetcdfVariable(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
     vector<int> dim_ids;
     nc_type type_tmp;
@@ -60,7 +59,6 @@ PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
 
 PnetcdfVariable::~PnetcdfVariable()
 {
-    TIMING("PnetcdfVariable::~PnetcdfVariable()");
 
     transform(atts.begin(), atts.end(), atts.begin(),
               pagoda::ptr_deleter<PnetcdfAttribute*>);
@@ -69,35 +67,30 @@ PnetcdfVariable::~PnetcdfVariable()
 
 string PnetcdfVariable::get_name() const
 {
-    TIMING("PnetcdfVariable::get_name()");
     return name;
 }
 
 
 vector<Dimension*> PnetcdfVariable::get_dims() const
 {
-    TIMING("PnetcdfVariable::get_dims()");
     return vector<Dimension*>(dims.begin(), dims.end());
 }
 
 
 vector<Attribute*> PnetcdfVariable::get_atts() const
 {
-    TIMING("PnetcdfVariable::get_atts()");
     return vector<Attribute*>(atts.begin(), atts.end());
 }
 
 
 Dataset* PnetcdfVariable::get_dataset() const
 {
-    TIMING("PnetcdfVariable::get_dataset()");
     return dataset;
 }
 
 
 DataType PnetcdfVariable::get_type() const
 {
-    TIMING("PnetcdfVariable::get_type()");
     return type;
 }
 
@@ -196,7 +189,6 @@ Array* PnetcdfVariable::_read(Array *dst) const
     Array *tmp;
 
     TRACER("PnetcdfVariable::_read(Array*) %s\n", get_name().c_str());
-    TIMING("PnetcdfVariable::_read(Array*)");
 
     tmp = read_prep(dst, start, count, found_bit);
     do_read(tmp, start, count, found_bit);
@@ -223,7 +215,6 @@ Array* PnetcdfVariable::_iread(Array *dst)
     Array *tmp;
 
     TRACER("PnetcdfVariable::_iread(Array*) %s\n", get_name().c_str());
-    TIMING("PnetcdfVariable::_iread(Array*)");
 
     tmp = read_prep(dst, start, count, found_bit);
     do_iread(tmp, start, count, found_bit);
@@ -310,7 +301,6 @@ Array* PnetcdfVariable::_read(int64_t record, Array *dst) const
     Array *tmp;
 
     TRACER("PnetcdfVariable::_read(int64_t,Array*) %s\n", get_name().c_str());
-    TIMING("PnetcdfVariable::_read(int64_t,Array*)");
 
     tmp = read_prep(dst, start, count, found_bit, record);
     do_read(tmp, start, count, found_bit);
@@ -339,7 +329,6 @@ Array* PnetcdfVariable::_iread(int64_t record, Array *dst)
     Array *tmp;
 
     TRACER("PnetcdfVariable::_read(int64_t,Array*) %s\n", get_name().c_str());
-    TIMING("PnetcdfVariable::_read(int64_t,Array*)");
 
     tmp = read_prep(dst, start, count, found_bit, record);
     do_iread(tmp, start, count, found_bit);
@@ -548,7 +537,6 @@ void PnetcdfVariable::renumber(Array *array) const
 
 ostream& PnetcdfVariable::print(ostream &os) const
 {
-    TIMING("PnetcdfVariable::print(ostream)");
     os << "PnetcdfVariable(" << name << ")";
     return os;
 }
@@ -556,13 +544,11 @@ ostream& PnetcdfVariable::print(ostream &os) const
 
 PnetcdfDataset* PnetcdfVariable::get_netcdf_dataset() const
 {
-    TIMING("PnetcdfVariable::get_netcdf_dataset()");
     return dataset;
 }
 
 
 int PnetcdfVariable::get_id() const
 {
-    TIMING("PnetcdfVariable::get_id()");
     return id;
 }

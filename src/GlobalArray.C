@@ -37,7 +37,6 @@ static bool less_than(InputIterator1 first1, InputIterator1 last1, Value value)
 
 int GlobalArray::to_ga(const DataType &type)
 {
-    TIMING("DataType::to_ga()");
 
     if (false) {
         /*
@@ -95,7 +94,6 @@ int GlobalArray::to_ga(const DataType &type)
 
 DataType GlobalArray::to_dt(int type)
 {
-    TIMING("DataType::to_dt(int)");
 
     if (C_INT == type) {
         return DataType::INT;
@@ -782,7 +780,6 @@ void* GlobalArray::get(void *buffer) const
     vector<int64_t> hi(shape.begin(), shape.end());
     vector<int64_t> shape_copy(shape.begin(), shape.end());
 
-    TIMING("GlobalArray::get(void*,vector<int64_t>,vector<int64_t>,vector<int64_t>)");
     // GA indexing is inclusive i.e. shape is 1 too big
     std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
 
@@ -816,7 +813,6 @@ void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
     vector<int64_t> hi_copy(hi.begin(),hi.end());
     vector<int64_t> shape = pagoda::get_shape(lo,hi);
 
-    TIMING("GlobalArray::get(void*,vector<int64_t>,vector<int64_t>,vector<int64_t>)");
 
     if (buffer == NULL) {
 #define DATATYPE_EXPAND(DT,T) \
@@ -841,7 +837,6 @@ void GlobalArray::put(void *buffer)
     vector<int64_t> hi(shape.begin(), shape.end());
     vector<int64_t> shape_copy(shape.begin(), shape.end());
 
-    TIMING("GlobalArray::put(void*)");
 
     // GA indexing is inclusive i.e. shape is 1 too big
     std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
@@ -873,7 +868,6 @@ void GlobalArray::scatter(void *buffer, vector<int64_t> &subscripts)
     int64_t n = subscripts.size() / ndim;
     vector<int64_t*> subs(n,0);
 
-    TIMING("GlobalArray::scatter(void*,vector<int64_t>)");
 
     for (int64_t i=0; i<n; ++i) {
         subs[i] = &subscripts[i*ndim];
@@ -890,7 +884,6 @@ void* GlobalArray::gather(vector<int64_t> &subscripts, void *buffer) const
     int64_t n = subscripts.size() / ndim;
     vector<int64_t*> subs(n,0);
 
-    TIMING("GlobalArray::gather(void*,vector<int64_t>)");
 
     for (int64_t i=0; i<n; ++i) {
         subs[i] = &subscripts[i*ndim];

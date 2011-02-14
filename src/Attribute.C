@@ -18,19 +18,16 @@ using std::ostringstream;
 
 Attribute::Attribute()
 {
-    TIMING("Attribute::Attribute()");
 }
 
 
 Attribute::~Attribute()
 {
-    TIMING("Attribute::~Attribute()");
 }
 
 
 size_t Attribute::get_count() const
 {
-    TIMING("Attribute::get_count()");
     return get_values()->size();
 }
 
@@ -39,7 +36,6 @@ string Attribute::get_string() const
 {
     string ret;
 
-    TIMING("Attribute::get_string()");
 
     get_values()->as(ret);
 
@@ -59,7 +55,6 @@ ostream& Attribute::print(ostream &os) const
     const DataType type = get_type();
     const string str = get_string();
 
-    TIMING("Attribute::print(ostream)");
 
     return os << name << "(" << type << ") = " << str;
 }
@@ -67,6 +62,5 @@ ostream& Attribute::print(ostream &os) const
 
 ostream& operator << (ostream &os, const Attribute *other)
 {
-    TIMING("Attribute::operator<<(ostream,Attribute*)");
     return other->print(os);
 }

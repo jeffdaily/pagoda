@@ -22,19 +22,16 @@ using std::vector;
 AggregationUnion::AggregationUnion()
     :   Aggregation()
 {
-    TIMING("AggregationUnion::AggregationUnion()");
 }
 
 
 AggregationUnion::~AggregationUnion()
 {
-    TIMING("AggregationUnion::~AggregationUnion()");
 }
 
 
 void AggregationUnion::add(Dataset *dataset)
 {
-    TIMING("AggregationUnion::add(Dataset*)");
     datasets.push_back(dataset);
 
     vector<Attribute*> other_atts = dataset->get_atts();
@@ -86,6 +83,5 @@ void AggregationUnion::add(const vector<Dataset*> &datasets)
 
 ostream& AggregationUnion::print(ostream &os) const
 {
-    TIMING("AggregationUnion::print(ostream)");
     return os << "AggregationUnion()";
 }

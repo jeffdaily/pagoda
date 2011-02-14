@@ -108,7 +108,6 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     ,   vars()
     ,   is_open(false)
 {
-    TIMING("PnetcdfDataset::PnetcdfDataset(string)");
     int ndim;
     int nvar;
     int natt;
@@ -129,7 +128,6 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
 
 PnetcdfDataset::~PnetcdfDataset()
 {
-    TIMING("PnetcdfDataset::~PnetcdfDataset()");
     using pagoda::ptr_deleter;
     transform(atts.begin(), atts.end(), atts.begin(),
               ptr_deleter<PnetcdfAttribute*>);
@@ -155,7 +153,6 @@ vector<Attribute*> PnetcdfDataset::get_atts() const
     vector<Attribute*> ret;
     vector<PnetcdfAttribute*>::const_iterator it;
 
-    TIMING("PnetcdfDataset::get_atts()");
 
     for (it=atts.begin(); it!=atts.end(); ++it) {
         ret.push_back(*it);
@@ -170,7 +167,6 @@ vector<Dimension*> PnetcdfDataset::get_dims() const
     vector<Dimension*> ret;
     vector<PnetcdfDimension*>::const_iterator it;
 
-    TIMING("PnetcdfDataset::get_dims()");
 
     for (it=dims.begin(); it!=dims.end(); ++it) {
         ret.push_back(*it);
@@ -185,7 +181,6 @@ vector<Variable*> PnetcdfDataset::get_vars() const
     vector<Variable*> ret;
     vector<PnetcdfVariable*>::const_iterator it;
 
-    TIMING("PnetcdfDataset::get_vars()");
 
     for (it=vars.begin(); it!=vars.end(); ++it) {
         ret.push_back(*it);
@@ -213,7 +208,6 @@ Attribute* PnetcdfDataset::get_att(const vector<string> &names,
 
 PnetcdfAttribute* PnetcdfDataset::get_att(size_t i) const
 {
-    TIMING("PnetcdfDataset::get_att(size_t)");
     return atts.at(i);
 }
 
@@ -228,7 +222,6 @@ Dimension* PnetcdfDataset::get_dim(const string &name,
 
 PnetcdfDimension* PnetcdfDataset::get_dim(size_t i) const
 {
-    TIMING("PnetcdfDataset::get_dim(size_t)");
     return dims.at(i);
 }
 
@@ -243,7 +236,6 @@ Variable* PnetcdfDataset::get_var(const string &name,
 
 PnetcdfVariable* PnetcdfDataset::get_var(size_t i) const
 {
-    TIMING("PnetcdfDataset::get_var(size_t)");
     return vars.at(i);
 }
 
@@ -254,7 +246,6 @@ void PnetcdfDataset::wait()
     vector<PnetcdfVariable*>::iterator var_it;
     vector<PnetcdfVariable*>::iterator var_end = vars.end();
 
-    TIMING("PnetcdfDataset::wait()");
 
     // gather requests from all Variables
     for (var_it=vars.begin(); var_it!=var_end; ++var_it) {
@@ -296,20 +287,17 @@ FileFormat PnetcdfDataset::get_file_format() const
 
 ostream& PnetcdfDataset::print(ostream &os) const
 {
-    TIMING("PnetcdfDataset::print(ostream)");
     return os << "PnetcdfDataset(" << filename << ")";
 }
 
 
 string PnetcdfDataset::get_filename() const
 {
-    TIMING("PnetcdfDataset::get_filename()");
     return filename;
 }
 
 
 int PnetcdfDataset::get_id() const
 {
-    TIMING("PnetcdfDataset::get_id()");
     return ncid;
 }

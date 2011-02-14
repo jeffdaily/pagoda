@@ -38,7 +38,6 @@ AggregationVariable::AggregationVariable(
     ,   arrays_to_copy()
     ,   array_to_fill(NULL)
 {
-    TIMING("AggregationVariable::AggregationVariable(...)");
     TRACER("AggregationVariable ctor %s\n", var->get_name().c_str());
     add(var);
 }
@@ -46,13 +45,11 @@ AggregationVariable::AggregationVariable(
 
 AggregationVariable::~AggregationVariable()
 {
-    TIMING("AggregationVariable::~AggregationVariable()");
 }
 
 
 void AggregationVariable::add(Variable *var)
 {
-    TIMING("AggregationVariable::add(Variable*)");
     TRACER("AggregationVariable::add %s\n", var->get_name().c_str());
     vars.push_back(var);
 }
@@ -60,14 +57,12 @@ void AggregationVariable::add(Variable *var)
 
 string AggregationVariable::get_name() const
 {
-    TIMING("AggregationVariable::get_name()");
     return vars[0]->get_name();
 }
 
 
 vector<Dimension*> AggregationVariable::get_dims() const
 {
-    TIMING("AggregationVariable::get_dims()");
     vector<Dimension*> dims = vars[0]->get_dims();
     dims[0] = agg_dim;
     return dims;
@@ -76,7 +71,6 @@ vector<Dimension*> AggregationVariable::get_dims() const
 
 vector<Attribute*> AggregationVariable::get_atts() const
 {
-    TIMING("AggregationVariable::get_atts()");
     /** @todo return union of attributes of all vars */
     return vars[0]->get_atts();
 }
@@ -138,14 +132,12 @@ Validator* AggregationVariable::get_validator(int64_t record) const
 
 Dataset* AggregationVariable::get_dataset() const
 {
-    TIMING("AggregationVariable::get_dataset()");
     return (Dataset*)agg;
 }
 
 
 DataType AggregationVariable::get_type() const
 {
-    TIMING("AggregationVariable::get_type()");
     return vars[0]->get_type();
 }
 
@@ -365,7 +357,6 @@ Array* AggregationVariable::iread(int64_t record, Array *dst)
 
 ostream& AggregationVariable::print(ostream &os) const
 {
-    TIMING("AggregationVariable::print(ostream)");
     const string name(get_name());
     return os << "AggregationVariable(" << name << ")";
 }

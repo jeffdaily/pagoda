@@ -26,7 +26,6 @@ PgboCommands::PgboCommands()
     :   GenericCommands()
     ,   op_type("")
 {
-    TIMING("PgboCommands::PgboCommands()");
     init();
 }
 
@@ -35,7 +34,6 @@ PgboCommands::PgboCommands(int argc, char **argv)
     :   GenericCommands()
     ,   op_type("")
 {
-    TIMING("PgboCommands::PgboCommands(int,char**)");
     init();
     parse(argc, argv);
 }
@@ -43,7 +41,6 @@ PgboCommands::PgboCommands(int argc, char **argv)
 
 PgboCommands::~PgboCommands()
 {
-    TIMING("PgboCommands::~PgboCommands()");
 }
 
 

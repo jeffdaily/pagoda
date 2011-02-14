@@ -18,7 +18,6 @@ Array* Array::create(DataType type, vector<int64_t> shape)
 {
     Array *ret = NULL;
 
-    TIMING("Array::create(DataType,vector<int64_t>)");
 
     // GlobalArray doesn't handle all types. Those not handled use a different
     // read and write types.
@@ -54,7 +53,6 @@ Array* Array::create(DataType type, vector<Dimension*> dims)
 {
     vector<int64_t> shape;
 
-    TIMING("Array::create(DataType,vector<Dimension*>)");
 
     for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
             it!=end; ++it) {
@@ -67,18 +65,15 @@ Array* Array::create(DataType type, vector<Dimension*> dims)
 
 Array::Array()
 {
-    TIMING("Array::Array()");
 }
 
 
 Array::~Array()
 {
-    TIMING("Array::~Array()");
 }
 
 
 ostream& operator << (ostream &os, const Array *array)
 {
-    TIMING("operator<<(ostream,Array*)");
     return array->print(os);
 }

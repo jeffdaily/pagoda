@@ -32,13 +32,11 @@ Mask* Mask::create(const Dimension *dim)
 Mask::Mask()
     :   AbstractArray(DataType::NOT_A_TYPE)
 {
-    TIMING("Mask::Mask()");
 }
 
 
 Mask::~Mask()
 {
-    TIMING("Mask::~Mask()");
 }
 
 

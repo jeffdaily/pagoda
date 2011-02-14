@@ -36,7 +36,6 @@ PnetcdfAttribute::PnetcdfAttribute(
     int ncid = dataset->get_id();
     int varid = (var == NULL) ? NC_GLOBAL : var->get_id();
 
-    TIMING("PnetcdfAttribute::PnetcdfAttribute(...)");
 
     name = ncmpi::inq_attname(ncid, varid, attid);
     type = PnetcdfDataset::to_dt(ncmpi::inq_atttype(ncid, varid, name));
@@ -62,28 +61,24 @@ PnetcdfAttribute::PnetcdfAttribute(
 
 PnetcdfAttribute::~PnetcdfAttribute()
 {
-    TIMING("PnetcdfAttribute::~PnetcdfAttribute()");
     delete values;
 }
 
 
 string PnetcdfAttribute::get_name() const
 {
-    TIMING("PnetcdfAttribute::get_name()");
     return name;
 }
 
 
 DataType PnetcdfAttribute::get_type() const
 {
-    TIMING("PnetcdfAttribute::get_type()");
     return type;
 }
 
 
 Values* PnetcdfAttribute::get_values() const
 {
-    TIMING("PnetcdfAttribute::get_values()");
     return values;
 }
 
@@ -102,20 +97,17 @@ Variable* PnetcdfAttribute::get_var() const
 
 PnetcdfDataset* PnetcdfAttribute::get_netcdf_dataset() const
 {
-    TIMING("PnetcdfAttribute::get_netcdf_dataset()");
     return dataset;
 }
 
 
 PnetcdfVariable* PnetcdfAttribute::get_netcdf_var() const
 {
-    TIMING("PnetcdfAttribute::get_netcdf_var()");
     return var;
 }
 
 
 int PnetcdfAttribute::get_id() const
 {
-    TIMING("PnetcdfAttribute::get_id()");
     return id;
 }

@@ -16,13 +16,11 @@ Aggregation::Aggregation()
     ,   dims()
     ,   vars()
 {
-    TIMING("Aggregation::Aggregation()");
 }
 
 
 Aggregation::~Aggregation()
 {
-    TIMING("Aggregation::~Aggregation()");
     // before deleting aggregate datasets, remove their (shared) masks
     // since all MaskMaps get deleted with the Dataset
     for (vector<Dataset*>::iterator it=datasets.begin(), end=datasets.end();
@@ -47,7 +45,6 @@ void Aggregation::close()
 
 void Aggregation::add(const vector<Dataset*> &datasets)
 {
-    TIMING("Aggregation::add(vector<Dataset*>)");
     vector<Dataset*>::const_iterator it;
     for (it=datasets.begin(); it!=datasets.end(); ++it) {
         add(*it);

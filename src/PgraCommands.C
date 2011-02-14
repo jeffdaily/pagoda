@@ -26,7 +26,6 @@ PgraCommands::PgraCommands()
     :   GenericCommands()
     ,   op_type("")
 {
-    TIMING("PgraCommands::PgraCommands()");
     init();
 }
 
@@ -35,7 +34,6 @@ PgraCommands::PgraCommands(int argc, char **argv)
     :   GenericCommands()
     ,   op_type("")
 {
-    TIMING("PgraCommands::PgraCommands(int,char**)");
     init();
     parse(argc, argv);
 }
@@ -43,7 +41,6 @@ PgraCommands::PgraCommands(int argc, char **argv)
 
 PgraCommands::~PgraCommands()
 {
-    TIMING("PgraCommands::~PgraCommands()");
 }
 
 

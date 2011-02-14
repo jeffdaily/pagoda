@@ -107,7 +107,6 @@ Netcdf4Dataset::Netcdf4Dataset(const string &filename)
     ,   vars()
     ,   is_open(false)
 {
-    TIMING("Netcdf4Dataset::Netcdf4Dataset(string)");
     int ndim;
     int nvar;
     int natt;
@@ -128,7 +127,6 @@ Netcdf4Dataset::Netcdf4Dataset(const string &filename)
 
 Netcdf4Dataset::~Netcdf4Dataset()
 {
-    TIMING("Netcdf4Dataset::~Netcdf4Dataset()");
     using pagoda::ptr_deleter;
     transform(atts.begin(), atts.end(), atts.begin(),
               ptr_deleter<Netcdf4Attribute*>);
@@ -154,7 +152,6 @@ vector<Attribute*> Netcdf4Dataset::get_atts() const
     vector<Attribute*> ret;
     vector<Netcdf4Attribute*>::const_iterator it;
 
-    TIMING("Netcdf4Dataset::get_atts()");
 
     for (it=atts.begin(); it!=atts.end(); ++it) {
         ret.push_back(*it);
@@ -169,7 +166,6 @@ vector<Dimension*> Netcdf4Dataset::get_dims() const
     vector<Dimension*> ret;
     vector<Netcdf4Dimension*>::const_iterator it;
 
-    TIMING("Netcdf4Dataset::get_dims()");
 
     for (it=dims.begin(); it!=dims.end(); ++it) {
         ret.push_back(*it);
@@ -184,7 +180,6 @@ vector<Variable*> Netcdf4Dataset::get_vars() const
     vector<Variable*> ret;
     vector<Netcdf4Variable*>::const_iterator it;
 
-    TIMING("Netcdf4Dataset::get_vars()");
 
     for (it=vars.begin(); it!=vars.end(); ++it) {
         ret.push_back(*it);
@@ -212,7 +207,6 @@ Attribute* Netcdf4Dataset::get_att(const vector<string> &names,
 
 Netcdf4Attribute* Netcdf4Dataset::get_att(size_t i) const
 {
-    TIMING("Netcdf4Dataset::get_att(size_t)");
     return atts.at(i);
 }
 
@@ -227,7 +221,6 @@ Dimension* Netcdf4Dataset::get_dim(const string &name,
 
 Netcdf4Dimension* Netcdf4Dataset::get_dim(size_t i) const
 {
-    TIMING("Netcdf4Dataset::get_dim(size_t)");
     return dims.at(i);
 }
 
@@ -242,14 +235,12 @@ Variable* Netcdf4Dataset::get_var(const string &name,
 
 Netcdf4Variable* Netcdf4Dataset::get_var(size_t i) const
 {
-    TIMING("Netcdf4Dataset::get_var(size_t)");
     return vars.at(i);
 }
 
 
 void Netcdf4Dataset::wait()
 {
-    TIMING("Netcdf4Dataset::wait()");
 }
 
 
@@ -278,20 +269,17 @@ FileFormat Netcdf4Dataset::get_file_format() const
 
 ostream& Netcdf4Dataset::print(ostream &os) const
 {
-    TIMING("Netcdf4Dataset::print(ostream)");
     return os << "Netcdf4Dataset(" << filename << ")";
 }
 
 
 string Netcdf4Dataset::get_filename() const
 {
-    TIMING("Netcdf4Dataset::get_filename()");
     return filename;
 }
 
 
 int Netcdf4Dataset::get_id() const
 {
-    TIMING("Netcdf4Dataset::get_id()");
     return ncid;
 }

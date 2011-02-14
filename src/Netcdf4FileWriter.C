@@ -182,7 +182,6 @@ Netcdf4FileWriter::Netcdf4FileWriter(const string &filename)
 
 Netcdf4FileWriter::~Netcdf4FileWriter()
 {
-    TIMING("Netcdf4FileWriter::~Netcdf4FileWriter()");
     close();
 }
 
@@ -200,7 +199,6 @@ FileWriter* Netcdf4FileWriter::create()
 {
     MPI_Info info;
 
-    TIMING("Netcdf4FileWriter::create()");
     TRACER("Netcdf4FileWriter create %s\n", filename.c_str());
 
     MPI_Info_create(&info);
@@ -301,7 +299,6 @@ void Netcdf4FileWriter::def_dim(const string &name, int64_t size)
 {
     int id;
 
-    TIMING("Netcdf4FileWriter::def_dim(Dimension*)");
 
     maybe_redef();
 
@@ -357,7 +354,6 @@ void Netcdf4FileWriter::def_var(const string &name,
     vector<int64_t> shape;
     int id;
 
-    TIMING("Netcdf4FileWriter::def_var(string,vector<string>)");
 
     maybe_redef();
 
@@ -406,7 +402,6 @@ void Netcdf4FileWriter::def_var(Variable *var)
 
 ostream& Netcdf4FileWriter::print(ostream &os) const
 {
-    TIMING("Netcdf4FileWriter::print(ostream)");
     return os << "Netcdf4FileWriter(" << filename << ")";
 }
 
@@ -416,7 +411,6 @@ int Netcdf4FileWriter::get_dim_id(const string &name) const
     ostringstream strerr;
     map<string,int>::const_iterator it = dim_id.find(name);
 
-    TIMING("Netcdf4FileWriter::get_dim_id(string)");
 
     if (it != dim_id.end()) {
         return it->second;
@@ -432,7 +426,6 @@ int64_t Netcdf4FileWriter::get_dim_size(const string &name) const
     ostringstream strerr;
     map<string,int64_t>::const_iterator it = dim_size.find(name);
 
-    TIMING("Netcdf4FileWriter::get_dim_size(string)");
 
     if (it != dim_size.end()) {
         return it->second;
@@ -448,7 +441,6 @@ int Netcdf4FileWriter::get_var_id(const string &name) const
     ostringstream strerr;
     map<string,int>::const_iterator it = var_id.find(name);
 
-    TIMING("Netcdf4FileWriter::get_var_id(string)");
 
     if (it != var_id.end()) {
         return it->second;
@@ -464,7 +456,6 @@ vector<int> Netcdf4FileWriter::get_var_dims(const string &name) const
     ostringstream strerr;
     map<string,vector<int> >::const_iterator it = var_dims.find(name);
 
-    TIMING("Netcdf4FileWriter::get_var_dims(string)");
 
     if (it != var_dims.end()) {
         return it->second;
@@ -480,7 +471,6 @@ vector<int64_t> Netcdf4FileWriter::get_var_shape(const string &name) const
     ostringstream strerr;
     map<string,vector<int64_t> >::const_iterator it = var_shape.find(name);
 
-    TIMING("Netcdf4FileWriter::get_var_shape(string)");
 
     if (it != var_shape.end()) {
         return it->second;
@@ -494,7 +484,6 @@ vector<int64_t> Netcdf4FileWriter::get_var_shape(const string &name) const
 #if 0
 void Netcdf4FileWriter::def_check() const
 {
-    TIMING("Netcdf4FileWriter::def_check()");
     if (!is_in_define_mode) {
         ostringstream strerr;
         strerr << "cannot (re)define output file after writing begins";
@@ -506,7 +495,6 @@ void Netcdf4FileWriter::def_check() const
 
 void Netcdf4FileWriter::maybe_redef()
 {
-    TIMING("Netcdf4FileWriter::maybe_redef()");
     if (!is_in_define_mode) {
         is_in_define_mode = true;
         nc::redef(ncid);
@@ -517,7 +505,6 @@ void Netcdf4FileWriter::maybe_redef()
 
 void Netcdf4FileWriter::maybe_enddef()
 {
-    TIMING("Netcdf4FileWriter::maybe_enddef()");
     if (is_in_define_mode) {
         is_in_define_mode = false;
         nc::enddef(ncid);
@@ -536,7 +523,6 @@ void Netcdf4FileWriter::write_att(const string &name, Values *values,
 
 void Netcdf4FileWriter::write_att(Attribute *att, const string &name)
 {
-    TIMING("Netcdf4FileWriter::write_att(Attribute*,string)");
     write_att_id(att, name.empty() ? NC_GLOBAL : get_var_id(name));
 }
 
@@ -546,7 +532,6 @@ void Netcdf4FileWriter::write_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
 
-    TIMING("Netcdf4FileWriter::write_att_id(Attribute*,int)");
     TRACER("Netcdf4FileWriter::write_att_id %s\n", attr->get_name().c_str());
 
     maybe_redef();
@@ -623,7 +608,6 @@ void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
     vector<size_t> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
-    TIMING("Netcdf4FileWriter::write(Array*,string,int64_t)");
     TRACER("Netcdf4FileWriter::write record %ld %s\n",
            (long)record, name.c_str());
 
@@ -693,7 +677,6 @@ void Netcdf4FileWriter::write(Array *array, const string &name,
     vector<size_t> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
-    TIMING("Netcdf4FileWriter::write(Array*,string,vector<int64_t>)");
     TRACER("Netcdf4FileWriter::write %s\n", name.c_str());
 
     if (start.size() != shape.size()) {

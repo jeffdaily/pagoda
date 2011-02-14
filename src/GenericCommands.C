@@ -62,7 +62,6 @@ GenericCommands::GenericCommands()
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
 {
-    TIMING("GenericCommands::GenericCommands()");
     init();
 }
 
@@ -93,7 +92,6 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
 {
-    TIMING("GenericCommands::GenericCommands(int,char**)");
     init();
     parse(argc, argv);
 }
@@ -134,7 +132,6 @@ void GenericCommands::init()
 
 GenericCommands::~GenericCommands()
 {
-    TIMING("GenericCommands::~GenericCommands()");
 }
 
 
@@ -142,7 +139,6 @@ void GenericCommands::parse(int argc, char **argv)
 {
     vector<string> positional_arguments;
 
-    TIMING("GenericCommands::parse(int,char**)");
 
     // copy command line
     cmdline = argv[0];
@@ -725,21 +721,18 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
 
 vector<LatLonBox> GenericCommands::get_boxes() const
 {
-    TIMING("GenericCommands::get_box()");
     return boxes;
 }
 
 
 vector<IndexHyperslab> GenericCommands::get_index_hyperslabs() const
 {
-    TIMING("GenericCommands::get_index_hyperslabs()");
     return index_hyperslabs;
 }
 
 
 vector<CoordHyperslab> GenericCommands::get_coord_hyperslabs() const
 {
-    TIMING("GenericCommands::get_coord_hyperslabs()");
     return coord_hyperslabs;
 }
 

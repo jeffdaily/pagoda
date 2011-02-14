@@ -25,7 +25,6 @@ PnetcdfDimension::PnetcdfDimension(PnetcdfDataset *dataset, int dimid)
     ,   size(0)
     ,   unlimited(false)
 {
-    TIMING("PnetcdfDimension::PnetcdfDimension(PnetcdfDataset*,int)");
     int ncid = dataset->get_id();
     int udim = ncmpi::inq_unlimdim(ncid);
     MPI_Offset size_tmp;
@@ -37,13 +36,11 @@ PnetcdfDimension::PnetcdfDimension(PnetcdfDataset *dataset, int dimid)
 
 PnetcdfDimension::~PnetcdfDimension()
 {
-    TIMING("PnetcdfDimension::~PnetcdfDimension()");
 }
 
 
 string PnetcdfDimension::get_name() const
 {
-    TIMING("PnetcdfDimension::get_name()");
     return name;
 }
 
@@ -51,7 +48,6 @@ string PnetcdfDimension::get_name() const
 int64_t PnetcdfDimension::get_size() const
 {
     Mask *mask = NULL;
-    TIMING("PnetcdfDimension::get_size()");
     if ((mask = get_mask())) {
         return mask->get_count();
     }
@@ -61,35 +57,30 @@ int64_t PnetcdfDimension::get_size() const
 
 bool PnetcdfDimension::is_unlimited() const
 {
-    TIMING("PnetcdfDimension::is_unlimited()");
     return unlimited;
 }
 
 
 Dataset* PnetcdfDimension::get_dataset() const
 {
-    TIMING("PnetcdfDimension::get_dataset()");
     return dataset;
 }
 
 
 PnetcdfDataset* PnetcdfDimension::get_netcdf_dataset() const
 {
-    TIMING("PnetcdfDimension::get_netcdf_dataset()");
     return dataset;
 }
 
 
 int PnetcdfDimension::get_id() const
 {
-    TIMING("PnetcdfDimension::get_id()");
     return id;
 }
 
 
 ostream& PnetcdfDimension::print(ostream &os) const
 {
-    TIMING("PnetcdfDimension::print(ostream)");
     os << "PnetcdfDimension(";
     os << name << ",";
     os << size << ",";

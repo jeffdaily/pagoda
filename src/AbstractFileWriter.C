@@ -26,13 +26,11 @@ using std::vector;
 
 AbstractFileWriter::AbstractFileWriter()
 {
-    TIMING("AbstractFileWriter::AbstractFileWriter()");
 }
 
 
 AbstractFileWriter::~AbstractFileWriter()
 {
-    TIMING("AbstractFileWriter::~AbstractFileWriter()");
 }
 
 
@@ -63,7 +61,6 @@ void AbstractFileWriter::def_dim(Dimension *dim)
 
 void AbstractFileWriter::def_dims(const vector<Mask*> &masks)
 {
-    TIMING("AbstractFileWriter::def_dims(vector<Mask*>)");
     vector<Mask*>::const_iterator msk_it;
     for (msk_it=masks.begin(); msk_it!=masks.end(); ++msk_it) {
         def_dim(*msk_it);
@@ -73,7 +70,6 @@ void AbstractFileWriter::def_dims(const vector<Mask*> &masks)
 
 void AbstractFileWriter::def_dims(const vector<Dimension*> &dims)
 {
-    TIMING("AbstractFileWriter::def_dims(vector<Dimension*>)");
     vector<Dimension*>::const_iterator dim_it;
     for (dim_it=dims.begin(); dim_it!=dims.end(); ++dim_it) {
         def_dim(*dim_it);
@@ -119,7 +115,6 @@ void AbstractFileWriter::def_var(Variable *var)
 
 void AbstractFileWriter::def_vars(const vector<Variable*> &vars)
 {
-    TIMING("AbstractFileWriter::def_vars(vector<Variable*>)");
     vector<Variable*>::const_iterator var_it;
     for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
         def_var(*var_it);
@@ -137,7 +132,6 @@ void AbstractFileWriter::write_att(const string &name, Values *values,
 
 void AbstractFileWriter::write_atts(const vector<Attribute*> &atts, const string &name)
 {
-    TIMING("AbstractFileWriter::write_atts(vector<Attribute*>,string)");
     vector<Attribute*>::const_iterator att_it;
     for (att_it=atts.begin(); att_it!=atts.end(); ++att_it) {
         write_att(*att_it, name);
@@ -185,6 +179,5 @@ void AbstractFileWriter::icopy_vars(const vector<Variable*> &vars)
 
 ostream& operator << (ostream &os, const AbstractFileWriter *writer)
 {
-    TIMING("operator<<(ostream,AbstractFileWriter*)");
     return writer->print(os);
 }

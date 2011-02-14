@@ -46,7 +46,6 @@ GlobalMask::GlobalMask(const string &name, int64_t size)
     ,   dirty_count(true)
     ,   name(name)
 {
-    TIMING("GlobalMask::GlobalMask(Dimension*)");
     TRACER("GlobalMask ctor size=%ld\n", size);
 
     mask = new GlobalArray(DataType::INT, vector<int64_t>(1,size));
@@ -71,7 +70,6 @@ GlobalMask::GlobalMask(const GlobalMask &that)
     ,   dirty_count(true)
     ,   name(that.name)
 {
-    TIMING("GlobalMask::GlobalMask(GlobalMask)");
     TRACER("GlobalMask ctor copy\n");
 
     mask = new GlobalArray(*mask);
@@ -83,7 +81,6 @@ GlobalMask::GlobalMask(const GlobalMask &that)
  */
 GlobalMask::~GlobalMask()
 {
-    TIMING("GlobalMask::~GlobalMask()");
 
     delete mask;
     delete index;
@@ -106,7 +103,6 @@ string GlobalMask::get_name() const
  */
 int64_t GlobalMask::get_count()
 {
-    TIMING("GlobalMask::get_count()");
 
     if (dirty_count) {
         int64_t ZERO = 0;
@@ -135,7 +131,6 @@ int64_t GlobalMask::get_count()
  */
 void GlobalMask::clear()
 {
-    TIMING("GlobalMask::clear()");
 
     mask->fill_value(0);
 }
@@ -146,7 +141,6 @@ void GlobalMask::clear()
  */
 void GlobalMask::reset()
 {
-    TIMING("GlobalMask::reset()");
 
     mask->fill_value(1);
 }
@@ -166,7 +160,6 @@ void GlobalMask::modify(const IndexHyperslab &hyperslab)
     vector<int64_t> lo;
     vector<int64_t> hi;
 
-    TIMING("GlobalMask::modify(IndexHyperslab)");
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -236,7 +229,6 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     int64_t size = get_local_size();
     DataType type = lat->get_type();
 
-    TIMING("GlobalMask::modify(LatLonBox,Array*,Array*)\n");
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -295,7 +287,6 @@ void GlobalMask::modify(double min, double max, const Array *var)
     const void *var_data;
     DataType type = var->get_type();
 
-    TIMING("GlobalMask::modify(double,double,Variable*,bool)");
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -345,7 +336,6 @@ void GlobalMask::modify_gt(double value, const Array *var)
     const void *var_data;
     DataType type = var->get_type();
 
-    TIMING("GlobalMask::modify_gt(double,Variable*)");
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -396,7 +386,6 @@ void GlobalMask::modify_lt(double value, const Array *var)
     const void *var_data;
     DataType type = var->get_type();
 
-    TIMING("GlobalMask::modify_gt(double,Variable*)");
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -446,7 +435,6 @@ void GlobalMask::modify_lt(double value, const Array *var)
  */
 void GlobalMask::normalize()
 {
-    TIMING("GlobalMask::normalize()");
     TRACER("GlobalMask::normalize()");
 
     if (owns_data()) {
@@ -482,7 +470,6 @@ Array* GlobalMask::reindex()
     vector<int64_t> size(1, get_size());
     Array *tmp;
 
-    TIMING("GlobalMask::reindex()");
     TRACER("GlobalMask::reindex() BEGIN\n");
 
     if (dirty_index) {
@@ -512,7 +499,6 @@ Array* GlobalMask::reindex()
 Array* GlobalMask::partial_sum(bool excl)
 {
 
-    TIMING("GlobalMask::partial_sum(bool)");
 
     if (last_excl != excl) {
         dirty_sum = true;

@@ -33,19 +33,16 @@ AbstractVariable::AbstractVariable()
     :   Variable()
     ,   enable_record_translation(true)
 {
-    TIMING("AbstractVariable::AbstractVariable()");
 }
 
 
 AbstractVariable::~AbstractVariable()
 {
-    TIMING("AbstractVariable::~AbstractVariable()");
 }
 
 
 bool AbstractVariable::has_record() const
 {
-    TIMING("AbstractVariable::has_record()");
     vector<Dimension*> dims = get_dims();
     if (dims.empty()) {
         return false;
@@ -62,7 +59,6 @@ int64_t AbstractVariable::get_nrec() const
 
 int64_t AbstractVariable::get_ndim() const
 {
-    TIMING("AbstractVariable::get_ndim()");
     return get_dims().size();
 }
 
@@ -84,14 +80,12 @@ vector<int64_t> AbstractVariable::get_shape() const
 
 int64_t AbstractVariable::num_atts() const
 {
-    TIMING("AbstractVariable::num_atts()");
     return get_atts().size();
 }
 
 
 string AbstractVariable::get_standard_name() const
 {
-    TIMING("AbstractVariable::get_standard_name()");
     string att_name("standard_name");
     Attribute *att = get_att(att_name);
 
@@ -105,7 +99,6 @@ string AbstractVariable::get_standard_name() const
 
 string AbstractVariable::get_long_name() const
 {
-    TIMING("AbstractVariable::get_long_name()");
     string att_name("long_name");
     Attribute *att = get_att(att_name);
 
@@ -297,7 +290,6 @@ Attribute* AbstractVariable::get_att(
     const string &name,
     bool ignore_case) const
 {
-    TIMING("AbstractVariable::get_att(string,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -319,7 +311,6 @@ Attribute* AbstractVariable::get_att(
     const vector<string> &names,
     bool ignore_case) const
 {
-    TIMING("AbstractVariable::get_att(vector<string>,bool)");
     vector<Attribute*> atts = get_atts();
     vector<Attribute*>::const_iterator it = atts.begin();
     vector<Attribute*>::const_iterator end = atts.end();
@@ -529,7 +520,6 @@ Array* AbstractVariable::iread_alloc(int64_t record)
 
 ostream& AbstractVariable::print(ostream &os) const
 {
-    TIMING("AbstractVariable::print(ostream)");
     const string name(get_name());
     return os << "AbstractVariable(" << name << ")";
 }

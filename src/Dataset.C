@@ -45,13 +45,11 @@ void Dataset::register_opener(opener_t opener)
 
 Dataset::Dataset()
 {
-    TIMING("Dataset::Dataset()");
 }
 
 
 Dataset::~Dataset()
 {
-    TIMING("Dataset::~Dataset()");
 }
 
 

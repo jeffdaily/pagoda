@@ -11,19 +11,16 @@
 
 Dimension::Dimension()
 {
-    TIMING("Dimension::Dimension()");
 }
 
 
 Dimension::Dimension(const Dimension &copy)
 {
-    TIMING("Dimension::Dimension(Dimension)");
 }
 
 
 Dimension& Dimension::operator = (const Dimension &copy)
 {
-    TIMING("Dimension::operator=(Dimension)");
     if (&copy != this) {
     }
     return *this;
@@ -32,7 +29,6 @@ Dimension& Dimension::operator = (const Dimension &copy)
 
 Dimension::~Dimension()
 {
-    TIMING("Dimension::~Dimension()");
 }
 
 
@@ -40,7 +36,6 @@ Mask* Dimension::get_mask() const
 {
     Dataset *dataset = get_dataset();
     MaskMap *masks = dataset->get_masks();
-    TIMING("Dimension::get_mask()");
     if (masks && masks->has_mask(this)) {
         return masks->get_mask(this);
     }
@@ -82,6 +77,5 @@ bool Dimension::equal(
 
 ostream& operator << (ostream &os, const Dimension *other)
 {
-    TIMING("operator<<(ostream,Dimension*)");
     return other->print(os);
 }

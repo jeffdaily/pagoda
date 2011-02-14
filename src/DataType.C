@@ -70,7 +70,6 @@ ostream& operator << (ostream &os, const DataType &type)
 #if 0
 static nc_type to_nc()
 {
-    TIMING("DataType::to_nc()");
 
     if (operator==(DataType::CHAR)) {
         return NC_CHAR;
@@ -269,7 +268,6 @@ int64_t DataType::get_bytes() const
 #if 0
 DataType DataType::to_dt(int type)
 {
-    TIMING("DataType::to_dt(int)");
 
     if (NC_NAT == type) {        // Not A Type
         throw DataTypeException("NC_NAT not supported");

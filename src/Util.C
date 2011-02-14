@@ -481,7 +481,6 @@ vector<int64_t> pagoda::get_shape(const vector<int64_t> &lo,
 {
     vector<int64_t> ret(lo.size());
 
-    TIMING("pagoda::get_shape(vector<int64_t>,vector<int64_t>)");
 
 #if 0
     for (size_t i=0,limit=lo.size(); i<limit; ++i) {
@@ -516,7 +515,6 @@ int64_t pagoda::shape_to_size(const vector<int64_t> &shape)
  */
 bool pagoda::ends_with(const string &fullString, const string &ending)
 {
-    TIMING("pagoda::ends_with(string,string)");
     size_t len_string = fullString.length();
     size_t len_ending = ending.length();
     size_t arg1 = len_string - len_ending;
@@ -614,7 +612,6 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
     string max_name;
     vector<Variable*>::const_iterator var;
 
-    TIMING("pagoda::calculate_required_memory(vector<Variable*>)");
     TRACER("pagoda::calculate_required_memory BEGIN\n");
 
     for (var=vars.begin(); var!=vars.end(); ++var) {
