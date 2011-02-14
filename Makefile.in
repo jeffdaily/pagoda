@@ -173,8 +173,8 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/MaskMap.C src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
 	src/PgraCommands.C src/Print.C src/RegularGrid.C \
 	src/ScalarArray.C src/StringComparator.C \
-	src/SubsetterCommands.C src/Timing.C src/Util.C \
-	src/Validator.C src/Values.C src/Variable.C src/GlobalArray.C \
+	src/SubsetterCommands.C src/Util.C src/Validator.C \
+	src/Values.C src/Variable.C src/GlobalArray.C \
 	src/GlobalArray.H src/GlobalArray.def src/GlobalMask.C \
 	src/GlobalMask.H src/Memory.c src/PnetcdfAttribute.C \
 	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
@@ -223,9 +223,9 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/MaskMap.lo src/Pack.lo src/PgboCommands.lo \
 	src/PgeaCommands.lo src/PgraCommands.lo src/Print.lo \
 	src/RegularGrid.lo src/ScalarArray.lo src/StringComparator.lo \
-	src/SubsetterCommands.lo src/Timing.lo src/Util.lo \
-	src/Validator.lo src/Values.lo src/Variable.lo \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3)
+	src/SubsetterCommands.lo src/Util.lo src/Validator.lo \
+	src/Values.lo src/Variable.lo $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3)
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -899,6 +899,7 @@ DISTCLEANFILES =
 MAINTAINERCLEANFILES = 
 lib_LTLIBRARIES = libpagoda.la
 check_DATA = 
+#pkginclude_HEADERS += src/Timing.H
 pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/AbstractFileWriter.H src/AbstractVariable.H \
 	src/AggregationDimension.H src/Aggregation.H \
@@ -915,7 +916,7 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/PgboCommands.H src/PgeaCommands.H src/PgraCommands.H \
 	src/PagodaException.H src/Print.H src/RangeException.H \
 	src/RegularGrid.H src/ScalarArray.H src/Slice.H \
-	src/StringComparator.H src/SubsetterCommands.H src/Timing.H \
+	src/StringComparator.H src/SubsetterCommands.H \
 	src/TypedValues.H src/Util.H src/Validator.H src/ValidMax.H \
 	src/ValidMin.H src/ValidRange.H src/Values.H src/Variable.H
 pagodadir = $(datadir)/pagoda
@@ -925,6 +926,7 @@ pgbo_SOURCES = src/pgbo.C
 pgra_SOURCES = src/pgra.C
 pgea_SOURCES = src/pgea.C
 pgcmp_SOURCES = src/pgcmp.C
+#libpagoda_la_SOURCES += src/Timing.C
 libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/AbstractArray_op_v.C src/AbstractArray_op_vc.C \
 	src/AbstractArray_op_scalar.C src/AbstractArray_op_scalar_v.C \
@@ -941,9 +943,9 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/MaskMap.C src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
 	src/PgraCommands.C src/Print.C src/RegularGrid.C \
 	src/ScalarArray.C src/StringComparator.C \
-	src/SubsetterCommands.C src/Timing.C src/Util.C \
-	src/Validator.C src/Values.C src/Variable.C $(am__append_3) \
-	$(am__append_4) $(am__append_5)
+	src/SubsetterCommands.C src/Util.C src/Validator.C \
+	src/Values.C src/Variable.C $(am__append_3) $(am__append_4) \
+	$(am__append_5)
 
 #############################################################################
 # tests (autotest suite)
@@ -1158,7 +1160,6 @@ src/StringComparator.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/SubsetterCommands.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/Timing.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Util.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Validator.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Values.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1634,8 +1635,6 @@ mostlyclean-compile:
 	-rm -f src/StringComparator.lo
 	-rm -f src/SubsetterCommands.$(OBJEXT)
 	-rm -f src/SubsetterCommands.lo
-	-rm -f src/Timing.$(OBJEXT)
-	-rm -f src/Timing.lo
 	-rm -f src/Util.$(OBJEXT)
 	-rm -f src/Util.lo
 	-rm -f src/Validator.$(OBJEXT)
@@ -1752,7 +1751,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ScalarArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/StringComparator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/SubsetterCommands.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Validator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Values.Plo@am__quote@
