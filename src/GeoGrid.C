@@ -137,8 +137,6 @@ GridType GeoGrid::get_type() const
 Variable* GeoGrid::get_coord(const string &att_name,
                              const string &coord_name, const string &dim_name)
 {
-    TRACER("GeoGrid::get_coord(%s,%s,%s)\n", att_name.c_str(),
-           coord_name.c_str(), dim_name.c_str());
     if (grid_var) {
         Attribute *att = grid_var->get_att(att_name);
         if (att) {
@@ -160,25 +158,17 @@ Variable* GeoGrid::get_coord(const string &att_name,
                 }
                 standard_name = var->get_standard_name();
                 long_name = var->get_long_name();
-                TRACER("\tcomparing '%s' '%s' '%s'\n",
-                       coord_name.c_str(), standard_name.c_str(),
-                       long_name.c_str());
                 if (!standard_name.empty()) {
                     cmp.set_value(standard_name);
                     if (cmp(coord_name)) {
-                        TRACER("\tfound\n");
                         return var;
                     }
                 }
                 else if (!long_name.empty()) {
                     cmp.set_value(long_name);
                     if (cmp(coord_name)) {
-                        TRACER("\tfound\n");
                         return var;
                     }
-                }
-                else {
-                    TRACER("\tNOT FOUND\n");
                 }
             }
         }

@@ -113,7 +113,6 @@ Array* Netcdf4Variable::read_wrapper(Array *dst) const
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("Netcdf4Variable::read_wrapper(Array*) %s\n", get_name().c_str());
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into i.e. subset occurs after the fact
@@ -194,7 +193,6 @@ Array* Netcdf4Variable::read_wrapper(int64_t record, Array *dst) const
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("Netcdf4Variable::read_wrapper(int64_t,Array*) %s\n", get_name().c_str());
 
     // if we are subsetting, then the passed in array is different than the
     // one in which the data is read into i.e. subset occurs after the fact

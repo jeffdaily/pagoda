@@ -205,7 +205,6 @@ FileWriter* PnetcdfFileWriter::create()
 {
     MPI_Info info;
 
-    TRACER("PnetcdfFileWriter create %s\n", filename.c_str());
 
     MPI_Info_create(&info);
     if (_header_pad > 0) {
@@ -327,8 +326,6 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
     }
     else {
         id = ncmpi::def_dim(ncid, name, size);
-        TRACER("PnetcdfFileWriter::def_dim %s=%lld id=%d\n",
-               name.c_str(), size, id);
         dim_id[name] = id;
         dim_size[name] = size;
         if (size == NC_UNLIMITED) {
@@ -503,7 +500,6 @@ void PnetcdfFileWriter::maybe_redef()
     if (!is_in_define_mode) {
         is_in_define_mode = true;
         ncmpi::redef(ncid);
-        TRACER("PnetcdfFileWriter::maybe_redef BEGIN DEF\n");
     }
 }
 
@@ -513,7 +509,6 @@ void PnetcdfFileWriter::maybe_enddef()
     if (is_in_define_mode) {
         is_in_define_mode = false;
         ncmpi::enddef(ncid);
-        TRACER("PnetcdfFileWriter::maybe_enddef END DEF\n");
     }
 }
 
@@ -537,7 +532,6 @@ void PnetcdfFileWriter::write_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
 
-    TRACER("PnetcdfFileWriter::write_att_id %s\n", attr->get_name().c_str());
 
     maybe_redef();
 
@@ -633,9 +627,6 @@ void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
     vector<MPI_Offset> count(shape.size(), 0);
     int varid = get_var_id(name);
 
-    TRACER("PnetcdfFileWriter::write record %ld %s\n",
-           (long)record, name.c_str());
-
     if (array_shape.size()+1 != shape.size()) {
         ERR("array rank mismatch");
     }
@@ -691,7 +682,6 @@ void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
     vector<MPI_Offset> count(shape.size(), 0);
     int varid = get_var_id(name);
 
-    TRACER("PnetcdfFileWriter::write %s\n", name.c_str());
 
     if (start.size() != shape.size()) {
         ERR("start rank mismatch");

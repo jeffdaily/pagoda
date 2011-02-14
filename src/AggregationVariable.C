@@ -37,7 +37,6 @@ AggregationVariable::AggregationVariable(
     ,   arrays_to_copy()
     ,   array_to_fill(NULL)
 {
-    TRACER("AggregationVariable ctor %s\n", var->get_name().c_str());
     add(var);
 }
 
@@ -49,7 +48,6 @@ AggregationVariable::~AggregationVariable()
 
 void AggregationVariable::add(Variable *var)
 {
-    TRACER("AggregationVariable::add %s\n", var->get_name().c_str());
     vars.push_back(var);
 }
 

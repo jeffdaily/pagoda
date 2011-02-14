@@ -353,10 +353,6 @@ int64_t AbstractVariable::translate_record(int64_t record) const
     int64_t count = -1;
     int64_t index = 0;
 
-    TRACER("AbstractVariable::translate_record(%ld) %s\n",
-           record, get_name().c_str());
-    TRACER("size=%ld, count=%ld, index=%ld\n", size, count, index);
-
     if (masks.empty() || masks.at(0) == NULL || !enable_record_translation) {
         return record;
     }
@@ -368,15 +364,9 @@ int64_t AbstractVariable::translate_record(int64_t record) const
     for (index=0; index<size; ++index) {
         if (buf[index] != 0) {
             ++count;
-            TRACER("buf[index]=%ld, count=%ld, index=%ld\n",
-                   buf[index], count, index);
             if (count == record) {
                 break;
             }
-        }
-        else {
-            TRACER("buf[index]=%ld, count=%ld, index=%ld\n",
-                   buf[index], count, index);
         }
     }
     delete [] buf;

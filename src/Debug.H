@@ -93,9 +93,7 @@ namespace pagoda
 #endif
 
 #ifdef TRACE
-#   define TRACER pagoda::print_sync
 #else
-#   define TRACER pagoda::print_sync_dummy
 #endif
 
 #endif // DEBUG_H_

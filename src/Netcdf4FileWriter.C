@@ -198,7 +198,6 @@ FileWriter* Netcdf4FileWriter::create()
 {
     MPI_Info info;
 
-    TRACER("Netcdf4FileWriter create %s\n", filename.c_str());
 
     MPI_Info_create(&info);
     if (_header_pad > 0) {
@@ -321,8 +320,6 @@ void Netcdf4FileWriter::def_dim(const string &name, int64_t size)
     }
     else {
         id = nc::def_dim(ncid, name, size);
-        TRACER("Netcdf4FileWriter::def_dim %s=%lld id=%d\n",
-               name.c_str(), size, id);
         dim_id[name] = id;
         dim_size[name] = size;
         if (size == NC_UNLIMITED) {
@@ -497,7 +494,6 @@ void Netcdf4FileWriter::maybe_redef()
     if (!is_in_define_mode) {
         is_in_define_mode = true;
         nc::redef(ncid);
-        TRACER("Netcdf4FileWriter::maybe_redef BEGIN DEF\n");
     }
 }
 
@@ -507,7 +503,6 @@ void Netcdf4FileWriter::maybe_enddef()
     if (is_in_define_mode) {
         is_in_define_mode = false;
         nc::enddef(ncid);
-        TRACER("Netcdf4FileWriter::maybe_enddef END DEF\n");
     }
 }
 
@@ -531,7 +526,6 @@ void Netcdf4FileWriter::write_att_id(Attribute *attr, int varid)
     string name = attr->get_name();
     DataType dt = attr->get_type();
 
-    TRACER("Netcdf4FileWriter::write_att_id %s\n", attr->get_name().c_str());
 
     maybe_redef();
 
@@ -607,9 +601,6 @@ void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
     vector<size_t> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
-    TRACER("Netcdf4FileWriter::write record %ld %s\n",
-           (long)record, name.c_str());
-
     if (array_shape.size()+1 != shape.size()) {
         ERR("array rank mismatch");
     }
@@ -676,7 +667,6 @@ void Netcdf4FileWriter::write(Array *array, const string &name,
     vector<size_t> count(shape.size(), 0);
     int var_id = get_var_id(name);
 
-    TRACER("Netcdf4FileWriter::write %s\n", name.c_str());
 
     if (start.size() != shape.size()) {
         ERR("start rank mismatch");

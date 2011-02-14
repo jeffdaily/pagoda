@@ -63,7 +63,6 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
     void *ptr_dst;
     int64_t elems;
 
-    TRACER("partial_sum\n");
 
     /* make sure we were given valid args */
     GA_Check_handle(g_src, "partial_sum src");
@@ -128,7 +127,6 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
             TYPE values[nproc]; \
             memset(values, 0, sizeof(TYPE)*nproc); \
             GOP_OP(values, nproc, "+"); \
-            TRACER("partial_sum_op N/A\n"); \
         } else
         partial_sum_op(C_INT,int,armci_msg_igop)
         partial_sum_op(C_LONG,long,armci_msg_lgop)
@@ -161,7 +159,6 @@ void gax::partial_sum(int g_src, int g_dst, int excl)
             for (int64_t i=0; i<elems; ++i) { \
                 dst[i] += value; \
             } \
-            TRACER("partial_sum_op "#FMT"\n", value); \
         } else
         partial_sum_op(C_INT,int,C_INT,int,armci_msg_igop,%d)
         partial_sum_op(C_INT,int,C_LONG,long,armci_msg_lgop,%ld)
@@ -199,7 +196,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
     int64_t hi_dst[ndim_dst];
     int64_t ld_dst[ndim_dst-1];
 
-    TRACER("pack BEGIN\n");
 
     if (ndim_src != ndim_dst) {
         GA_Error("pack: src and dst ndims don't match", 0);
@@ -214,9 +210,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 
     if (0 > lo_src[0] && 0 > hi_src[0]) {
         /* no elements on this process */
-        TRACER("no elements on this process\n");
-        TRACER("no elements on this process\n");
-        TRACER("no Clean up\n");
     }
     else {
         int64_t elems_src[ndim_src];
@@ -244,8 +237,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
 
         if (0 == local_counts_product) {
             /* if any of the local mask counts are zero, no work is needed */
-            TRACER("0 == local_counts_product\n");
-            TRACER("0 == local_counts_product\n");
         }
         else {
             /* determine where the data is to go */
@@ -271,7 +262,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
                     TYPE *buf_src = NULL; \
                     TYPE *buf_dst = new TYPE[local_counts_product]; \
                     NGA_Access64(g_src, lo_src, hi_src, &buf_src, ld_src); \
-                    TRACER("buf_src[0]="#FMT"\n", buf_src[0]); \
                     for (int64_t i=0; i<elems_product_src; ++i) { \
                         unravel64i(i, ndim_src, elems_src, index); \
                         int okay = 1; \
@@ -285,7 +275,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
                     if (buf_dst_index != local_counts_product) { \
                         GA_Error("pack: mismatch", buf_dst_index); \
                     } \
-                    TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
                     NGA_Put64(g_dst, lo_dst, hi_dst, buf_dst, ld_dst); \
                     NGA_Release64(g_src, lo_src, hi_src); \
                     delete [] buf_dst; \
@@ -300,7 +289,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
         }
         //print_local_masks(local_masks, elems, ndim);
         // Clean up
-        TRACER("before Clean up\n");
         /* Remove temporary partial sum arrays */
         for (int i=0; i<ndim_src; ++i) {
             int *tmp = local_masks[i];
@@ -309,7 +297,6 @@ void gax::pack(int g_src, int g_dst, int *g_masks, int *g_masksums)
         }
     }
 
-    TRACER("pack(%d,%d,...) END\n", g_src, g_dst);
 }
 
 
@@ -342,7 +329,6 @@ void gax::enumerate(int g_src, void *start_val, void *inc_val)
     int64_t count;
     void *buf;
 
-    TRACER("enumerate BEGIN\n");
 
     NGA_Inquire64(g_src, &src_type, &src_ndim, &src_size);
     if (src_ndim > 1) {
@@ -350,17 +336,13 @@ void gax::enumerate(int g_src, void *start_val, void *inc_val)
     }
 
     NGA_Distribution64(g_src, me, &src_lo, &src_hi);
-    //TRACER("enumerate lo,hi = %lld,%lld\n", src_lo, src_hi);
     if (0 > src_lo && 0 > src_hi) {
-        //TRACER("enumerate result = N/A\n");
-        //TRACER("enumerate count = N/A\n");
     }
     else {
         loc_lo = 0;
         loc_hi = src_size-1;
         count = 0;
         result = NGA_Locate_region64(g_src, &loc_lo, &loc_hi, map, procs);
-        //TRACER("enumerate result = %d\n", result);
         for (int i=0; i<result; ++i) {
             if (procs[i] < me) {
                 count += map[i*2+1]-map[i*2]+1;
@@ -372,7 +354,6 @@ void gax::enumerate(int g_src, void *start_val, void *inc_val)
             ptr += 2;
         }
         */
-        //TRACER("enumerate count = %lld\n", count);
 
         NGA_Access64(g_src, &src_lo, &src_hi, &buf, NULL);
 #define enumerate_op(MTYPE,TYPE) \
@@ -399,7 +380,6 @@ void gax::enumerate(int g_src, void *start_val, void *inc_val)
 #undef enumerate_op
         NGA_Release_update64(g_src, &src_lo, &src_hi);
     }
-    TRACER("enumerate END\n");
 }
 
 
@@ -410,7 +390,6 @@ void gax::enumerate(int g_src, void *start_val, void *inc_val)
  */
 void gax::unpack1d(int g_src, int g_dst, int g_msk)
 {
-    TRACER("unpack1d BEGIN\n");
     int me = pagoda::nodeid();
     int nproc = pagoda::num_nodes();
     int *mask;
@@ -432,7 +411,6 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
     NGA_Distribution64(g_msk, me, &lo_msk, &hi_msk);
     if (0 > lo_msk && 0 > hi_msk) {
         GA_Lgop(counts, nproc, "+");
-        TRACER("unpack1d lo,hi N/A 1\n");
     }
     else {
         NGA_Access64(g_msk, &lo_msk, &hi_msk, &mask, NULL);
@@ -445,7 +423,6 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
         mask = NULL;
         GA_Lgop(counts, nproc, "+");
         if (0 == counts[me]) {
-            TRACER("unpack1d lo,hi N/A 2\n");
         }
         else {
             // tally up where to start the 'get' of the packed array
@@ -453,7 +430,6 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
                 lo_src += counts[i];
             }
             hi_src = lo_src + counts[me] - 1;
-            TRACER("unpack1d lo,hi = %ld,%ld\n", lo_src, hi_src);
             // do the unpacking
             // assumption is that dst array has same distribution as msk array
             // get src (and dst) type, that's all we want...
@@ -487,5 +463,4 @@ void gax::unpack1d(int g_src, int g_dst, int g_msk)
             }
         }
     }
-    TRACER("unpack1d END\n");
 }

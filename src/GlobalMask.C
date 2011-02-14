@@ -45,7 +45,6 @@ GlobalMask::GlobalMask(const string &name, int64_t size)
     ,   dirty_count(true)
     ,   name(name)
 {
-    TRACER("GlobalMask ctor size=%ld\n", size);
 
     mask = new GlobalArray(DataType::INT, vector<int64_t>(1,size));
     mask->fill_value(1);
@@ -69,7 +68,6 @@ GlobalMask::GlobalMask(const GlobalMask &that)
     ,   dirty_count(true)
     ,   name(that.name)
 {
-    TRACER("GlobalMask ctor copy\n");
 
     mask = new GlobalArray(*mask);
 }
@@ -434,7 +432,6 @@ void GlobalMask::modify_lt(double value, const Array *var)
  */
 void GlobalMask::normalize()
 {
-    TRACER("GlobalMask::normalize()");
 
     if (owns_data()) {
         int *mask_data = static_cast<int*>(access());
@@ -469,7 +466,6 @@ Array* GlobalMask::reindex()
     vector<int64_t> size(1, get_size());
     Array *tmp;
 
-    TRACER("GlobalMask::reindex() BEGIN\n");
 
     if (dirty_index) {
         if (!index) {
@@ -489,7 +485,6 @@ Array* GlobalMask::reindex()
         dirty_index = false;
     }
 
-    TRACER("GlobalMask::reindex() END\n");
 
     return index;
 }

@@ -204,7 +204,6 @@ void MaskMap::modify(const IndexHyperslab &hyperslab)
     string hyperslab_name = hyperslab.get_name();
     Mask *mask = get_mask(hyperslab_name);
 
-    TRACER("MaskMap::modify(IndexHyperslab)\n");
 
     if (mask == NULL) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
@@ -257,7 +256,6 @@ void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
     string hyperslab_name = hyperslab.get_name();
     Mask *mask = get_mask(hyperslab_name);
 
-    TRACER("MaskMap::modify(CoordHyperslab)\n");
 
     if (mask == NULL) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
@@ -323,7 +321,6 @@ void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
 
 void MaskMap::modify(const LatLonBox &box, Grid *grid)
 {
-    TRACER("MaskMap::modify(LatLonBox,Grid)\n");
 
     if (grid->get_type() == GridType::GEODESIC) {
         Variable *cell_lat = grid->get_cell_lat();
@@ -464,7 +461,6 @@ void MaskMap::modify(const LatLonBox &box,
     Array *lat_array;
     Array *lon_array;
 
-    TRACER("MaskMap::modify(LatLonBox,Variable,Variable,Dimension)\n");
 
     lat->get_dataset()->push_masks(NULL);
     lat_array = lat->read();

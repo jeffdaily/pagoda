@@ -97,7 +97,6 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
     void *ptr_dst;
     int64_t elems;
 
-    TRACER("partial_sum(Array*,Array*,bool)");
 
     if (! g_src->same_distribution(g_dst)) {
         pagoda::abort("partial_sum: Arrays must have same distribution", 0);
@@ -141,7 +140,6 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
             for (int64_t i=0; i<elems; ++i) { \
                 dst[i] += value; \
             } \
-            TRACER("partial_sum_op "#FMT"\n", value); \
         } else
         partial_sum_op(DataType::INT,int,DataType::INT,int,%d)
         partial_sum_op(DataType::INT,int,DataType::LONG,long,%ld)
@@ -164,7 +162,6 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
         if (DTYPE == type_dst) { \
             vector<TYPE> values(nproc, 0); \
             pagoda::gop_sum(values); \
-            TRACER("partial_sum_op N/A\n"); \
         } else
         partial_sum_op(DataType::INT,       int)
         partial_sum_op(DataType::LONG,      long)
@@ -232,9 +229,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
 
     if (0 > lo_src[0] && 0 > hi_src[0]) {
         /* no elements on this process */
-        TRACER("no elements on this process\n");
-        TRACER("no elements on this process\n");
-        TRACER("no Clean up\n");
     }
     else {
         vector<int64_t> elems_src(ndim_src,0);
@@ -264,8 +258,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
 
         if (0 == local_counts_product) {
             /* if any of the local mask counts are zero, no work is needed */
-            TRACER("0 == local_counts_product\n");
-            TRACER("0 == local_counts_product\n");
         }
         else {
             /* determine where the data is to go */
@@ -303,7 +295,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                 int64_t *dims_m1 = new int64_t[ndim_src]; \
                 int64_t *strides = new int64_t[ndim_src]; \
                 int64_t *backstrides = new int64_t[ndim_src]; \
-                TRACER("buf_src[0]="#FMT"\n", sptr[0]); \
                 for (int64_t i=nd_m1; i>=0; --i) { \
                     coords[i] = 0; \
                     dims_m1[i] = elems_src[i]-1; \
@@ -338,7 +329,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
                 if (okay_count != local_counts_product) { \
                     pagoda::abort("pack: mismatch", okay_count); \
                 } \
-                TRACER("g_dst=%d, lo_dst[0]=%ld, hi_dst[0]=%ld, buf_dst[0]="#FMT"\n", g_dst, lo_dst[0], hi_dst[0], buf_dst[0]); \
                 g_dst->put(buf_dst, lo_dst, hi_dst); \
                 g_src->release(); \
                 delete [] buf_dst; \
@@ -359,7 +349,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         }
         //print_local_masks(local_masks, elems, ndim);
         // Clean up
-        TRACER("before Clean up\n");
         /* Remove temporary partial sum arrays */
         for (int i=0; i<ndim_src; ++i) {
             int *tmp = local_masks[i];
@@ -370,7 +359,6 @@ void pagoda::pack(const Array *g_src, Array *g_dst,
         }
     }
 
-    TRACER("pack(%d,%d,...) END\n", g_src, g_dst);
 }
 
 
@@ -400,7 +388,6 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
     vector<int64_t> hi;
     DataType type = src->get_type();
 
-    TRACER("enumerate BEGIN\n");
 
     src->get_distribution(lo,hi);
 
@@ -435,7 +422,6 @@ void pagoda::enumerate(Array *src, void *start_val, void *inc_val)
         }
 #undef enumerate_op
     }
-    TRACER("enumerate END\n");
 }
 
 
@@ -454,7 +440,6 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     vector<int64_t> hi_src(1,0);
     DataType type_src = src->get_type();
 
-    TRACER("unpack1d BEGIN\n");
 
     if (!dst->same_distribution(msk)) {
         pagoda::abort("unpack1d: dst and msk distributions differ");
@@ -470,8 +455,6 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
     // count mask bits on each proc
     if (!msk->owns_data()) {
         pagoda::gop_sum(counts);
-        TRACER("unpack1d lo,hi N/A 1 counts[me]=%ld\n", counts[me]);
-        TRACER("unpack1d END\n");
         return; // this process doesn't participate
     }
     else {
@@ -484,8 +467,6 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         msk->release();
         pagoda::gop_sum(counts);
         if (0 == counts[me]) {
-            TRACER("unpack1d lo,hi N/A 2 counts[me]=%ld\n", counts[me]);
-            TRACER("unpack1d END\n");
             return; // this process doesn't participate
         }
     }
@@ -495,8 +476,6 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         lo_src[0] += counts[i];
     }
     hi_src[0] = lo_src[0] + counts[me] - 1;
-    TRACER("unpack1d lo,hi,counts[me] = %ld,%ld,%ld\n",
-           lo_src[0], hi_src[0], counts[me]);
     // do the unpacking
     // assumption is that dst array has same distribution as msk array
 #define unpack1d_op(DTYPE,TYPE) \
@@ -525,7 +504,6 @@ void pagoda::unpack1d(const Array *src, Array *dst, Array *msk)
         EXCEPT(DataTypeException, "DataType not handled", type_src);
     }
 #undef unpack1d_op
-    TRACER("unpack1d END\n");
 }
 
 

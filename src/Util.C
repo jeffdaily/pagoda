@@ -611,7 +611,6 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
     string max_name;
     vector<Variable*>::const_iterator var;
 
-    TRACER("pagoda::calculate_required_memory BEGIN\n");
 
     for (var=vars.begin(); var!=vars.end(); ++var) {
         int64_t var_size = shape_to_size((*var)->get_shape());
@@ -625,19 +624,15 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
         max_name = "NO VARIALBES";
     }
     gigabytes = 1.0 / 1073741824.0 * max_size * 8;
-    TRACER("MA max variable '%s' is %ld bytes (%f gigabytes)\n",
-           max_name.c_str(), max_size*8, gigabytes);
 
     //max_size = int64_t(max_size * 0.04);
     max_size = int64_t(max_size / pagoda::num_nodes());
     gigabytes = 1.0 / 1073741824.0 * max_size * 8;
-    TRACER("MA max memory %ld bytes (%f gigabytes)\n", max_size*8, gigabytes);
 
     if (MA_init(C_DBL, max_size, max_size) == MA_FALSE) {
         char msg[] = "MA_init failed";
         GA_Error(msg, 0);
     }
-    TRACER("pagoda::calculate_required_memory END\n");
 #endif
 }
 

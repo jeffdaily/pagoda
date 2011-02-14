@@ -140,11 +140,9 @@ bool Grid::is_coordinate(const Variable *var)
 {
     bool ret = false;;
 
-    TRACER("Grid::is_coordinate %s\n", (var? var->get_name().c_str() : "NULL"));
 
     // check grid Variables first
     if (!var) {
-        TRACER("\tNULL\n");
         ret = false;
     }
     else if (var == get_cell_lat()) {
@@ -168,7 +166,6 @@ bool Grid::is_coordinate(const Variable *var)
     else if (var->get_dims().size() == 1
              && var->get_dims()[0]->get_name() == var->get_name()) {
         // does this Variable have only 1 dim with same name?
-        TRACER("\ttruly\n");
         ret = true;
     }
     else {
@@ -187,7 +184,6 @@ bool Grid::is_coordinate(const Variable *var)
                 vector<string>::iterator part;
                 for (part=parts.begin(); part!=parts.end(); ++part) {
                     if (name == *part) {
-                        TRACER("\tcoordinates\n");
                         ret = true;
                         break;
                     }
@@ -202,7 +198,6 @@ bool Grid::is_coordinate(const Variable *var)
                 vector<string>::iterator part;
                 for (part=parts.begin(); part!=parts.end(); ++part) {
                     if (name == *part) {
-                        TRACER("\tbounds\n");
                         ret = true;
                         break;
                     }
@@ -214,7 +209,6 @@ bool Grid::is_coordinate(const Variable *var)
         }
     }
 
-    TRACER("\t%s\n", ret ? "TRUE" : "FALSE");
     return ret;
 }
 
@@ -224,7 +218,6 @@ bool Grid::is_topology(const Variable *var)
     bool ret;
 
     if (!var) {
-        TRACER("Grid::is_topology NULL\n");
         ret = false;
     }
     else if (var == get_cell_cells()) {
@@ -263,10 +256,8 @@ bool Grid::is_topology(const Variable *var)
 
 #ifdef TRACE
     if (ret) {
-        TRACER("Grid::is_topology TRUE  %s\n", var->get_name().c_str());
     }
     else {
-        TRACER("Grid::is_topology FALSE %s\n", var->get_name().c_str());
     }
 #endif
 

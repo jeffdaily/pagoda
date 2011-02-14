@@ -29,7 +29,6 @@ AggregationJoinExisting::AggregationJoinExisting(const string& name)
     ,   agg_dim(NULL)
     ,   agg_vars()
 {
-    TRACER("AggregationJoinExisting::ctor(%s)\n", name.c_str());
 }
 
 
@@ -51,7 +50,6 @@ AggregationJoinExisting::~AggregationJoinExisting()
 
 void AggregationJoinExisting::add(Dataset *dataset)
 {
-    TRACER("AggregationJoinExisting::add BEGIN\n");
     datasets.push_back(dataset);
 
     /* combine global attributes */
@@ -124,8 +122,6 @@ void AggregationJoinExisting::add(Dataset *dataset)
                     ERR("dynamic_cast of AggregationVariable failed");
                 }
                 agg_var->add(other_var);
-                TRACER("agg_var->get_sizes()[0]=%ld\n",
-                       agg_var->get_shape()[0]);
             }
             else {
                 // no-op. other_var was found in the aggregation, but its
@@ -135,7 +131,6 @@ void AggregationJoinExisting::add(Dataset *dataset)
             }
         }
     }
-    TRACER("AggregationJoinExisting::add END\n");
 }
 
 

@@ -187,7 +187,6 @@ Array* PnetcdfVariable::_read(Array *dst) const
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("PnetcdfVariable::_read(Array*) %s\n", get_name().c_str());
 
     tmp = read_prep(dst, start, count, found_bit);
     do_read(tmp, start, count, found_bit);
@@ -213,7 +212,6 @@ Array* PnetcdfVariable::_iread(Array *dst)
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("PnetcdfVariable::_iread(Array*) %s\n", get_name().c_str());
 
     tmp = read_prep(dst, start, count, found_bit);
     do_iread(tmp, start, count, found_bit);
@@ -299,7 +297,6 @@ Array* PnetcdfVariable::_read(int64_t record, Array *dst) const
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("PnetcdfVariable::_read(int64_t,Array*) %s\n", get_name().c_str());
 
     tmp = read_prep(dst, start, count, found_bit, record);
     do_read(tmp, start, count, found_bit);
@@ -327,7 +324,6 @@ Array* PnetcdfVariable::_iread(int64_t record, Array *dst)
     bool found_bit = true;
     Array *tmp;
 
-    TRACER("PnetcdfVariable::_read(int64_t,Array*) %s\n", get_name().c_str());
 
     tmp = read_prep(dst, start, count, found_bit, record);
     do_iread(tmp, start, count, found_bit);
