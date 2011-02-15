@@ -12,9 +12,9 @@ class PgboCommands : public GenericCommands
     public:
         PgboCommands();
         PgboCommands(int argc, char **argv);
-        ~PgboCommands();
+        virtual ~PgboCommands();
 
-        void parse(int argc, char **argv);
+        virtual void parse(int argc, char **argv);
 
         void get_inputs_and_outputs(Dataset* &dataset,
                                     Dataset* &operand,

@@ -12,12 +12,12 @@ class PgraCommands : public GenericCommands
     public:
         PgraCommands();
         PgraCommands(int argc, char **argv);
-        ~PgraCommands();
+        virtual ~PgraCommands();
 
-        void parse(int argc, char **argv);
+        virtual void parse(int argc, char **argv);
 
-        Dataset* get_dataset();
-        FileWriter* get_output() const;
+        virtual Dataset* get_dataset();
+        virtual FileWriter* get_output() const;
 
         string get_operator() const;
 

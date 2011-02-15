@@ -31,53 +31,46 @@ class GenericCommands
     public:
         GenericCommands();
         GenericCommands(int argc, char **argv);
-        ~GenericCommands();
+        virtual ~GenericCommands();
 
-        void parse(int argc, char **argv);
+        virtual void parse(int argc, char **argv);
 
-        void get_inputs_and_outputs(Dataset* &dataset,
-                                    vector<Variable*> &vars,
-                                    FileWriter* &writer);
-        void get_inputs_and_outputs(Dataset* &dataset,
-                                    vector<Variable*> &vars,
-                                    vector<Dimension*> &dims,
-                                    vector<Attribute*> &atts,
-                                    FileWriter* &writer);
-        void get_inputs(Dataset* &dataset,
-                        vector<Variable*> &vars,
-                        vector<Dimension*> &dims,
-                        vector<Attribute*> &atts);
-        FileWriter* get_output() const;
+        virtual void get_inputs_and_outputs(Dataset* &dataset,
+                                            vector<Variable*> &vars,
+                                            FileWriter* &writer);
+        virtual void get_inputs(Dataset* &dataset,
+                                vector<Variable*> &vars,
+                                vector<Dimension*> &dims,
+                                vector<Attribute*> &atts);
+        virtual FileWriter* get_output() const;
 
-        Dataset* get_dataset();
-        vector<Variable*> get_variables(Dataset *dataset);
-        vector<Dimension*> get_dimensions(Dataset *dataset);
-        vector<Attribute*> get_attributes(Dataset *dataset) const;
+        virtual Dataset* get_dataset();
+        virtual vector<Variable*> get_variables(Dataset *dataset);
+        virtual vector<Dimension*> get_dimensions(Dataset *dataset);
+        virtual vector<Attribute*> get_attributes(Dataset *dataset) const;
 
-        vector<LatLonBox> get_boxes() const;
-        vector<IndexHyperslab> get_index_hyperslabs() const;
-        vector<CoordHyperslab> get_coord_hyperslabs() const;
-        vector<string> get_input_filenames() const;
-        string get_output_filename() const;
-        set<string> get_variables() const;
-        string get_join_name() const;
-        bool is_excluding_variables() const;
-        bool is_alphabetizing() const;
-        bool is_processing_all_coords() const;
-        bool is_processing_coords() const;
-        bool is_modifying_history() const;
-        bool is_requesting_info() const;
-        bool is_appending() const;
-        bool is_overwriting() const;
-        bool is_fixing_record_dimension() const;
-        bool is_nonblocking() const;
-        bool is_reading_all_records() const;
-        int get_header_pad() const;
-        string get_usage() const;
-        string get_version() const;
-        string get_info() const;
-        FileFormat get_file_format() const;
-        string get_input_path() const;
+        virtual vector<LatLonBox> get_boxes() const;
+        virtual vector<IndexHyperslab> get_index_hyperslabs() const;
+        virtual vector<CoordHyperslab> get_coord_hyperslabs() const;
+        virtual vector<string> get_input_filenames() const;
+        virtual string get_output_filename() const;
+        virtual set<string> get_variables() const;
+        virtual string get_join_name() const;
+        virtual bool is_excluding_variables() const;
+        virtual bool is_alphabetizing() const;
+        virtual bool is_processing_all_coords() const;
+        virtual bool is_processing_coords() const;
+        virtual bool is_modifying_history() const;
+        virtual bool is_appending() const;
+        virtual bool is_overwriting() const;
+        virtual bool is_fixing_record_dimension() const;
+        virtual bool is_nonblocking() const;
+        virtual bool is_reading_all_records() const;
+        virtual int get_header_pad() const;
+        virtual string get_usage() const;
+        virtual string get_version() const;
+        virtual FileFormat get_file_format() const;
+        virtual string get_input_path() const;
 
     protected:
         void init();

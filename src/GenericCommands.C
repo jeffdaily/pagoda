@@ -365,18 +365,6 @@ void GenericCommands::get_inputs_and_outputs(Dataset *&dataset,
 }
 
 
-void GenericCommands::get_inputs_and_outputs(Dataset *&dataset,
-        vector<Variable*> &vars, vector<Dimension*> &dims,
-        vector<Attribute*> &atts, FileWriter* &writer)
-{
-    get_inputs(dataset, vars, dims, atts);
-    writer = get_output();
-    writer->write_atts(atts);
-    writer->def_dims(dims);
-    writer->def_vars(vars);
-}
-
-
 void GenericCommands::get_inputs(Dataset *&dataset, vector<Variable*> &vars,
         vector<Dimension*> &dims, vector<Attribute*> &atts)
 {
