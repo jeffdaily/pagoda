@@ -44,6 +44,9 @@ int F77_DUMMY_MAIN()
 static void copy(Variable *var, FileWriter *writer);
 static void copy_per_record(Variable *var, FileWriter *writer);
 
+static bool same_shape(const Variable *lhs, const Variable *rhs);
+static bool same_shape_sans_first(const Variable *lhs, const Variable *rhs);
+
 static void op_shape_match(
     Variable *lhs, Variable *rhs, string op, FileWriter *writer);
 static void op_shape_match_per_record(
@@ -146,8 +149,8 @@ void pgbo_blocking(Dataset *dataset, Dataset *operand,
                 op_shape_match(ds_var, op_var, op, writer);
             }
         }
-        // at this point we know the shapes are mismatched, but at least they
-        // are broadcast-able
+        // at this point we know the shapes are mismatched
+        // but they might be broadcast-able
         else if (per_record && ds_var->has_record()) {
             op_broadcast_per_record(ds_var, op_var, op, writer);
         } else {
@@ -183,8 +186,8 @@ static void pgbo_nonblocking(Dataset *dataset, Dataset *operand,
         if (ds_var->get_ndim() < op_var->get_ndim()) {
             ERR("operand variable rank < input variable rank");
         }
-        nb_arrays.push_back(ds_var->iread());
         names.push_back(ds_var->get_name());
+        nb_arrays.push_back(ds_var->iread());
         if (dataset->is_grid_var(ds_var) || !op_var) {
             nb_operands.push_back(NULL);
         } else {
@@ -231,16 +234,30 @@ static void pgbo_nonblocking(Dataset *dataset, Dataset *operand,
     }
 
     // now the record variables, one record at a time
+    // special case if the operand variable is a degenerate record variable
+    // or a nonrecord variable, in which case it is only read from disk once
     for (int64_t rec=0; rec<nrec; ++rec) {
         for (int64_t v=0,limit=record_vars.size(); v<limit; ++v) {
             Variable *ds_var = record_vars[v];
             Variable *op_var = operand->get_var(ds_var->get_name());
-            nb_arrays[v] = ds_var->iread(rec, nb_arrays[v]);
             names[v] = ds_var->get_name();
+            nb_arrays[v] = ds_var->iread(rec, nb_arrays[v]);
             if (dataset->is_grid_var(ds_var) || !op_var) {
                 nb_operands[v] = NULL;
-            } else {
-                nb_operands[v] = op_var->iread(rec, nb_operands[v]);
+            }
+            else {
+                if (same_shape(ds_var,op_var)) {
+                    nb_operands[v] = op_var->iread(rec, nb_operands[v]);
+                }
+                // since not same shape, should be NULL first record only
+                else if (NULL == nb_operands[v]) {
+                    if (same_shape_sans_first(ds_var,op_var)) {
+                        nb_operands[v] = op_var->iread(int64_t(0));
+                    }
+                    else {
+                        nb_operands[v] = op_var->iread();
+                    }
+                }
             }
         }
         dataset->wait();
@@ -334,14 +351,8 @@ static void op_broadcast_per_record(
     Array *lhs_array = NULL; // reuse allocated array each record
     Array *rhs_array = NULL;
     // special case if rhs is same shape except for the record
-    if (rhs->has_record()) {
-        vector<int64_t> lhs_shape = lhs->get_shape();
-        vector<int64_t> rhs_shape = rhs->get_shape();
-        lhs_shape.erase(lhs_shape.begin());
-        rhs_shape.erase(rhs_shape.begin());
-        if (lhs_shape == rhs_shape) {
-            rhs_array = rhs->read(int64_t(0));
-        }
+    if (same_shape_sans_first(lhs,rhs)) {
+        rhs_array = rhs->read(int64_t(0));
     }
     if (NULL == rhs_array) {
         rhs_array = rhs->read();
@@ -373,4 +384,27 @@ static void do_op(Array *lhs, string op, Array *rhs)
     else {
         ERR("bad op_type"); // shouldn't happen, but still...
     }
+}
+
+
+// convenience function to check matching shapes of two variables
+static bool same_shape(const Variable *lhs, const Variable *rhs)
+{
+    return lhs->get_shape() == rhs->get_shape();
+}
+
+
+// checks whether the Variables are compatible in the special case where the
+// right-hand side shape has one preceeding degenerate dimensions
+static bool same_shape_sans_first(const Variable *lhs, const Variable *rhs)
+{
+    bool answer = false;
+    vector<int64_t> lhs_shape = lhs->get_shape();
+    vector<int64_t> rhs_shape = rhs->get_shape();
+    if (1 == rhs_shape[0]) { // degenerate dimension, record or not
+        lhs_shape.erase(lhs_shape.begin());
+        rhs_shape.erase(rhs_shape.begin());
+        answer = (lhs_shape == rhs_shape);
+    }
+    return answer;
 }
