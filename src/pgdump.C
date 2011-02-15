@@ -28,8 +28,8 @@ using std::vector;
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
+#include "Print.H"
 #include "Values.H"
 #include "Variable.H"
 
@@ -38,6 +38,8 @@ static CommandLineOption TYPE(0, "type", false,
         "print the type of file to stdout");
 static CommandLineOption HAS_RECORD(0, "has_record", false,
         "exit with 0 if file has a record dimension > 0");
+static CommandLineOption HELP('h', "help", false,
+        "print usage and exit");
 
 static int dump_type(const string &filename);
 static int has_record(const string &filename);
@@ -54,12 +56,18 @@ int main(int argc, char **argv)
 
     parser.push_back(&TYPE);
     parser.push_back(&HAS_RECORD);
+    parser.push_back(&HELP);
     parser.parse(argc,argv);
 
-    if (parser.get_positional_arguments().empty()) {
+    if (parser.get_positional_arguments().empty() || parser.count("help")) {
         pagoda::println_zero("Usage: pgdump [--type] <filename>");
+        pagoda::println_zero(parser.get_usage());
         pagoda::finalize();
-        return EXIT_FAILURE;
+        if (parser.count("help")) {
+            return EXIT_SUCCESS;
+        } else {
+            return EXIT_FAILURE;
+        }
     } else {
         filename = parser.get_positional_arguments().back();
     }
@@ -90,13 +98,11 @@ static int dump_type(const string &filename)
     FileFormat format = dataset->get_file_format();
     string name;
     switch (format) {
-        case FF_NETCDF3_CDF1: name = "CDF1"; break;
-        case FF_NETCDF3_CDF2: name = "CDF2"; break;
         case FF_NETCDF4: name = "NC4"; break;
         case FF_NETCDF4_CLASSIC: name = "NC4_CLASSIC"; break;
-        case FF_PNETCDF_CDF1: name = "CDF1"; break;
-        case FF_PNETCDF_CDF2: name = "CDF2"; break;
-        case FF_PNETCDF_CDF5: name = "CDF5"; break;
+        case FF_CDF1: name = "CDF1"; break;
+        case FF_CDF2: name = "CDF2"; break;
+        case FF_CDF5: name = "CDF5"; break;
         case FF_UNKNOWN:
         default: name = "UNKNOWN"; break;
     }

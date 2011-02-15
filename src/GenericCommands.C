@@ -24,11 +24,11 @@
 #include "Grid.H"
 #include "MaskMap.H"
 #include "PagodaException.H"
+#include "Print.H"
 #include "TypedValues.H"
 #include "Util.H"
 #include "Variable.H"
 
-#include "Debug.H"
 
 using std::sort;
 using std::vector;
@@ -288,13 +288,13 @@ void GenericCommands::parse(int argc, char **argv)
         }
         val = args.front();
         if (val == "classic") {
-            file_format = FF_PNETCDF_CDF1;
+            file_format = FF_CDF1;
         }
         else if (val == "64bit") {
-            file_format = FF_PNETCDF_CDF2;
+            file_format = FF_CDF2;
         }
         else if (val == "64data") {
-            file_format = FF_PNETCDF_CDF5;
+            file_format = FF_CDF5;
         }
         else if (val == "netcdf4") {
             file_format = FF_NETCDF4;
@@ -308,15 +308,15 @@ void GenericCommands::parse(int argc, char **argv)
     }
 
     if (parser.count("3")) {
-        file_format = FF_PNETCDF_CDF1;
+        file_format = FF_CDF1;
     }
 
     if (parser.count("64")) {
-        file_format = FF_PNETCDF_CDF2;
+        file_format = FF_CDF2;
     }
 
     if (parser.count("5")) {
-        file_format = FF_PNETCDF_CDF5;
+        file_format = FF_CDF5;
     }
 
     if (parser.count("nbio")) {
@@ -450,13 +450,12 @@ Dataset* GenericCommands::get_dataset()
 
 FileWriter* GenericCommands::get_output() const
 {
-    FileWriter *writer = FileWriter::open(output_filename);
+    FileWriter *writer = FileWriter::open(output_filename, file_format);
 
     writer->append(append)
     ->overwrite(overwrite)
     ->fixed_record_dimension(record_dimension_size)
     ->header_pad(header_pad)
-    ->file_format(file_format)
     ->create();
 
     return writer;

@@ -40,9 +40,9 @@
 #include <netcdf.h>
 
 #include "Bootstrap.H"
-#include "Debug.H"
 #include "Netcdf4Error.H"
 #include "Netcdf4Timing.H"
+#include "Print.H"
 
 using std::cerr;
 using std::endl;

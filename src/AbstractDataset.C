@@ -51,6 +51,18 @@ Grid* AbstractDataset::get_grid()
 }
 
 
+bool AbstractDataset::is_grid_var(const Variable *var)
+{
+    Grid *grid = get_grid();
+    if (NULL != grid) {
+        if (grid->is_coordinate(var) || grid->is_topology(var)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 Attribute* AbstractDataset::get_att(
     const string &name, bool ignore_case, bool within) const
 {

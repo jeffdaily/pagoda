@@ -9,7 +9,6 @@
 #include "AbstractArray.H"
 #include "Bootstrap.H"
 #include "DataType.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "ScalarArray.H"
 

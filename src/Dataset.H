@@ -93,6 +93,11 @@ class Dataset
         virtual Grid* get_grid() = 0;
 
         /**
+         * Returns whether the given Variable is part of the Grid.
+         */
+        virtual bool is_grid_var(const Variable *var) = 0;
+
+        /**
          * Returns the Attribute with the given name.
          *
          * @param[in] name the name of the Attribute

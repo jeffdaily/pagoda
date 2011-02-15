@@ -20,7 +20,7 @@ class Dataset;
 class Netcdf4Variable;
 class Variable;
 
-FileWriter* pagoda_netcdf4_create(const string &);
+FileWriter* pagoda_netcdf4_create(const string &, FileFormat);
 
 /**
  * Writes a Dataset to a netcdf-4 file using netcdf4.
@@ -30,7 +30,7 @@ class Netcdf4FileWriter : public AbstractFileWriter
     public:
         static nc_type to_nc(const DataType &type);
 
-        Netcdf4FileWriter(const string &filename);
+        Netcdf4FileWriter(const string &filename, FileFormat format);
         virtual ~Netcdf4FileWriter();
         virtual void close();
 

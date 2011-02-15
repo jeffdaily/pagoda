@@ -14,13 +14,13 @@
 #include "Bootstrap.H"
 #include "CommandException.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
 #include "FileWriter.H"
 #include "Grid.H"
 #include "MaskMap.H"
 #include "PgboCommands.H"
+#include "Print.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -40,17 +40,29 @@ int F77_DUMMY_MAIN()
 }
 #endif
 
-//#define READ_ALL
-//#define READ_RECORD
-//#define READ_NONBLOCKING
 
+static void copy(Variable *var, FileWriter *writer);
+static void copy_per_record(Variable *var, FileWriter *writer);
 
-static void write(Variable *var, FileWriter *writer);
-static void write_shape_match_per_record(
+static void op_shape_match(
     Variable *lhs, Variable *rhs, string op, FileWriter *writer);
-static void write_shape_match(
+static void op_shape_match_per_record(
     Variable *lhs, Variable *rhs, string op, FileWriter *writer);
+static void op_broadcast(
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer);
+static void op_broadcast_per_record(
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer);
+
 static void do_op(Array *lhs, string op, Array *rhs);
+
+
+static void pgbo_blocking(Dataset *dataset, Dataset *operand,
+                          const vector<Variable*> &vars,
+                          FileWriter *writer, const string &op,
+                          bool per_record);
+static void pgbo_nonblocking(Dataset *dataset, Dataset *operand,
+                             const vector<Variable*> &vars,
+                             FileWriter *writer, const string &op);
 
 
 int main(int argc, char **argv)
@@ -58,101 +70,27 @@ int main(int argc, char **argv)
     PgboCommands cmd;
     string op_type;
     Dataset *dataset;
-    vector<Variable*> ds_vars;
-    vector<Dimension*> ds_dims;
-    MaskMap *ds_masks;
     Dataset *operand;
-    vector<Variable*> op_vars;
-    vector<Dimension*> op_dims;
-    MaskMap *op_masks;
-    vector<Variable*>::iterator var_it;
+    vector<Variable*> vars;
     FileWriter *writer;
-    vector<Grid*> grids;
-    Grid *grid;
 
     try {
         pagoda::initialize(&argc, &argv);
 
         cmd.parse(argc,argv);
-
-        dataset = cmd.get_dataset();
-        operand = cmd.get_operand();
+        cmd.get_inputs_and_outputs(dataset, operand, vars, writer);
         op_type = cmd.get_operator();
 
-        ds_vars = cmd.get_variables(dataset);
-        op_vars = cmd.get_variables(operand);
-        ds_dims = cmd.get_dimensions(dataset);
-        op_dims = cmd.get_dimensions(operand);
-
-        // okay, we assume dataset and operand have the same grid
-        grids = dataset->get_grids();
-        if (grids.empty()) {
-            pagoda::print_zero("no grid found\n");
-            grid = NULL;
-        }
-        else {
-            grid = grids[0];
-        }
-
-        // create masks for dataset and operand
-        ds_masks = new MaskMap(dataset);
-        ds_masks->modify(cmd.get_index_hyperslabs());
-        ds_masks->modify(cmd.get_coord_hyperslabs(), grid);
-        ds_masks->modify(cmd.get_boxes(), grid);
-        op_masks = new MaskMap(operand);
-        op_masks->modify(cmd.get_index_hyperslabs());
-        op_masks->modify(cmd.get_coord_hyperslabs(), grid);
-        op_masks->modify(cmd.get_boxes(), grid);
-
-        // create the output writer
-        writer = cmd.get_output();
-        writer->write_atts(cmd.get_attributes(dataset));
-        writer->def_dims(ds_dims);
-        writer->def_vars(ds_vars);
-
-        // handle one variable at a time
-        for (var_it=ds_vars.begin(); var_it!=ds_vars.end(); ++var_it) {
-            Variable *ds_var = *var_it;
-            Variable *op_var = operand->get_var(ds_var->get_name());
-            if (!op_var) {
-                // no corresponding variable in the operand dataset,
-                // so copy ds_var unchanged to output
-                pagoda::print_zero(
-                    "missing operand variable " + ds_var->get_name());
-                write(ds_var, writer);
-            }
-            else if (grid->is_coordinate(ds_var)
-                     || grid->is_topology(ds_var)) {
-                // we have a coordinate or topology variable,
-                // so copy ds_var unchanged to output
-                write(ds_var, writer);
-            }
-            else if (ds_var->get_ndim() < op_var->get_ndim()) {
-                ERR("operand variable rank < input variable rank");
-            }
-            else if (ds_var->get_shape() == op_var->get_shape()) {
-                // shapes of each var match
-                // if either variable is record-based, both are treated as such
-                if (ds_var->has_record() || op_var->has_record()) {
-                    write_shape_match_per_record(
-                        ds_var, op_var, op_type, writer);
-                }
-                else {
-                    // oh well, we tried to do something record-based
-                    write_shape_match(ds_var, op_var, op_type, writer);
-                }
-            }
-            else {
-                // at this point we know the shapes are mismatched, but at
-                // least they are broadcast-able
-            }
+        if (cmd.is_nonblocking()) {
+            pgbo_nonblocking(dataset, operand, vars, writer, op_type);
+        } else {
+            pgbo_blocking(dataset, operand, vars, writer, op_type,
+                    !cmd.is_reading_all_records());
         }
 
         // clean up
         delete dataset;
         delete operand;
-        delete ds_masks;
-        delete op_masks;
         delete writer;
 
         pagoda::finalize();
@@ -171,28 +109,194 @@ int main(int argc, char **argv)
 }
 
 
-/**
- * Write entire Variable to FileWriter.
- */
-static void write(Variable *var, FileWriter *writer)
+void pgbo_blocking(Dataset *dataset, Dataset *operand,
+                   const vector<Variable*> &vars,
+                   FileWriter *writer, const string &op, bool per_record)
 {
-    if (var->has_record()) {
-        Array *array = NULL; // reuse allocated array each record
-        for (int64_t rec=0,limit=var->get_nrec(); rec<limit; ++rec) {
-            array = var->read(rec, array);
-            writer->write(array, var->get_name(), rec);
+    vector<Variable*>::const_iterator var_it,var_end;
+
+    // handle one variable at a time
+    for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
+        Variable *ds_var = *var_it;
+        Variable *op_var = operand->get_var(ds_var->get_name());
+        if (!op_var || dataset->is_grid_var(ds_var)) {
+            if (!op_var) {
+                // no corresponding variable in the operand dataset,
+                // so copy ds_var unchanged to output
+                pagoda::println_zero(
+                        "missing operand variable " + ds_var->get_name());
+            }
+            if (per_record && ds_var->has_record()) {
+                copy_per_record(ds_var, writer);
+            } else {
+                copy(ds_var, writer);
+            }
         }
-        delete array;
-    }
-    else {
-        Array *array = var->read();
-        writer->write(array, var->get_name());
-        delete array;
+        else if (ds_var->get_ndim() < op_var->get_ndim()) {
+            ERR("operand variable rank < input variable rank");
+        }
+        else if (ds_var->get_shape() == op_var->get_shape()) {
+            // shapes of each var match
+            // if either variable is record-based, both are treated as such
+            if (per_record && (ds_var->has_record() || op_var->has_record())) {
+                op_shape_match_per_record(ds_var, op_var, op, writer);
+            }
+            else {
+                // oh well, we tried to do something record-based
+                op_shape_match(ds_var, op_var, op, writer);
+            }
+        }
+        // at this point we know the shapes are mismatched, but at least they
+        // are broadcast-able
+        else if (per_record && ds_var->has_record()) {
+            op_broadcast_per_record(ds_var, op_var, op, writer);
+        } else {
+            op_broadcast(ds_var, op_var, op, writer);
+        }
     }
 }
 
 
-static void write_shape_match_per_record(
+static void pgbo_nonblocking(Dataset *dataset, Dataset *operand,
+                             const vector<Variable*> &vars,
+                             FileWriter *writer, const string &op)
+{
+    vector<Variable*> record_vars;
+    vector<Variable*> nonrecord_vars;
+    vector<Variable*>::const_iterator var_it;
+    vector<Variable*>::const_iterator var_end;
+    vector<string> names;
+    vector<Array*> nb_arrays;
+    vector<Array*> nb_operands;
+    Dimension *udim = dataset->get_udim();
+    int64_t nrec = NULL != udim ? udim->get_size() : 0;
+
+    Variable::split(vars, record_vars, nonrecord_vars);
+    for (var_it=nonrecord_vars.begin(), var_end=nonrecord_vars.end();
+            var_it!=var_end; ++var_it) {
+        Variable *ds_var = *var_it;
+        Variable *op_var = operand->get_var(ds_var->get_name());
+        if (!op_var) {
+            pagoda::println_zero("missing operand variable "
+                    + ds_var->get_name());
+        }
+        if (ds_var->get_ndim() < op_var->get_ndim()) {
+            ERR("operand variable rank < input variable rank");
+        }
+        nb_arrays.push_back(ds_var->iread());
+        names.push_back(ds_var->get_name());
+        if (dataset->is_grid_var(ds_var) || !op_var) {
+            nb_operands.push_back(NULL);
+        } else {
+            nb_operands.push_back(op_var->iread());
+        }
+    }
+    dataset->wait();
+    operand->wait();
+    for (size_t i=0,limit=nonrecord_vars.size(); i<limit; ++i) {
+        Array *ds_array = nb_arrays[i];
+        Array *op_array = nb_operands[i];
+        string name = names[i];
+        if (NULL != op_array) {
+            do_op(ds_array, op, op_array);
+        }
+        writer->iwrite(ds_array, name);
+    }
+    writer->wait();
+    for (size_t i=0,limit=nonrecord_vars.size(); i<limit; ++i) {
+        Array *ds_array = nb_arrays[i];
+        Array *op_array = nb_operands[i];
+        if (NULL != op_array) {
+            delete op_array;
+        }
+        delete ds_array;
+    }
+    // prefill the nb vectors with NULL so that we can reuse allocated arrays
+    // this also 'clear()'s the vectors so we can reuse them
+    nb_arrays.assign(record_vars.size(), NULL);
+    nb_operands.assign(record_vars.size(), NULL);
+    names.assign(record_vars.size(), "");
+
+    // do the sanity checking once to avoid one message per record
+    for (int64_t v=0,limit=record_vars.size(); v<limit; ++v) {
+        Variable *ds_var = record_vars[v];
+        Variable *op_var = operand->get_var(ds_var->get_name());
+        if (!op_var) {
+            pagoda::println_zero("missing operand variable "
+                    + ds_var->get_name());
+        }
+        if (ds_var->get_ndim() < op_var->get_ndim()) {
+            ERR("operand variable rank < input variable rank");
+        }
+    }
+
+    // now the record variables, one record at a time
+    for (int64_t rec=0; rec<nrec; ++rec) {
+        for (int64_t v=0,limit=record_vars.size(); v<limit; ++v) {
+            Variable *ds_var = record_vars[v];
+            Variable *op_var = operand->get_var(ds_var->get_name());
+            nb_arrays[v] = ds_var->iread(rec, nb_arrays[v]);
+            names[v] = ds_var->get_name();
+            if (dataset->is_grid_var(ds_var) || !op_var) {
+                nb_operands[v] = NULL;
+            } else {
+                nb_operands[v] = op_var->iread(rec, nb_operands[v]);
+            }
+        }
+        dataset->wait();
+        operand->wait();
+        for (size_t i=0,limit=record_vars.size(); i<limit; ++i) {
+            Array *ds_array = nb_arrays[i];
+            Array *op_array = nb_operands[i];
+            string name = names[i];
+            if (NULL != op_array) {
+                do_op(ds_array, op, op_array);
+            }
+            writer->iwrite(ds_array, name, rec);
+        }
+        writer->wait();
+    }
+}
+
+
+/**
+ * Write entire Variable to FileWriter.
+ */
+static void copy(Variable *var, FileWriter *writer)
+{
+    Array *array = var->read();
+    writer->write(array, var->get_name());
+    delete array;
+}
+
+
+/**
+ * Write entire Variable to FileWriter.
+ */
+static void copy_per_record(Variable *var, FileWriter *writer)
+{
+    Array *array = NULL; // reuse allocated array each record
+    for (int64_t rec=0,limit=var->get_nrec(); rec<limit; ++rec) {
+        array = var->read(rec, array);
+        writer->write(array, var->get_name(), rec);
+    }
+    delete array;
+}
+
+
+static void op_shape_match(
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer)
+{
+    Array *lhs_array = lhs->read();
+    Array *rhs_array = rhs->read();
+    do_op(lhs_array, op, rhs_array);
+    writer->write(lhs_array, lhs->get_name());
+    delete lhs_array;
+    delete rhs_array;
+}
+
+
+static void op_shape_match_per_record(
     Variable *lhs, Variable *rhs, string op, FileWriter *writer)
 {
     // operate one record at a time for both vars
@@ -209,13 +313,44 @@ static void write_shape_match_per_record(
 }
 
 
-static void write_shape_match(
+static void op_broadcast(
     Variable *lhs, Variable *rhs, string op, FileWriter *writer)
 {
     Array *lhs_array = lhs->read();
     Array *rhs_array = rhs->read();
     do_op(lhs_array, op, rhs_array);
     writer->write(lhs_array, lhs->get_name());
+    delete lhs_array;
+    delete rhs_array;
+}
+
+
+static void op_broadcast_per_record(
+    Variable *lhs, Variable *rhs, string op, FileWriter *writer)
+{
+    // It is assumed since this is a broadcasted operation, the right-hand
+    // side is smaller than the left-hand side.  We read the right-hand side
+    // entirely and reuse it for each record of the left-hand side.
+    Array *lhs_array = NULL; // reuse allocated array each record
+    Array *rhs_array = NULL;
+    // special case if rhs is same shape except for the record
+    if (rhs->has_record()) {
+        vector<int64_t> lhs_shape = lhs->get_shape();
+        vector<int64_t> rhs_shape = rhs->get_shape();
+        lhs_shape.erase(lhs_shape.begin());
+        rhs_shape.erase(rhs_shape.begin());
+        if (lhs_shape == rhs_shape) {
+            rhs_array = rhs->read(int64_t(0));
+        }
+    }
+    if (NULL == rhs_array) {
+        rhs_array = rhs->read();
+    }
+    for (int64_t rec=0,limit=lhs->get_nrec(); rec<limit; ++rec) {
+        lhs_array = lhs->read(rec, lhs_array);
+        do_op(lhs_array, op, rhs_array);
+        writer->write(lhs_array, lhs->get_name(), rec);
+    }
     delete lhs_array;
     delete rhs_array;
 }

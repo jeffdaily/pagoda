@@ -20,7 +20,7 @@
 #endif
 
 #include "DataType.H"
-#include "Debug.H"
+#include "Print.H"
 #include "Util.H"
 #include "Variable.H"
 

@@ -14,7 +14,6 @@ using std::vector;
 
 #include "Attribute.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
 #include "Grid.H"

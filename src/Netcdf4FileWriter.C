@@ -14,7 +14,6 @@
 #include "AbstractFileWriter.H"
 #include "Attribute.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "FileWriter.H"
 #include "Mask.H"
@@ -32,17 +31,25 @@ using std::string;
 using std::vector;
 
 
-FileWriter* pagoda_netcdf4_create(const string &filename)
+static bool is_valid_format(FileFormat format)
+{
+    return (FF_NETCDF4 <= format && format <= FF_NETCDF4_CLASSIC);
+}
+
+
+FileWriter* pagoda_netcdf4_create(const string &filename, FileFormat format)
 {
     FileWriter *ret = NULL;
 
-    try {
-        ret = new Netcdf4FileWriter(filename);
-    } catch (PagodaException &ex) {
-        if (ret != NULL) {
-            delete ret;
+    if (is_valid_format(format)) {
+        try {
+            ret = new Netcdf4FileWriter(filename, format);
+        } catch (PagodaException &ex) {
+            if (ret != NULL) {
+                delete ret;
+            }
+            ret = NULL;
         }
-        ret = NULL;
     }
 
     return ret;
@@ -51,7 +58,7 @@ FileWriter* pagoda_netcdf4_create(const string &filename)
 
 static int file_format_to_nc_format(FileFormat format)
 {
-    assert(FF_NETCDF4 <= format && format <= FF_NETCDF4_CLASSIC);
+    assert(is_valid_format(format));
     if (format == FF_NETCDF4) {
         return NC_NETCDF4;
     }
@@ -158,7 +165,7 @@ nc_type Netcdf4FileWriter::to_nc(const DataType &type)
 }
 
 
-Netcdf4FileWriter::Netcdf4FileWriter(const string &filename)
+Netcdf4FileWriter::Netcdf4FileWriter(const string &filename, FileFormat format)
     :   AbstractFileWriter()
     ,   is_in_define_mode(true)
     ,   filename(filename)
@@ -166,7 +173,7 @@ Netcdf4FileWriter::Netcdf4FileWriter(const string &filename)
     ,   unlimdimid(-1)
     ,   _fixed_record_dimension(-1)
     ,   _header_pad(-1)
-    ,   _file_format(FF_NETCDF4)
+    ,   _file_format(format)
     ,   _append(false)
     ,   _overwrite(false)
     ,   dim_id()
@@ -238,6 +245,11 @@ FileWriter* Netcdf4FileWriter::create()
                 }
                 var_shape[name] = shape;
             }
+            // warn if existing format is not the expected format
+            if (file_format_to_nc_format(_file_format)
+                    != nc::inq_format(ncid)) {
+                pagoda::println_zero("WARNING: appended format mismatch: expected '" + pagoda::file_format_to_string(_file_format));
+            }
         }
         else if (_overwrite) {
             ncid = nc::create(filename,
@@ -249,7 +261,8 @@ FileWriter* Netcdf4FileWriter::create()
         }
     }
     else {
-        ncid = nc::create(filename, _file_format, MPI_COMM_WORLD, info);
+        ncid = nc::create(filename, file_format_to_nc_format(_file_format),
+                MPI_COMM_WORLD, info);
     }
 
     open = true;

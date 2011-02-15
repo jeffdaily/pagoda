@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "Debug.H"
 #include "PnetcdfError.H"
 #include "PnetcdfNS.H"
 #include "PnetcdfTiming.H"

@@ -30,9 +30,9 @@
 #include <pnetcdf.h>
 
 #include "Bootstrap.H"
-#include "Debug.H"
 #include "PnetcdfError.H"
 #include "PnetcdfTiming.H"
+#include "Print.H"
 
 using std::cerr;
 using std::endl;

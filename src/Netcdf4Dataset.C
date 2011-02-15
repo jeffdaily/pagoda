@@ -248,10 +248,10 @@ FileFormat Netcdf4Dataset::get_file_format() const
 {
     int format = nc::inq_format(ncid);
     if (format == NC_FORMAT_CLASSIC) {
-        return FF_NETCDF3_CDF1;
+        return FF_CDF1;
     }
     else if (format == NC_FORMAT_64BIT) {
-        return FF_NETCDF3_CDF2;
+        return FF_CDF2;
     }
     else if (format == NC_FORMAT_NETCDF4) {
         return FF_NETCDF4;

@@ -27,8 +27,8 @@
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
+#include "Print.H"
 #include "Values.H"
 #include "Variable.H"
 

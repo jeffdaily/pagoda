@@ -46,6 +46,7 @@ class AbstractDataset : public Dataset
 
         virtual vector<Grid*> get_grids();
         virtual Grid* get_grid();
+        virtual bool is_grid_var(const Variable *var);
 
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false,

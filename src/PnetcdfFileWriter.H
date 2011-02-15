@@ -20,7 +20,7 @@ class Dataset;
 class PnetcdfVariable;
 class Variable;
 
-FileWriter* pagoda_pnetcdf_create(const string &);
+FileWriter* pagoda_pnetcdf_create(const string &, FileFormat);
 
 
 /**
@@ -31,7 +31,7 @@ class PnetcdfFileWriter : public AbstractFileWriter
     public:
         static nc_type to_nc(const DataType &type);
 
-        PnetcdfFileWriter(const string &filename);
+        PnetcdfFileWriter(const string &filename, FileFormat format);
         virtual ~PnetcdfFileWriter();
         virtual void close();
 

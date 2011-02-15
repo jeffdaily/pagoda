@@ -17,14 +17,14 @@ using std::vector;
 vector<FileWriter::writer_t> FileWriter::writers;
 
 
-FileWriter* FileWriter::open(const string &filename)
+FileWriter* FileWriter::open(const string &filename, FileFormat format)
 {
     FileWriter *writer = NULL;
     vector<writer_t>::iterator it = FileWriter::writers.begin();
     vector<writer_t>::iterator end = FileWriter::writers.end();
 
     for (; it != end; ++it) {
-        writer = (*it)(filename);
+        writer = (*it)(filename, format);
         if (NULL != writer) {
             break;
         }

@@ -14,7 +14,6 @@
 #include "Array.H"
 #include "Dataset.H"
 #include "DataType.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
 #include "IndexOutOfBoundsException.H"

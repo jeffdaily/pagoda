@@ -38,9 +38,9 @@ using std::vector;
 class FileWriter
 {
     public:
-        typedef FileWriter*(*writer_t)(const string &);
+        typedef FileWriter*(*writer_t)(const string &, FileFormat);
 
-        static FileWriter* open(const string &filename);
+        static FileWriter* open(const string &filename, FileFormat format);
 
         static void register_writer(writer_t writer);
 

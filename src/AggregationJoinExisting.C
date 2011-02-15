@@ -11,7 +11,6 @@
 #include "AggregationJoinExisting.H"
 #include "AggregationVariable.H"
 #include "Attribute.H"
-#include "Debug.H"
 #include "Dimension.H"
 #include "Error.H"
 #include "Util.H"

@@ -14,17 +14,17 @@
 #include "Bootstrap.H"
 #include "Dataset.H"
 #include "FileWriter.H"
+#include "Print.H"
 
 #if HAVE_PNETCDF
 extern Dataset* pagoda_pnetcdf_open(const std::string&);
-extern FileWriter* pagoda_pnetcdf_create(const std::string&);
-#   include "Debug.H"
+extern FileWriter* pagoda_pnetcdf_create(const std::string&, FileFormat);
 #   include "PnetcdfTiming.H"
 #   include "Util.H"
 #endif
 #if HAVE_NETCDF4
 extern Dataset* pagoda_netcdf4_open(const std::string&);
-extern FileWriter* pagoda_netcdf4_create(const std::string&);
+extern FileWriter* pagoda_netcdf4_create(const std::string&, FileFormat);
 #endif
 
 

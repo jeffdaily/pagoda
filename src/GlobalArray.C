@@ -17,6 +17,7 @@
 #include "Debug.H"
 #include "Error.H"
 #include "GlobalArray.H"
+#include "Print.H"
 #include "ScalarArray.H"
 #include "Util.H"
 

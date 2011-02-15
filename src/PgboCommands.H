@@ -16,7 +16,11 @@ class PgboCommands : public GenericCommands
 
         void parse(int argc, char **argv);
 
-        Dataset* get_dataset() const;
+        void get_inputs_and_outputs(Dataset* &dataset,
+                                    Dataset* &operand,
+                                    vector<Variable*> &vars,
+                                    FileWriter* &writer);
+
         Dataset* get_operand() const;
         string get_operator() const;
 
@@ -29,6 +33,7 @@ class PgboCommands : public GenericCommands
         static vector<string> DIV;
 
         string op_type;
+        string operand_filename;
 };
 
 #endif // PGBOCOMMANDS_H_

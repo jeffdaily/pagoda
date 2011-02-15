@@ -8,8 +8,11 @@
 #include "CommandLineOption.H"
 #include "Dataset.H"
 #include "Error.H"
+#include "FileWriter.H"
 #include "GenericCommands.H"
+#include "MaskMap.H"
 #include "PgboCommands.H"
+#include "Print.H"
 
 using std::find;
 
@@ -24,6 +27,7 @@ vector<string> PgboCommands::DIV;
 PgboCommands::PgboCommands()
     :   GenericCommands()
     ,   op_type("")
+    ,   operand_filename()
 {
     init();
 }
@@ -32,6 +36,7 @@ PgboCommands::PgboCommands()
 PgboCommands::PgboCommands(int argc, char **argv)
     :   GenericCommands()
     ,   op_type("")
+    ,   operand_filename()
 {
     init();
     parse(argc, argv);
@@ -50,6 +55,8 @@ void PgboCommands::parse(int argc, char **argv)
     if (input_filenames.size() != 2) {
         throw CommandException("two and only input files required");
     }
+    operand_filename = input_filenames[1];
+    input_filenames.resize(1); // pop
 
     if (parser.count("op_typ")) {
         vector<string> valid;
@@ -68,21 +75,60 @@ void PgboCommands::parse(int argc, char **argv)
 }
 
 
-Dataset* PgboCommands::get_dataset() const
+void PgboCommands::get_inputs_and_outputs(Dataset* &dataset,
+                                          Dataset* &operand,
+                                          vector<Variable*> &vars,
+                                          FileWriter* &writer)
 {
-    if (input_filenames.size() != 2) {
-        throw CommandException("two and only input files required");
+    vector<Attribute*> atts;
+    vector<Dimension*> dims;
+    vector<Grid*> grids;
+    Grid *ds_grid = NULL;
+    Grid *op_grid = NULL;
+    MaskMap *ds_masks = NULL;
+    MaskMap *op_masks = NULL;
+
+    dataset = get_dataset();
+    operand = get_operand();
+    vars = get_variables(dataset);
+    dims = get_dimensions(dataset);
+
+    grids = dataset->get_grids();
+    if (grids.empty()) {
+        pagoda::println_zero("no grid found in dataset");
+    } else {
+        ds_grid = grids[0];
     }
-    return Dataset::open(input_filenames[0]);
+
+    grids = operand->get_grids();
+    if (grids.empty()) {
+        pagoda::println_zero("no grid found in operand");
+    } else {
+        op_grid = grids[0];
+    }
+
+    ds_masks = new MaskMap(dataset);
+    ds_masks->modify(get_index_hyperslabs());
+    ds_masks->modify(get_coord_hyperslabs(), ds_grid);
+    ds_masks->modify(get_boxes(), ds_grid);
+    dataset->set_masks(ds_masks);
+
+    op_masks = new MaskMap(operand);
+    op_masks->modify(get_index_hyperslabs());
+    op_masks->modify(get_coord_hyperslabs(), op_grid);
+    op_masks->modify(get_boxes(), op_grid);
+    operand->set_masks(op_masks);
+
+    writer = get_output();
+    writer->write_atts(atts);
+    writer->def_dims(dims);
+    writer->def_vars(vars);
 }
 
 
 Dataset* PgboCommands::get_operand() const
 {
-    if (input_filenames.size() != 2) {
-        throw CommandException("two and only input files required");
-    }
-    return Dataset::open(input_filenames[1]);
+    return Dataset::open(operand_filename);
 }
 
 

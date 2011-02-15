@@ -15,8 +15,8 @@
 #include "Attribute.H"
 #include "Copy.H"
 #include "Dataset.H"
-#include "Debug.H"
 #include "Dimension.H"
+#include "FileFormat.H"
 #include "FileWriter.H"
 #include "Mask.H"
 #include "PnetcdfDimension.H"
@@ -25,6 +25,7 @@
 #include "PnetcdfVariable.H"
 #include "Pack.H"
 #include "PnetcdfNS.H"
+#include "Print.H"
 #include "Util.H"
 #include "Values.H"
 
@@ -33,38 +34,46 @@ using std::string;
 using std::vector;
 
 
-FileWriter* pagoda_pnetcdf_create(const string &filename)
+static bool is_valid_format(FileFormat format)
 {
-    FileWriter *ret = NULL;
-
-    try {
-        ret = new PnetcdfFileWriter(filename);
-    } catch (PagodaException &ex) {
-        if (ret != NULL) {
-            delete ret;
-        }
-        ret = NULL;
-    }
-
-    return ret;
+    return (FF_CDF1 <= format && format <= FF_CDF5);
 }
 
 
 static int file_format_to_nc_format(FileFormat format)
 {
-    assert(FF_PNETCDF_CDF1 <= format && format <= FF_PNETCDF_CDF5);
-    if (format == FF_PNETCDF_CDF1) {
+    assert(is_valid_format(format));
+    if (format == FF_CDF1) {
         return 0; /* NC_FORMAT_CLASSIC is default */
     }
-    else if (format == FF_PNETCDF_CDF2) {
+    else if (format == FF_CDF2) {
         return NC_64BIT_OFFSET;
     }
-    else if (format == FF_PNETCDF_CDF5) {
+    else if (format == FF_CDF5) {
         return NC_64BIT_DATA;
     }
     else {
         ERR("FileFormat not recognized");
     }
+}
+
+
+FileWriter* pagoda_pnetcdf_create(const string &filename, FileFormat format)
+{
+    FileWriter *ret = NULL;
+
+    if (is_valid_format(format)) {
+        try {
+            ret = new PnetcdfFileWriter(filename, format);
+        } catch (PagodaException &ex) {
+            if (ret != NULL) {
+                delete ret;
+            }
+            ret = NULL;
+        }
+    }
+
+    return ret;
 }
 
 
@@ -162,7 +171,7 @@ nc_type PnetcdfFileWriter::to_nc(const DataType &type)
 }
 
 
-PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
+PnetcdfFileWriter::PnetcdfFileWriter(const string &filename, FileFormat format)
     :   AbstractFileWriter()
     ,   is_in_define_mode(true)
     ,   filename(filename)
@@ -170,7 +179,7 @@ PnetcdfFileWriter::PnetcdfFileWriter(const string &filename)
     ,   unlimdimid(-1)
     ,   _fixed_record_dimension(-1)
     ,   _header_pad(-1)
-    ,   _file_format(FF_PNETCDF_CDF2)
+    ,   _file_format(format)
     ,   _append(false)
     ,   _overwrite(false)
     ,   dim_id()
@@ -204,7 +213,6 @@ void PnetcdfFileWriter::close()
 FileWriter* PnetcdfFileWriter::create()
 {
     MPI_Info info;
-
 
     MPI_Info_create(&info);
     if (_header_pad > 0) {
@@ -245,6 +253,11 @@ FileWriter* PnetcdfFileWriter::create()
                 }
                 var_shape[name] = shape;
             }
+            // warn if existing format is not the expected format
+            if (file_format_to_nc_format(_file_format)
+                    != ncmpi::inq_format(ncid)) {
+                pagoda::println_zero("WARNING: appended format mismatch: expected '" + pagoda::file_format_to_string(_file_format));
+            }
         }
         else if (_overwrite) {
             ncid = ncmpi::create(MPI_COMM_WORLD, filename,
@@ -255,7 +268,8 @@ FileWriter* PnetcdfFileWriter::create()
         }
     }
     else {
-        ncid = ncmpi::create(MPI_COMM_WORLD, filename, _file_format, info);
+        ncid = ncmpi::create(MPI_COMM_WORLD, filename,
+                file_format_to_nc_format(_file_format), info);
     }
 
     open = true;

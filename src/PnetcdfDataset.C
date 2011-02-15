@@ -269,13 +269,13 @@ FileFormat PnetcdfDataset::get_file_format() const
 {
     int format = ncmpi::inq_format(ncid);
     if (format == NC_FORMAT_64BIT_DATA) {
-        return FF_PNETCDF_CDF5;
+        return FF_CDF5;
     }
     else if (format == NC_FORMAT_64BIT) {
-        return FF_PNETCDF_CDF2;
+        return FF_CDF2;
     }
     else if (format == NC_FORMAT_CLASSIC) {
-        return FF_PNETCDF_CDF1;
+        return FF_CDF1;
     }
     else {
         ERR("unknown file format");
