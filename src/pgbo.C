@@ -273,6 +273,14 @@ static void pgbo_nonblocking(Dataset *dataset, Dataset *operand,
         }
         writer->wait();
     }
+    for (size_t i=0,limit=record_vars.size(); i<limit; ++i) {
+        Array *ds_array = nb_arrays[i];
+        Array *op_array = nb_operands[i];
+        if (NULL != op_array) {
+            delete op_array;
+        }
+        delete ds_array;
+    }
 }
 
 
