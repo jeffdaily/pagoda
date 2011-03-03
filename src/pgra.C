@@ -58,7 +58,6 @@ int main(int argc, char **argv)
     vector<Variable*> vars;
     vector<Variable*> record_vars;
     vector<Variable*> nonrecord_vars;
-    vector<Variable*>::iterator var_it;
     FileWriter *writer = NULL;
     string op;
     vector<Array*> nb_arrays;
@@ -220,7 +219,6 @@ void pgra_nonblocking(Dataset *dataset,
 {
     vector<Variable*> record_vars;
     vector<Variable*> nonrecord_vars;
-    vector<Variable*>::const_iterator var_it;
     vector<Array*> nb_arrays;
     vector<Array*> nb_results;
     vector<Array*> nb_tallys;

@@ -3,6 +3,7 @@
 #endif
 
 #include <algorithm>
+#include <ctime>
 #include <vector>
 
 #include "Aggregation.H"
