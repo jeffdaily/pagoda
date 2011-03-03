@@ -121,7 +121,7 @@ DataType GlobalArray::to_dt(int type)
 
 void GlobalArray::create()
 {
-#if 0
+#if 1
     /* mpich2 seems to handle distribution of the slowest (first) dimension
      * better than the fastest (last) dimension
      * for now, only distribute the first dimension, possibly the first two
