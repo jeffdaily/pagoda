@@ -69,6 +69,7 @@ namespace pagoda
     void broadcast(long double &value, int root);
     vector<int64_t> get_shape(const vector<int64_t> &lo, const vector<int64_t> &hi);
     int64_t shape_to_size(const vector<int64_t> &shape);
+    bool starts_with(const string &str, const string &start);
     bool ends_with(const string &str, const string &end);
     vector<string> split(const string &s);
     vector<string> split(const string &s, char delimiter);

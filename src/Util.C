@@ -506,6 +506,28 @@ int64_t pagoda::shape_to_size(const vector<int64_t> &shape)
 
 
 /**
+ * Returns true if string str starts with the string start.
+ *
+ * @param[in] fullString the string being queried
+ * @param[in] prefix the string to test with
+ * @return true if the given string starts with the given prefix
+ */
+bool pagoda::starts_with(const string &fullString, const string &prefix)
+{
+    size_t len_string = fullString.length();
+    size_t len_prefix = prefix.length();
+    size_t arg1 = 0;
+
+    if (len_string > len_prefix) {
+        return (0 == fullString.compare(arg1, len_prefix, prefix));
+    }
+    else {
+        return false;
+    }
+}
+
+
+/**
  * Returns true if string str ends with the string end.
  *
  * @param[in] fullString the string being queried

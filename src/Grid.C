@@ -144,6 +144,44 @@ bool Grid::is_coordinate(const Variable *var)
     if (!var) {
         ret = false;
     }
+    // these hard-coded names come from how NCO handles special CF variables
+    else if (var->get_name() == "ORO") {
+        ret = true;
+    }
+    else if (var->get_name() == "area") {
+        ret = true;
+    }
+    else if (var->get_name() == "datesec") {
+        ret = true;
+    }
+    else if (var->get_name() == "date") {
+        ret = true;
+    }
+    else if (var->get_name() == "gw") {
+        ret = true;
+    }
+    else if (var->get_name() == "hyai") {
+        ret = true;
+    }
+    else if (var->get_name() == "hyam") {
+        ret = true;
+    }
+    else if (var->get_name() == "hybi") {
+        ret = true;
+    }
+    else if (var->get_name() == "hybm") {
+        ret = true;
+    }
+    else if (var->get_name() == "lat_bnds") {
+        ret = true;
+    }
+    else if (var->get_name() == "lon_bnds") {
+        ret = true;
+    }
+    else if (pagoda::starts_with(var->get_name(), "msk_")) {
+        ret = true;
+    }
+    // now for the non-hardcoded checks
     else if (var == get_cell_lat()) {
         ret = true;
     }

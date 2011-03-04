@@ -21,6 +21,7 @@
 #include "PnetcdfVariable.H"
 #include "Pack.H"
 #include "PnetcdfNS.H"
+#include "ScalarArray.H"
 #include "Util.H"
 
 using std::fill;
@@ -91,6 +92,43 @@ DataType PnetcdfVariable::get_type() const
 {
     return type;
 }
+
+
+#if 0
+ScalarArray* PnetcdfVariable::read1(const vector<int64_t> &index,
+                                    ScalarArray *dst) const
+{
+    int ncid = get_netcdf_dataset()->get_id();
+    vector<MPI_Offset> _index(index.begin(), index.end());
+    DataType type = get_type();
+    void *buf;
+
+    if (dst == NULL) {
+        dst = new ScalarArray(type);
+    }
+
+    buf = dst->access();
+#define read_var1(T,DT) \
+    if (DT == type) { \
+        T *tbuf = static_cast<T*>(buf); \
+        ncmpi::get_var1(ncid, id, _index, tbuf); \
+    } else
+    read_var1(unsigned char, DataType::UCHAR)
+    read_var1(signed char,   DataType::SCHAR)
+    read_var1(char,          DataType::CHAR)
+    read_var1(int,           DataType::INT)
+    read_var1(long,          DataType::LONG)
+    read_var1(float,         DataType::FLOAT)
+    read_var1(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef read_var1
+    dst->release_update();
+
+    return dst;
+}
+#endif
 
 
 Array* PnetcdfVariable::read(Array *dst) const

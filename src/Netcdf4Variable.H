@@ -37,6 +37,11 @@ class Netcdf4Variable : public AbstractVariable
         virtual vector<Attribute*> get_atts() const;
         virtual Dataset* get_dataset() const;
         virtual DataType get_type() const;
+#if 0
+        virtual ScalarArray* read1(
+                const vector<int64_t> &index=vector<int64_t>(),
+                ScalarArray *dst=NULL) const;
+#endif
         virtual Array* read(Array *dst=NULL) const;
         virtual Array* read(int64_t record, Array *dst=NULL) const;
         virtual Array* iread(Array *dst=NULL);

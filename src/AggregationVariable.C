@@ -17,6 +17,7 @@
 #include "Dimension.H"
 #include "Error.H"
 #include "IndexOutOfBoundsException.H"
+#include "ScalarArray.H"
 #include "Variable.H"
 #include "Validator.H"
 
@@ -136,6 +137,54 @@ DataType AggregationVariable::get_type() const
 {
     return vars[0]->get_type();
 }
+
+
+#if 0
+ScalarArray* AggregationVariable::read1(const vector<int64_t> &index,
+        ScalarArray *dst) const
+{
+    vector<int64_t> index_copy = index;
+    int64_t record;
+    int64_t index_within_var;
+
+    if (index_copy.empty()) {
+        index_copy.assign(get_ndim(), 0);
+    }
+    record = index_copy.empty() ? 0 : index.front();
+    index_within_var = translate_record(record);
+
+    if (dst == NULL) {
+        dst = new ScalarArray(get_type());
+    }
+
+    if (record < 0 || record > get_shape().at(0)) {
+        throw IndexOutOfBoundsException("AggregationVariable::read1");
+    }
+
+    for (size_t index_var=0; index_var<vars.size(); ++index_var) {
+        Variable *var = vars.at(index_var);
+        int64_t num_records;
+        // we want the non-masked size of this variable
+        get_dataset()->push_masks(NULL);
+        num_records = var->get_shape().at(0);
+        get_dataset()->pop_masks();
+        if (index_within_var < num_records) {
+            if (!index_copy.empty()) {
+                index_copy[0] = index_within_var;
+            }
+            var->set_translate_record(false);
+            dst = var->read1(index_copy, dst);
+            var->set_translate_record(true);
+            return dst;
+        }
+        else {
+            index_within_var -= num_records;
+        }
+    }
+
+    return NULL;
+}
+#endif
 
 
 Array* AggregationVariable::read(Array *dst) const

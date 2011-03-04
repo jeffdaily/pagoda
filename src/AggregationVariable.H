@@ -47,6 +47,11 @@ class AggregationVariable : public AbstractVariable
 
         virtual DataType get_type() const;
 
+#if 0
+        virtual ScalarArray* read1(
+                const vector<int64_t> &index,
+                ScalarArray *dst=NULL) const;
+#endif
         virtual Array* read(Array *dst=NULL) const;
         virtual Array* read(int64_t record, Array *dst=NULL) const;
 

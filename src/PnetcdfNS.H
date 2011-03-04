@@ -138,6 +138,15 @@ namespace ncmpi
 
     void wait_all(int ncid, vector<int> &array_of_requests, vector<int> &array_of_statuses);
 
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, unsigned char *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, signed char *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, char *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, short *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, int *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, long *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, float *ip);
+    void get_var1(int ncid, int varid, const vector<MPI_Offset> &index, double *ip);
+
     /*
     void put_vars_all(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], const MPI_Offset stride[], const short *op);
     void put_vars_all(int ncid, int varid, const MPI_Offset start[], const MPI_Offset count[], const MPI_Offset stride[], const int *op);

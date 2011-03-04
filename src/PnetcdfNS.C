@@ -1088,3 +1088,59 @@ void ncmpi::wait_all(int ncid,
                                &array_of_requests[0], &array_of_statuses[0]));
 #endif
 }
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, unsigned char *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_BYTE);
+    ERRNO_CHECK(ncmpi_get_var1_uchar(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, signed char *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_BYTE);
+    ERRNO_CHECK(ncmpi_get_var1_schar(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, char *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_CHAR);
+    ERRNO_CHECK(ncmpi_get_var1_text(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, short *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_SHORT);
+    ERRNO_CHECK(ncmpi_get_var1_short(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, int *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_INT);
+    ERRNO_CHECK(ncmpi_get_var1_int(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, long *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_INT);
+    ERRNO_CHECK(ncmpi_get_var1_long(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, float *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_FLOAT);
+    ERRNO_CHECK(ncmpi_get_var1_float(ncid, varid, &index[0], ip));
+}
+
+
+void ncmpi::get_var1(int ncid, int varid, const vector<MPI_Offset> &index, double *ip)
+{
+    PNETCDF_TIMING3("get_var1", 1, NC_DOUBLE);
+    ERRNO_CHECK(ncmpi_get_var1_double(ncid, varid, &index[0], ip));
+}

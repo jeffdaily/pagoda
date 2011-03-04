@@ -105,6 +105,7 @@ class CommandLineOption
         static CommandLineOption HELP;
         static CommandLineOption HISTORY;
         static CommandLineOption INPUT_PATH;
+        static CommandLineOption INTERPOLATE;
         static CommandLineOption JOIN;
         static CommandLineOption LATLONBOX;
         static CommandLineOption NC4;
@@ -120,6 +121,7 @@ class CommandLineOption
         static CommandLineOption UNION;
         static CommandLineOption VARIABLE;
         static CommandLineOption VERS;
+        static CommandLineOption WEIGHT;
 
     protected:
         int _value;

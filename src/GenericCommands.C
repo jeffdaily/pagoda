@@ -61,6 +61,7 @@ GenericCommands::GenericCommands()
     ,   file_format(FF_UNKNOWN)
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
+    ,   histories()
 {
     init();
 }
@@ -91,6 +92,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   file_format(FF_UNKNOWN)
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
+    ,   histories()
 {
     init();
     parse(argc, argv);
@@ -132,6 +134,9 @@ void GenericCommands::init()
 
 GenericCommands::~GenericCommands()
 {
+    for (size_t i=0,limit=histories.size(); i<limit; ++i) {
+        delete histories[i];
+    }
 }
 
 
@@ -647,7 +652,7 @@ vector<Dimension*> GenericCommands::get_dimensions(Dataset *dataset)
 }
 
 
-vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
+vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset)
 {
     vector<Attribute*> atts = dataset->get_atts();
 
@@ -692,13 +697,17 @@ vector<Attribute*> GenericCommands::get_attributes(Dataset *dataset) const
             // Dataset is deleted.  However this new Attribute will not get
             // destroyed which is a memory leak.
             /** @todo cache Attribute in this GenericCommands instance */
-            atts[pos] = new GenericAttribute("history",
-                                             history_complete, DataType::CHAR);
+            histories.push_back(new GenericAttribute("history",
+                        history_complete, DataType::CHAR));
+            // this is safe because Dataset instances delete their own atts,
+            // not those in this atts vector
+            atts[pos] = histories.back();
         }
         else {
             history_complete = new TypedValues<char>(history_copy);
-            atts.push_back(new GenericAttribute("history",
-                                                history_complete, DataType::CHAR));
+            histories.push_back(new GenericAttribute("history",
+                        history_complete, DataType::CHAR));
+            atts.push_back(histories.back());
         }
     }
 

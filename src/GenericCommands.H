@@ -20,6 +20,7 @@ class Attribute;
 class Dataset;
 class Dimension;
 class FileWriter;
+class GenericAttribute;
 class Variable;
 
 
@@ -47,7 +48,7 @@ class GenericCommands
         virtual Dataset* get_dataset();
         virtual vector<Variable*> get_variables(Dataset *dataset);
         virtual vector<Dimension*> get_dimensions(Dataset *dataset);
-        virtual vector<Attribute*> get_attributes(Dataset *dataset) const;
+        virtual vector<Attribute*> get_attributes(Dataset *dataset);
 
         virtual vector<LatLonBox> get_boxes() const;
         virtual vector<IndexHyperslab> get_index_hyperslabs() const;
@@ -101,6 +102,7 @@ class GenericCommands
         FileFormat file_format;
         bool nonblocking_io;
         bool reading_all_records;
+        vector<GenericAttribute*> histories;
 };
 
 #endif // GENERICCOMMANDS_H_

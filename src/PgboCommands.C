@@ -92,6 +92,7 @@ void PgboCommands::get_inputs_and_outputs(Dataset* &dataset,
     operand = get_operand();
     vars = get_variables(dataset);
     dims = get_dimensions(dataset);
+    atts = get_attributes(dataset);
 
     grids = dataset->get_grids();
     if (grids.empty()) {

@@ -20,6 +20,7 @@
 #include "Netcdf4Variable.H"
 #include "Pack.H"
 #include "Netcdf4.H"
+#include "ScalarArray.H"
 #include "Util.H"
 
 using std::fill;
@@ -85,6 +86,21 @@ DataType Netcdf4Variable::get_type() const
 {
     return type;
 }
+
+
+#if 0
+ScalarArray* Netcdf4Variable::read1(const vector<int64_t> &index,
+                                    ScalarArray *dst) const
+{
+    if (dst == NULL) {
+        dst = new ScalarArray(get_type());
+    }
+
+    ERR("Not Implemented");
+
+    return dst;
+}
+#endif
 
 
 Array* Netcdf4Variable::read(Array *dst) const

@@ -18,6 +18,7 @@ class Attribute;
 class Dataset;
 class Dimension;
 class Mask;
+class ScalarArray;
 class Validator;
 
 
@@ -86,6 +87,11 @@ class Variable
 
         virtual DataType get_type() const = 0;
 
+#if 0
+        virtual ScalarArray* read1(
+                const vector<int64_t> &index=vector<int64_t>(),
+                ScalarArray *dst=NULL) const = 0;
+#endif
         virtual Array* read(Array *dst=NULL) const = 0;
         virtual Array* read(int64_t record, Array *dst=NULL) const = 0;
 

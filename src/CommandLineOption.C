@@ -68,6 +68,10 @@ CommandLineOption CommandLineOption::INPUT_PATH(
     'p', "path", true,
     "path prefix for all input filenames",
     "pth");
+CommandLineOption CommandLineOption::INTERPOLATE(
+    'i', "interpolate", true,
+    "interpolant and value",
+    "ntp");
 CommandLineOption CommandLineOption::JOIN(
     'j', "join", true,
     "join all input files on the given dimension");
@@ -115,6 +119,10 @@ CommandLineOption CommandLineOption::VARIABLE(
 CommandLineOption CommandLineOption::VERS(
     'V', "version", false,
     "print version information and exit");
+CommandLineOption CommandLineOption::WEIGHT(
+    'w', "weight", true,
+    "weight(s) of files",
+    "wgt_var");
 
 
 CommandLineOption::CommandLineOption(const int &value, const string &name,
