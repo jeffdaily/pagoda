@@ -107,6 +107,9 @@ CommandLineOption CommandLineOption::OVERWRITE(
 CommandLineOption CommandLineOption::READ_ALL_RECORDS(
     0, "allrec", false,
     "read all records per variable rather than record-at-a-time");
+CommandLineOption CommandLineOption::READ_ALL_VARIABLES(
+    0, "allvar", false,
+    "read all variables per file rather than variable-at-a-time");
 CommandLineOption CommandLineOption::TOPOLOGY(
     'T', "topology", false,
     "do not process toplogy variables");

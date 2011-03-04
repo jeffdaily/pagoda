@@ -61,6 +61,7 @@ GenericCommands::GenericCommands()
     ,   file_format(FF_UNKNOWN)
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
+    ,   reading_all_variables(false)
     ,   histories()
 {
     init();
@@ -92,6 +93,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   file_format(FF_UNKNOWN)
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
+    ,   reading_all_variables(false)
     ,   histories()
 {
     init();
@@ -111,6 +113,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::FILE_FORMAT);
     parser.push_back(&CommandLineOption::NONBLOCKING_IO);
     parser.push_back(&CommandLineOption::READ_ALL_RECORDS);
+    parser.push_back(&CommandLineOption::READ_ALL_VARIABLES);
     parser.push_back(&CommandLineOption::APPEND);
     parser.push_back(&CommandLineOption::ALPHABETIZE);
     parser.push_back(&CommandLineOption::NO_COORDS);
@@ -331,6 +334,10 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("allrec")) {
         reading_all_records = true;
+    }
+
+    if (parser.count("allvar")) {
+        reading_all_variables = true;
     }
 
     if (parser.count("append")) {
@@ -844,4 +851,10 @@ bool GenericCommands::is_nonblocking() const
 bool GenericCommands::is_reading_all_records() const
 {
     return reading_all_records;
+}
+
+
+bool GenericCommands::is_reading_all_variables() const
+{
+    return reading_all_variables;
 }

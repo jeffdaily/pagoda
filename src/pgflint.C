@@ -65,6 +65,10 @@ static void pgflint_nonblocking(Dataset *dataset, Dataset *operand,
                                 double weight1, double weight2,
                                 const vector<Variable*> &vars,
                                 FileWriter *writer, bool per_record);
+static void pgflint_allvars(Dataset *dataset, Dataset *operand,
+                            double weight1, double weight2,
+                            const vector<Variable*> &vars,
+                            FileWriter *writer);
 
 
 int main(int argc, char **argv)
@@ -85,12 +89,18 @@ int main(int argc, char **argv)
         w1 = cmd.get_weight1();
         w2 = cmd.get_weight2();
 
-        if (cmd.is_nonblocking()) {
-            pgflint_nonblocking(dataset, operand, w1, w2, vars, writer,
-                    !cmd.is_reading_all_records());
-        } else {
-            pgflint_blocking(dataset, operand, w1, w2, vars, writer,
-                    !cmd.is_reading_all_records());
+        if (cmd.is_reading_all_variables()) {
+            pgflint_allvars(dataset, operand, w1, w2, vars, writer);
+        }
+        else {
+            if (cmd.is_nonblocking()) {
+                pgflint_nonblocking(dataset, operand, w1, w2, vars, writer,
+                        !cmd.is_reading_all_records());
+            }
+            else {
+                pgflint_blocking(dataset, operand, w1, w2, vars, writer,
+                        !cmd.is_reading_all_records());
+            }
         }
 
         // clean up
@@ -344,6 +354,73 @@ static void pgflint_nonblocking(Dataset *dataset, Dataset *operand,
             delete rt_array;
         }
         delete ds_array;
+    }
+}
+
+
+static void pgflint_allvars(Dataset *dataset, Dataset *operand,
+                            double weight1, double weight2,
+                            const vector<Variable*> &vars,
+                            FileWriter *writer)
+{
+    vector<Variable*>::const_iterator var_it,var_end;
+    vector<string> names;
+    vector<Array*> nb_arrays;
+    vector<Array*> nb_operands;
+    vector<Array*> nb_results;
+
+    // nonblocking read, one var at a time, all records
+    for (var_it=vars.begin(),var_end=vars.end(); var_it!=var_end; ++var_it) {
+        Variable *ds_var = *var_it;
+        Variable *op_var = operand->get_var(ds_var->get_name());
+        names.push_back(ds_var->get_name());
+        nb_arrays.push_back(ds_var->iread());
+        if (ds_var->get_shape() != op_var->get_shape()) {
+            ERR("operand variable shape != input variable shape");
+        }
+        if (!op_var) {
+            // no corresponding variable in the operand dataset,
+            // so copy ds_var unchanged to output
+            pagoda::println_zero(
+                    "missing operand variable " + ds_var->get_name());
+            nb_operands.push_back(NULL);
+        }
+        else {
+            // shapes of each var match
+            nb_operands.push_back(op_var->iread());
+        }
+    }
+    dataset->wait();
+    operand->wait();
+    // do the operation
+    for (size_t i=0,limit=nb_arrays.size(); i<limit; ++i) {
+        if (NULL == nb_operands[i]) {
+            nb_results.push_back(
+                    do_op(nb_arrays[i], nb_operands[i], weight1, weight2));
+        }
+        else {
+            nb_results.push_back(NULL);
+        }
+    }
+    // nonblocking write, one var at a time, all records
+    for (size_t i=0,limit=nb_arrays.size(); i<limit; ++i) {
+        if (NULL == nb_results[i]) {
+            writer->iwrite(nb_arrays[i], names[i]);
+        }
+        else {
+            writer->iwrite(nb_results[i], names[i]);
+        }
+    }
+    writer->wait();
+    // clean up
+    for (size_t i=0,limit=nb_arrays.size(); i<limit; ++i) {
+        if (NULL != nb_operands[i]) {
+            delete nb_operands[i];
+        }
+        if (NULL != nb_results[i]) {
+            delete nb_results[i];
+        }
+        delete nb_arrays[i];
     }
 }
 

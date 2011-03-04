@@ -67,6 +67,7 @@ class GenericCommands
         virtual bool is_fixing_record_dimension() const;
         virtual bool is_nonblocking() const;
         virtual bool is_reading_all_records() const;
+        virtual bool is_reading_all_variables() const;
         virtual int get_header_pad() const;
         virtual string get_usage() const;
         virtual string get_version() const;
@@ -102,6 +103,7 @@ class GenericCommands
         FileFormat file_format;
         bool nonblocking_io;
         bool reading_all_records;
+        bool reading_all_variables;
         vector<GenericAttribute*> histories;
 };
 
