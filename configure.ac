@@ -246,7 +246,18 @@ AH_BOTTOM([#include <mpi.h>])
 AC_MSG_NOTICE
 AC_MSG_NOTICE([Libtool tests])
 AC_MSG_NOTICE
+# temporarily restore unwrapped compilers
+# libtool sadly relies on matching compiler names to determine features
+PAGODA_MPI_UNWRAP_PUSH
 LT_INIT
+# put the MPI compilers back; also hack libtool to use the MPI compilers
+PAGODA_MPI_UNWRAP_POP
+compiler="$CC"
+LTCC="$CC"
+lt_save_CC="$CC"
+compiler_DEFAULT="$CC"
+compiler_CXX="$CXX"
+compiler_F77="$F77"
 
 #####################################################3
 # The End.
