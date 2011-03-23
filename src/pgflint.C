@@ -375,15 +375,15 @@ static void pgflint_allvars(Dataset *dataset, Dataset *operand,
         Variable *op_var = operand->get_var(ds_var->get_name());
         names.push_back(ds_var->get_name());
         nb_arrays.push_back(ds_var->iread());
-        if (ds_var->get_shape() != op_var->get_shape()) {
-            ERR("operand variable shape != input variable shape");
-        }
         if (!op_var) {
             // no corresponding variable in the operand dataset,
             // so copy ds_var unchanged to output
             pagoda::println_zero(
                     "missing operand variable " + ds_var->get_name());
             nb_operands.push_back(NULL);
+        }
+        else if (ds_var->get_shape() != op_var->get_shape()) {
+            ERR("operand variable shape != input variable shape");
         }
         else {
             // shapes of each var match
