@@ -388,6 +388,7 @@ void GenericCommands::get_inputs(Dataset *&dataset, vector<Variable*> &vars,
     dataset = get_dataset();
     vars = get_variables(dataset);
     dims = get_dimensions(dataset);
+    atts = get_attributes(dataset);
     grids = dataset->get_grids();
     if (grids.empty()) {
         pagoda::println_zero("no grid found");
