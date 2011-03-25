@@ -115,6 +115,7 @@ class Variable
 
         virtual int64_t get_bytes() const = 0;
 
+        static bool promote_to_float;
     protected:
         Variable();
 };

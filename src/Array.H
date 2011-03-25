@@ -20,6 +20,19 @@ class Validator;
  * may "own" a portion of the Array's data.  Data is assumed to be distributed
  * in some form of cartesian distribution.  When accessed, the local data can
  * be manipulated as a 1D C array.  This is how new operations may be written.
+ *
+ * Unfortunately, to work around certain deficiencies in some IO libraries, we
+ * had to introduce the notion of separate read, write, and storage types.
+ * Each Array has a concrete type which represents the DataType of each
+ * element in the Array.  However, when reading from disk using an IO library,
+ * the IO library may not allow data conversion (i.e. the data is stored on
+ * disk as a char array but we want to promote it to an int in memory.)  We
+ * must then read into a temporary buffer of the correct type, then cast into
+ * an int Array.  This is handled by setting the "read_type" to something
+ * other than the "type".  Similarly, when writing back to disk, the
+ * "write_type" can be different than "type".  Typically, read_type ==
+ * write_type == type.  And in rare cases, read_type == write_type != type.
+ * And in no case thus far are all types different.
  */
 class Array
 {
@@ -66,12 +79,12 @@ class Array
         virtual void set_write_type(DataType type) = 0;
 
         /**
-         * Gets the DataType to use when writing the data.
+         * Gets the DataType to use when reading the data.
          */
         virtual DataType get_read_type() const = 0;
 
         /**
-         * Sets the DataType to use when writing the data.
+         * Sets the DataType to use when reading the data.
          */
         virtual void set_read_type(DataType type) = 0;
 

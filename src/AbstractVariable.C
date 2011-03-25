@@ -468,7 +468,13 @@ void AbstractVariable::renumber(Array *array) const
 
 Array* AbstractVariable::read_alloc() const
 {
-    Array *dst = Array::create(get_type(), get_shape());
+    Array *dst;
+    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
+        dst = Array::create(DataType::FLOAT, get_shape());
+    }
+    else {
+        dst = Array::create(get_type(), get_shape());
+    }
     assert(NULL != dst);
     return read(dst);
 }
@@ -481,7 +487,12 @@ Array* AbstractVariable::read_alloc(int64_t record) const
 
     shape = get_shape();
     shape.erase(shape.begin());
-    dst = Array::create(get_type(), shape);
+    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
+        dst = Array::create(DataType::FLOAT, shape);
+    }
+    else {
+        dst = Array::create(get_type(), shape);
+    }
 
     return read(record, dst);
 }
@@ -489,7 +500,13 @@ Array* AbstractVariable::read_alloc(int64_t record) const
 
 Array* AbstractVariable::iread_alloc()
 {
-    Array *dst = Array::create(get_type(), get_shape());
+    Array *dst;
+    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
+        dst = Array::create(DataType::FLOAT, get_shape());
+    }
+    else {
+        dst = Array::create(get_type(), get_shape());
+    }
     return iread(dst);
 }
 
@@ -501,7 +518,12 @@ Array* AbstractVariable::iread_alloc(int64_t record)
 
     shape = get_shape();
     shape.erase(shape.begin());
-    dst = Array::create(get_type(), shape);
+    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
+        dst = Array::create(DataType::FLOAT, shape);
+    }
+    else {
+        dst = Array::create(get_type(), shape);
+    }
 
     return iread(record, dst);
 }

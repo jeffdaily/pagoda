@@ -6,6 +6,9 @@
 #include "Variable.H"
 
 
+bool Variable::promote_to_float = false;
+
+
 Variable::Variable()
 {
 }

@@ -36,6 +36,9 @@ int main(int argc, char **argv)
     utimer_t timer_nonblocking_total=0;
 
     pagoda::initialize(&argc, &argv);
+#if TEST_PROMOTE_TO_FLOAT
+    Variable::promote_to_float = true;
+#endif
 
     if (argc < 2) {
         pagoda::println_zero("Usage: TestRead filename [variablename] ...");
@@ -86,11 +89,12 @@ int main(int argc, char **argv)
     // it is assumed they have the same distributions
     for (size_t i=0; i<arrays.size(); ++i) {
         Variable *var = variables[i];
-        DataType type = var->get_type();
         Array *array = arrays[i];
         Array *nbarray = nbarrays[i];
-        bool ok = true;
         string name = var->get_name();
+        DataType type = array->get_type();
+        bool ok = true;
+        pagoda::println_zero("name=" + name + " type=" + type.get_name());
         if (array->owns_data()) {
             int64_t size = array->get_local_size();
 #define compare_helper(DT,T) \
