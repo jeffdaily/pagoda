@@ -253,11 +253,6 @@ FileWriter* PnetcdfFileWriter::create()
                 }
                 var_shape[name] = shape;
             }
-            // warn if existing format is not the expected format
-            if (file_format_to_nc_format(_file_format)
-                    != ncmpi::inq_format(ncid)) {
-                pagoda::println_zero("WARNING: appended format mismatch: expected '" + pagoda::file_format_to_string(_file_format));
-            }
         }
         else if (_overwrite) {
             ncid = ncmpi::create(MPI_COMM_WORLD, filename,

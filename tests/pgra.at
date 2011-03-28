@@ -162,13 +162,31 @@ PG_FOR_DATA([file],
 AT_CLEANUP
 
 # Test with subset.
-AT_SETUP([pgra -dlat,-20.,20. <input> <output>])
+AT_SETUP([pgra -d${DIM},-20.,20. <input> <output>])
 PG_FOR_DATA([file],
     [base=`PG_BASENAME(["$file"])`
      PG_HAS_RECORD_IFELSE([$file],
         [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
          do
-            AT_CHECK([$MPIRUN -np $p pgra -dlat,-20.,20. $file pgra_${p}_$base])
+            AT_CHECK([$MPIRUN -np $p pgra -d${DIM},-20.,20. $file pgra_${p}_$base])
+         done
+         AT_CHECK([ncra $file ncra_$base])
+         AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],
+            [], [ignore], [ignore])
+         for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np 1 pgcmp pgra_${NP_FIRST}_$base pgra_${p}_$base])
+         done])])
+AT_CLEANUP
+
+# Test with subset nonblocking.
+AT_SETUP([pgra --nbio -dlat,-20.,20. <input> <output>])
+PG_FOR_DATA([file],
+    [base=`PG_BASENAME(["$file"])`
+     PG_HAS_RECORD_IFELSE([$file],
+        [for p in $(seq $NP_FIRST $NP_INC $NP_LAST)
+         do
+            AT_CHECK([$MPIRUN -np $p pgra --nbio -dlat,-20.,20. $file pgra_${p}_$base])
          done
          AT_CHECK([ncra $file ncra_$base])
          AT_CHECK([$MPIRUN -np 1 pgcmp ncra_$base pgra_${NP_FIRST}_$base],

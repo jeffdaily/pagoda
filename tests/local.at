@@ -1,7 +1,7 @@
 # M4 macros used in building Pagoda test suites.
 
 # Programs this package provides or needs during testing.
-AT_TESTED([pgsub pgra pgea pgbo pgcmp pgdump ncra od head])
+AT_TESTED([pgsub pgra pgea pgbo pgcmp pgdump ncks ncra ncea ncbo od head])
 
 # Enable colored test output.
 AT_COLOR_TESTS

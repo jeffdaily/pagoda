@@ -1,4 +1,3 @@
-enable_fetch='@enable_fetch@'
 enable_sandbox='@enable_sandbox@'
 enable_sandbox_ga='@enable_sandbox_ga@'
 have_pnetcdf='@have_pnetcdf@'

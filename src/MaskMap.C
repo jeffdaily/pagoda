@@ -204,7 +204,6 @@ void MaskMap::modify(const IndexHyperslab &hyperslab)
     string hyperslab_name = hyperslab.get_name();
     Mask *mask = get_mask(hyperslab_name);
 
-
     if (mask == NULL) {
         pagoda::print_zero("Sliced dimension '%s' does not exist\n",
                            hyperslab_name.c_str());
@@ -234,7 +233,6 @@ void MaskMap::modify(const vector<IndexHyperslab> &hyperslabs)
 {
     vector<IndexHyperslab>::const_iterator hyperslab_it;
 
-
     // we're iterating over the command-line specified hyperslabs to create masks
     for (hyperslab_it=hyperslabs.begin(); hyperslab_it!=hyperslabs.end(); ++hyperslab_it) {
         modify(*hyperslab_it);
@@ -250,49 +248,48 @@ void MaskMap::modify(const vector<IndexHyperslab> &hyperslabs)
  * reported to stderr but otherwise ignored.
  *
  * @param[in] hyperslab the CoordHyperslab to apply to associatd Masks
+ *
+ * @todo TODO handle auxiliary coordinate hyperslabs?
  */
 void MaskMap::modify(const CoordHyperslab &hyperslab, Grid *grid)
 {
     string hyperslab_name = hyperslab.get_name();
-    Mask *mask = get_mask(hyperslab_name);
+    const Dataset *dataset = grid->get_dataset();
+    Variable *variable = dataset->get_var(hyperslab_name);
 
+    if (variable == NULL) {
+        pagoda::print_zero("coordinate variable '%s' does not exist\n",
+                hyperslab_name.c_str());
+    } else {
+        Array *data = variable->read();
+        Mask *mask = get_mask(hyperslab_name);
 
-    if (mask == NULL) {
-        pagoda::print_zero("Sliced dimension '%s' does not exist\n",
-                           hyperslab_name.c_str());
-    }
-    else {
-        const Dataset *dataset = grid->get_dataset();
-        Variable *variable = dataset->get_var(hyperslab_name);
-
-        if (variable == NULL) {
-            pagoda::print_zero("coordinate variable '%s' does not exist\n",
+        if (mask == NULL) {
+            pagoda::print_zero("Sliced dimension '%s' does not exist\n",
                     hyperslab_name.c_str());
-        } else {
-            Array *data = variable->read();
-
-            ASSERT(variable->get_ndim() == 1);
-            ASSERT(variable->get_dims()[0]->get_name() == hyperslab_name);
-
-            // clear the Mask the first time only
-            if (cleared.count(hyperslab_name) == 0) {
-                cleared.insert(hyperslab_name);
-                mask->clear();
-            }
-
-            // modify the Mask based on the current Slice
-            ASSERT(hyperslab.has_min() || hyperslab.has_max());
-            if (hyperslab.has_min() && hyperslab.has_max()) {
-                mask->modify(
-                        hyperslab.get_min(), hyperslab.get_max(), data);
-            } else if (hyperslab.has_min()) {
-                mask->modify_gt(hyperslab.get_min(), data);
-            } else if (hyperslab.has_max()) {
-                mask->modify_lt(hyperslab.get_max(), data);
-            }
-
-            delete data;
         }
+
+        ASSERT(variable->get_ndim() == 1);
+        ASSERT(variable->get_dims()[0]->get_name() == hyperslab_name);
+
+        // clear the Mask the first time only
+        if (cleared.count(hyperslab_name) == 0) {
+            cleared.insert(hyperslab_name);
+            mask->clear();
+        }
+
+        // modify the Mask based on the current Slice
+        ASSERT(hyperslab.has_min() || hyperslab.has_max());
+        if (hyperslab.has_min() && hyperslab.has_max()) {
+            mask->modify(
+                    hyperslab.get_min(), hyperslab.get_max(), data);
+        } else if (hyperslab.has_min()) {
+            mask->modify_gt(hyperslab.get_min(), data);
+        } else if (hyperslab.has_max()) {
+            mask->modify_lt(hyperslab.get_max(), data);
+        }
+
+        delete data;
     }
 }
 
@@ -310,7 +307,6 @@ void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
 {
     vector<CoordHyperslab>::const_iterator hyperslab_it;
 
-
     // we're iterating over the command-line specified hyperslabs to create
     // masks
     for (hyperslab_it=hyperslabs.begin(); hyperslab_it!=hyperslabs.end(); ++hyperslab_it) {
@@ -321,7 +317,6 @@ void MaskMap::modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid)
 
 void MaskMap::modify(const LatLonBox &box, Grid *grid)
 {
-
     if (grid->get_type() == GridType::GEODESIC) {
         Variable *cell_lat = grid->get_cell_lat();
         Variable *cell_lon = grid->get_cell_lon();
@@ -616,7 +611,7 @@ Mask* MaskMap::get_mask(const string &name)
     if (masks_it == masks.end()) {
         sizes_t::iterator sizes_it = sizes.find(name);
         if (sizes_it == sizes.end()) {
-            ERR("cannot create Mask; initial seed was required");
+            ERR("cannot create Mask; '" + name + "' not found");
         } else {
             return masks.insert(
                     make_pair(name, Mask::create(name,sizes_it->second)))
