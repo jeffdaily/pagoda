@@ -25,6 +25,9 @@ CommandLineOption CommandLineOption::AUXILIARY(
 CommandLineOption CommandLineOption::AVG_TYPE(
     'y', "op_typ", true,
     "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
+CommandLineOption CommandLineOption::CB_BUFFER_SIZE(
+    0, "cb_buffer_size", true,
+    "buffer size for collective IO (in bytes)");
 CommandLineOption CommandLineOption::CDF1(
     '3', "3", false,
     "output file in netCDF3 CLASSIC (32-bit offset) storage format");
@@ -110,6 +113,15 @@ CommandLineOption CommandLineOption::READ_ALL_RECORDS(
 CommandLineOption CommandLineOption::READ_ALL_VARIABLES(
     0, "allvar", false,
     "read all variables per file rather than variable-at-a-time");
+CommandLineOption CommandLineOption::ROMIO_CB_READ(
+    0, "romio_cb_read", true,
+    "enable/disable/automatic collective buffering during read operations");
+CommandLineOption CommandLineOption::ROMIO_DS_READ(
+    0, "romio_ds_read", true,
+    "enable/disable/automatic data sieving during read operations");
+CommandLineOption CommandLineOption::STRIPING_UNIT(
+    0, "striping_unit", true,
+    "striping unit (in bytes)");
 CommandLineOption CommandLineOption::TOPOLOGY(
     'T', "topology", false,
     "do not process toplogy variables");

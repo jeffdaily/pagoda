@@ -18,6 +18,7 @@
 #include "Dimension.H"
 #include "FileFormat.H"
 #include "FileWriter.H"
+#include "Hints.H"
 #include "Mask.H"
 #include "PnetcdfDimension.H"
 #include "PnetcdfError.H"
@@ -214,7 +215,7 @@ FileWriter* PnetcdfFileWriter::create()
 {
     MPI_Info info;
 
-    MPI_Info_create(&info);
+    info = Hints::get_info();
     if (_header_pad > 0) {
         ostringstream value;
         value << _header_pad;

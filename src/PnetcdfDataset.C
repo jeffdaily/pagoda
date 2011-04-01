@@ -7,6 +7,7 @@
 #include <pnetcdf.h>
 
 #include "Array.H"
+#include "Hints.H"
 #include "Grid.H"
 #include "Pack.H"
 #include "PnetcdfAttribute.H"
@@ -110,7 +111,8 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     int ndim;
     int nvar;
     int natt;
-    ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_NOWRITE, MPI_INFO_NULL);
+    MPI_Info info = Hints::get_info();
+    ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_NOWRITE, info);
     is_open = true;
     ncmpi::inq(ncid, ndim, nvar, natt, udim);
     for (int attid=0; attid<natt; ++attid) {
@@ -122,6 +124,7 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     for (int varid=0; varid<nvar; ++varid) {
         vars.push_back(new PnetcdfVariable(this, varid));
     }
+    MPI_Info_free(&info);
 }
 
 

@@ -23,6 +23,7 @@
 #include "GenericAttribute.H"
 #include "GenericCommands.H"
 #include "Grid.H"
+#include "Hints.H"
 #include "MaskMap.H"
 #include "PagodaException.H"
 #include "Print.H"
@@ -112,6 +113,10 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::NC4_CLASSIC);
     parser.push_back(&CommandLineOption::FILE_FORMAT);
     parser.push_back(&CommandLineOption::NONBLOCKING_IO);
+    parser.push_back(&CommandLineOption::CB_BUFFER_SIZE);
+    parser.push_back(&CommandLineOption::ROMIO_CB_READ);
+    parser.push_back(&CommandLineOption::ROMIO_DS_READ);
+    parser.push_back(&CommandLineOption::STRIPING_UNIT);
     parser.push_back(&CommandLineOption::READ_ALL_RECORDS);
     parser.push_back(&CommandLineOption::READ_ALL_VARIABLES);
     parser.push_back(&CommandLineOption::APPEND);
@@ -360,6 +365,20 @@ void GenericCommands::parse(int argc, char **argv)
             throw CommandException("invalid header pad argument: " + arg);
         }
     }
+
+    if (parser.count("cb_buffer_size")) {
+        Hints::cb_buffer_size = parser.get_argument("cb_buffer_size");
+    }
+    if (parser.count("romio_cb_read")) {
+        Hints::romio_cb_read = parser.get_argument("romio_cb_read");
+    }
+    if (parser.count("romio_ds_read")) {
+        Hints::romio_ds_read = parser.get_argument("romio_ds_read");
+    }
+    if (parser.count("striping_unit")) {
+        Hints::striping_unit = parser.get_argument("striping_unit");
+    }
+    pagoda::println_zero("Hints\n" + Hints::to_string());
 }
 
 

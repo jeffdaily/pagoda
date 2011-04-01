@@ -169,12 +169,13 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
 	src/Dataset.C src/DataType.C src/Dimension.C src/FileFormat.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
-	src/GeoGrid.C src/Grid.C src/IndexHyperslab.C src/LatLonBox.C \
-	src/Mask.C src/MaskMap.C src/Pack.C src/PgboCommands.C \
-	src/PgeaCommands.C src/PgflintCommands.C src/PgraCommands.C \
-	src/Print.C src/RegularGrid.C src/ScalarArray.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
-	src/Validator.C src/Values.C src/Variable.C src/GlobalArray.C \
+	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
+	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
+	src/PgboCommands.C src/PgeaCommands.C src/PgflintCommands.C \
+	src/PgraCommands.C src/Print.C src/RegularGrid.C \
+	src/ScalarArray.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Util.C src/Validator.C \
+	src/Values.C src/Variable.C src/GlobalArray.C \
 	src/GlobalArray.H src/GlobalArray.def src/GlobalMask.C \
 	src/GlobalMask.H src/Memory.c src/PnetcdfAttribute.C \
 	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
@@ -218,7 +219,7 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/CommandLineParser.lo src/Copy.lo src/CoordHyperslab.lo \
 	src/Dataset.lo src/DataType.lo src/Dimension.lo \
 	src/FileFormat.lo src/FileWriter.lo src/GenericAttribute.lo \
-	src/GenericCommands.lo src/GeoGrid.lo src/Grid.lo \
+	src/GenericCommands.lo src/GeoGrid.lo src/Grid.lo src/Hints.lo \
 	src/IndexHyperslab.lo src/LatLonBox.lo src/Mask.lo \
 	src/MaskMap.lo src/Pack.lo src/PgboCommands.lo \
 	src/PgeaCommands.lo src/PgflintCommands.lo src/PgraCommands.lo \
@@ -917,7 +918,7 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/CoordHyperslab.H src/Dataset.H src/DataType.def \
 	src/DataType2.def src/DataType.H src/Debug.H src/Dimension.H \
 	src/Error.H src/FileFormat.H src/FileWriter.H \
-	src/GenericCommands.H src/GeoGrid.H src/Grid.H \
+	src/GenericCommands.H src/GeoGrid.H src/Grid.H src/Hints.H \
 	src/IndexHyperslab.H src/LatLonBox.H src/Mask.H src/MaskMap.H \
 	src/NodeZeroArray.H src/NotImplementedException.H src/pagoda.H \
 	src/Pack.H src/PgboCommands.H src/PgeaCommands.H \
@@ -948,13 +949,14 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
 	src/Dataset.C src/DataType.C src/Dimension.C src/FileFormat.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
-	src/GeoGrid.C src/Grid.C src/IndexHyperslab.C src/LatLonBox.C \
-	src/Mask.C src/MaskMap.C src/Pack.C src/PgboCommands.C \
-	src/PgeaCommands.C src/PgflintCommands.C src/PgraCommands.C \
-	src/Print.C src/RegularGrid.C src/ScalarArray.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
-	src/Validator.C src/Values.C src/Variable.C $(am__append_3) \
-	$(am__append_4) $(am__append_5)
+	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
+	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
+	src/PgboCommands.C src/PgeaCommands.C src/PgflintCommands.C \
+	src/PgraCommands.C src/Print.C src/RegularGrid.C \
+	src/ScalarArray.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Util.C src/Validator.C \
+	src/Values.C src/Variable.C $(am__append_3) $(am__append_4) \
+	$(am__append_5)
 
 #############################################################################
 # tests (autotest suite)
@@ -1154,6 +1156,7 @@ src/GenericCommands.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/GeoGrid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Grid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Hints.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/IndexHyperslab.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/LatLonBox.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1598,6 +1601,8 @@ mostlyclean-compile:
 	-rm -f src/GlobalMask.lo
 	-rm -f src/Grid.$(OBJEXT)
 	-rm -f src/Grid.lo
+	-rm -f src/Hints.$(OBJEXT)
+	-rm -f src/Hints.lo
 	-rm -f src/IndexHyperslab.$(OBJEXT)
 	-rm -f src/IndexHyperslab.lo
 	-rm -f src/LatLonBox.$(OBJEXT)
@@ -1746,6 +1751,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalMask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Grid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Hints.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/IndexHyperslab.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/LatLonBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Mask.Plo@am__quote@

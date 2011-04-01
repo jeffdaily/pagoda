@@ -93,6 +93,7 @@ class CommandLineOption
         static CommandLineOption APPEND;
         static CommandLineOption AUXILIARY;
         static CommandLineOption AVG_TYPE;
+        static CommandLineOption CB_BUFFER_SIZE;
         static CommandLineOption CDF1;
         static CommandLineOption CDF2;
         static CommandLineOption CDF5;
@@ -118,6 +119,9 @@ class CommandLineOption
         static CommandLineOption OVERWRITE;
         static CommandLineOption READ_ALL_RECORDS;
         static CommandLineOption READ_ALL_VARIABLES;
+        static CommandLineOption ROMIO_CB_READ;
+        static CommandLineOption ROMIO_DS_READ;
+        static CommandLineOption STRIPING_UNIT;
         static CommandLineOption TOPOLOGY;
         static CommandLineOption UNION;
         static CommandLineOption VARIABLE;
