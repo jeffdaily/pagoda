@@ -48,9 +48,9 @@ int64_t pagoda::num_nodes()
 #if HAVE_GA
     return GA_Nnodes();
 #elif HAVE_MPI
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    return rank;
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    return size;
 #else
 #   error
 #endif
@@ -69,9 +69,9 @@ int64_t pagoda::nodeid()
 #if HAVE_GA
     return GA_Nodeid();
 #elif HAVE_MPI
-    int size;
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    return size;
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return rank;
 #else
 #   error
 #endif
