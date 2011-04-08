@@ -378,7 +378,7 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count("striping_unit")) {
         Hints::striping_unit = parser.get_argument("striping_unit");
     }
-    pagoda::println_zero("Hints\n" + Hints::to_string());
+    //pagoda::println_zero("Hints\n" + Hints::to_string());
 }
 
 

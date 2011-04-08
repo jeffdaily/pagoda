@@ -49,6 +49,8 @@ void pgra_blocking(Dataset *dataset,
         const vector<Variable*> &vars, FileWriter *writer, const string &op);
 void pgra_nonblocking(Dataset *dataset,
         const vector<Variable*> &vars, FileWriter *writer, const string &op);
+void pgra_nonblocking_allrec(Dataset *dataset,
+        const vector<Variable*> &vars, FileWriter *writer, const string &op);
 
 
 int main(int argc, char **argv)
@@ -72,7 +74,11 @@ int main(int argc, char **argv)
         op = cmd.get_operator();
 
         if (cmd.is_nonblocking()) {
-            pgra_nonblocking(dataset, vars, writer, op);
+            if (cmd.is_reading_all_records()) {
+                pgra_nonblocking_allrec(dataset, vars, writer, op);
+            } else {
+                pgra_nonblocking(dataset, vars, writer, op);
+            }
         } else {
             pgra_blocking(dataset, vars, writer, op);
         }
@@ -341,6 +347,143 @@ void pgra_nonblocking(Dataset *dataset,
 }
 
 
+void pgra_nonblocking_allrec(Dataset *dataset,
+        const vector<Variable*> &vars, FileWriter *writer, const string &op)
+{
+    vector<Variable*> record_vars;
+    vector<Variable*> nonrecord_vars;
+    vector<vector<Array*> > nb_arrays;
+    vector<Array*> nb_results;
+    vector<Array*> nb_tallys;
+    Dimension *udim = dataset->get_udim();
+    int64_t nrec = NULL != udim ? udim->get_size() : 0;
+
+    // we process record and non-record variables separately
+    Variable::split(vars, record_vars, nonrecord_vars);
+    // copy non-record variables unchanged to output
+    writer->icopy_vars(nonrecord_vars);
+    // prefill/size nb_XXX vectors
+    nb_arrays.assign(record_vars.size(), vector<Array*>(nrec, NULL));
+    nb_tallys.assign(record_vars.size(), NULL);
+    nb_results.assign(record_vars.size(), NULL);
+    // read all records from all record variables
+    // first record read directly into result array
+    for (size_t v=0; v<record_vars.size(); ++v) {
+        Variable *var = record_vars[v];
+        nb_results[v] = var->iread(int64_t(0));
+    }
+    // remaining records read into temporary buffers
+    for (int64_t r=1; r<nrec; ++r ) {
+        for (size_t v=0; v<record_vars.size(); ++v) {
+            Variable *var = record_vars[v];
+            nb_arrays[v][r] = var->iread(r);
+        }
+    }
+    dataset->wait();
+    // create and initialize tally arrays
+    for (size_t v=0; v<record_vars.size(); ++v) {
+        Variable *var = record_vars[v];
+        if (nb_results[v]->get_type() == DataType::CHAR) {
+            continue;
+        }
+        if (var->has_validator(0)) {
+            nb_tallys[v] = Array::create(
+                    DataType::INT, nb_results[v]->get_shape());
+            initialize_tally(nb_results[v], nb_tallys[v],
+                    var->get_validator(0));
+        }
+        if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+            // square the values
+            nb_results[v]->imul(nb_results[v]);
+        }
+    }
+    // accumulate all records per variable
+    for (size_t v=0; v<record_vars.size(); ++v) {
+        for (size_t r=1; r<nrec; ++r) {
+            Array *array = nb_arrays[v][r];
+            if (nb_results[v]->get_type() == DataType::CHAR) {
+                continue;
+            }
+            if (op == OP_MAX) {
+                nb_results[v]->imax(array);
+            }
+            else if (op == OP_MIN) {
+                nb_results[v]->imin(array);
+            }
+            else {
+                if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+                    // square the values
+                    array->imul(array);
+                }
+                // sum the values or squares, keep a tally
+                nb_results[v]->set_counter(nb_tallys[v]);
+                nb_results[v]->iadd(array);
+                nb_results[v]->set_counter(NULL);
+            }
+        }
+    }
+    // we can delete the temporary arrays now
+    for (size_t v=0; v<record_vars.size(); ++v) {
+        for (size_t r=1; r<nrec; ++r) {
+            delete nb_arrays[v][r];
+            nb_arrays[v][r] = NULL;
+        }
+    }
+    // some operation results require additional processing
+    // also write the results
+    for (size_t v=0; v<record_vars.size(); ++v) {
+        Variable *var = record_vars[v];
+        // normalize, multiply, etc where necessary
+        if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
+                || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
+            if (NULL != nb_tallys[v]) {
+                finalize_tally(nb_results[v], nb_tallys[v],
+                        var->get_validator(0));
+                nb_results[v]->idiv(nb_tallys[v]);
+            } else {
+                ScalarArray scalar(nb_results[v]->get_type());
+                scalar.fill_value(nrec);
+                nb_results[v]->idiv(&scalar);
+            }
+        }
+        else if (op == OP_RMSSDN) {
+            if (NULL != nb_tallys[v]) {
+                ScalarArray scalar(nb_tallys[v]->get_type());
+                scalar.fill_value(1);
+                nb_tallys[v]->isub(&scalar);
+                finalize_tally(nb_results[v], nb_tallys[v],
+                        var->get_validator(0));
+                nb_results[v]->idiv(nb_tallys[v]);
+            } else {
+                ScalarArray scalar(nb_results[v]->get_type());
+                scalar.fill_value(nrec-1);
+                nb_results[v]->idiv(&scalar);
+            }
+        }
+
+        // some operation results require even more additional processing
+        if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
+            nb_results[v]->ipow(0.5);
+        }
+        else if (op == OP_SQRAVG) {
+            nb_results[v]->imul(nb_results[v]);
+        }
+
+        writer->iwrite(nb_results[v], var->get_name(), 0);
+    }
+    writer->wait();
+    // clean up
+    for (size_t v=0; v<record_vars.size(); ++v) {
+        delete nb_results[v];
+        nb_results[v] = NULL;
+        if (NULL != nb_tallys[v]) {
+            delete nb_tallys[v];
+            nb_tallys[v] = NULL;
+        }
+    }
+}
+
+
 void initialize_tally(Array *result, Array *tally, Validator *validator)
 {
     void *ptr_result;
@@ -392,10 +535,11 @@ void finalize_tally(Array *result, Array *tally, Validator *validator)
 #define DATATYPE_EXPAND(DT,T) \
         if (DT == type) { \
             T *buf_result = static_cast<T*>(ptr_result); \
+            const T fill_value = *static_cast<const T*>(validator->get_fill_value());\
             for (int64_t i=0,limit=result->get_local_size(); i<limit; ++i) { \
                 if (buf_tally[i] <= 0) { \
                     buf_tally[i] = 1; \
-                    buf_result[i] = *static_cast<const T*>(validator->get_fill_value()); \
+                    buf_result[i] = fill_value; \
                 } \
             } \
         } else
