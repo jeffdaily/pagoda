@@ -4,26 +4,31 @@ User Guide for Parallel Analysis Of Geodesic Data (Pagoda)
 Overview
 ========
 
-Pagoda is both an API for data-parallel analysis of geodesic climate data as
-well as the a set of data-parallel processing tools based on this API. The API
-and the tools were designed first to support geodesic semi-structured NetCDF
-data, however they are generic enough to work with regularly gridded data as
-well. The command line tools are designed to be similar to the NetCDF
-Operators.
+Pagoda is both an API for data-parallel analysis of geoscience data as well as
+the a set of data-parallel processing tools based on this API. The API and the
+tools were designed first to support geodesic semi-structured NetCDF data,
+however they are generic enough to work with regularly gridded data as well.
+The command line tools are designed to be similar to the NetCDF Operators.
 
 Currently supported tools:
 
- * pgra record averages
- * pgea ensemble averages
- * pgba binary operations
- * pgsub data subsetting 
+=================================  =============  =============================
+Operation                          pagoda         corresponding netCDF operator
+=================================  =============  =============================
+record averages                    pgra           ncra
+ensemble averages                  pgea           ncea
+binary operations (arithmetic)     pgbo           ncbo
+data subsetting aka hyperslabbing  pgsub          ncks
+file interpolation                 pgflint        ncflint
+permute dimensions quickly         N/A\ :sup:`1`  ncpdq
+attribute editor                   N/A\ :sup:`1`  ncatted
+=================================  =============  =============================
 
-Pagoda is currently in an early release stage. While we intend to mimic the NCO
-tools, some functionality is not yet available. In particular, the command line
-tools do not yet process missing values. Metadata editing operations are not
-implemented since they are not inherently parallel operations.
+:sup:`1` While we intend to mimic the NCO tools, some functionality is not
+implemented.  Metadata editing operations are not implemented since they are
+not inherently parallel operations.
 
-Pagoda has been tested on linux workstations and Cray Xt4 (franklin).
+Pagoda has been tested on linux workstations and Cray Xt4 (franklin.nersc.gov).
 
 Motivation
 ==========
@@ -172,3 +177,12 @@ The following options are unique to pgra:
                      avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl
 
 NOTE: Aggregation is not supported.
+
+Memory Requirements and Algorithms
+==================================
+The memory requirements of pagoda are notably different than those of NCO.
+Whereas NCO is quite memory efficient, pagoda uses additional memory in order
+to take advantage of non-blocking parallel IO on systems supporting such a
+feature.  Reading from disk is more efficient when reading in large, contiguous
+chunks.  Non-blocking parallel IO helps achieve the large, contiguous chunks
+at the cost of additional data buffers.

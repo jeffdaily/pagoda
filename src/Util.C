@@ -35,6 +35,9 @@ using std::printf;
 using std::string;
 using std::vector;
 
+static char SUM[] = "+";
+static char MIN[] = "min";
+
 
 /**
  * Returns the number of nodes in this calculation.
@@ -138,7 +141,7 @@ void pagoda::abort(const char *message, int errorcode)
 void pagoda::gop_min(vector<long> &values)
 {
 #if HAVE_GA
-    GA_Lgop(&values[0], values.size(), "min");
+    GA_Lgop(&values[0], values.size(), MIN);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_LONG, MPI_MIN, MPI_COMM_WORLD);
@@ -156,7 +159,7 @@ void pagoda::gop_min(vector<long> &values)
 void pagoda::gop_sum(vector<int> &values)
 {
 #if HAVE_GA
-    GA_Igop(&values[0], values.size(), "+");
+    GA_Igop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -174,7 +177,7 @@ void pagoda::gop_sum(vector<int> &values)
 void pagoda::gop_sum(vector<long> &values)
 {
 #if HAVE_GA
-    GA_Lgop(&values[0], values.size(), "+");
+    GA_Lgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
@@ -192,7 +195,7 @@ void pagoda::gop_sum(vector<long> &values)
 void pagoda::gop_sum(vector<long long> &values)
 {
 #if HAVE_GA && HAVE_GA_LLGOP
-    GA_Llgop(&values[0], values.size(), "+");
+    GA_Llgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
@@ -211,11 +214,11 @@ void pagoda::gop_sum(vector<long long> &values)
 void pagoda::gop_sum(vector<int64_t> &values)
 {
 #   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
-    GA_Llgop(&values[0], values.size(), "+");
+    GA_Llgop(&values[0], values.size(), SUM);
 #   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG
-    GA_Lgop(&values[0], values.size(), "+");
+    GA_Lgop(&values[0], values.size(), SUM);
 #   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
-    GA_Igop(&values[0], values.size(), "+");
+    GA_Igop(&values[0], values.size(), SUM);
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
     MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
@@ -237,7 +240,7 @@ void pagoda::gop_sum(vector<int64_t> &values)
 void pagoda::gop_sum(vector<float> &values)
 {
 #if HAVE_GA
-    GA_Fgop(&values[0], values.size(), "+");
+    GA_Fgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
@@ -255,7 +258,7 @@ void pagoda::gop_sum(vector<float> &values)
 void pagoda::gop_sum(vector<double> &values)
 {
 #if HAVE_GA
-    GA_Dgop(&values[0], values.size(), "+");
+    GA_Dgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -273,7 +276,7 @@ void pagoda::gop_sum(vector<double> &values)
 void pagoda::gop_sum(vector<long double> &values)
 {
 #if HAVE_GA && HAVE_GA_LDGOP
-    GA_Ldgop(&values[0], values.size(), "+");
+    GA_Ldgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
                   MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -291,7 +294,7 @@ void pagoda::gop_sum(vector<long double> &values)
 void pagoda::gop_sum(int &value)
 {
 #if HAVE_GA
-    GA_Igop(&value, 1, "+");
+    GA_Igop(&value, 1, SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 #else
@@ -308,7 +311,7 @@ void pagoda::gop_sum(int &value)
 void pagoda::gop_sum(long &value)
 {
 #if HAVE_GA
-    GA_Lgop(&value, 1, "+");
+    GA_Lgop(&value, 1, SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
 #else
@@ -325,7 +328,7 @@ void pagoda::gop_sum(long &value)
 void pagoda::gop_sum(long long &value)
 {
 #if HAVE_GA && HAVE_GA_LLGOP
-    GA_Llgop(&value, 1, "+");
+    GA_Llgop(&value, 1, SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
 #else
@@ -343,11 +346,11 @@ void pagoda::gop_sum(long long &value)
 void pagoda::gop_sum(int64_t &value)
 {
 #   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
-    GA_Llgop(&value, 1, "+");
+    GA_Llgop(&value, 1, SUM);
 #   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG
-    GA_Lgop(&value, 1, "+");
+    GA_Lgop(&value, 1, SUM);
 #   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
-    GA_Igop(&value, 1, "+");
+    GA_Igop(&value, 1, SUM);
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
     MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
@@ -369,7 +372,7 @@ void pagoda::gop_sum(int64_t &value)
 void pagoda::gop_sum(float &value)
 {
 #if HAVE_GA
-    GA_Fgop(&value, 1, "+");
+    GA_Fgop(&value, 1, SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&value, &value, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
 #else
@@ -386,7 +389,7 @@ void pagoda::gop_sum(float &value)
 void pagoda::gop_sum(double &value)
 {
 #if HAVE_GA
-    GA_Dgop(&value, 1, "+");
+    GA_Dgop(&value, 1, SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&value, &value, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #else
@@ -403,7 +406,7 @@ void pagoda::gop_sum(double &value)
 void pagoda::gop_sum(long double &value)
 {
 #if HAVE_GA && HAVE_GA_LDGOP
-    GA_Ldgop(&value, 1, "+");
+    GA_Ldgop(&value, 1, SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&value, &value, 1, MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #else

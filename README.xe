@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# The following steps get Pagoda to build on the franklin Cray XT at NERSC.
+# The following steps get Pagoda to build on the hopper Cray XE at NERSC.
 #
 # If you put the required tarballs in your current working directory, you can
 # execute this file as a script.
@@ -11,11 +11,12 @@ GA_DIR=ga-5-0-2
 PAGODA_DIR=pagoda-0.6
 #
 # GA install
+module load onesided
 tar -xzf $GA_DIR.tgz
 cd $GA_DIR
 mkdir bld
 cd bld
-../configure --with-portals --prefix=`pwd`
+../configure --with-gemini --prefix=`pwd`
 make
 make install
 #

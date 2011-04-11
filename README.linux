@@ -12,8 +12,8 @@
 #
 TOP=`pwd`
 PNETCDF_DIR=parallel-netcdf-1.2.0
-GA_DIR=ga-5-0B
-PAGODA_DIR=pagoda-0.5.1
+GA_DIR=ga-5-0-2
+PAGODA_DIR=pagoda-0.6
 export MPICC=mpicc
 export MPICXX=mpicxx
 export MPIF77=mpif77
