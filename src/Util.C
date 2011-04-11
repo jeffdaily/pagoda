@@ -632,7 +632,7 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
 {
 #if HAVE_GA
     int64_t max_size = 0;
-    double gigabytes = 0;
+    //double gigabytes = 0;
     string max_name;
     vector<Variable*>::const_iterator var;
 
@@ -648,11 +648,11 @@ void pagoda::calculate_required_memory(const vector<Variable*> &vars)
         max_size = 4000;
         max_name = "NO VARIALBES";
     }
-    gigabytes = 1.0 / 1073741824.0 * max_size * 8;
+    //gigabytes = 1.0 / 1073741824.0 * max_size * 8;
 
     //max_size = int64_t(max_size * 0.04);
     max_size = int64_t(max_size / pagoda::num_nodes());
-    gigabytes = 1.0 / 1073741824.0 * max_size * 8;
+    //gigabytes = 1.0 / 1073741824.0 * max_size * 8;
 
     if (MA_init(C_DBL, max_size, max_size) == MA_FALSE) {
         char msg[] = "MA_init failed";
