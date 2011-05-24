@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <cstdlib>
+#include <cstring>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -363,7 +364,7 @@ void pgra_nonblocking_allrec(Dataset *dataset,
     // copy non-record variables unchanged to output
     writer->icopy_vars(nonrecord_vars);
     // prefill/size nb_XXX vectors
-    nb_arrays.assign(record_vars.size(), vector<Array*>(nrec, NULL));
+    nb_arrays.assign(record_vars.size(), vector<Array*>(nrec, 0));
     nb_tallys.assign(record_vars.size(), NULL);
     nb_results.assign(record_vars.size(), NULL);
     // read all records from all record variables
