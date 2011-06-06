@@ -320,6 +320,7 @@ check_PROGRAMS += sandbox/TestJoin
 check_PROGRAMS += sandbox/TestPnetcdfAttribute
 check_PROGRAMS += sandbox/TestPnetcdfDataset
 check_PROGRAMS += sandbox/TestRead2
+check_PROGRAMS += sandbox/TestRead2b
 endif
 if HAVE_NETCDF4
 check_PROGRAMS += sandbox/TestRead3
@@ -341,6 +342,7 @@ sandbox_TestPartialSum_SOURCES        = sandbox/TestPartialSum.C
 sandbox_TestRavel_SOURCES             = sandbox/TestRavel.C
 sandbox_TestRead_SOURCES              = sandbox/TestRead.C
 sandbox_TestRead2_SOURCES             = sandbox/TestRead2.C
+sandbox_TestRead2b_SOURCES            = sandbox/TestRead2b.C
 sandbox_TestRead3_SOURCES             = sandbox/TestRead3.C
 sandbox_TestScatter_SOURCES           = sandbox/TestScatter.C
 sandbox_TestSlice_SOURCES             = sandbox/TestSlice.C
