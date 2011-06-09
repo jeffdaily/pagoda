@@ -81,7 +81,6 @@ static int nc_sizeof(nc_type type) {
 }
 #endif
 
-static MPI_Comm comm;
 static int groupid=-1;
 
 static int get_precision()
@@ -89,7 +88,7 @@ static int get_precision()
     int precision = 1;
     int npe;
 
-    MPI_Comm_size(comm, &npe);
+    MPI_Comm_size(MPI_COMM_WORLD, &npe);
     while (npe > 10) {
         ++precision;
         npe /= 10;
@@ -102,23 +101,21 @@ static void print_sync(const string &str)
     int me;
     int npe;
 
-    MPI_Comm_rank(comm, &me);
-    MPI_Comm_size(comm, &npe);
+    MPI_Comm_rank(MPI_COMM_WORLD, &me);
+    MPI_Comm_size(MPI_COMM_WORLD, &npe);
 
     if (me == 0) {
-        fprintf(STREAM, "[%d,%*d] ", groupid, get_precision(), 0);
+        fprintf(STREAM, "[%*d] ", get_precision(), 0);
         fprintf(STREAM, str.c_str());
         for (int proc=1; proc<npe; ++proc) {
             MPI_Status stat;
             int count;
             char *msg;
 
-            MPI_Recv(&count, 1, MPI_INT, proc, TAG_DEBUG, comm,
-                     &stat);
+            MPI_Recv(&count, 1, MPI_INT, proc, TAG_DEBUG, MPI_COMM_WORLD, &stat);
             msg = new char[count];
-            MPI_Recv(msg, count, MPI_CHAR, proc, TAG_DEBUG, comm,
-                     &stat);
-            fprintf(STREAM, "[%d,%*d] ", groupid, get_precision(), proc);
+            MPI_Recv(msg, count, MPI_CHAR, proc, TAG_DEBUG, MPI_COMM_WORLD, &stat);
+            fprintf(STREAM, "[%*d] ", get_precision(), proc);
             fprintf(STREAM, msg);
             delete [] msg;
         }
@@ -127,36 +124,35 @@ static void print_sync(const string &str)
     else {
         int count = str.size() + 1;
 
-        MPI_Send(&count, 1, MPI_INT, 0, TAG_DEBUG, comm);
-        MPI_Send((void*)str.c_str(), count, MPI_CHAR, 0, TAG_DEBUG,
-                 comm);
+        MPI_Send(&count, 1, MPI_INT, 0, TAG_DEBUG, MPI_COMM_WORLD);
+        MPI_Send((void*)str.c_str(), count, MPI_CHAR, 0, TAG_DEBUG, MPI_COMM_WORLD);
     }
 }
 
-static void print_zero_world(const string &str)
+static void print_zero(const string &str, MPI_Comm comm)
 {
     int me;
     
-    MPI_Comm_rank(MPI_COMM_WORLD, &me);
+    MPI_Comm_rank(comm, &me);
+    MPI_Barrier(comm);
     if (0 == me) {
-        fprintf(STREAM, "[g%d] ", groupid);
         fprintf(STREAM, str.c_str());
         fflush(STREAM);
     }
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(comm);
 }
 
 static void print_zero(const string &str)
 {
     int me;
     
-    MPI_Comm_rank(comm, &me);
+    MPI_Comm_rank(MPI_COMM_WORLD, &me);
+    MPI_Barrier(MPI_COMM_WORLD);
     if (0 == me) {
-        fprintf(STREAM, "[g%d] ", groupid);
         fprintf(STREAM, str.c_str());
         fflush(STREAM);
     }
-    MPI_Barrier(comm);
+    MPI_Barrier(MPI_COMM_WORLD);
 }
 
 template <class Collection>
@@ -199,7 +195,7 @@ template <class T>
 static void buf_cmp(T *buf, T *nb_buf, MPI_Offset size, const string &name)
 {
     int me;
-    MPI_Comm_rank(comm, &me);
+    MPI_Comm_rank(MPI_COMM_WORLD, &me);
     for (MPI_Offset i=0; i<size; ++i) {
         if (buf[i] != nb_buf[i]) {
             //if (0 == me) {
@@ -248,6 +244,7 @@ int main(int argc, char **argv)
     utimer_t timer_nonblocking_total=0;
     char *env_str_numgroups=NULL;
     int env_numgroups=1;
+    MPI_Comm comm;
 
     MPI_Init(&argc, &argv);
 
@@ -288,10 +285,12 @@ int main(int argc, char **argv)
     print_sync("groupid=" + to_string(groupid) + "\n");
     MPI_Comm_rank(comm, &me_local);
     MPI_Comm_size(comm, &npe_local);
+    print_sync("groupid=" + to_string(groupid) + "\t"
+            + "me_local=" + to_string(me_local) + "\t"
+            + "npe_local=" + to_string(npe_local) + "\n");
 
     // open the nc file, query for basic info
-    ERRNO_CHECK(ncmpi_open(comm, argv[1], NC_NOWRITE, MPI_INFO_NULL,
-                &ncid));
+    ERRNO_CHECK(ncmpi_open(comm, argv[1], NC_NOWRITE, MPI_INFO_NULL, &ncid));
     ERRNO_CHECK(ncmpi_inq(ncid, &ndims, &nvars, &natts, &udim));
 
     // iterate over dimensions in file, query for info
@@ -334,6 +333,7 @@ int main(int argc, char **argv)
     }
 
     // for ease of implementation, every proc reads entire variable
+    print_zero("begin variables loop\n");
     for (size_t i=0; i<var_ids.size(); ++i) {
         int request;
         int varid = var_ids[i];
@@ -347,35 +347,44 @@ int main(int argc, char **argv)
         // only read variables in our 'group'
         //bool doread = (0 == groupid);
         bool doread = (i%env_numgroups == groupid);
-#if FRONT
-        if (0 == i) {
-            print_zero("decomp using first dimension\n");
-        }
-        if (!count.empty() && count.front() >= npe) {
-            int original = count.front();
-            int piece = count.front()/npe;
-            count.front() = piece;
-            start.front() = piece*me;
-            if (me == npe-1) {
-                count.front() += original-piece*npe;
-            }
-        }
-#elif BACK
-        if (0 == i) {
-            print_zero("decomp using last dimension\n");
-        }
-        if (!count.empty() && count.back() >= npe) {
-            int original = count.back();
-            int piece = count.back()/npe;
-            count.back() = piece;
-            start.back() = piece*me;
-            if (me == npe-1) {
-                count.back() += original-piece*npe;
-            }
-        }
-#endif
-        size = shape_to_size(count);
         if (doread) {
+#define FRONT 1
+#if FRONT
+            if (count.size() >= 1 && count[0] >= npe_local) {
+                int piece = count[0]/npe_local;
+                int remainder = count[0]%npe_local;
+                if (me_local < remainder) {
+                    count[0] = piece+1;
+                    start[0] = piece*me_local+me_local;
+                } else {
+                    count[0] = piece;
+                    start[0] = piece*me_local+remainder;
+                }
+            }
+            // first dimension too small, try to distribute second dimension
+            else if (count.size() >= 2 && count[1] >= npe_local) {
+                int piece = count[1]/npe_local;
+                int remainder = count[1]%npe_local;
+                if (me_local < remainder) {
+                    count[1] = piece+1;
+                    start[1] = piece*me_local+me_local;
+                } else {
+                    count[1] = piece;
+                    start[1] = piece*me_local+remainder;
+                }
+            }
+#elif BACK
+            if (!count.empty() && count.back() >= npe_local) {
+                int original = count.back();
+                int piece = count.back()/npe_local;
+                count.back() = piece;
+                start.back() = piece*me_local;
+                if (me_local == npe_local-1) {
+                    count.back() += original-piece*npe_local;
+                }
+            }
+#endif
+            size = shape_to_size(count);
             // print_sync("var=" + name
             //         + "\tstart=" + vec_to_string(start)
             //         + "\tcount=" + vec_to_string(count)
@@ -414,7 +423,6 @@ int main(int argc, char **argv)
                     ERRNO(NC_EBADTYPE);
                     /*break; unreachable */
             }
-            //print_zero("blocking read of " + name + " ... ");
             timer_blocking_local = timer_start();
             switch (type) {
                 case NC_BYTE:
@@ -447,9 +455,6 @@ int main(int argc, char **argv)
                     /*break; unreachable */
             }
             timer_blocking_total += timer_end(timer_blocking_local);
-            print_zero("blocking read of " + name + " done\n");
-            //print_zero("done\n");
-            //print_zero("non-blocking read of " + name + " ... ");
             timer_nonblocking_local = timer_start();
             switch (type) {
                 case NC_BYTE:
@@ -482,14 +487,17 @@ int main(int argc, char **argv)
                     /*break; unreachable */
             }
             timer_nonblocking_total += timer_end(timer_nonblocking_local);
-            print_zero("non-blocking read of " + name + " done\n");
-            //print_zero("done\n");
             buf_sizes.push_back(size);
             buffers.push_back(buf);
             nb_buffers.push_back(nb_buf);
             requests.push_back(request);
+            print_zero("[g" + to_string(groupid) + "] variable " + name + " done\n", comm);
+        } else {
+            //print_sync("var=" + name + "\tskipped\n");
         }
+        //print_zero("blocking and non-blocking read of " + name + " done\n");
     }
+    print_zero("end variables loop\n");
     statuses.assign(requests.size(), 0);
     print_zero("wait ... ");
     timer_nonblocking_local = timer_start();
@@ -499,6 +507,7 @@ int main(int argc, char **argv)
     print_zero("done\n");
 
     // compare the buffers
+    print_zero("begin buffer comparison loop\n");
     for (size_t i=0; i<buffers.size(); ++i) {
         string name = var_names[i];
         nc_type type = buf_types[i];
@@ -531,6 +540,7 @@ int main(int argc, char **argv)
                 /*break; unreachable */
         }
     }
+    print_zero("end buffer comparison loop\n");
 
     // print timing info
     // instead of print_sync from all procs, we perform MPI reduction and
@@ -541,14 +551,10 @@ int main(int argc, char **argv)
             MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Reduce(&timer_nonblocking_total, &timer_nonblocking_total_all, 1,
             MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-    print_zero_world("   timer_blocking_total_all="
+    print_zero("   timer_blocking_total_all="
             + to_string(timer_blocking_total_all) + "\n");
-    print_zero_world("timer_nonblocking_total_all="
+    print_zero("timer_nonblocking_total_all="
             + to_string(timer_nonblocking_total_all) + "\n");
-    // print_sync("   timer_blocking_total="
-    //         + to_string(timer_blocking_total) + "\n");
-    // print_sync("timer_nonblocking_total="
-    //         + to_string(timer_nonblocking_total) + "\n");
 
     // clean up
     for (size_t i=0; i<buffers.size(); ++i) {

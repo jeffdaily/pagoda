@@ -296,17 +296,32 @@ int main(int argc, char **argv)
         MPI_Offset size;
         void *buf;
         void *nb_buf;
+#define FRONT 1
 #if FRONT
         if (0 == i) {
             print_zero("decomp using first dimension\n");
         }
-        if (!count.empty() && count.front() >= npe) {
-            int original = count.front();
-            int piece = count.front()/npe;
-            count.front() = piece;
-            start.front() = piece*me;
-            if (me == npe-1) {
-                count.front() += original-piece*npe;
+        if (count.size() >= 1 && count[0] >= npe) {
+            int piece = count[0]/npe;
+            int remainder = count[0]%npe;
+            if (me < remainder) {
+                count[0] = piece+1;
+                start[0] = piece*me+me;
+            } else {
+                count[0] = piece;
+                start[0] = piece*me+remainder;
+            }
+        }
+        // first dimension too small, try to distribute second dimension
+        else if (count.size() >= 2 && count[1] >= npe) {
+            int piece = count[1]/npe;
+            int remainder = count[1]%npe;
+            if (me < remainder) {
+                count[1] = piece+1;
+                start[1] = piece*me+me;
+            } else {
+                count[1] = piece;
+                start[1] = piece*me+remainder;
             }
         }
 #elif BACK
