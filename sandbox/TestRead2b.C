@@ -273,7 +273,11 @@ int main(int argc, char **argv)
         MPI_Finalize();
         return EXIT_FAILURE;
     }
+#if ROUND_ROBIN_GROUPS
     groupid = me_world%env_numgroups;
+#else
+    groupid = me_world/(npe_world/env_numgroups);
+#endif
     if (MPI_SUCCESS != MPI_Comm_split(MPI_COMM_WORLD, groupid, 0, &comm)) {
         if (me_world == 0) {
             printf("uh oh\n");
@@ -345,8 +349,11 @@ int main(int argc, char **argv)
         void *buf=NULL;
         void *nb_buf=NULL;
         // only read variables in our 'group'
-        //bool doread = (0 == groupid);
+#if ROUND_ROBIN_GROUPS
         bool doread = (i%env_numgroups == groupid);
+#else
+        bool doread = (i/(nvars/env_numgroups) == groupid);
+#endif
         if (doread) {
 #define FRONT 1
 #if FRONT
