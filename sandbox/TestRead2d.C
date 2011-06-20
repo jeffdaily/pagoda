@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdio>
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -13,6 +14,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include <ctype.h>
+#include <unistd.h>
 
 #include <mpi.h>
 #include <pnetcdf.h>
