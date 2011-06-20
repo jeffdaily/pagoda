@@ -589,20 +589,23 @@ int main(int argc, char **argv)
         print_sync("Reading " + filenames[groupid] + "\n", MPI_COMM_WORLD);
         read(filenames[groupid], comm,
                 timer_blocking_total, timer_nonblocking_total);
-        MPI_Reduce(&timer_blocking_total, &timer_blocking_total_all, 1,
-                MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(&timer_nonblocking_total, &timer_nonblocking_total_all, 1,
-                MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
     } else {
         print_zero("Reading files without groups!\n", MPI_COMM_WORLD);
         for (size_t i=0; i<filenames.size(); ++i) {
+            utimer_t timer_blocking=0;
+            utimer_t timer_nonblocking=0;
             print_zero("Reading " + filenames[i] + "\n", MPI_COMM_WORLD);
             read(filenames[i], MPI_COMM_WORLD,
-                    timer_blocking_total, timer_nonblocking_total);
-            timer_blocking_total_all += timer_blocking_total;
-            timer_nonblocking_total_all += timer_nonblocking_total;
+                    timer_blocking, timer_nonblocking);
+            timer_blocking_total += timer_blocking;
+            timer_nonblocking_total += timer_nonblocking;
         }
     }
+
+    MPI_Reduce(&timer_blocking_total, &timer_blocking_total_all, 1,
+            MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&timer_nonblocking_total, &timer_nonblocking_total_all, 1,
+            MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
     print_zero("   timer_blocking_total_all="
             + to_string(timer_blocking_total_all) + "\n", MPI_COMM_WORLD);
