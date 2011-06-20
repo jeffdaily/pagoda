@@ -103,7 +103,8 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestPnetcdfDataset \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2 \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2b \
-@ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2c
+@ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2c \
+@ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2d
 @ENABLE_SANDBOX_TRUE@@HAVE_NETCDF4_TRUE@am__append_9 = sandbox/TestRead3
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(pkginclude_HEADERS) \
@@ -271,7 +272,8 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestPnetcdfDataset$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2b$(EXEEXT) \
-@ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2c$(EXEEXT)
+@ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2c$(EXEEXT) \
+@ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestRead2d$(EXEEXT)
 @ENABLE_SANDBOX_TRUE@@HAVE_NETCDF4_TRUE@am__EXEEXT_4 = sandbox/TestRead3$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 am_pgbo_OBJECTS = src/pgbo.$(OBJEXT)
@@ -465,6 +467,14 @@ am__sandbox_TestRead2c_SOURCES_DIST = sandbox/TestRead2c.C
 sandbox_TestRead2c_OBJECTS = $(am_sandbox_TestRead2c_OBJECTS)
 sandbox_TestRead2c_LDADD = $(LDADD)
 sandbox_TestRead2c_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
+am__sandbox_TestRead2d_SOURCES_DIST = sandbox/TestRead2d.C
+@ENABLE_SANDBOX_TRUE@am_sandbox_TestRead2d_OBJECTS =  \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestRead2d.$(OBJEXT)
+sandbox_TestRead2d_OBJECTS = $(am_sandbox_TestRead2d_OBJECTS)
+sandbox_TestRead2d_LDADD = $(LDADD)
+sandbox_TestRead2d_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2)
 am__sandbox_TestRead3_SOURCES_DIST = sandbox/TestRead3.C
@@ -692,10 +702,10 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestPnetcdfDataset_SOURCES) \
 	$(sandbox_TestRavel_SOURCES) $(sandbox_TestRead_SOURCES) \
 	$(sandbox_TestRead2_SOURCES) $(sandbox_TestRead2b_SOURCES) \
-	$(sandbox_TestRead2c_SOURCES) $(sandbox_TestRead3_SOURCES) \
-	$(sandbox_TestScatter_SOURCES) $(sandbox_TestSlice_SOURCES) \
-	$(sandbox_TestUnion_SOURCES) $(sandbox_TestVecBool_SOURCES) \
-	$(sandbox_TestWrite_SOURCES) \
+	$(sandbox_TestRead2c_SOURCES) $(sandbox_TestRead2d_SOURCES) \
+	$(sandbox_TestRead3_SOURCES) $(sandbox_TestScatter_SOURCES) \
+	$(sandbox_TestSlice_SOURCES) $(sandbox_TestUnion_SOURCES) \
+	$(sandbox_TestVecBool_SOURCES) $(sandbox_TestWrite_SOURCES) \
 	$(sandbox_ga_TestAttribute_SOURCES) \
 	$(sandbox_ga_TestBin_SOURCES) \
 	$(sandbox_ga_TestDimension_SOURCES) \
@@ -730,6 +740,7 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestRead2_SOURCES_DIST) \
 	$(am__sandbox_TestRead2b_SOURCES_DIST) \
 	$(am__sandbox_TestRead2c_SOURCES_DIST) \
+	$(am__sandbox_TestRead2d_SOURCES_DIST) \
 	$(am__sandbox_TestRead3_SOURCES_DIST) \
 	$(am__sandbox_TestScatter_SOURCES_DIST) \
 	$(am__sandbox_TestSlice_SOURCES_DIST) \
@@ -1030,6 +1041,7 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead2_SOURCES = sandbox/TestRead2.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead2b_SOURCES = sandbox/TestRead2b.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead2c_SOURCES = sandbox/TestRead2c.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestRead2d_SOURCES = sandbox/TestRead2d.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead3_SOURCES = sandbox/TestRead3.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestScatter_SOURCES = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestSlice_SOURCES = sandbox/TestSlice.C
@@ -1413,6 +1425,11 @@ sandbox/TestRead2c.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestRead2c$(EXEEXT): $(sandbox_TestRead2c_OBJECTS) $(sandbox_TestRead2c_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestRead2c$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestRead2c_OBJECTS) $(sandbox_TestRead2c_LDADD) $(LIBS)
+sandbox/TestRead2d.$(OBJEXT): sandbox/$(am__dirstamp) \
+	sandbox/$(DEPDIR)/$(am__dirstamp)
+sandbox/TestRead2d$(EXEEXT): $(sandbox_TestRead2d_OBJECTS) $(sandbox_TestRead2d_DEPENDENCIES) sandbox/$(am__dirstamp)
+	@rm -f sandbox/TestRead2d$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestRead2d_OBJECTS) $(sandbox_TestRead2d_LDADD) $(LIBS)
 sandbox/TestRead3.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestRead3$(EXEEXT): $(sandbox_TestRead3_OBJECTS) $(sandbox_TestRead3_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1550,6 +1567,7 @@ mostlyclean-compile:
 	-rm -f sandbox/TestRead2.$(OBJEXT)
 	-rm -f sandbox/TestRead2b.$(OBJEXT)
 	-rm -f sandbox/TestRead2c.$(OBJEXT)
+	-rm -f sandbox/TestRead2d.$(OBJEXT)
 	-rm -f sandbox/TestRead3.$(OBJEXT)
 	-rm -f sandbox/TestScatter.$(OBJEXT)
 	-rm -f sandbox/TestSlice.$(OBJEXT)
@@ -1735,6 +1753,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead2b.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead2c.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead2d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestScatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestSlice.Po@am__quote@
