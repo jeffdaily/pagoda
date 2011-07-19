@@ -119,6 +119,9 @@ CommandLineOption CommandLineOption::ROMIO_CB_READ(
 CommandLineOption CommandLineOption::ROMIO_DS_READ(
     0, "romio_ds_read", true,
     "enable/disable/automatic data sieving during read operations");
+CommandLineOption CommandLineOption::ROMIO_NO_INDEP_RW(
+    0, "romio_no_indep_rw", true,
+    "enable/disable independent (vs collective) IO hint");
 CommandLineOption CommandLineOption::STRIPING_UNIT(
     0, "striping_unit", true,
     "striping unit (in bytes)");

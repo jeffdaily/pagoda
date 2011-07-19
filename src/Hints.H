@@ -9,6 +9,7 @@ class Hints
         static string cb_buffer_size;
         static string romio_cb_read;
         static string romio_ds_read;
+        static string romio_no_indep_rw;
 
         static MPI_Info get_info();
         static string to_string();

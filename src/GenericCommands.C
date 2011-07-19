@@ -116,6 +116,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::CB_BUFFER_SIZE);
     parser.push_back(&CommandLineOption::ROMIO_CB_READ);
     parser.push_back(&CommandLineOption::ROMIO_DS_READ);
+    parser.push_back(&CommandLineOption::ROMIO_NO_INDEP_RW);
     parser.push_back(&CommandLineOption::STRIPING_UNIT);
     parser.push_back(&CommandLineOption::READ_ALL_RECORDS);
     parser.push_back(&CommandLineOption::READ_ALL_VARIABLES);
@@ -377,6 +378,9 @@ void GenericCommands::parse(int argc, char **argv)
     }
     if (parser.count("striping_unit")) {
         Hints::striping_unit = parser.get_argument("striping_unit");
+    }
+    if (parser.count("romio_no_indep_rw")) {
+        Hints::romio_no_indep_rw = parser.get_argument("romio_no_indep_rw");
     }
     //pagoda::println_zero("Hints\n" + Hints::to_string());
 }

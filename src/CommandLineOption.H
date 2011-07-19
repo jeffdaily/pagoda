@@ -121,6 +121,7 @@ class CommandLineOption
         static CommandLineOption READ_ALL_VARIABLES;
         static CommandLineOption ROMIO_CB_READ;
         static CommandLineOption ROMIO_DS_READ;
+        static CommandLineOption ROMIO_NO_INDEP_RW;
         static CommandLineOption STRIPING_UNIT;
         static CommandLineOption TOPOLOGY;
         static CommandLineOption UNION;
