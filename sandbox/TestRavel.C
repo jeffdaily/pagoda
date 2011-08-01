@@ -2,6 +2,8 @@
 #   include "config.h"
 #endif // HAVE_CONFIG_H
 
+#include <stdint.h>
+
 // C++ includes, std and otherwise
 #include <cstdio>
 #include <cstdlib>

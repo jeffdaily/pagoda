@@ -7,9 +7,12 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 using namespace std;
 
 #include "Array.H"

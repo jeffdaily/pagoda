@@ -1,14 +1,16 @@
+#include <stdint.h>
+
 #include <iostream>
 #include <sstream>
 #include <vector>
-
-#include "pagoda.H"
-#include "timer.h"
 
 using std::cout;
 using std::endl;
 using std::istringstream;
 using std::vector;
+
+#include "pagoda.H"
+#include "timer.h"
 
 #define BYTES_PER_GB 1073741824.0
 

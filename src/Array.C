@@ -5,8 +5,13 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <vector>
+
+using std::vector;
 
 #include "Array.H"
+#include "DataType.H"
+#include "Dimension.H"
 #include "GlobalArray.H"
 #include "NodeZeroArray.H"
 #include "ScalarArray.H"

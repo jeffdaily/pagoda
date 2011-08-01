@@ -2,17 +2,21 @@
 #   include "config.h"
 #endif
 
+#include <stdint.h>
+
 #include <cstdlib>
 #include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
 
 #include "Array.H"
 #include "Bootstrap.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Util.H"
-
-using std::cout;
-using std::endl;
 
 
 template <class T>

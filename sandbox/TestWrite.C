@@ -3,8 +3,16 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <cstdlib>
 #include <iostream>
+#include <vector>
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::vector;
 
 #include "Array.H"
 #include "Bootstrap.H"
@@ -13,10 +21,6 @@
 #include "FileWriter.H"
 #include "Util.H"
 #include "Variable.H"
-
-using std::cerr;
-using std::cout;
-using std::endl;
 
 
 /**

@@ -2,13 +2,17 @@
 #   include "config.h"
 #endif
 
+#include <stdint.h>
+
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 
-using std::setw;
 using std::cout;
 using std::endl;
+using std::setw;
+using std::vector;
 
 #include "Array.H"
 #include "Bootstrap.H"

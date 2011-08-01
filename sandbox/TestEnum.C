@@ -7,17 +7,21 @@
 #   include <config.h>
 #endif
 
+#include <stdint.h>
+
 #include <cstdlib>
 #include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
 
 #include "Array.H"
 #include "Bootstrap.H"
 #include "gax.H"
 #include "Pack.H"
 #include "Util.H"
-
-using std::cout;
-using std::endl;
 
 
 int main(int argc, char **argv)
