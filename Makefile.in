@@ -90,7 +90,7 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestCommandLine \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestDimension sandbox/TestEnum \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGet sandbox/TestGrid \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestMaskMap \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestGroups sandbox/TestMaskMap \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum sandbox/TestRavel \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead sandbox/TestScatter \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestUnion \
@@ -175,8 +175,8 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
 	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
 	src/PgboCommands.C src/PgeaCommands.C src/PgflintCommands.C \
-	src/PgraCommands.C src/Print.C src/RegularGrid.C \
-	src/ScalarArray.C src/StringComparator.C \
+	src/PgraCommands.C src/Print.C src/ProcessGroup.C \
+	src/RegularGrid.C src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Util.C src/Validator.C \
 	src/Values.C src/Variable.C src/GlobalArray.C \
 	src/GlobalArray.H src/GlobalArray.def src/GlobalMask.C \
@@ -226,10 +226,11 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/IndexHyperslab.lo src/LatLonBox.lo src/Mask.lo \
 	src/MaskMap.lo src/Pack.lo src/PgboCommands.lo \
 	src/PgeaCommands.lo src/PgflintCommands.lo src/PgraCommands.lo \
-	src/Print.lo src/RegularGrid.lo src/ScalarArray.lo \
-	src/StringComparator.lo src/SubsetterCommands.lo src/Util.lo \
-	src/Validator.lo src/Values.lo src/Variable.lo \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3)
+	src/Print.lo src/ProcessGroup.lo src/RegularGrid.lo \
+	src/ScalarArray.lo src/StringComparator.lo \
+	src/SubsetterCommands.lo src/Util.lo src/Validator.lo \
+	src/Values.lo src/Variable.lo $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3)
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -256,6 +257,7 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@	sandbox/TestEnum$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGet$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGrid$(EXEEXT) \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestGroups$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestMaskMap$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel$(EXEEXT) \
@@ -383,6 +385,14 @@ am__sandbox_TestGrid_SOURCES_DIST = sandbox/TestGrid.C
 sandbox_TestGrid_OBJECTS = $(am_sandbox_TestGrid_OBJECTS)
 sandbox_TestGrid_LDADD = $(LDADD)
 sandbox_TestGrid_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
+am__sandbox_TestGroups_SOURCES_DIST = sandbox/TestGroups.C
+@ENABLE_SANDBOX_TRUE@am_sandbox_TestGroups_OBJECTS =  \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestGroups.$(OBJEXT)
+sandbox_TestGroups_OBJECTS = $(am_sandbox_TestGroups_OBJECTS)
+sandbox_TestGroups_LDADD = $(LDADD)
+sandbox_TestGroups_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2)
 am__sandbox_TestJoin_SOURCES_DIST = sandbox/TestJoin.C
@@ -696,7 +706,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestDimension_SOURCES) \
 	$(sandbox_TestDistance_SOURCES) $(sandbox_TestEnum_SOURCES) \
 	$(sandbox_TestGet_SOURCES) $(sandbox_TestGrid_SOURCES) \
-	$(sandbox_TestJoin_SOURCES) $(sandbox_TestMaskMap_SOURCES) \
+	$(sandbox_TestGroups_SOURCES) $(sandbox_TestJoin_SOURCES) \
+	$(sandbox_TestMaskMap_SOURCES) \
 	$(sandbox_TestPartialSum_SOURCES) \
 	$(sandbox_TestPnetcdfAttribute_SOURCES) \
 	$(sandbox_TestPnetcdfDataset_SOURCES) \
@@ -730,6 +741,7 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestEnum_SOURCES_DIST) \
 	$(am__sandbox_TestGet_SOURCES_DIST) \
 	$(am__sandbox_TestGrid_SOURCES_DIST) \
+	$(am__sandbox_TestGroups_SOURCES_DIST) \
 	$(am__sandbox_TestJoin_SOURCES_DIST) \
 	$(am__sandbox_TestMaskMap_SOURCES_DIST) \
 	$(am__sandbox_TestPartialSum_SOURCES_DIST) \
@@ -955,13 +967,13 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/GenericCommands.H src/GeoGrid.H src/Grid.H src/Hints.H \
 	src/IndexHyperslab.H src/LatLonBox.H src/Mask.H src/MaskMap.H \
 	src/NodeZeroArray.H src/NotImplementedException.H src/pagoda.H \
-	src/Pack.H src/PgboCommands.H src/PgeaCommands.H \
-	src/PgflintCommands.H src/PgraCommands.H src/PagodaException.H \
-	src/Print.H src/RangeException.H src/RegularGrid.H \
-	src/ScalarArray.H src/Slice.H src/StringComparator.H \
-	src/SubsetterCommands.H src/TypedValues.H src/Util.H \
-	src/Validator.H src/ValidMax.H src/ValidMin.H src/ValidRange.H \
-	src/Values.H src/Variable.H
+	src/Pack.H src/PagodaException.H src/PgboCommands.H \
+	src/PgeaCommands.H src/PgflintCommands.H src/PgraCommands.H \
+	src/Print.H src/ProcessGroup.H src/RangeException.H \
+	src/RegularGrid.H src/ScalarArray.H src/Slice.H \
+	src/StringComparator.H src/SubsetterCommands.H \
+	src/TypedValues.H src/Util.H src/Validator.H src/ValidMax.H \
+	src/ValidMin.H src/ValidRange.H src/Values.H src/Variable.H
 pagodadir = $(datadir)/pagoda
 pgdump_SOURCES = src/pgdump.C
 pgsub_SOURCES = src/pgsub.C
@@ -986,8 +998,8 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
 	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
 	src/PgboCommands.C src/PgeaCommands.C src/PgflintCommands.C \
-	src/PgraCommands.C src/Print.C src/RegularGrid.C \
-	src/ScalarArray.C src/StringComparator.C \
+	src/PgraCommands.C src/Print.C src/ProcessGroup.C \
+	src/RegularGrid.C src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Util.C src/Validator.C \
 	src/Values.C src/Variable.C $(am__append_3) $(am__append_4) \
 	$(am__append_5)
@@ -1031,6 +1043,7 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestEnum_SOURCES = sandbox/TestEnum.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestGet_SOURCES = sandbox/TestGet.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestGrid_SOURCES = sandbox/TestGrid.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestGroups_SOURCES = sandbox/TestGroups.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestJoin_SOURCES = sandbox/TestJoin.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestPnetcdfAttribute_SOURCES = sandbox/TestPnetcdfAttribute.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestPnetcdfDataset_SOURCES = sandbox/TestPnetcdfDataset.C
@@ -1206,6 +1219,7 @@ src/PgflintCommands.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/PgraCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Print.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/ProcessGroup.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/RegularGrid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ScalarArray.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/StringComparator.lo: src/$(am__dirstamp) \
@@ -1375,6 +1389,11 @@ sandbox/TestGrid.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestGrid$(EXEEXT): $(sandbox_TestGrid_OBJECTS) $(sandbox_TestGrid_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestGrid$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestGrid_OBJECTS) $(sandbox_TestGrid_LDADD) $(LIBS)
+sandbox/TestGroups.$(OBJEXT): sandbox/$(am__dirstamp) \
+	sandbox/$(DEPDIR)/$(am__dirstamp)
+sandbox/TestGroups$(EXEEXT): $(sandbox_TestGroups_OBJECTS) $(sandbox_TestGroups_DEPENDENCIES) sandbox/$(am__dirstamp)
+	@rm -f sandbox/TestGroups$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestGroups_OBJECTS) $(sandbox_TestGroups_LDADD) $(LIBS)
 sandbox/TestJoin.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestJoin$(EXEEXT): $(sandbox_TestJoin_OBJECTS) $(sandbox_TestJoin_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1557,6 +1576,7 @@ mostlyclean-compile:
 	-rm -f sandbox/TestEnum.$(OBJEXT)
 	-rm -f sandbox/TestGet.$(OBJEXT)
 	-rm -f sandbox/TestGrid.$(OBJEXT)
+	-rm -f sandbox/TestGroups.$(OBJEXT)
 	-rm -f sandbox/TestJoin.$(OBJEXT)
 	-rm -f sandbox/TestMaskMap.$(OBJEXT)
 	-rm -f sandbox/TestPartialSum.$(OBJEXT)
@@ -1708,6 +1728,8 @@ mostlyclean-compile:
 	-rm -f src/PnetcdfVariable.lo
 	-rm -f src/Print.$(OBJEXT)
 	-rm -f src/Print.lo
+	-rm -f src/ProcessGroup.$(OBJEXT)
+	-rm -f src/ProcessGroup.lo
 	-rm -f src/RegularGrid.$(OBJEXT)
 	-rm -f src/RegularGrid.lo
 	-rm -f src/ScalarArray.$(OBJEXT)
@@ -1743,6 +1765,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestEnum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestGet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestGrid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestGroups.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestJoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestMaskMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestPartialSum.Po@am__quote@
@@ -1835,6 +1858,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfTiming.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PnetcdfVariable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Print.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ProcessGroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/RegularGrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ScalarArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/StringComparator.Plo@am__quote@
