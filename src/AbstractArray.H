@@ -99,10 +99,10 @@ class AbstractArray : public Array
         virtual void release_update() = 0;
 
         /** @copydoc Array::get(void*) const */
-        virtual void* get(void *buffer=NULL) const = 0;
+        virtual void* get(void *buffer=NULL) const;
 
         /** @copydoc Array::get(int64_t,int64_t,void*) const */
-        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const = 0;
+        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const;
 
         /** @copydoc Array::get(const vector<int64_t>&,const vector<int64_t>&,void*) const */
         virtual void* get(const vector<int64_t> &lo,
@@ -110,15 +110,27 @@ class AbstractArray : public Array
                           void *buffer=NULL) const = 0;
 
         /** @copydoc Array::put(void*) */
-        virtual void put(void *buffer) = 0;
+        virtual void put(void *buffer);
 
         /** @copydoc Array::put(void*,int64_t,int64_t) */
-        virtual void put(void *buffer, int64_t lo, int64_t hi) = 0;
+        virtual void put(void *buffer, int64_t lo, int64_t hi);
 
         /** @copydoc Array::put(void*,const vector<int64_t>&,const vector<int64_t>&) */
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
                          const vector<int64_t> &hi) = 0;
+
+        /** @copydoc Array::acc(void*) */
+        virtual void acc(void *buffer, void *alpha=NULL);
+
+        /** @copydoc Array::acc(void*,int64_t,int64_t) */
+        virtual void acc(void *buffer, int64_t lo, int64_t hi, void *alpha=NULL);
+
+        /** @copydoc Array::acc(void*,const vector<int64_t>&,const vector<int64_t>&) */
+        virtual void acc(void *buffer,
+                         const vector<int64_t> &lo,
+                         const vector<int64_t> &hi,
+                         void *alpha=NULL) = 0;
 
         /** @copydoc Array::scatter(void*,vector<int64_t>&) */
         virtual void scatter(void *buffer, vector<int64_t> &subscripts) = 0;

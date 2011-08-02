@@ -352,6 +352,46 @@ class Array
                          const vector<int64_t> &hi) = 0;
 
         /**
+         * Accumulates data from the source buffer into into the Array.
+         *
+         * The buffer is assumed to both have the same number of elements as
+         * the entire Array and also to be contiguous.
+         *
+         * @param[in] buffer the contiguous buffer
+         */
+        virtual void acc(void *buffer, void *alpha=NULL) = 0;
+
+        /**
+         * Accumulates data from the source buffer into into the 1-D Array.
+         *
+         * The buffer is assumed both to have the same number of elements as
+         * the indicated patch and also to be contiguous.
+         *
+         * It is an error to call this if the rank of the Array is not 1.
+         *
+         * @param[in] buffer the contiguous buffer
+         * @param[in] lo
+         * @param[in] hi
+         */
+        virtual void acc(void *buffer, int64_t lo, int64_t hi,
+                         void *alpha=NULL) = 0;
+
+        /**
+         * Accumulates data from the source buffer into into the Array patch.
+         *
+         * The buffer is assumed to have the same number of elements as the
+         * indicated patch.
+         *
+         * @param[in] buffer the contiguous buffer
+         * @param[in] lo
+         * @param[in] hi
+         */
+        virtual void acc(void *buffer,
+                         const vector<int64_t> &lo,
+                         const vector<int64_t> &hi,
+                         void *alpha=NULL) = 0;
+
+        /**
          * Scatters values into this Array.
          *
          * The order of the values in the provided buffer should match the

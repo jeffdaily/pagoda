@@ -209,6 +209,63 @@ Array* AbstractArray::cast(DataType new_type) const
 }
 
 
+void* AbstractArray::get(void *buffer) const
+{
+    vector<int64_t> my_shape = get_shape();
+    vector<int64_t> lo(0, my_shape.size());
+    vector<int64_t> hi(my_shape.begin(), my_shape.end());
+
+    // indexing is inclusive i.e. shape is 1 too big
+    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+
+    return get(lo, hi, buffer);
+}
+
+
+void* AbstractArray::get(int64_t lo, int64_t hi, void *buffer) const
+{
+    return get(vector<int64_t>(1,lo), vector<int64_t>(1,hi), buffer);
+}
+
+
+void AbstractArray::put(void *buffer)
+{
+    vector<int64_t> my_shape = get_shape();
+    vector<int64_t> lo(0, my_shape.size());
+    vector<int64_t> hi(my_shape.begin(), my_shape.end());
+
+    // indexing is inclusive i.e. shape is 1 too big
+    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+
+    put(buffer, lo, hi);
+}
+
+
+void AbstractArray::put(void *buffer, int64_t lo, int64_t hi)
+{
+    put(buffer, vector<int64_t>(1,lo), vector<int64_t>(1,hi));
+}
+
+
+void AbstractArray::acc(void *buffer, void *alpha)
+{
+    vector<int64_t> my_shape = get_shape();
+    vector<int64_t> lo(0, my_shape.size());
+    vector<int64_t> hi(my_shape.begin(), my_shape.end());
+
+    // indexing is inclusive i.e. shape is 1 too big
+    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+
+    acc(buffer, lo, hi, alpha);
+}
+
+
+void AbstractArray::acc(void *buffer, int64_t lo, int64_t hi, void *alpha)
+{
+    acc(buffer, vector<int64_t>(1,lo), vector<int64_t>(1,hi), alpha);
+}
+
+
 Array* AbstractArray::add(const Array *rhs) const
 {
     Array *array = clone();

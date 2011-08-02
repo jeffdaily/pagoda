@@ -774,38 +774,6 @@ void GlobalArray::release_update()
 }
 
 
-void* GlobalArray::get(void *buffer) const
-{
-    vector<int64_t> lo(0, shape.size());
-    vector<int64_t> hi(shape.begin(), shape.end());
-    vector<int64_t> shape_copy(shape.begin(), shape.end());
-
-    // GA indexing is inclusive i.e. shape is 1 too big
-    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
-
-    if (buffer == NULL) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            buffer = static_cast<void*>(new T[pagoda::shape_to_size(shape)]); \
-        } else
-#include "DataType.def"
-        {
-            EXCEPT(DataTypeException, "DataType not handled", type);
-        }
-    }
-
-    NGA_Get64(handle, &lo[0], &hi[0], buffer, &shape_copy[1]);
-
-    return buffer;
-}
-
-
-void* GlobalArray::get(int64_t lo, int64_t hi, void *buffer) const
-{
-    return get(vector<int64_t>(1,lo), vector<int64_t>(1,hi), buffer);
-}
-
-
 void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
                        void *buffer) const
 {
@@ -831,26 +799,6 @@ void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
 }
 
 
-void GlobalArray::put(void *buffer)
-{
-    vector<int64_t> lo(0, shape.size());
-    vector<int64_t> hi(shape.begin(), shape.end());
-    vector<int64_t> shape_copy(shape.begin(), shape.end());
-
-
-    // GA indexing is inclusive i.e. shape is 1 too big
-    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
-
-    NGA_Put64(handle, &lo[0], &hi[0], buffer, &shape_copy[1]);
-}
-
-
-void GlobalArray::put(void *buffer, int64_t lo, int64_t hi)
-{
-    put(buffer, vector<int64_t>(1,lo), vector<int64_t>(1,hi));
-}
-
-
 void GlobalArray::put(void *buffer,
                       const vector<int64_t> &lo, const vector<int64_t> &hi)
 {
@@ -858,6 +806,17 @@ void GlobalArray::put(void *buffer,
     vector<int64_t> hi_copy(hi.begin(), hi.end());
     vector<int64_t> shape = pagoda::get_shape(lo, hi);
     NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1]);
+}
+
+
+void GlobalArray::acc(void *buffer,
+                      const vector<int64_t> &lo, const vector<int64_t> &hi,
+                      void *alpha)
+{
+    vector<int64_t> lo_copy(lo.begin(), lo.end());
+    vector<int64_t> hi_copy(hi.begin(), hi.end());
+    vector<int64_t> shape = pagoda::get_shape(lo, hi);
+    NGA_Acc64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1], alpha);
 }
 
 
