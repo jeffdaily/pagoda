@@ -23,10 +23,14 @@ class ProcessGroup
          *
          * @param[in] id of the group
          */
-        ProcessGroup(int id);
+        ProcessGroup(int color);
 
         /**
-         * Return the ID used to create the group.
+         * Return the ID of the group.
+         *
+         * If Global Arrays is used, this is the process group handle. If
+         * Global Arrays is not used, this is a non-negative integer such that
+         * all groups have a unique ID.
          */
         int get_id() const;
 
@@ -36,9 +40,21 @@ class ProcessGroup
         MPI_Comm get_comm() const;
 
         /**
-         * Return the Global Arrays group ID associated with the group.
+         * Return the ordered set of ranks associated with this group.
+         *
+         * The ranks are with respect to the world group.
          */
-        int get_ga_group() const;
+        const vector<int>& get_ranks() const;
+
+        /**
+         * Return the number of processes within this group.
+         */
+        int get_size() const;
+
+        /**
+         * Return the rank of this process with respect to the group size.
+         */
+        int get_rank() const;
 
         /**
          * Return the world ProcessGroup.
@@ -48,8 +64,8 @@ class ProcessGroup
     protected:
         int id;
         MPI_Comm comm;
-        int ga_id;
         vector<int> ranks;
+        int rank;
         int size;
 };
 

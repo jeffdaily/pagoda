@@ -774,6 +774,18 @@ void GlobalArray::release_update()
 }
 
 
+void* GlobalArray::get(void *buffer) const
+{
+    return AbstractArray::get(buffer);
+}
+
+
+void* GlobalArray::get(int64_t lo, int64_t hi, void *buffer) const
+{
+    return AbstractArray::get(lo,hi,buffer);
+}
+
+
 void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
                        void *buffer) const
 {
@@ -799,6 +811,18 @@ void* GlobalArray::get(const vector<int64_t> &lo,const vector<int64_t> &hi,
 }
 
 
+void GlobalArray::put(void *buffer)
+{
+    AbstractArray::put(buffer);
+}
+
+
+void GlobalArray::put(void *buffer, int64_t lo, int64_t hi)
+{
+    AbstractArray::put(buffer,lo,hi);
+}
+
+
 void GlobalArray::put(void *buffer,
                       const vector<int64_t> &lo, const vector<int64_t> &hi)
 {
@@ -806,6 +830,18 @@ void GlobalArray::put(void *buffer,
     vector<int64_t> hi_copy(hi.begin(), hi.end());
     vector<int64_t> shape = pagoda::get_shape(lo, hi);
     NGA_Put64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1]);
+}
+
+
+void GlobalArray::acc(void *buffer, void *alpha)
+{
+    AbstractArray::acc(buffer,alpha);
+}
+
+
+void GlobalArray::acc(void *buffer, int64_t lo, int64_t hi, void *alpha)
+{
+    AbstractArray::acc(buffer,lo,hi,alpha);
 }
 
 

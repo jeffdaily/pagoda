@@ -239,6 +239,39 @@ void ScalarArray::put(void *buffer,
 }
 
 
+void ScalarArray::acc(void *buffer, void *alpha)
+{
+#define DATATYPE_EXPAND(DT,T) \
+    if (DT == type) { \
+        if (alpha == NULL) { \
+            *static_cast<T*>(value) += *static_cast<T*>(buffer); \
+        } else { \
+            *static_cast<T*>(value) += *static_cast<T*>(buffer) * *static_cast<T*>(alpha); \
+        } \
+    } else
+#include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+}
+
+
+void ScalarArray::acc(void *buffer, int64_t lo, int64_t hi, void *alpha)
+{
+    ERR("ScalarArray::acc(void*,int64_t,int64_t,void*) invalid for ScalarArray");
+}
+
+
+void ScalarArray::acc(void *buffer,
+                      const vector<int64_t> &lo, const vector<int64_t> &hi,
+                      void *alpha)
+{
+    ASSERT(lo.empty());
+    ASSERT(hi.empty());
+    acc(buffer,alpha);
+}
+
+
 void ScalarArray::scatter(void *buffer, vector<int64_t> &subscripts)
 {
     ASSERT(subscripts.empty());

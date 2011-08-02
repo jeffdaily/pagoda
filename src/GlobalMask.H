@@ -79,6 +79,13 @@ class GlobalMask : public Mask
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
                          const vector<int64_t> &hi);
+        virtual void acc(void *buffer, void *alpha=NULL);
+        virtual void acc(void *buffer, int64_t lo, int64_t hi,
+                         void *alpha=NULL);
+        virtual void acc(void *buffer,
+                         const vector<int64_t> &lo,
+                         const vector<int64_t> &hi,
+                         void *alpha=NULL);
         virtual void scatter(void *buffer, vector<int64_t> &subscripts);
         virtual void* gather(vector<int64_t> &subscripts,
                              void *buffer=NULL) const;

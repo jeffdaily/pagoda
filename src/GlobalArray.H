@@ -66,12 +66,19 @@ class GlobalArray : public AbstractArray
         virtual void release() const;
         virtual void release_update();
 
+        virtual void* get(void *buffer=NULL) const;
+        virtual void* get(int64_t lo, int64_t hi, void *buffer=NULL) const;
         virtual void* get(const vector<int64_t> &lo,
                           const vector<int64_t> &hi,
                           void *buffer=NULL) const;
+        virtual void put(void *buffer);
+        virtual void put(void *buffer, int64_t lo, int64_t hi);
         virtual void put(void *buffer,
                          const vector<int64_t> &lo,
                          const vector<int64_t> &hi);
+        virtual void acc(void *buffer, void *alpha=NULL);
+        virtual void acc(void *buffer, int64_t lo, int64_t hi,
+                         void *alpha=NULL);
         virtual void acc(void *buffer,
                          const vector<int64_t> &lo,
                          const vector<int64_t> &hi,

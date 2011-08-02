@@ -644,6 +644,26 @@ void GlobalMask::put(void *buffer,
 }
 
 
+void GlobalMask::acc(void *buffer, void *alpha)
+{
+    mask->acc(buffer,alpha);
+}
+
+
+void GlobalMask::acc(void *buffer, int64_t lo, int64_t hi, void *alpha)
+{
+    mask->acc(buffer,lo,hi,alpha);
+}
+
+
+void GlobalMask::acc(void *buffer,
+                     const vector<int64_t> &lo, const vector<int64_t> &hi,
+                     void *alpha)
+{
+    mask->acc(buffer,lo,hi,alpha);
+}
+
+
 void GlobalMask::scatter(void *buffer, vector<int64_t> &subscripts)
 {
     mask->scatter(buffer,subscripts);
