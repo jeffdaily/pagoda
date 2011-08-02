@@ -11,6 +11,7 @@ using std::vector;
 
 #include "AbstractDataset.H"
 #include "FileFormat.H"
+#include "ProcessGroup.H"
 
 class Array;
 class Attribute;
@@ -21,7 +22,7 @@ class PnetcdfDimension;
 class PnetcdfVariable;
 class Variable;
 
-Dataset* pagoda_pnetcdf_open(const string &filename);
+Dataset* pagoda_pnetcdf_open(const string &filename, const ProcessGroup &group);
 
 /**
  * The pnetcdf implementation of the Dataset.
@@ -41,6 +42,14 @@ class PnetcdfDataset : public AbstractDataset
          * @param[in] filename to open
          */
         PnetcdfDataset(const string &filename);
+
+        /**
+         * Constructs a PnetcdfDataset by opening the given filename and group.
+         *
+         * @param[in] filename to open
+         * @param[in] group process group to use during open
+         */
+        PnetcdfDataset(const string &filename, const ProcessGroup &group);
 
         /**
          * Destructs and automatically closes the PnetcdfDataset.
@@ -115,6 +124,12 @@ class PnetcdfDataset : public AbstractDataset
         friend class PnetcdfVariable;
 
     protected:
+        /**
+         * Common construction code.
+         */
+        void init();
+
+        ProcessGroup group; /**< process group the file is opened on */
         string filename; /**< name of the file opened */
         int ncid; /**< NetCDF handle for the opened file */
         int udim; /**< NetCDF handle for the unlimited (aka record) dim */

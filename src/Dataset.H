@@ -9,6 +9,7 @@
 
 #include "FileFormat.H"
 #include "LatLonBox.H"
+#include "ProcessGroup.H"
 #include "Slice.H"
 
 using std::ostream;
@@ -29,7 +30,7 @@ class Variable;
 class Dataset
 {
     public:
-        typedef Dataset*(*opener_t)(const string &);
+        typedef Dataset*(*opener_t)(const string &, const ProcessGroup &);
 
         /**
          * Opens the given filename and deduces the appropriate type handler.
@@ -38,6 +39,15 @@ class Dataset
          * @return the Dataset
          */
         static Dataset* open(const string &filename);
+
+        /**
+         * Opens the given filename and deduces the appropriate type handler.
+         *
+         * @param[in] filename the name of the file to open
+         * @param[in] group the process group used to open the file
+         * @return the Dataset
+         */
+        static Dataset* open(const string &filename, const ProcessGroup &group);
 
         /**
          * Registers a file format handler.

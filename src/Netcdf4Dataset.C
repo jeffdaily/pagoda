@@ -13,14 +13,15 @@
 #include "Netcdf4Error.H"
 #include "Netcdf4Variable.H"
 #include "Netcdf4.H"
+#include "ProcessGroup.H"
 #include "Util.H"
 
 
-Dataset* pagoda_netcdf4_open(const string &filename)
+Dataset* pagoda_netcdf4_open(const string &filename, const ProcessGroup &group)
 {
     Dataset *ret = NULL;
     try {
-        ret = new Netcdf4Dataset(filename);
+        ret = new Netcdf4Dataset(filename, group);
     } catch (PagodaException &ex) {
         if (ret != NULL) {
             delete ret;
@@ -98,6 +99,7 @@ DataType Netcdf4Dataset::to_dt(const nc_type &type)
 
 Netcdf4Dataset::Netcdf4Dataset(const string &filename)
     :   AbstractDataset()
+    ,   group(ProcessGroup::get_world())
     ,   filename(filename)
     ,   ncid(-1)
     ,   udim(-1)
@@ -106,10 +108,32 @@ Netcdf4Dataset::Netcdf4Dataset(const string &filename)
     ,   vars()
     ,   is_open(false)
 {
+    init();
+}
+
+
+Netcdf4Dataset::Netcdf4Dataset(const string &filename,
+        const ProcessGroup &group)
+    :   AbstractDataset()
+    ,   group(group)
+    ,   filename(filename)
+    ,   ncid(-1)
+    ,   udim(-1)
+    ,   atts()
+    ,   dims()
+    ,   vars()
+    ,   is_open(false)
+{
+    init();
+}
+
+
+void Netcdf4Dataset::init()
+{
     int ndim;
     int nvar;
     int natt;
-    ncid = nc::open(filename, NC_NOWRITE, MPI_COMM_WORLD, MPI_INFO_NULL);
+    ncid = nc::open(filename, NC_NOWRITE, group.get_comm(), MPI_INFO_NULL);
     is_open = true;
     nc::inq(ncid, ndim, nvar, natt, udim);
     for (int attid=0; attid<natt; ++attid) {

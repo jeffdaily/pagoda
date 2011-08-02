@@ -7,6 +7,7 @@
 #include "Dataset.H"
 #include "Dimension.H"
 #include "Error.H"
+#include "ProcessGroup.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -18,12 +19,18 @@ vector<Dataset::opener_t> Dataset::openers;
 
 Dataset* Dataset::open(const string &filename)
 {
+    return open(filename, ProcessGroup::get_world());
+}
+
+
+Dataset* Dataset::open(const string &filename, const ProcessGroup &group)
+{
     Dataset *dataset = NULL;
     vector<opener_t>::iterator it = Dataset::openers.begin();
     vector<opener_t>::iterator end = Dataset::openers.end();
 
     for (; it != end; ++it) {
-        dataset = (*it)(filename);
+        dataset = (*it)(filename, group);
         if (NULL != dataset) {
             break;
         }

@@ -11,6 +11,7 @@ using std::vector;
 
 #include "AbstractDataset.H"
 #include "FileFormat.H"
+#include "ProcessGroup.H"
 
 class Array;
 class Attribute;
@@ -21,7 +22,7 @@ class Netcdf4Dimension;
 class Netcdf4Variable;
 class Variable;
 
-Dataset* pagoda_netcdf4_open(const string &filename);
+Dataset* pagoda_netcdf4_open(const string &filename, const ProcessGroup &group);
 
 /**
  * The netcdf4 implementation of the Dataset.
@@ -41,6 +42,14 @@ class Netcdf4Dataset : public AbstractDataset
          * @param[in] filename to open
          */
         Netcdf4Dataset(const string &filename);
+
+        /**
+         * Constructs a Netcdf4Dataset by opening the given filename and group.
+         *
+         * @param[in] filename to open
+         * @param[in] group process group to use during open
+         */
+        Netcdf4Dataset(const string &filename, const ProcessGroup &group);
 
         /**
          * Destructs and automatically closes the Netcdf4Dataset.
@@ -115,6 +124,9 @@ class Netcdf4Dataset : public AbstractDataset
         friend class Netcdf4Variable;
 
     protected:
+        void init();
+
+        ProcessGroup group; /**< process group the file opened on */
         string filename; /**< name of the file opened */
         int ncid; /**< NetCDF handle for the opened file */
         int udim; /**< NetCDF handle for the unlimited (aka record) dim */

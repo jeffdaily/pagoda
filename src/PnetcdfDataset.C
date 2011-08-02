@@ -16,14 +16,15 @@
 #include "PnetcdfError.H"
 #include "PnetcdfVariable.H"
 #include "PnetcdfNS.H"
+#include "ProcessGroup.H"
 #include "Util.H"
 
 
-Dataset* pagoda_pnetcdf_open(const string &filename)
+Dataset* pagoda_pnetcdf_open(const string &filename, const ProcessGroup &group)
 {
     Dataset *ret = NULL;
     try {
-        ret = new PnetcdfDataset(filename);
+        ret = new PnetcdfDataset(filename, group);
     } catch (PagodaException &ex) {
         if (ret != NULL) {
             delete ret;
@@ -100,6 +101,7 @@ DataType PnetcdfDataset::to_dt(const nc_type &type)
 
 PnetcdfDataset::PnetcdfDataset(const string &filename)
     :   AbstractDataset()
+    ,   group(ProcessGroup::get_world())
     ,   filename(filename)
     ,   ncid(-1)
     ,   udim(-1)
@@ -108,11 +110,33 @@ PnetcdfDataset::PnetcdfDataset(const string &filename)
     ,   vars()
     ,   is_open(false)
 {
+    init();
+}
+
+
+PnetcdfDataset::PnetcdfDataset(const string &filename,
+        const ProcessGroup &group)
+    :   AbstractDataset()
+    ,   group(group)
+    ,   filename(filename)
+    ,   ncid(-1)
+    ,   udim(-1)
+    ,   atts()
+    ,   dims()
+    ,   vars()
+    ,   is_open(false)
+{
+    init();
+}
+
+
+void PnetcdfDataset::init()
+{
     int ndim;
     int nvar;
     int natt;
     MPI_Info info = Hints::get_info();
-    ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_NOWRITE, info);
+    ncid = ncmpi::open(group.get_comm(), filename, NC_NOWRITE, info);
     is_open = true;
     ncmpi::inq(ncid, ndim, nvar, natt, udim);
     for (int attid=0; attid<natt; ++attid) {
