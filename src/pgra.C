@@ -404,13 +404,14 @@ void pgra_nonblocking_groups(Dataset *dataset,
 #if ROUND_ROBIN_GROUPS
     color = pagoda::me%cmd.get_number_of_groups();
 #else
-    color = pagoda::me/(pagoda::npe/cmd.get_number_of_groups());
+    color = pagoda::me/int(1.0*pagoda::npe/cmd.get_number_of_groups()+0.5);
 #endif
     ASSERT(cmd.get_number_of_groups() <= pagoda::npe);
     ASSERT(color >= 0);
     group = ProcessGroup(color);
 
     filenames = cmd.get_input_filenames();
+    ASSERT(filenames.size() >= cmd.get_number_of_groups());
     for (size_t i=0; i<filenames.size(); ++i) {
         Dataset *local_dataset;
         vector<Variable*> local_vars;
@@ -430,14 +431,11 @@ void pgra_nonblocking_groups(Dataset *dataset,
         local_vars = cmd.get_variables(local_dataset);
         Variable::split(local_vars, local_record_vars, local_nonrecord_vars);
         
-        pagoda::println_sync("local_nrec = " + pagoda::to_string(local_nrec));
-
         // create local arrays if needed
         for (size_t i=0; i<local_record_vars.size(); ++i) {
             Variable *var = local_record_vars[i];
             string name = var->get_name();
             if (local_results.count(name) == 0) {
-                pagoda::println_sync(name + " did not exist, creating");
                 Array *array = var->alloc(true);
                 Array *result = var->alloc(true);
                 result->fill_value(0);
@@ -449,8 +447,6 @@ void pgra_nonblocking_groups(Dataset *dataset,
                 }
                 local_arrays.insert(make_pair(name, array));
                 local_results.insert(make_pair(name, result));
-            } else {
-                pagoda::println_sync(name + " existed");
             }
         }
 
@@ -530,7 +526,6 @@ void pgra_nonblocking_groups(Dataset *dataset,
     }
     local_arrays.clear();
 
-    pagoda::println_sync("local_tallys.size() " + pagoda::to_string(local_tallys.size()));
     // accumulate local results to global results
     // we copy one-group-array-at-a-time to a temporary global array and
     // perform the global accumulation
@@ -545,30 +540,33 @@ void pgra_nonblocking_groups(Dataset *dataset,
         Array *local_result = local_results.find(name)->second;
         bool first = true;
 
-        pagoda::println_sync("accumulating " + name);
         // TODO TODO TODO!!accumulate the global_tally!!
         if (global_tallys.count(name) == 1) {
             global_tally = global_tallys.find(name)->second;
         }
         for (int i=0; i<cmd.get_number_of_groups(); ++i) {
-            pagoda::println_sync("color is " + pagoda::to_string(i));
             if (first) {
-                pagoda::println_sync("first");
                 // first group's array is copied directly to result
                 if (i == color) {
-                    global_result->copy(local_result);
+                    if (local_result->owns_data()) {
+                        vector<int64_t> lo,hi;
+                        void *buf = local_result->access();
+                        local_result->get_distribution(lo,hi);
+                        global_result->put(buf,lo,hi);
+                    }
                 }
                 pagoda::barrier();
-                if (name == "time") {
-                    pagoda::println_sync("time value " + pagoda::to_string(*static_cast<double*>(global_result->get())));
-                }
                 first = false;
                 continue;
             } else {
-                pagoda::println_sync("NOT first");
                 // subsequent groups' arrays are copied and modified
                 if (i == color) {
-                    global_array->copy(local_result);
+                    if (local_result->owns_data()) {
+                        vector<int64_t> lo,hi;
+                        void *buf = local_result->access();
+                        local_result->get_distribution(lo,hi);
+                        global_array->put(buf,lo,hi);
+                    }
                 }
                 pagoda::barrier();
                 if (op == OP_MAX) {
@@ -585,42 +583,7 @@ void pgra_nonblocking_groups(Dataset *dataset,
                 }
             }
         }
-        if (name == "time") {
-            global_result->dump();
-        }
     }
-
-#if 0 /*first attempt doesn't work since ga.acc() does do all we need */
-    // accumulate local results to global results
-    ASSERT(local_results.size() == global_results.size());
-    ASSERT(local_tallys.size() == global_tallys.size());
-    for (iter=local_results.begin(); iter!=local_results.end(); ++iter) {
-        void *buf;
-        vector<int64_t> lo;
-        vector<int64_t> hi;
-        string name = iter->first;
-        Array *local_result = iter->second;
-        Array *global_result = global_results.find(name)->second;
-
-        if (local_result->owns_data()) {
-            local_result->get_distribution(lo,hi);
-            pagoda::println_sync("lo/hi " + pagoda::vec_to_string(lo) + "/" + pagoda::vec_to_string(hi));
-            buf = local_result->access();
-            if (name == "time") {
-                pagoda::println_sync("accessed local time is " + pagoda::to_string(*static_cast<double*>(buf)));
-            }
-            global_result->acc(buf, lo, hi);
-            local_result->release();
-            if (local_tallys.count(name) == 1) {
-                Array *local_tally = local_tallys.find(name)->second;
-                Array *global_tally = global_tallys.find(name)->second;
-                buf = local_tally->access();
-                global_tally->acc(buf, lo, hi);
-                local_tally->release();
-            }
-        }
-    }
-#endif
 
     // we can delete the local results and tallys now
     for (iter=local_results.begin(); iter!=local_results.end(); ++iter) {
@@ -630,12 +593,10 @@ void pgra_nonblocking_groups(Dataset *dataset,
         delete iter->second;
     }
 
-    pagoda::println_sync("global_nrec = " + pagoda::to_string(global_nrec));
     for (size_t i=0; i<global_record_vars.size(); ++i) {
         Variable *var = global_record_vars[i];
         string name = var->get_name();
         Array *result = global_results.find(name)->second;
-        pagoda::println_sync("finalizing var " + name);
         // normalize, multiply, etc where necessary
         if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
                 || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
@@ -672,7 +633,6 @@ void pgra_nonblocking_groups(Dataset *dataset,
             result->imul(result);
         }
 
-        pagoda::println_sync("writing var " + name);
         writer->iwrite(result, name, 0);
     }
     writer->wait();
