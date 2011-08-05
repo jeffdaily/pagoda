@@ -175,7 +175,7 @@ void AbstractArray::operate_array_validator_counter(const Array *rhs, const int 
                 default: ERRCODE("operation not supported", op);          \
             }                                                             \
         } else
-#include "DataType2.def"
+#include "DataType2_small.def"
         {
             EXCEPT(DataTypeException, "DataType not handled", lhs_type);
         }

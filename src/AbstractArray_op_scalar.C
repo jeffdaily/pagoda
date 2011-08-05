@@ -111,7 +111,7 @@ void AbstractArray::operate_scalar(const void *rhs_ptr, DataType rhs_type,
                 default: ERRCODE("operation not supported", op);   \
             }                                                      \
         } else
-#include "DataType2.def"
+#include "DataType2_small.def"
         {
             EXCEPT(DataTypeException, "DataType not handled", lhs_type);
         }

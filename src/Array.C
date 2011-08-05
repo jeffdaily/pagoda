@@ -35,6 +35,7 @@ Array* Array::create(DataType type, vector<int64_t> shape,
     // GlobalArray doesn't handle all types. Those not handled use a different
     // read and write types.
     if (shape.empty()) {
+#if 1
         if (type == DataType::CHAR) {
             ret = new GlobalScalar(DataType::INT, group);
             ret->set_read_type(DataType::CHAR);
@@ -54,6 +55,9 @@ Array* Array::create(DataType type, vector<int64_t> shape,
         } else {
             ret = new GlobalScalar(type, group);
         }
+#else
+        ret = new ScalarArray(type);
+#endif
     }
     else {
         if (type == DataType::CHAR) {

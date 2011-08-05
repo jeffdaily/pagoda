@@ -186,7 +186,7 @@ Array* AbstractArray::cast(DataType new_type) const
                 dst_t *dst = static_cast<dst_t*>(dst_data); \
                 pagoda::copy_cast<dst_t>(src,src+get_size(),dst); \
             } else
-#include "DataType2.def"
+#include "DataType2_small.def"
             {
                 EXCEPT(DataTypeException, "DataType not handled", type);
             }

@@ -106,7 +106,7 @@ void AbstractArray::operate_array(const Array *rhs, const int op)
                 default: ERRCODE("operation not supported", op);          \
             }                                                             \
         } else
-#include "DataType2.def"
+#include "DataType2_small.def"
         {
             EXCEPT(DataTypeException, "DataType not handled", lhs_type);
         }

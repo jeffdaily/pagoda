@@ -185,7 +185,7 @@ void AbstractArray::operate_scalar_validator_counter(const void *rhs_ptr,
                 default: ERRCODE("operation not supported", op);   \
             }                                                      \
         } else
-#include "DataType2.def"
+#include "DataType2_small.def"
         {
             ERR("triple type not handled");
         }
