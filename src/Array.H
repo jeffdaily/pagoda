@@ -9,6 +9,7 @@ using std::vector;
 
 #include "DataType.H"
 #include "Error.H"
+#include "ProcessGroup.H"
 
 class Dimension;
 class Validator;
@@ -48,6 +49,17 @@ class Array
         static Array* create(DataType type, vector<int64_t> shape);
 
         /**
+         * Factory Array creation taking a shape directly.
+         *
+         * @param[in] type of Array to create
+         * @param[in] shape of the Array to create
+         * @param[in] group the process group
+         * @return the new Array
+         */
+        static Array* create(DataType type, vector<int64_t> shape,
+                const ProcessGroup &group);
+
+        /**
          * Factory Array creation deriving shape from dims.
          *
          * @param[in] type of Array to create
@@ -55,6 +67,17 @@ class Array
          * @return the new Array
          */
         static Array* create(DataType type, vector<Dimension*> dims);
+
+        /**
+         * Factory Array creation deriving shape from dims.
+         *
+         * @param[in] type of Array to create
+         * @param[in] dims the shape is taken from the given Dimensions
+         * @param[in] group the process group
+         * @return the new Array
+         */
+        static Array* create(DataType type, vector<Dimension*> dims,
+                const ProcessGroup &group);
 
         /**
          * Destroys the Array.

@@ -102,6 +102,7 @@ class CommandLineOption
         static CommandLineOption EXCLUDE;
         static CommandLineOption FILE_FORMAT;
         static CommandLineOption FIX_RECORD_DIMENSION;
+        static CommandLineOption GROUPS;
         static CommandLineOption HEADER_PAD;
         static CommandLineOption HELP;
         static CommandLineOption HISTORY;

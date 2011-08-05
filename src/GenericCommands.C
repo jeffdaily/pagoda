@@ -57,6 +57,7 @@ GenericCommands::GenericCommands()
     ,   fix_record_dimension(false)
     ,   record_dimension_size(-1)
     ,   header_pad(-1)
+    ,   number_of_groups(1)
     ,   index_hyperslabs()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -89,6 +90,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   fix_record_dimension(false)
     ,   record_dimension_size(-1)
     ,   header_pad(-1)
+    ,   number_of_groups(1)
     ,   index_hyperslabs()
     ,   boxes()
     ,   file_format(FF_UNKNOWN)
@@ -118,6 +120,7 @@ void GenericCommands::init()
     parser.push_back(&CommandLineOption::ROMIO_DS_READ);
     parser.push_back(&CommandLineOption::ROMIO_NO_INDEP_RW);
     parser.push_back(&CommandLineOption::STRIPING_UNIT);
+    parser.push_back(&CommandLineOption::GROUPS);
     parser.push_back(&CommandLineOption::READ_ALL_RECORDS);
     parser.push_back(&CommandLineOption::READ_ALL_VARIABLES);
     parser.push_back(&CommandLineOption::APPEND);
@@ -364,6 +367,15 @@ void GenericCommands::parse(int argc, char **argv)
         s >> header_pad;
         if (s.fail()) {
             throw CommandException("invalid header pad argument: " + arg);
+        }
+    }
+
+    if (parser.count("groups")) {
+        string arg = parser.get_argument("groups");
+        istringstream s(arg);
+        s >> number_of_groups;
+        if (s.fail()) {
+            throw CommandException("invalid groups argument: " + arg);
         }
     }
 
@@ -839,6 +851,12 @@ bool GenericCommands::is_fixing_record_dimension() const
 int GenericCommands::get_header_pad() const
 {
     return header_pad;
+}
+
+
+int GenericCommands::get_number_of_groups() const
+{
+    return number_of_groups;
 }
 
 

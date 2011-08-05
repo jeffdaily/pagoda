@@ -91,6 +91,15 @@ class AbstractVariable : public Variable
          */
         virtual void set_translate_record(bool value);
 
+        /**
+         * Allocate an Array shaped and typed to match this Variable.
+         *
+         * @param[in] remove_record whether the first dimension should be
+         *            erased prior to Array creation
+         * @return the new Array
+         */
+        virtual Array* alloc(bool remove_record) const;
+
     protected:
         AbstractVariable();
 

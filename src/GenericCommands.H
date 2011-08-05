@@ -69,6 +69,7 @@ class GenericCommands
         virtual bool is_reading_all_records() const;
         virtual bool is_reading_all_variables() const;
         virtual int get_header_pad() const;
+        virtual int get_number_of_groups() const;
         virtual string get_usage() const;
         virtual string get_version() const;
         virtual FileFormat get_file_format() const;
@@ -97,6 +98,7 @@ class GenericCommands
         bool fix_record_dimension;
         int record_dimension_size;
         int header_pad;
+        int number_of_groups;
         vector<IndexHyperslab> index_hyperslabs;
         vector<CoordHyperslab> coord_hyperslabs;
         vector<LatLonBox> boxes;

@@ -11,6 +11,7 @@
 using std::fprintf;
 using std::string;
 
+#include "Bootstrap.H"
 #include "Print.H"
 #include "Util.H"
 
@@ -25,7 +26,7 @@ using std::string;
 static inline int get_precision()
 {
     int precision = 1;
-    int nproc = pagoda::num_nodes();
+    int nproc = pagoda::npe;
 
 
     while (nproc > 10) {
@@ -91,7 +92,7 @@ void pagoda::print_zero(FILE *stream, const char *fmt, ...)
 
 void pagoda::print_zero(FILE *stream, const string &str)
 {
-    if (0 == pagoda::nodeid()) {
+    if (0 == pagoda::me) {
         fprintf(stream, str.c_str());
         fflush(stream);
     }
@@ -182,18 +183,18 @@ void pagoda::print_sync(FILE *stream, const char *fmt, ...)
 
 void pagoda::print_sync(FILE *stream, const string &str)
 {
-    if (0 == pagoda::nodeid()) {
+    if (0 == pagoda::me) {
         fprintf(stream, "[%*d] ", get_precision(), 0);
         fprintf(stream, str.c_str());
-        for (int proc=1,nproc=pagoda::num_nodes(); proc<nproc; ++proc) {
+        for (int proc=1,nproc=pagoda::npe; proc<nproc; ++proc) {
             MPI_Status stat;
             int count;
             char *msg;
 
-            MPI_Recv(&count, 1, MPI_INT, proc, TAG_PRINT, MPI_COMM_WORLD,
+            MPI_Recv(&count, 1, MPI_INT, proc, TAG_PRINT, pagoda::COMM_WORLD,
                      &stat);
             msg = new char[count];
-            MPI_Recv(msg, count, MPI_CHAR, proc, TAG_PRINT, MPI_COMM_WORLD,
+            MPI_Recv(msg, count, MPI_CHAR, proc, TAG_PRINT, pagoda::COMM_WORLD,
                      &stat);
             fprintf(stream, "[%*d] ", get_precision(), proc);
             fprintf(stream, msg);
@@ -204,9 +205,9 @@ void pagoda::print_sync(FILE *stream, const string &str)
     else {
         int count = str.size() + 1;
 
-        MPI_Send(&count, 1, MPI_INT, 0, TAG_PRINT, MPI_COMM_WORLD);
+        MPI_Send(&count, 1, MPI_INT, 0, TAG_PRINT, pagoda::COMM_WORLD);
         MPI_Send((void*)str.c_str(), count, MPI_CHAR, 0, TAG_PRINT,
-                 MPI_COMM_WORLD);
+                 pagoda::COMM_WORLD);
     }
 }
 

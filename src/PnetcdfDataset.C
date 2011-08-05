@@ -101,7 +101,7 @@ DataType PnetcdfDataset::to_dt(const nc_type &type)
 
 PnetcdfDataset::PnetcdfDataset(const string &filename)
     :   AbstractDataset()
-    ,   group(ProcessGroup::get_world())
+    ,   group(ProcessGroup::get_default())
     ,   filename(filename)
     ,   ncid(-1)
     ,   udim(-1)

@@ -114,12 +114,15 @@ void ScalarArray::copy(const Array *src)
             EXCEPT(DataTypeException, "DataType not handled", type);
         }
     }
+    else {
+        ERR("not implemented ScalarArray::copy of mixed subclasses");
+    }
 }
 
 
 void ScalarArray::copy(const Array *src, const vector<int64_t> &src_lo, const vector<int64_t> &src_hi, const vector<int64_t> &dst_lo, const vector<int64_t> &dst_hi)
 {
-    ERR("not implemented ScalarArray::copy");
+    ERR("not implemented ScalarArray::copy patch");
 }
 
 
@@ -532,7 +535,7 @@ void ScalarArray::dump() const
 #define DATATYPE_EXPAND(DT,T) \
     if (type == DT) { \
         std::ostringstream os; \
-        os << *((T*)value) << std::endl; \
+        os << "ScalarArray(" << *((T*)value) << ")" << std::endl; \
         pagoda::print_zero(os.str()); \
     } else
 #include "DataType.def"

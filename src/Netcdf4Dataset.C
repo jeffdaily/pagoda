@@ -99,7 +99,7 @@ DataType Netcdf4Dataset::to_dt(const nc_type &type)
 
 Netcdf4Dataset::Netcdf4Dataset(const string &filename)
     :   AbstractDataset()
-    ,   group(ProcessGroup::get_world())
+    ,   group(ProcessGroup::get_default())
     ,   filename(filename)
     ,   ncid(-1)
     ,   udim(-1)

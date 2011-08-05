@@ -46,7 +46,8 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 #libpagoda_la_SOURCES += src/gax.C
 #libpagoda_la_SOURCES += src/gax.H
 @HAVE_GA_TRUE@am__append_3 = src/GlobalArray.C src/GlobalArray.H \
-@HAVE_GA_TRUE@	src/GlobalArray.def src/GlobalMask.C \
+@HAVE_GA_TRUE@	src/GlobalArray.def src/GlobalScalar.C \
+@HAVE_GA_TRUE@	src/GlobalScalar.H src/GlobalMask.C \
 @HAVE_GA_TRUE@	src/GlobalMask.H src/Memory.c
 @HAVE_PNETCDF_TRUE@am__append_4 = src/PnetcdfAttribute.C \
 @HAVE_PNETCDF_TRUE@	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
@@ -179,14 +180,14 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/RegularGrid.C src/ScalarArray.C src/StringComparator.C \
 	src/SubsetterCommands.C src/Util.C src/Validator.C \
 	src/Values.C src/Variable.C src/GlobalArray.C \
-	src/GlobalArray.H src/GlobalArray.def src/GlobalMask.C \
-	src/GlobalMask.H src/Memory.c src/PnetcdfAttribute.C \
-	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
-	src/PnetcdfDataset.H src/PnetcdfDimension.C \
-	src/PnetcdfDimension.H src/PnetcdfError.H \
-	src/PnetcdfFileWriter.C src/PnetcdfFileWriter.H \
-	src/PnetcdfNS.C src/PnetcdfNS.H src/PnetcdfTiming.C \
-	src/PnetcdfTiming.H src/PnetcdfVariable.C \
+	src/GlobalArray.H src/GlobalArray.def src/GlobalScalar.C \
+	src/GlobalScalar.H src/GlobalMask.C src/GlobalMask.H \
+	src/Memory.c src/PnetcdfAttribute.C src/PnetcdfAttribute.H \
+	src/PnetcdfDataset.C src/PnetcdfDataset.H \
+	src/PnetcdfDimension.C src/PnetcdfDimension.H \
+	src/PnetcdfError.H src/PnetcdfFileWriter.C \
+	src/PnetcdfFileWriter.H src/PnetcdfNS.C src/PnetcdfNS.H \
+	src/PnetcdfTiming.C src/PnetcdfTiming.H src/PnetcdfVariable.C \
 	src/PnetcdfVariable.H src/Netcdf4.C src/Netcdf4.H \
 	src/Netcdf4Attribute.C src/Netcdf4Attribute.H \
 	src/Netcdf4Dataset.C src/Netcdf4Dataset.H \
@@ -196,8 +197,8 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/Netcdf4Timing.H src/Netcdf4Variable.C \
 	src/Netcdf4Variable.H
 am__dirstamp = $(am__leading_dot)dirstamp
-@HAVE_GA_TRUE@am__objects_1 = src/GlobalArray.lo src/GlobalMask.lo \
-@HAVE_GA_TRUE@	src/Memory.lo
+@HAVE_GA_TRUE@am__objects_1 = src/GlobalArray.lo src/GlobalScalar.lo \
+@HAVE_GA_TRUE@	src/GlobalMask.lo src/Memory.lo
 @HAVE_PNETCDF_TRUE@am__objects_2 = src/PnetcdfAttribute.lo \
 @HAVE_PNETCDF_TRUE@	src/PnetcdfDataset.lo \
 @HAVE_PNETCDF_TRUE@	src/PnetcdfDimension.lo \
@@ -1231,6 +1232,7 @@ src/Validator.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Values.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Variable.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/GlobalArray.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/GlobalScalar.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/GlobalMask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Memory.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PnetcdfAttribute.lo: src/$(am__dirstamp) \
@@ -1674,6 +1676,8 @@ mostlyclean-compile:
 	-rm -f src/GlobalArray.lo
 	-rm -f src/GlobalMask.$(OBJEXT)
 	-rm -f src/GlobalMask.lo
+	-rm -f src/GlobalScalar.$(OBJEXT)
+	-rm -f src/GlobalScalar.lo
 	-rm -f src/Grid.$(OBJEXT)
 	-rm -f src/Grid.lo
 	-rm -f src/Hints.$(OBJEXT)
@@ -1831,6 +1835,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GeoGrid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalMask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/GlobalScalar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Hints.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/IndexHyperslab.Plo@am__quote@

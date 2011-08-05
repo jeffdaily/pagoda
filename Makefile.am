@@ -162,6 +162,8 @@ if HAVE_GA
 libpagoda_la_SOURCES += src/GlobalArray.C
 libpagoda_la_SOURCES += src/GlobalArray.H
 libpagoda_la_SOURCES += src/GlobalArray.def
+libpagoda_la_SOURCES += src/GlobalScalar.C
+libpagoda_la_SOURCES += src/GlobalScalar.H
 libpagoda_la_SOURCES += src/GlobalMask.C
 libpagoda_la_SOURCES += src/GlobalMask.H
 libpagoda_la_SOURCES += src/Memory.c

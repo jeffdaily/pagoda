@@ -407,7 +407,7 @@ string PnetcdfTiming::get_stats_aggregate()
     }
 
     pagoda::print_sync("Before allreduce bytes_read:      %lu\n", bytes_read);
-    MPI_Allreduce(&bytes_read,&bytes_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(&bytes_read,&bytes_read_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
     pagoda::print_sync(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
     if (bytes_read_agg < bytes_read) {
         pagoda::print_sync("WARNING: bytes_read_agg<bytes_read\n");
@@ -416,7 +416,7 @@ string PnetcdfTiming::get_stats_aggregate()
     }
 
     pagoda::print_sync("Before allreduce bytes_write:     %lu\n", bytes_write);
-    MPI_Allreduce(&bytes_write,&bytes_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(&bytes_write,&bytes_write_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
     pagoda::print_sync(" after allreduce bytes_write_agg: %lu\n", bytes_write_agg);
     if (bytes_write_agg < bytes_write) {
         pagoda::print_sync("WARNING: bytes_write_agg<bytes_write\n");
@@ -425,8 +425,8 @@ string PnetcdfTiming::get_stats_aggregate()
     }
 
     pagoda::print_sync("Before allreduce times_read:      %lu\n", times_read);
-    //MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
-    MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
+    //MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
+    MPI_Allreduce(&times_read,&times_read_agg,1,type,MPI_MAX,pagoda::COMM_WORLD);
     pagoda::print_sync(" after allreduce times_read_agg:  %lu\n", times_read_agg);
     if (times_read_agg < times_read) {
         pagoda::print_sync("WARNING: times_read_agg<times_read\n");
@@ -435,8 +435,8 @@ string PnetcdfTiming::get_stats_aggregate()
     }
 
     pagoda::print_sync("Before allreduce times_write:     %lu\n", times_write);
-    //MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,MPI_COMM_WORLD);
-    MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_MAX,MPI_COMM_WORLD);
+    //MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
+    MPI_Allreduce(&times_write,&times_write_agg,1,type,MPI_MAX,pagoda::COMM_WORLD);
     pagoda::print_sync(" after allreduce times_write_agg: %lu\n", times_write_agg);
     if (times_write_agg < times_write) {
         pagoda::print_sync("WARNING: times_write_agg<times_write\n");

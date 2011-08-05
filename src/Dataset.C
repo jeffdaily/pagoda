@@ -19,7 +19,7 @@ vector<Dataset::opener_t> Dataset::openers;
 
 Dataset* Dataset::open(const string &filename)
 {
-    return open(filename, ProcessGroup::get_world());
+    return open(filename, ProcessGroup::get_default());
 }
 
 

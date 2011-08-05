@@ -56,6 +56,9 @@ CommandLineOption CommandLineOption::FILE_FORMAT(
 CommandLineOption CommandLineOption::FIX_RECORD_DIMENSION(
     0, "fix_rec_dmn", false,
     "change record dimension into fixed dimension in output file");
+CommandLineOption CommandLineOption::GROUPS(
+    0, "groups", true,
+    "use indicated number of process groups for IO (default: 1)");
 CommandLineOption CommandLineOption::HEADER_PAD(
     0, "header_pad", true,
     "pad output header with indicated number of bytes",

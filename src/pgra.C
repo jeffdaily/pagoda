@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <map>
@@ -50,6 +51,9 @@ void pgra_blocking(Dataset *dataset,
         const vector<Variable*> &vars, FileWriter *writer, const string &op);
 void pgra_nonblocking(Dataset *dataset,
         const vector<Variable*> &vars, FileWriter *writer, const string &op);
+void pgra_nonblocking_groups(Dataset *dataset,
+        const vector<Variable*> &vars, FileWriter *writer, const string &op,
+        PgraCommands &cmd);
 void pgra_nonblocking_allrec(Dataset *dataset,
         const vector<Variable*> &vars, FileWriter *writer, const string &op);
 
@@ -59,13 +63,8 @@ int main(int argc, char **argv)
     PgraCommands cmd;
     Dataset *dataset = NULL;
     vector<Variable*> vars;
-    vector<Variable*> record_vars;
-    vector<Variable*> nonrecord_vars;
     FileWriter *writer = NULL;
     string op;
-    vector<Array*> nb_arrays;
-    vector<Array*> nb_results;
-    vector<Array*> nb_tallys;
 
     try {
         pagoda::initialize(&argc, &argv);
@@ -78,7 +77,11 @@ int main(int argc, char **argv)
             if (cmd.is_reading_all_records()) {
                 pgra_nonblocking_allrec(dataset, vars, writer, op);
             } else {
-                pgra_nonblocking(dataset, vars, writer, op);
+                if (cmd.get_number_of_groups() > 1) {
+                    pgra_nonblocking_groups(dataset, vars, writer, op, cmd);
+                } else {
+                    pgra_nonblocking(dataset, vars, writer, op);
+                }
             }
         } else {
             pgra_blocking(dataset, vars, writer, op);
@@ -344,6 +347,342 @@ void pgra_nonblocking(Dataset *dataset,
             delete nb_tallys[i];
             nb_tallys[i] = NULL;
         }
+    }
+}
+
+
+// TODO optimize the "global" dataset
+// i.e. perhaps we don't need to open the dataset globally
+// so that we avoid opening all of the files twice
+void pgra_nonblocking_groups(Dataset *dataset,
+        const vector<Variable*> &vars, FileWriter *writer, const string &op,
+        PgraCommands &cmd)
+{
+    vector<string> filenames;
+    vector<Variable*> global_record_vars;
+    vector<Variable*> global_nonrecord_vars;
+    map<string,Array*> global_arrays;
+    map<string,Array*> global_results;
+    map<string,Array*> global_tallys;
+    map<string,Array*> local_arrays;
+    map<string,Array*> local_results;
+    map<string,Array*> local_tallys;
+    map<string,Array*>::iterator iter;
+    Dimension *global_udim;
+    int64_t global_nrec;
+    int color;
+    bool first_record = true;
+    ProcessGroup group; // defaults to world group
+
+    global_udim = dataset->get_udim();
+    global_nrec = (NULL != global_udim) ? global_udim->get_size() : 0;
+
+    // nonblocking copy of nonrecord variables
+    // from global dataset to global writer
+    Variable::split(vars, global_record_vars, global_nonrecord_vars);
+    writer->icopy_vars(global_nonrecord_vars);
+
+    // create a result and tally array for each variable in the dataset
+    // these arrays are created on the world process group
+    for (size_t i=0; i<global_record_vars.size(); ++i) {
+        Variable *var = global_record_vars[i];
+        string name = var->get_name();
+        Array *array = var->alloc(true);
+        Array *result = var->alloc(true);
+        array->fill_value(0); // TODO might not need this
+        result->fill_value(0); // TODO might not need this
+        global_arrays.insert(make_pair(name,array));
+        global_results.insert(make_pair(name,result));
+        if (var->has_validator(0)) {
+            Array *tally = Array::create(DataType::INT,array->get_shape());
+            tally->fill_value(0); // TODO might not need this
+            global_tallys.insert(make_pair(name,tally));
+        }
+    }
+
+    // create the process groups
+#if ROUND_ROBIN_GROUPS
+    color = pagoda::me%cmd.get_number_of_groups();
+#else
+    color = pagoda::me/(pagoda::npe/cmd.get_number_of_groups());
+#endif
+    ASSERT(cmd.get_number_of_groups() <= pagoda::npe);
+    ASSERT(color >= 0);
+    group = ProcessGroup(color);
+
+    filenames = cmd.get_input_filenames();
+    for (size_t i=0; i<filenames.size(); ++i) {
+        Dataset *local_dataset;
+        vector<Variable*> local_vars;
+        vector<Variable*> local_record_vars;
+        vector<Variable*> local_nonrecord_vars;
+        Dimension *local_udim;
+        int64_t local_nrec;
+        int64_t r = 0;
+
+        if (i%cmd.get_number_of_groups() != color) {
+            continue; // skip files to be handled by another group
+        }
+
+        local_dataset = Dataset::open(filenames[i], group);
+        local_udim = local_dataset->get_udim();
+        local_nrec = (NULL != local_udim) ? local_udim->get_size() : 0;
+        local_vars = cmd.get_variables(local_dataset);
+        Variable::split(local_vars, local_record_vars, local_nonrecord_vars);
+        
+        pagoda::println_sync("local_nrec = " + pagoda::to_string(local_nrec));
+
+        // create local arrays if needed
+        for (size_t i=0; i<local_record_vars.size(); ++i) {
+            Variable *var = local_record_vars[i];
+            string name = var->get_name();
+            if (local_results.count(name) == 0) {
+                pagoda::println_sync(name + " did not exist, creating");
+                Array *array = var->alloc(true);
+                Array *result = var->alloc(true);
+                result->fill_value(0);
+                if (var->has_validator(0)) {
+                    Array *tally = Array::create(
+                            DataType::INT, array->get_shape());
+                    tally->fill_value(0);
+                    local_tallys.insert(make_pair(name, tally));
+                }
+                local_arrays.insert(make_pair(name, array));
+                local_results.insert(make_pair(name, result));
+            } else {
+                pagoda::println_sync(name + " existed");
+            }
+        }
+
+        // first record is optimized
+        if (first_record) {
+            for (size_t i=0; i<local_record_vars.size(); ++i) {
+                Variable *var = local_record_vars[i];
+                Array *result = local_results.find(var->get_name())->second;
+                (void)var->iread(int64_t(0), result);
+            }
+            local_dataset->wait();
+            r = 1;
+            first_record = false;
+            for (size_t i=0; i<local_record_vars.size(); ++i) {
+                Variable *var = local_record_vars[i];
+                Array *result = local_results.find(var->get_name())->second;
+                Array *tally = NULL;
+
+                if (result->get_type() == DataType::CHAR) {
+                    continue;
+                }
+                if (var->has_validator(0)
+                        && local_tallys.count(var->get_name())) {
+                    tally = local_tallys.find(var->get_name())->second;
+                    initialize_tally(result, tally, var->get_validator(0));
+                }
+                if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+                    // square the values
+                    result->imul(result);
+                }
+            }
+        } else {
+            r = 0;
+        }
+
+        // remaining records
+        for (/*empty*/; r<local_nrec; ++r ) {
+            for (size_t i=0; i<local_record_vars.size(); ++i) {
+                Variable *var = local_record_vars[i];
+                Array *array = local_arrays.find(var->get_name())->second;
+                (void)var->iread(r, array);
+            }
+            local_dataset->wait();
+            for (size_t i=0; i<local_record_vars.size(); ++i) {
+                Variable *var = local_record_vars[i];
+                Array *array = local_arrays.find(var->get_name())->second;
+                Array *result = local_results.find(var->get_name())->second;
+                Array *tally = NULL;
+                if (local_tallys.count(var->get_name())) {
+                    tally = local_tallys.find(var->get_name())->second;
+                }
+                if (result->get_type() == DataType::CHAR) {
+                    continue;
+                }
+                if (op == OP_MAX) {
+                    result->imax(array);
+                }
+                else if (op == OP_MIN) {
+                    result->imin(array);
+                }
+                else {
+                    if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+                        // square the values
+                        array->imul(array);
+                    }
+                    // sum the values or squares, keep a tally
+                    result->set_counter(tally);
+                    result->iadd(array);
+                    result->set_counter(NULL);
+                }
+            }
+        }
+    }
+    // we can delete the temporary arrays now
+    for (iter=local_arrays.begin(); iter!=local_arrays.end(); ++iter) {
+        delete iter->second;
+    }
+    local_arrays.clear();
+
+    pagoda::println_sync("local_tallys.size() " + pagoda::to_string(local_tallys.size()));
+    // accumulate local results to global results
+    // we copy one-group-array-at-a-time to a temporary global array and
+    // perform the global accumulation
+    ASSERT(local_results.size() == global_results.size());
+    ASSERT(local_tallys.size() == global_tallys.size());
+    ProcessGroup::set_default(ProcessGroup::get_world());
+    for (iter=global_results.begin(); iter!=global_results.end(); ++iter) {
+        string name = iter->first;
+        Array *global_result = iter->second;
+        Array *global_array = global_arrays.find(name)->second;
+        Array *global_tally = NULL;
+        Array *local_result = local_results.find(name)->second;
+        bool first = true;
+
+        pagoda::println_sync("accumulating " + name);
+        // TODO TODO TODO!!accumulate the global_tally!!
+        if (global_tallys.count(name) == 1) {
+            global_tally = global_tallys.find(name)->second;
+        }
+        for (int i=0; i<cmd.get_number_of_groups(); ++i) {
+            pagoda::println_sync("color is " + pagoda::to_string(i));
+            if (first) {
+                pagoda::println_sync("first");
+                // first group's array is copied directly to result
+                if (i == color) {
+                    global_result->copy(local_result);
+                }
+                pagoda::barrier();
+                if (name == "time") {
+                    pagoda::println_sync("time value " + pagoda::to_string(*static_cast<double*>(global_result->get())));
+                }
+                first = false;
+                continue;
+            } else {
+                pagoda::println_sync("NOT first");
+                // subsequent groups' arrays are copied and modified
+                if (i == color) {
+                    global_array->copy(local_result);
+                }
+                pagoda::barrier();
+                if (op == OP_MAX) {
+                    global_result->imax(global_array);
+                }
+                else if (op == OP_MIN) {
+                    global_result->imin(global_array);
+                }
+                else {
+                    // sum the values or squares, keep a tally
+                    global_result->set_counter(global_tally);
+                    global_result->iadd(global_array);
+                    global_result->set_counter(NULL);
+                }
+            }
+        }
+        if (name == "time") {
+            global_result->dump();
+        }
+    }
+
+#if 0 /*first attempt doesn't work since ga.acc() does do all we need */
+    // accumulate local results to global results
+    ASSERT(local_results.size() == global_results.size());
+    ASSERT(local_tallys.size() == global_tallys.size());
+    for (iter=local_results.begin(); iter!=local_results.end(); ++iter) {
+        void *buf;
+        vector<int64_t> lo;
+        vector<int64_t> hi;
+        string name = iter->first;
+        Array *local_result = iter->second;
+        Array *global_result = global_results.find(name)->second;
+
+        if (local_result->owns_data()) {
+            local_result->get_distribution(lo,hi);
+            pagoda::println_sync("lo/hi " + pagoda::vec_to_string(lo) + "/" + pagoda::vec_to_string(hi));
+            buf = local_result->access();
+            if (name == "time") {
+                pagoda::println_sync("accessed local time is " + pagoda::to_string(*static_cast<double*>(buf)));
+            }
+            global_result->acc(buf, lo, hi);
+            local_result->release();
+            if (local_tallys.count(name) == 1) {
+                Array *local_tally = local_tallys.find(name)->second;
+                Array *global_tally = global_tallys.find(name)->second;
+                buf = local_tally->access();
+                global_tally->acc(buf, lo, hi);
+                local_tally->release();
+            }
+        }
+    }
+#endif
+
+    // we can delete the local results and tallys now
+    for (iter=local_results.begin(); iter!=local_results.end(); ++iter) {
+        delete iter->second;
+    }
+    for (iter=local_tallys.begin(); iter!=local_tallys.end(); ++iter) {
+        delete iter->second;
+    }
+
+    pagoda::println_sync("global_nrec = " + pagoda::to_string(global_nrec));
+    for (size_t i=0; i<global_record_vars.size(); ++i) {
+        Variable *var = global_record_vars[i];
+        string name = var->get_name();
+        Array *result = global_results.find(name)->second;
+        pagoda::println_sync("finalizing var " + name);
+        // normalize, multiply, etc where necessary
+        if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
+                || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
+            if (global_tallys.count(name) == 1) {
+                Array *tally = global_tallys.find(name)->second;
+                finalize_tally(result, tally, var->get_validator(0));
+                result->idiv(tally);
+            } else {
+                ScalarArray scalar(result->get_type());
+                scalar.fill_value(global_nrec);
+                result->idiv(&scalar);
+            }
+        }
+        else if (op == OP_RMSSDN) {
+            if (global_tallys.count(name) == 1) {
+                Array *tally = global_tallys.find(name)->second;
+                ScalarArray scalar(tally->get_type());
+                scalar.fill_value(1);
+                tally->isub(&scalar);
+                finalize_tally(result, tally, var->get_validator(0));
+                result->idiv(tally);
+            } else {
+                ScalarArray scalar(result->get_type());
+                scalar.fill_value(global_nrec-1);
+                result->idiv(&scalar);
+            }
+        }
+
+        // some operations require additional processing */
+        if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
+            result->ipow(0.5);
+        }
+        else if (op == OP_SQRAVG) {
+            result->imul(result);
+        }
+
+        pagoda::println_sync("writing var " + name);
+        writer->iwrite(result, name, 0);
+    }
+    writer->wait();
+
+    // we can delete the global results and tallys now
+    for (iter=global_results.begin(); iter!=global_results.end(); ++iter) {
+        delete iter->second;
+    }
+    for (iter=global_tallys.begin(); iter!=global_tallys.end(); ++iter) {
+        delete iter->second;
     }
 }
 

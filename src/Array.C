@@ -12,48 +12,84 @@ using std::vector;
 #include "Array.H"
 #include "DataType.H"
 #include "Dimension.H"
+#include "Error.H"
 #include "GlobalArray.H"
+#include "GlobalScalar.H"
 #include "NodeZeroArray.H"
+#include "ProcessGroup.H"
 #include "ScalarArray.H"
 #include "Util.H"
 
 
 Array* Array::create(DataType type, vector<int64_t> shape)
 {
-    Array *ret = NULL;
+    return Array::create(type, shape, ProcessGroup::get_default());
+}
 
+
+Array* Array::create(DataType type, vector<int64_t> shape,
+        const ProcessGroup &group)
+{
+    Array *ret = NULL;
 
     // GlobalArray doesn't handle all types. Those not handled use a different
     // read and write types.
     if (shape.empty()) {
-        ret = new ScalarArray(type);
+        if (type == DataType::CHAR) {
+            ret = new GlobalScalar(DataType::INT, group);
+            ret->set_read_type(DataType::CHAR);
+            ret->set_write_type(DataType::CHAR);
+        }
+        else if (type == DataType::UCHAR) {
+            ret = new GlobalScalar(DataType::INT, group);
+            ret->set_write_type(DataType::UCHAR);
+        }
+        else if (type == DataType::SCHAR) {
+            ret = new GlobalScalar(DataType::INT, group);
+            ret->set_write_type(DataType::SCHAR);
+        }
+        else if (type == DataType::SHORT) {
+            ret = new GlobalScalar(DataType::INT, group);
+            ret->set_write_type(DataType::SHORT);
+        } else {
+            ret = new GlobalScalar(type, group);
+        }
     }
-    else if (type == DataType::CHAR) {
-        ret = new GlobalArray(DataType::INT, shape);
-        ret->set_read_type(DataType::CHAR);
-        ret->set_write_type(DataType::CHAR);
+    else {
+        if (type == DataType::CHAR) {
+            ret = new GlobalArray(DataType::INT, shape, group);
+            ret->set_read_type(DataType::CHAR);
+            ret->set_write_type(DataType::CHAR);
+        }
+        else if (type == DataType::UCHAR) {
+            ret = new GlobalArray(DataType::INT, shape, group);
+            ret->set_write_type(DataType::UCHAR);
+        }
+        else if (type == DataType::SCHAR) {
+            ret = new GlobalArray(DataType::INT, shape, group);
+            ret->set_write_type(DataType::SCHAR);
+        }
+        else if (type == DataType::SHORT) {
+            ret = new GlobalArray(DataType::INT, shape, group);
+            ret->set_write_type(DataType::SHORT);
+        } else {
+            ret = new GlobalArray(type, shape, group);
+        }
     }
-    else if (type == DataType::UCHAR) {
-        ret = new GlobalArray(DataType::INT, shape);
-        ret->set_write_type(DataType::UCHAR);
-    }
-    else if (type == DataType::SCHAR) {
-        ret = new GlobalArray(DataType::INT, shape);
-        ret->set_write_type(DataType::SCHAR);
-    }
-    else if (type == DataType::SHORT) {
-        ret = new GlobalArray(DataType::INT, shape);
-        ret->set_write_type(DataType::SHORT);
-    } else {
-        ret = new GlobalArray(type, shape);
-    }
-    assert(NULL != ret);
+    ASSERT(NULL != ret);
 
     return ret;
 }
 
 
 Array* Array::create(DataType type, vector<Dimension*> dims)
+{
+    return Array::create(type, dims, ProcessGroup::get_default());
+}
+
+
+Array* Array::create(DataType type, vector<Dimension*> dims,
+        const ProcessGroup &group)
 {
     vector<int64_t> shape;
 
@@ -63,7 +99,7 @@ Array* Array::create(DataType type, vector<Dimension*> dims)
         shape.push_back((*it)->get_size());
     }
 
-    return Array::create(type, shape);
+    return Array::create(type, shape, group);
 }
 
 

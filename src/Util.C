@@ -21,6 +21,7 @@
 
 #include "DataType.H"
 #include "Print.H"
+#include "ProcessGroup.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -48,15 +49,7 @@ static char MIN[] = "min";
  */
 int64_t pagoda::num_nodes()
 {
-#if HAVE_GA
-    return GA_Nnodes();
-#elif HAVE_MPI
-    int size;
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    return size;
-#else
-#   error
-#endif
+    return ProcessGroup::get_default().get_size();
 }
 
 
@@ -69,15 +62,7 @@ int64_t pagoda::num_nodes()
  */
 int64_t pagoda::nodeid()
 {
-#if HAVE_GA
-    return GA_Nodeid();
-#elif HAVE_MPI
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    return rank;
-#else
-#   error
-#endif
+    return ProcessGroup::get_default().get_rank();
 }
 
 
@@ -86,13 +71,7 @@ int64_t pagoda::nodeid()
  */
 void pagoda::barrier()
 {
-#if HAVE_GA
-    GA_Sync();
-#elif HAVE_MPI
-    MPI_Barrier();
-#else
-#   error
-#endif
+    ProcessGroup::get_default().barrier();
 }
 
 
@@ -101,10 +80,10 @@ void pagoda::barrier()
  *
  * @param[in] message message to print before aborting
  */
-void pagoda::abort(const char *message)
+void pagoda::abort(const string &message)
 {
 #if HAVE_GA
-    GA_Error(const_cast<char*>(message), 1);
+    GA_Error(const_cast<char*>(message.c_str()), 1);
 #elif HAVE_MPI
     cerr << "[" << nodeid() << "] " << message << endl;
     MPI_Abort(MPI_COMM_WORLD, 1);
@@ -120,10 +99,10 @@ void pagoda::abort(const char *message)
  * @param[in] message message to print before aborting
  * @param[in] errorcode
  */
-void pagoda::abort(const char *message, int errorcode)
+void pagoda::abort(const string &message, int errorcode)
 {
 #if HAVE_GA
-    GA_Error(const_cast<char*>(message), errorcode);
+    GA_Error(const_cast<char*>(message.c_str()), errorcode);
 #elif HAVE_MPI
     cerr << "[" << nodeid() << "] " << message << " :: " << errorcode << endl;
     MPI_Abort(MPI_COMM_WORLD, errorcode);
@@ -144,7 +123,7 @@ void pagoda::gop_min(vector<long> &values)
     GA_Lgop(&values[0], values.size(), MIN);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG, MPI_MIN, MPI_COMM_WORLD);
+                  MPI_LONG, MPI_MIN, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -162,7 +141,7 @@ void pagoda::gop_sum(vector<int> &values)
     GA_Igop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -180,7 +159,7 @@ void pagoda::gop_sum(vector<long> &values)
     GA_Lgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -198,7 +177,7 @@ void pagoda::gop_sum(vector<long long> &values)
     GA_Llgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -220,11 +199,11 @@ void pagoda::gop_sum(vector<int64_t> &values)
 #   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
     GA_Igop(&values[0], values.size(), SUM);
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
-    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_INT
-    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   else
 #       error
 #   endif
@@ -243,7 +222,7 @@ void pagoda::gop_sum(vector<float> &values)
     GA_Fgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_FLOAT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -261,7 +240,7 @@ void pagoda::gop_sum(vector<double> &values)
     GA_Dgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -279,7 +258,7 @@ void pagoda::gop_sum(vector<long double> &values)
     GA_Ldgop(&values[0], values.size(), SUM);
 #elif HAVE_MPI
     MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+                  MPI_LONG_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -296,7 +275,7 @@ void pagoda::gop_sum(int &value)
 #if HAVE_GA
     GA_Igop(&value, 1, SUM);
 #elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -313,7 +292,7 @@ void pagoda::gop_sum(long &value)
 #if HAVE_GA
     GA_Lgop(&value, 1, SUM);
 #elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -330,7 +309,7 @@ void pagoda::gop_sum(long long &value)
 #if HAVE_GA && HAVE_GA_LLGOP
     GA_Llgop(&value, 1, SUM);
 #elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -352,11 +331,11 @@ void pagoda::gop_sum(int64_t &value)
 #   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
     GA_Igop(&value, 1, SUM);
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
-    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_INT
-    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   else
 #       error
 #   endif
@@ -374,7 +353,7 @@ void pagoda::gop_sum(float &value)
 #if HAVE_GA
     GA_Fgop(&value, 1, SUM);
 #elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_FLOAT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -391,7 +370,7 @@ void pagoda::gop_sum(double &value)
 #if HAVE_GA
     GA_Dgop(&value, 1, SUM);
 #elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -408,7 +387,7 @@ void pagoda::gop_sum(long double &value)
 #if HAVE_GA && HAVE_GA_LDGOP
     GA_Ldgop(&value, 1, SUM);
 #elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce(&value, &value, 1, MPI_LONG_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
 #else
 #   error
 #endif
@@ -422,11 +401,11 @@ void pagoda::broadcast(vector<T> &values, int root)       \
     GA_Brdcst(&values[0], values.size()*sizeof(T), root); \
 }
 #elif HAVE_MPI
-#   define broadcast_impl(T)                              \
-void pagoda::broadcast(vector<T> &values, int root)       \
-{                                                         \
-    MPI_Bcast(&values[0], values.size()*sizeof(T),        \
-            MPI_CHAR, root, MPI_COMM_WORLD);              \
+#   define broadcast_impl(T)                                         \
+void pagoda::broadcast(vector<T> &values, int root)                  \
+{                                                                    \
+    MPI_Bcast(&values[0], values.size()*sizeof(T),                   \
+            MPI_CHAR, root, ProcessGroup::get_default().get_comm()); \
 }
 #else
 #   error
@@ -447,11 +426,11 @@ void pagoda::broadcast(T &value, int root)                \
     GA_Brdcst(&value, sizeof(T), root);                   \
 }
 #elif HAVE_MPI
-#   define broadcast_impl(T)                              \
-void pagoda::broadcast(T &value, int root)                \
-{                                                         \
-    MPI_Bcast(&value, sizeof(T),                          \
-            MPI_CHAR, root, MPI_COMM_WORLD);              \
+#   define broadcast_impl(T)                                         \
+void pagoda::broadcast(T &value, int root)                           \
+{                                                                    \
+    MPI_Bcast(&value, sizeof(T),                                     \
+            MPI_CHAR, root, ProcessGroup::get_default().get_comm()); \
 }
 #else
 #   error

@@ -141,10 +141,14 @@ void GlobalArray::create()
             chunk.assign(chunk.size(), -1);
         }
     }
-    handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name",
-            &chunk[0]);
+    //handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name",
+    //        &chunk[0]);
+    handle = NGA_Create_config64(to_ga(type), shape.size(), &shape[0], "name",
+            &chunk[0], group.get_id());
 #else
-    handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name", NULL);
+    //handle = NGA_Create64(to_ga(type), shape.size(), &shape[0], "name", NULL);
+    handle = NGA_Create_config64(to_ga(type), shape.size(), &shape[0], "name",
+            NULL, group.get_id());
 #endif
     set_distribution();
 }
@@ -157,6 +161,21 @@ GlobalArray::GlobalArray(DataType type, vector<int64_t> shape)
     ,   shape(shape)
     ,   lo(shape.size())
     ,   hi(shape.size())
+    ,   group(ProcessGroup::get_default())
+{
+    create();
+}
+
+
+GlobalArray::GlobalArray(DataType type, vector<int64_t> shape,
+        const ProcessGroup &group)
+    :   AbstractArray(type)
+    ,   handle(0)
+    ,   type(type)
+    ,   shape(shape)
+    ,   lo(shape.size())
+    ,   hi(shape.size())
+    ,   group(group)
 {
     create();
 }
@@ -169,6 +188,25 @@ GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims)
     ,   shape()
     ,   lo(dims.size())
     ,   hi(dims.size())
+    ,   group(ProcessGroup::get_default())
+{
+    for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
+            it!=end; ++it) {
+        shape.push_back((*it)->get_size());
+    }
+    create();
+}
+
+
+GlobalArray::GlobalArray(DataType type, vector<Dimension*> dims,
+        const ProcessGroup &group)
+    :   AbstractArray(type)
+    ,   handle(0)
+    ,   type(type)
+    ,   shape()
+    ,   lo(dims.size())
+    ,   hi(dims.size())
+    ,   group(group)
 {
     for (vector<Dimension*>::const_iterator it=dims.begin(), end=dims.end();
             it!=end; ++it) {
@@ -185,6 +223,7 @@ GlobalArray::GlobalArray(const GlobalArray &that)
     ,   shape(that.shape)
     ,   lo(that.lo)
     ,   hi(that.hi)
+    ,   group(that.group)
 {
     handle = GA_Duplicate(that.handle, "noname");
     GA_Copy(that.handle,handle);
@@ -852,7 +891,16 @@ void GlobalArray::acc(void *buffer,
     vector<int64_t> lo_copy(lo.begin(), lo.end());
     vector<int64_t> hi_copy(hi.begin(), hi.end());
     vector<int64_t> shape = pagoda::get_shape(lo, hi);
-    NGA_Acc64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1], alpha);
+    //NGA_Acc64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1], alpha);
+#define GATYPE_EXPAND(mt,t) \
+    if (to_ga(type) == mt) { \
+        t _alpha = 1; \
+        if (alpha != NULL) { \
+            _alpha = *static_cast<t*>(alpha); \
+        } \
+        NGA_Acc64(handle, &lo_copy[0], &hi_copy[0], buffer, &shape[1], &_alpha); \
+    } else
+#include "GlobalArray.def"
 }
 
 

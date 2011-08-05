@@ -4,9 +4,7 @@
 
 #include <string>
 
-#if HAVE_MPI
-#   include <mpi.h>
-#endif
+#include <mpi.h>
 #if HAVE_GA
 #   include <ga.h>
 #endif
@@ -31,14 +29,18 @@ extern FileWriter* pagoda_netcdf4_create(const std::string&, FileFormat);
 
 int pagoda::me = 0;
 int pagoda::npe = 0;
+MPI_Comm pagoda::COMM_WORLD = MPI_COMM_NULL;
 
 extern "C" void pagoda_register_stack_memory();
 
 void pagoda::initialize(int *argc, char ***argv)
 {
-#if HAVE_MPI
+    int mpierr;
     MPI_Init(argc,argv);
-#endif
+    mpierr = MPI_Comm_dup(MPI_COMM_WORLD, &pagoda::COMM_WORLD);
+    if (mpierr != MPI_SUCCESS) {
+        MPI_Abort(MPI_COMM_WORLD, -6);
+    }
 #if HAVE_GA
     GA_Initialize();
     // avoid using MA in GA
@@ -47,10 +49,11 @@ void pagoda::initialize(int *argc, char ***argv)
 #if HAVE_GA
     pagoda::me = GA_Nodeid();
     pagoda::npe = GA_Nnodes();
-#elif HAVE_MPI
-    MPI_Comm_rank(MPI_COMM_WORLD, &pagoda::me);
-    MPI_Comm_size(MPI_COMM_WORLD, &pagoda::npe);
+#else
+    MPI_Comm_rank(pagoda::COMM_WORLD, &pagoda::me);
+    MPI_Comm_size(pagoda::COMM_WORLD, &pagoda::npe);
 #endif
+    ProcessGroup::set_default(ProcessGroup::get_world());
 #if HAVE_PNETCDF
     Dataset::register_opener(pagoda_pnetcdf_open);
     FileWriter::register_writer(pagoda_pnetcdf_create);
@@ -82,7 +85,5 @@ void pagoda::finalize()
 #if HAVE_GA
     GA_Terminate();
 #endif
-#if HAVE_MPI
     MPI_Finalize();
-#endif
 }

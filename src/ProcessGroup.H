@@ -19,6 +19,11 @@ class ProcessGroup
     public:
 
         /**
+         * ProcessGroup default ctor (for world group).
+         */
+        ProcessGroup();
+
+        /**
          * ProcessGroup creation taking a non-negative group id.
          *
          * @param[in] id of the group
@@ -47,19 +52,27 @@ class ProcessGroup
         const vector<int>& get_ranks() const;
 
         /**
-         * Return the number of processes within this group.
-         */
-        int get_size() const;
-
-        /**
          * Return the rank of this process with respect to the group size.
          */
         int get_rank() const;
 
         /**
+         * Return the number of processes within this group.
+         */
+        int get_size() const;
+
+        /**
+         * GA_Sync() or MPI_Barrier() etc
+         */
+        void barrier() const;
+
+        /**
          * Return the world ProcessGroup.
          */
         static ProcessGroup get_world();
+
+        static void set_default(const ProcessGroup &group);
+        static ProcessGroup get_default();
 
     protected:
         int id;
@@ -67,6 +80,7 @@ class ProcessGroup
         vector<int> ranks;
         int rank;
         int size;
+        static ProcessGroup default_group;
 };
 
 #endif /* PROCESSGROUP_H_ */

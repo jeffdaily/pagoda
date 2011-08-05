@@ -113,7 +113,6 @@ FileWriter* PgraCommands::get_output() const
         writer->fixed_record_dimension(1);
     }
 
-
     return writer;
 }
 

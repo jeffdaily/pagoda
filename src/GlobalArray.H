@@ -8,6 +8,7 @@
 #include "AbstractArray.H"
 #include "DataType.H"
 #include "Dimension.H"
+#include "ProcessGroup.H"
 #include "ScalarArray.H"
 
 using std::vector;
@@ -39,7 +40,11 @@ class GlobalArray : public AbstractArray
         static DataType to_dt(int type);
 
         GlobalArray(DataType type, vector<int64_t> shape);
+        GlobalArray(DataType type, vector<int64_t> shape,
+                const ProcessGroup &group);
         GlobalArray(DataType type, vector<Dimension*> dims);
+        GlobalArray(DataType type, vector<Dimension*> dims,
+                const ProcessGroup &group);
         GlobalArray(const GlobalArray &that);
         virtual ~GlobalArray();
 
@@ -167,6 +172,7 @@ class GlobalArray : public AbstractArray
         vector<int64_t> shape;
         vector<int64_t> lo;
         vector<int64_t> hi;
+        ProcessGroup group;
 };
 
 #endif /* GLOBALARRAY_H_ */

@@ -13,6 +13,7 @@
 
 #include "AbstractFileWriter.H"
 #include "Attribute.H"
+#include "Bootstrap.H"
 #include "Copy.H"
 #include "Dataset.H"
 #include "Dimension.H"
@@ -233,7 +234,8 @@ FileWriter* PnetcdfFileWriter::create()
             vector<int> dimids;
             int varnatts;
 
-            ncid = ncmpi::open(MPI_COMM_WORLD, filename, NC_WRITE, info);
+            ncid = ncmpi::open(ProcessGroup::get_default().get_comm(),
+                    filename, NC_WRITE, info);
             is_in_define_mode = false;
             // we are appending so we must learn all we can about this file
             // since later calls depend on knowledge of various IDs
@@ -256,15 +258,16 @@ FileWriter* PnetcdfFileWriter::create()
             }
         }
         else if (_overwrite) {
-            ncid = ncmpi::create(MPI_COMM_WORLD, filename,
-                                 file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
+            ncid = ncmpi::create(ProcessGroup::get_default().get_comm(),
+                    filename,
+                    file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
         }
         else {
             ERR("file exists");
         }
     }
     else {
-        ncid = ncmpi::create(MPI_COMM_WORLD, filename,
+        ncid = ncmpi::create(ProcessGroup::get_default().get_comm(), filename,
                 file_format_to_nc_format(_file_format), info);
     }
 

@@ -466,66 +466,47 @@ void AbstractVariable::renumber(Array *array) const
 }
 
 
-Array* AbstractVariable::read_alloc() const
+Array* AbstractVariable::alloc(bool remove_record) const
 {
+    vector<int64_t> shape;
     Array *dst;
+
+    shape = get_shape();
+    if (remove_record) {
+        shape.erase(shape.begin());
+    }
     if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
-        dst = Array::create(DataType::FLOAT, get_shape());
+        dst = Array::create(DataType::FLOAT, shape);
     }
     else {
-        dst = Array::create(get_type(), get_shape());
+        dst = Array::create(get_type(), shape);
     }
-    assert(NULL != dst);
-    return read(dst);
+
+    return dst;
+}
+
+
+Array* AbstractVariable::read_alloc() const
+{
+    return read(alloc(false));
 }
 
 
 Array* AbstractVariable::read_alloc(int64_t record) const
 {
-    vector<int64_t> shape;
-    Array *dst;
-
-    shape = get_shape();
-    shape.erase(shape.begin());
-    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
-        dst = Array::create(DataType::FLOAT, shape);
-    }
-    else {
-        dst = Array::create(get_type(), shape);
-    }
-
-    return read(record, dst);
+    return read(record, alloc(true));
 }
 
 
 Array* AbstractVariable::iread_alloc()
 {
-    Array *dst;
-    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
-        dst = Array::create(DataType::FLOAT, get_shape());
-    }
-    else {
-        dst = Array::create(get_type(), get_shape());
-    }
-    return iread(dst);
+    return iread(alloc(false));
 }
 
 
 Array* AbstractVariable::iread_alloc(int64_t record)
 {
-    vector<int64_t> shape;
-    Array *dst;
-
-    shape = get_shape();
-    shape.erase(shape.begin());
-    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
-        dst = Array::create(DataType::FLOAT, shape);
-    }
-    else {
-        dst = Array::create(get_type(), shape);
-    }
-
-    return iread(record, dst);
+    return iread(record, alloc(true));
 }
 
 

@@ -195,7 +195,9 @@ Array* PnetcdfVariable::read_prep(Array *dst,
     tmp->get_distribution(lo,hi);
 
     if (tmp->get_ndim() != ndim) {
-        pagoda::abort("PnetcdfVariable::read(Array*) :: shape mismatch");
+        pagoda::abort("PnetcdfVariable::read(Array*) :: shape mismatch :: "
+                + pagoda::to_string(tmp->get_ndim()) + " != "
+                + pagoda::to_string(ndim));
     }
 
     found_bit = find_bit(get_dims(), lo, hi);
@@ -298,7 +300,11 @@ Array* PnetcdfVariable::read_prep(Array *dst,
     tmp->get_distribution(lo,hi);
 
     if (tmp->get_ndim()+1 != ndim) {
-        pagoda::abort("PnetcdfVariable::read(int64_t,Array*) :: shape mismatch");
+        pagoda::abort("PnetcdfVariable::read(int64_t,Array*)"
+                " :: shape mismatch :: "
+                + pagoda::to_string(tmp->get_ndim()+1)
+                + " != "
+                + pagoda::to_string(ndim));
     }
 
     found_bit = find_bit(adims, lo, hi);

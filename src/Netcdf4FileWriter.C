@@ -13,6 +13,7 @@
 
 #include "AbstractFileWriter.H"
 #include "Attribute.H"
+#include "Bootstrap.H"
 #include "Dataset.H"
 #include "Dimension.H"
 #include "FileWriter.H"
@@ -224,7 +225,8 @@ FileWriter* Netcdf4FileWriter::create()
             vector<int> dimids;
             int varnatts;
 
-            ncid = nc::open(filename, NC_WRITE, MPI_COMM_WORLD, info);
+            ncid = nc::open(filename, NC_WRITE,
+                    ProcessGroup::get_default().get_comm(), info);
             is_in_define_mode = false;
             // we are appending so we must learn all we can about this file
             // since later calls depend on knowledge of various IDs
@@ -254,7 +256,7 @@ FileWriter* Netcdf4FileWriter::create()
         else if (_overwrite) {
             ncid = nc::create(filename,
                     file_format_to_nc_format(_file_format)|NC_CLOBBER,
-                    MPI_COMM_WORLD, info);
+                    ProcessGroup::get_default().get_comm(), info);
         }
         else {
             ERR("file exists");
@@ -262,7 +264,7 @@ FileWriter* Netcdf4FileWriter::create()
     }
     else {
         ncid = nc::create(filename, file_format_to_nc_format(_file_format),
-                MPI_COMM_WORLD, info);
+                ProcessGroup::get_default().get_comm(), info);
     }
 
     open = true;

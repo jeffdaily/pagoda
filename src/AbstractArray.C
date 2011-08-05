@@ -80,12 +80,13 @@ int64_t AbstractArray::get_size() const
 vector<int64_t> AbstractArray::get_local_shape() const
 {
     if (owns_data()) {
-        vector<int64_t> local_shape(get_ndim());
+        int64_t ndim = get_ndim();
+        vector<int64_t> local_shape(ndim);
         vector<int64_t> lo;
         vector<int64_t> hi;
 
         get_distribution(lo, hi);
-        for (int64_t i=0,limit=get_ndim(); i<limit; ++i) {
+        for (int64_t i=0; i<ndim; ++i) {
             local_shape[i] = hi[i]-lo[i]+1;
         }
         return local_shape;
@@ -109,7 +110,8 @@ int64_t AbstractArray::get_ndim() const
 
 bool AbstractArray::is_scalar() const
 {
-    return get_ndim() == 0;
+    return get_ndim() == 0
+        || (get_ndim() == 1 && get_shape().at(0) == 1);
 }
 
 
@@ -390,7 +392,17 @@ bool AbstractArray::same_distribution(const Array *other) const
 
 bool AbstractArray::owns_data() const
 {
-    return get_local_size() > 0;
+    vector<int64_t> lo;
+    vector<int64_t> hi;
+
+    get_distribution(lo, hi);
+    for (int64_t i=0,ndim=get_ndim(); i<ndim; ++i) {
+        if (lo[i] <= 0 || hi[i] <= 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 

@@ -34,8 +34,8 @@ namespace pagoda
     int64_t num_nodes();
     int64_t nodeid();
     void barrier();
-    void abort(const char *message);
-    void abort(const char *message, int errorcode);
+    void abort(const string &message);
+    void abort(const string &message, int errorcode);
     void gop_min(vector<long> &values);
     void gop_sum(vector<int> &values);
     void gop_sum(vector<long> &values);

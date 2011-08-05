@@ -9,7 +9,7 @@ namespace pagoda
 
     extern int me;  /**< rank of this processing element */
     extern int npe; /**< number of global processing elements */
-
+    extern MPI_Comm COMM_WORLD; /**< MPI_Comm_dup of MPI_COMM_WORLD */
 };
 
 #endif // PAGODA_BOOTSTRAP_H_

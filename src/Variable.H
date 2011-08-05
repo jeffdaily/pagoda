@@ -116,6 +116,9 @@ class Variable
         virtual int64_t get_bytes() const = 0;
 
         static bool promote_to_float;
+
+        virtual Array* alloc(bool remove_record) const = 0;
+
     protected:
         Variable();
 };
