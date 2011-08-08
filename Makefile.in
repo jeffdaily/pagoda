@@ -123,6 +123,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/pagoda_check_package.m4 \
 	$(top_srcdir)/m4/pagoda_cxx_variadic_macro.m4 \
 	$(top_srcdir)/m4/pagoda_ga_gop.m4 \
+	$(top_srcdir)/m4/pagoda_ga_mpi_pgroup_comm.m4 \
 	$(top_srcdir)/m4/pagoda_mpi_unwrap.m4 \
 	$(top_srcdir)/m4/pagoda_pnetcdf_inq_format.m4 \
 	$(top_srcdir)/m4/pagoda_pnetcdf_nb.m4 \

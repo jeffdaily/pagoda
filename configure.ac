@@ -155,11 +155,18 @@ AS_IF([test "x$pg_cv_ga_found" = xno],
     [AC_MSG_FAILURE([Could not locate Global Arrays 5.x nor 4.x])])
 AM_CONDITIONAL([HAVE_GA], [test "x$pg_cv_ga_found" = xyes])
 AM_CONDITIONAL([GA_USES_FLIBS], [test "x$pg_ga_uses_flibs" = xyes])
+# Checks for GA functionality.
+PAGODA_GA_GOP
+PAGODA_GA_MPI_PGROUP_COMMUNICATOR
 
 # Check for pnetcdf.
 PAGODA_CHECK_PACKAGE([pnetcdf], [pnetcdf.h], [pnetcdf], [ncmpi_open])
 AM_CONDITIONAL([HAVE_PNETCDF], [test "x$pg_cv_pnetcdf_found" = xyes])
 AC_SUBST([have_pnetcdf], [$pg_cv_pnetcdf_found])
+# Does pnetcdf have the new nonblocking interface?
+PAGODA_PNETCDF_NB_INT
+# Does pnetcdf have ncmpi_inq_format function?
+PAGODA_PNETCDF_INQ_FORMAT
 
 # Check for netcdf4.
 PAGODA_CHECK_PACKAGE([netcdf4], [netcdf.h], [netcdf], [nc_open_par],
@@ -171,15 +178,6 @@ AC_SUBST([have_netcdf4], [$pg_cv_netcdf4_found])
 # We require at least one IO library.
 AS_CASE([$pg_cv_pnetcdf_found:$pg_cv_netcdf4_found], [no:no],
         [AC_MSG_FAILURE([Could not locate an IO library])])
-
-# Does pnetcdf have the new nonblocking interface?
-PAGODA_PNETCDF_NB_INT
-
-# Does pnetcdf have ncmpi_inq_format function?
-PAGODA_PNETCDF_INQ_FORMAT
-
-# Checks for GA functionality.
-PAGODA_GA_GOP
 
 AC_LANG_POP([C++])
 

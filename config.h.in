@@ -42,6 +42,9 @@
 /* Define to 1 if you have the `GA_Llgop' function. */
 #undef HAVE_GA_LLGOP
 
+/* Define to 1 if you have the `ga_mpi_pgroup_communicator' function. */
+#undef HAVE_GA_MPI_PGROUP_COMMUNICATOR
+
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 

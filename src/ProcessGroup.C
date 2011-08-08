@@ -79,11 +79,27 @@ ProcessGroup::ProcessGroup(int color)
             }
         }
         tmp_ga_id = GA_Pgroup_create(&the_list[0], the_list.size());
+#if HAVE_GA_MPI_PGROUP_COMMUNICATOR
         if (group_id == color) {
             id = tmp_ga_id;
             comm = ga_mpi_pgroup_communicator(id);
             default_to_set = this;
         }
+#else
+        {
+            int mpierr = MPI_Comm_split(pagoda::COMM_WORLD, color, 0, &comm);
+            if (mpierr != MPI_SUCCESS) {
+                if (pagoda::me == 0) {
+                    printf("MPI_Comm_split failed, aborting\n");
+                }
+                MPI_Abort(pagoda::COMM_WORLD, mpierr);
+            }
+        }
+        if (group_id == color) {
+            id = tmp_ga_id;
+            default_to_set = this;
+        }
+#endif
     }
     set_default(*default_to_set);
 #else

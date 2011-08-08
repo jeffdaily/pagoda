@@ -9451,6 +9451,38 @@ else
   GA_USES_FLIBS_FALSE=
 fi
 
+# Checks for GA functionality.
+save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $GA_LDFLAGS"
+save_LIBS="$LIBS"; LIBS="$LIBS $GA_LIBS $FLIBS"
+for ac_func in GA_Llgop GA_Ldgop
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
+
+LDFLAGS="$save_LDFLAGS"
+LIBS="$save_LIBS"
+save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $GA_LDFLAGS"
+save_LIBS="$LIBS"; LIBS="$LIBS $GA_LIBS $FLIBS"
+for ac_func in ga_mpi_pgroup_communicator
+do :
+  ac_fn_cxx_check_func "$LINENO" "ga_mpi_pgroup_communicator" "ac_cv_func_ga_mpi_pgroup_communicator"
+if test "x$ac_cv_func_ga_mpi_pgroup_communicator" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GA_MPI_PGROUP_COMMUNICATOR 1
+_ACEOF
+
+fi
+done
+
+LDFLAGS="$save_LDFLAGS"
+LIBS="$save_LIBS"
 
 # Check for pnetcdf.
 
@@ -9640,6 +9672,102 @@ else
 fi
 
 have_pnetcdf=$pg_cv_pnetcdf_found
+
+# Does pnetcdf have the new nonblocking interface?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pnetcdf uses the int non-blocking interface" >&5
+$as_echo_n "checking whether pnetcdf uses the int non-blocking interface... " >&6; }
+if test "${pagoda_cv_pnetcdf_nb_int+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS"
+     save_LIBS="$LIBS"; LIBS="$LIBS $PNETCDF_LIBS"
+     ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ncmpi_wait_all ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return ncmpi_wait_all ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  pagoda_cv_pnetcdf_nb_int=yes
+else
+  pagoda_cv_pnetcdf_nb_int=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+     ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+     LDFLAGS="$save_LDFLAGS"
+     LIBS="$save_LIBS"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pagoda_cv_pnetcdf_nb_int" >&5
+$as_echo "$pagoda_cv_pnetcdf_nb_int" >&6; }
+if test $pagoda_cv_pnetcdf_nb_int = yes; then :
+
+
+$as_echo "#define HAVE_PNETCDF_NEW_NB 1" >>confdefs.h
+
+fi
+
+# Does pnetcdf have ncmpi_inq_format function?
+save_CPPFLAGS="$CPPFLAGS"; CPPFLAGS="$CPPFLAGS $PNETCDF_CPPFLAGS"
+ac_fn_cxx_check_decl "$LINENO" "ncmpi_inq_format" "ac_cv_have_decl_ncmpi_inq_format" "#include <pnetcdf.h>
+"
+if test "x$ac_cv_have_decl_ncmpi_inq_format" = x""yes; then :
+  ac_have_decl=1
+else
+  ac_have_decl=0
+fi
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_DECL_NCMPI_INQ_FORMAT $ac_have_decl
+_ACEOF
+
+CPPFLAGS="$save_CPPFLAGS"
+save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS"
+save_LIBS="$LIBS"; LIBS="$PNETCDF_LIBS $LIBS"
+for ac_func in ncmpi_inq_format
+do :
+  ac_fn_cxx_check_func "$LINENO" "ncmpi_inq_format" "ac_cv_func_ncmpi_inq_format"
+if test "x$ac_cv_func_ncmpi_inq_format" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_NCMPI_INQ_FORMAT 1
+_ACEOF
+
+fi
+done
+
+LDFLAGS="$save_LDFLAGS"
+LIBS="$save_LIBS"
 
 
 # Check for netcdf4.
@@ -9842,122 +9970,6 @@ See \`config.log' for more details" "$LINENO" 5; } ;; #(
   *) :
      ;;
 esac
-
-# Does pnetcdf have the new nonblocking interface?
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pnetcdf uses the int non-blocking interface" >&5
-$as_echo_n "checking whether pnetcdf uses the int non-blocking interface... " >&6; }
-if test "${pagoda_cv_pnetcdf_nb_int+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS"
-     save_LIBS="$LIBS"; LIBS="$LIBS $PNETCDF_LIBS"
-     ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char ncmpi_wait_all ();
-#ifdef F77_DUMMY_MAIN
-
-#  ifdef __cplusplus
-     extern "C"
-#  endif
-   int F77_DUMMY_MAIN() { return 1; }
-
-#endif
-int
-main ()
-{
-return ncmpi_wait_all ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  pagoda_cv_pnetcdf_nb_int=yes
-else
-  pagoda_cv_pnetcdf_nb_int=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-     ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-     LDFLAGS="$save_LDFLAGS"
-     LIBS="$save_LIBS"
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $pagoda_cv_pnetcdf_nb_int" >&5
-$as_echo "$pagoda_cv_pnetcdf_nb_int" >&6; }
-if test $pagoda_cv_pnetcdf_nb_int = yes; then :
-
-
-$as_echo "#define HAVE_PNETCDF_NEW_NB 1" >>confdefs.h
-
-fi
-
-
-# Does pnetcdf have ncmpi_inq_format function?
-save_CPPFLAGS="$CPPFLAGS"; CPPFLAGS="$CPPFLAGS $PNETCDF_CPPFLAGS"
-ac_fn_cxx_check_decl "$LINENO" "ncmpi_inq_format" "ac_cv_have_decl_ncmpi_inq_format" "#include <pnetcdf.h>
-"
-if test "x$ac_cv_have_decl_ncmpi_inq_format" = x""yes; then :
-  ac_have_decl=1
-else
-  ac_have_decl=0
-fi
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_DECL_NCMPI_INQ_FORMAT $ac_have_decl
-_ACEOF
-
-CPPFLAGS="$save_CPPFLAGS"
-save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $PNETCDF_LDFLAGS"
-save_LIBS="$LIBS"; LIBS="$PNETCDF_LIBS $LIBS"
-for ac_func in ncmpi_inq_format
-do :
-  ac_fn_cxx_check_func "$LINENO" "ncmpi_inq_format" "ac_cv_func_ncmpi_inq_format"
-if test "x$ac_cv_func_ncmpi_inq_format" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_NCMPI_INQ_FORMAT 1
-_ACEOF
-
-fi
-done
-
-LDFLAGS="$save_LDFLAGS"
-LIBS="$save_LIBS"
-
-
-# Checks for GA functionality.
-save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $GA_LDFLAGS"
-save_LIBS="$LIBS"; LIBS="$LIBS $GA_LIBS $FLIBS"
-for ac_func in GA_Llgop GA_Ldgop
-do :
-  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
-ac_fn_cxx_check_func "$LINENO" "$ac_func" "$as_ac_var"
-if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
-  cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-done
-
-LDFLAGS="$save_LDFLAGS"
-LIBS="$save_LIBS"
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'

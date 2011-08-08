@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include <ga.h>
+#include <macdecls.h>
 
 #include "Error.H"
 #include "Print.H"
