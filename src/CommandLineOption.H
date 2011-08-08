@@ -127,6 +127,7 @@ class CommandLineOption
         static CommandLineOption TOPOLOGY;
         static CommandLineOption UNION;
         static CommandLineOption VARIABLE;
+        static CommandLineOption VERBOSE;
         static CommandLineOption VERS;
         static CommandLineOption WEIGHT;
 

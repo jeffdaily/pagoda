@@ -68,6 +68,7 @@ class GenericCommands
         virtual bool is_nonblocking() const;
         virtual bool is_reading_all_records() const;
         virtual bool is_reading_all_variables() const;
+        virtual bool is_verbose() const;
         virtual int get_header_pad() const;
         virtual int get_number_of_groups() const;
         virtual string get_usage() const;
@@ -96,6 +97,7 @@ class GenericCommands
         bool append;
         bool overwrite;
         bool fix_record_dimension;
+        bool verbose;
         int record_dimension_size;
         int header_pad;
         int number_of_groups;

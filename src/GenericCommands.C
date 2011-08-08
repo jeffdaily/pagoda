@@ -55,6 +55,7 @@ GenericCommands::GenericCommands()
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
+    ,   verbose(false)
     ,   record_dimension_size(-1)
     ,   header_pad(-1)
     ,   number_of_groups(1)
@@ -88,6 +89,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   append(false)
     ,   overwrite(false)
     ,   fix_record_dimension(false)
+    ,   verbose(false)
     ,   record_dimension_size(-1)
     ,   header_pad(-1)
     ,   number_of_groups(1)
@@ -108,6 +110,7 @@ void GenericCommands::init()
 {
     parser.push_back(&CommandLineOption::HELP);
     parser.push_back(&CommandLineOption::VERS);
+    parser.push_back(&CommandLineOption::VERBOSE);
     parser.push_back(&CommandLineOption::CDF1);
     parser.push_back(&CommandLineOption::CDF2);
     parser.push_back(&CommandLineOption::CDF5);
@@ -359,6 +362,10 @@ void GenericCommands::parse(int argc, char **argv)
 
     if (parser.count("fix_rec_dmn")) {
         fix_record_dimension = true;
+    }
+
+    if (parser.count("verbose")) {
+        verbose = true;
     }
 
     if (parser.count("header_pad")) {
@@ -899,4 +906,10 @@ bool GenericCommands::is_reading_all_records() const
 bool GenericCommands::is_reading_all_variables() const
 {
     return reading_all_variables;
+}
+
+
+bool GenericCommands::is_verbose() const
+{
+    return verbose;
 }

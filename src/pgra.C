@@ -47,15 +47,15 @@ int F77_DUMMY_MAIN()
 
 void initialize_tally(Array *result, Array *tally, Validator *validator);
 void finalize_tally(Array *result, Array *tally, Validator *validator);
-void pgra_blocking(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op);
-void pgra_nonblocking(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op);
-void pgra_nonblocking_groups(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op,
-        PgraCommands &cmd);
-void pgra_nonblocking_allrec(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op);
+
+void pgra_blocking(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd);
+void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd);
+void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd);
+void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd);
 
 
 int main(int argc, char **argv)
@@ -75,16 +75,16 @@ int main(int argc, char **argv)
 
         if (cmd.is_nonblocking()) {
             if (cmd.is_reading_all_records()) {
-                pgra_nonblocking_allrec(dataset, vars, writer, op);
+                pgra_nonblocking_allrec(dataset, vars, writer, op, cmd);
             } else {
                 if (cmd.get_number_of_groups() > 1) {
                     pgra_nonblocking_groups(dataset, vars, writer, op, cmd);
                 } else {
-                    pgra_nonblocking(dataset, vars, writer, op);
+                    pgra_nonblocking(dataset, vars, writer, op, cmd);
                 }
             }
         } else {
-            pgra_blocking(dataset, vars, writer, op);
+            pgra_blocking(dataset, vars, writer, op, cmd);
         }
 
         // clean up
@@ -115,8 +115,8 @@ int main(int argc, char **argv)
 }
 
 
-void pgra_blocking(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op)
+void pgra_blocking(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd)
 {
     vector<Variable*>::const_iterator var_it;
 
@@ -124,6 +124,9 @@ void pgra_blocking(Dataset *dataset,
     // for record variables, read one record at a time
     for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
         Variable *var = *var_it;
+        if (cmd.is_verbose()) {
+            pagoda::println_zero("processing variable: " + var->get_name());
+        }
         if (var->has_record() && var->get_nrec() > 0) {
             int64_t nrec = var->get_nrec();
             Array *result = NULL;
@@ -132,6 +135,9 @@ void pgra_blocking(Dataset *dataset,
 
             // optimization: read the first record directly into result
             result = var->read(0, result);
+            if (cmd.is_verbose()) {
+                pagoda::println_zero("\tfinished reading record 0");
+            }
 
             // ignore character data
             if (result->get_type() == DataType::CHAR) {
@@ -168,6 +174,10 @@ void pgra_blocking(Dataset *dataset,
                     result->set_counter(tally);
                     result->iadd(array);
                     result->set_counter(NULL);
+                }
+                if (cmd.is_verbose()) {
+                    pagoda::println_zero("\tfinished reading record "
+                            + pagoda::to_string(rec));
                 }
             }
 
@@ -208,6 +218,9 @@ void pgra_blocking(Dataset *dataset,
             }
 
             writer->write(result, var->get_name(), 0);
+            if (cmd.is_verbose()) {
+                pagoda::println_zero("\tfinished writing");
+            }
             delete result;
             delete array;
             if (NULL != tally) {
@@ -224,8 +237,8 @@ void pgra_blocking(Dataset *dataset,
 }
 
 
-void pgra_nonblocking(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op)
+void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd)
 {
     vector<Variable*> record_vars;
     vector<Variable*> nonrecord_vars;
@@ -354,9 +367,8 @@ void pgra_nonblocking(Dataset *dataset,
 // TODO optimize the "global" dataset
 // i.e. perhaps we don't need to open the dataset globally
 // so that we avoid opening all of the files twice
-void pgra_nonblocking_groups(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op,
-        PgraCommands &cmd)
+void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd)
 {
     vector<string> filenames;
     vector<Variable*> global_record_vars;
@@ -647,8 +659,8 @@ void pgra_nonblocking_groups(Dataset *dataset,
 }
 
 
-void pgra_nonblocking_allrec(Dataset *dataset,
-        const vector<Variable*> &vars, FileWriter *writer, const string &op)
+void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgraCommands &cmd)
 {
     vector<Variable*> record_vars;
     vector<Variable*> nonrecord_vars;
