@@ -59,6 +59,9 @@ class PnetcdfTiming
         static PnetcdfIOMap times;
         static PnetcdfIOMap bytes;
         static PnetcdfIOMap calls;
+        static bool time_wait_is_reading;
+        static uint64_t time_wait_read;
+        static uint64_t time_wait_write;
 };
 
 #endif // PNETCDFTIMING_H

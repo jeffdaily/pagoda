@@ -49,6 +49,9 @@ uint64_t PnetcdfTiming::end_global;
 PnetcdfIOMap PnetcdfTiming::times;
 PnetcdfIOMap PnetcdfTiming::bytes;
 PnetcdfIOMap PnetcdfTiming::calls;
+bool PnetcdfTiming::time_wait_is_reading(true);
+uint64_t PnetcdfTiming::time_wait_read(0);
+uint64_t PnetcdfTiming::time_wait_write(0);
 
 
 static int g_name_width = 14;
@@ -168,6 +171,14 @@ PnetcdfTiming::PnetcdfTiming(const string &name)
     ,   start(0)
 {
     ++calls[name];
+
+    if (name.find("iget_") != string::npos) {
+        time_wait_is_reading = true;
+    }
+    else if (name.find("iput_") != string::npos) {
+        time_wait_is_reading = false;
+    }
+
     BARRIER();
     start = get_time();
 }
@@ -186,6 +197,13 @@ PnetcdfTiming::PnetcdfTiming(
     // bytes
     calc_bytes(vector<MPI_Offset>(1,count), type);
 
+    if (name.find("iget_") != string::npos) {
+        time_wait_is_reading = true;
+    }
+    else if (name.find("iput_") != string::npos) {
+        time_wait_is_reading = false;
+    }
+
     BARRIER();
     start = get_time();
 }
@@ -203,6 +221,13 @@ PnetcdfTiming::PnetcdfTiming(
 
     // bytes
     calc_bytes(count, type);
+
+    if (name.find("iget_") != string::npos) {
+        time_wait_is_reading = true;
+    }
+    else if (name.find("iput_") != string::npos) {
+        time_wait_is_reading = false;
+    }
 
     BARRIER();
     start = get_time();
@@ -264,6 +289,21 @@ PnetcdfTiming::~PnetcdfTiming()
         }
         else {
             cerr << "WARNING: times overrun: " << name << endl;
+        }
+        if (time_wait_is_reading) {
+            uint64_t time_wait_read_new_sum = time_wait_read + diff;
+            if (time_wait_read_new_sum > time_wait_read) {
+                time_wait_read = time_wait_read_new_sum;
+            } else {
+                cerr << "WARNING: times overrun: time_wait_read" << endl;
+            }
+        } else {
+            uint64_t time_wait_write_new_sum = time_wait_write + diff;
+            if (time_wait_write_new_sum > time_wait_write) {
+                time_wait_write = time_wait_write_new_sum;
+            } else {
+                cerr << "WARNING: times overrun: time_wait_write" << endl;
+            }
         }
     }
 }
@@ -394,6 +434,8 @@ string PnetcdfTiming::get_stats_aggregate()
             times_write += data;
         }
     }
+    times_read += time_wait_read;
+    times_write += time_wait_write;
     // calculate total bytes
     for (PnetcdfIOMap::const_iterator it=bytes.begin(), end=bytes.end();
             it != end; ++it) {
