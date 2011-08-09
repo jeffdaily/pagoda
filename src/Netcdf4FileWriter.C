@@ -631,11 +631,15 @@ void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
         vector<int64_t> hi;
 
         count[0] = 1;
-        std::copy(array_local_shape.begin(), array_local_shape.end(),
-                  count.begin()+1);
+        if (count.size() > 1) {
+            std::copy(array_local_shape.begin(), array_local_shape.end(),
+                    count.begin()+1);
+        }
         start[0] = record;
-        array->get_distribution(lo, hi);
-        std::copy(lo.begin(), lo.end(), start.begin()+1);
+        if (start.size() > 1) {
+            array->get_distribution(lo, hi);
+            std::copy(lo.begin(), lo.end(), start.begin()+1);
+        }
     }
 
 #define write_var(TYPE, DT) \
