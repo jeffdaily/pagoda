@@ -485,14 +485,18 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         int64_t r = 0;
 
         if (i%cmd.get_number_of_groups() != color) {
+#if 0
             if (cmd.is_verbose()) {
                 pagoda::println_sync("skipping " + filenames[i]);
             }
+#endif
             continue; // skip files to be handled by another group
         }
+#if 0
         if (cmd.is_verbose()) {
             pagoda::println_sync(" reading " + filenames[i]);
         }
+#endif
 
         local_dataset = Dataset::open(filenames[i], group);
         local_udim = local_dataset->get_udim();

@@ -49,7 +49,8 @@ uint64_t PnetcdfTiming::end_global;
 PnetcdfIOMap PnetcdfTiming::times;
 PnetcdfIOMap PnetcdfTiming::bytes;
 PnetcdfIOMap PnetcdfTiming::calls;
-bool PnetcdfTiming::time_wait_is_reading(true);
+bool PnetcdfTiming::time_wait_is_reading(false);
+bool PnetcdfTiming::time_wait_is_writing(false);
 uint64_t PnetcdfTiming::time_wait_read(0);
 uint64_t PnetcdfTiming::time_wait_write(0);
 
@@ -176,7 +177,7 @@ PnetcdfTiming::PnetcdfTiming(const string &name)
         time_wait_is_reading = true;
     }
     else if (name.find("iput_") != string::npos) {
-        time_wait_is_reading = false;
+        time_wait_is_writing = true;
     }
 
     BARRIER();
@@ -201,7 +202,7 @@ PnetcdfTiming::PnetcdfTiming(
         time_wait_is_reading = true;
     }
     else if (name.find("iput_") != string::npos) {
-        time_wait_is_reading = false;
+        time_wait_is_writing = true;
     }
 
     BARRIER();
@@ -226,7 +227,7 @@ PnetcdfTiming::PnetcdfTiming(
         time_wait_is_reading = true;
     }
     else if (name.find("iput_") != string::npos) {
-        time_wait_is_reading = false;
+        time_wait_is_writing = true;
     }
 
     BARRIER();
@@ -290,19 +291,23 @@ PnetcdfTiming::~PnetcdfTiming()
         else {
             cerr << "WARNING: times overrun: " << name << endl;
         }
-        if (time_wait_is_reading) {
-            uint64_t time_wait_read_new_sum = time_wait_read + diff;
-            if (time_wait_read_new_sum > time_wait_read) {
-                time_wait_read = time_wait_read_new_sum;
-            } else {
-                cerr << "WARNING: times overrun: time_wait_read" << endl;
-            }
-        } else {
-            uint64_t time_wait_write_new_sum = time_wait_write + diff;
-            if (time_wait_write_new_sum > time_wait_write) {
-                time_wait_write = time_wait_write_new_sum;
-            } else {
-                cerr << "WARNING: times overrun: time_wait_write" << endl;
+        if (name.find("wait") != string::npos) {
+            if (time_wait_is_reading) {
+                time_wait_is_reading = false;
+                uint64_t time_wait_read_new_sum = time_wait_read + diff;
+                if (time_wait_read_new_sum > time_wait_read) {
+                    time_wait_read = time_wait_read_new_sum;
+                } else {
+                    cerr << "WARNING: times overrun: time_wait_read" << endl;
+                }
+            } else if (time_wait_is_writing) {
+                time_wait_is_writing = false;
+                uint64_t time_wait_write_new_sum = time_wait_write + diff;
+                if (time_wait_write_new_sum > time_wait_write) {
+                    time_wait_write = time_wait_write_new_sum;
+                } else {
+                    cerr << "WARNING: times overrun: time_wait_write" << endl;
+                }
             }
         }
     }
@@ -412,6 +417,10 @@ string PnetcdfTiming::get_stats_aggregate()
     uint64_t bytes_read_agg=0;
     uint64_t bytes_write=0;
     uint64_t bytes_write_agg=0;
+    double bw_read=0;
+    double bw_read_agg=0;
+    double bw_write=0;
+    double bw_write_agg=0;
 #if   SIZEOF_UINT64_T == SIZEOF_UNSIGNED_INT
     MPI_Datatype type = MPI_UNSIGNED;
 #elif SIZEOF_UINT64_T == SIZEOF_UNSIGNED_LONG
@@ -435,7 +444,9 @@ string PnetcdfTiming::get_stats_aggregate()
         }
     }
     times_read += time_wait_read;
+    pagoda::println_sync("time_wait_read " + pagoda::to_string(time_wait_read));
     times_write += time_wait_write;
+    pagoda::println_sync("time_wait_write " + pagoda::to_string(time_wait_write));
     // calculate total bytes
     for (PnetcdfIOMap::const_iterator it=bytes.begin(), end=bytes.end();
             it != end; ++it) {
@@ -448,6 +459,16 @@ string PnetcdfTiming::get_stats_aggregate()
         }
     }
 
+    bw_read = static_cast<double>(bytes_read)/static_cast<double>(times_read);
+    bw_write = static_cast<double>(bytes_write)/static_cast<double>(times_write);
+    type = MPI_DOUBLE;
+    MPI_Allreduce(&bw_read,&bw_read_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
+    MPI_Allreduce(&bw_write,&bw_write_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
+
+    double io_read  = g_io_multiplier * bw_read_agg;
+    double io_write = g_io_multiplier * bw_write_agg;
+
+#if 0
     pagoda::print_sync("Before allreduce bytes_read:      %lu\n", bytes_read);
     MPI_Allreduce(&bytes_read,&bytes_read_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
     pagoda::print_sync(" after allreduce bytes_read_agg:  %lu\n", bytes_read_agg);
@@ -491,28 +512,35 @@ string PnetcdfTiming::get_stats_aggregate()
     double io_read  = g_io_multiplier * bytes_read_agg  / times_read_agg;
     double io_write = g_io_multiplier * bytes_write_agg / times_write_agg;
     double io_total = g_io_multiplier * bytes_total     / times_total;
+#endif
 
     out << endl
         << "Aggregate Bandwidth (Total Bytes/Total Times)"
         << endl
-        << "Read"
+        << "Read "
+#if 0
         << endl
         << bytes_read_agg  << " " << UNIT_SIZE << " / "
         << times_read_agg  << " " << UNIT_TIME << " = "
+#endif
         <<    io_read      << " gigabytes/sec"
         << endl
-        << "Write"
+        << "Write "
+#if 0
         << endl
         << bytes_write_agg << " " << UNIT_SIZE << " / "
         << times_write_agg << " " << UNIT_TIME << " = "
+#endif
         <<    io_write     << " gigabytes/sec"
         << endl
+#if 0
         << "Total"
         << endl
         << bytes_total << " " << UNIT_SIZE << " / "
         << times_total << " " << UNIT_TIME << " = "
         <<    io_total << " gigabytes/sec"
         << endl
+#endif
         << endl;
 
     return out.str();
