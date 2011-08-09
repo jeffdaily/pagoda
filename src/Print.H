@@ -70,14 +70,14 @@ namespace pagoda
         }
 
         if (beg == end) {
-            return "{}";
+            os << "{}";
+        } else {
+            os << "{" << *(beg++);
+            for (; beg != end; ++beg) {
+                os << delimiter << *beg;
+            }
+            os << "}";
         }
-
-        os << "{" << *(beg++);
-        for (; beg != end; ++beg) {
-            os << delimiter << *beg;
-        }
-        os << "}";
 
         return os.str();
     }
