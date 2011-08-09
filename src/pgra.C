@@ -248,19 +248,32 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
     Dimension *udim = dataset->get_udim();
     int64_t nrec = NULL != udim ? udim->get_size() : 0;
 
+    if (cmd.is_verbose()) {
+        pagoda::print_zero("copying nonrecord variables...");
+    }
     Variable::split(vars, record_vars, nonrecord_vars);
     writer->icopy_vars(nonrecord_vars);
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("done");
+    }
+
     // read/write all record variables, record-at-a-time
     // prefill/size nb_XXX vectors
     nb_arrays.assign(record_vars.size(), NULL);
     nb_tallys.assign(record_vars.size(), NULL);
     nb_results.assign(record_vars.size(), NULL);
     // first record is optimized
+    if (cmd.is_verbose()) {
+        pagoda::print_zero("reading record 0...");
+    }
     for (size_t i=0; i<record_vars.size(); ++i) {
         Variable *var = record_vars[i];
         nb_results[i] = var->iread(int64_t(0));
     }
     dataset->wait();
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("done");
+    }
     for (size_t i=0; i<record_vars.size(); ++i) {
         Variable *var = record_vars[i];
         if (nb_results[i]->get_type() == DataType::CHAR) {
@@ -277,13 +290,23 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
             nb_results[i]->imul(nb_results[i]);
         }
     }
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("finished processing record 0");
+    }
     // remaining records
     for (int64_t r=1; r<nrec; ++r ) {
+        if (cmd.is_verbose()) {
+            pagoda::print_zero("reading record " + pagoda::to_string(r)
+                    + "...");
+        }
         for (size_t i=0; i<record_vars.size(); ++i) {
             Variable *var = record_vars[i];
             nb_arrays[i] = var->iread(r, nb_arrays[i]);
         }
         dataset->wait();
+        if (cmd.is_verbose()) {
+            pagoda::println_zero("done");
+        }
         for (size_t i=0; i<record_vars.size(); ++i) {
             if (nb_results[i]->get_type() == DataType::CHAR) {
                 continue;
@@ -305,6 +328,10 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
                 nb_results[i]->set_counter(NULL);
             }
         }
+        if (cmd.is_verbose()) {
+            pagoda::println_zero("finished processing record "
+                    + pagoda::to_string(r));
+        }
     }
     // we can delete the temporary arrays now
     for (size_t i=0; i<record_vars.size(); ++i) {
@@ -313,6 +340,10 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
     }
     for (size_t i=0; i<record_vars.size(); ++i) {
         Variable *var = record_vars[i];
+        if (cmd.is_verbose()) {
+            pagoda::println_zero("final procesing for variable "
+                    + var->get_name());
+        }
         // normalize, multiply, etc where necessary
         if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
                 || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
@@ -351,7 +382,13 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
 
         writer->iwrite(nb_results[i], var->get_name(), 0);
     }
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("before final write");
+    }
     writer->wait();
+    if (cmd.is_verbose()) {
+        pagoda::println_zero(" after final write");
+    }
     // clean up
     for (size_t i=0; i<record_vars.size(); ++i) {
         delete nb_results[i];
@@ -391,8 +428,14 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
 
     // nonblocking copy of nonrecord variables
     // from global dataset to global writer
+    if (cmd.is_verbose()) {
+        pagoda::print_zero("copying nonrecord variables...");
+    }
     Variable::split(vars, global_record_vars, global_nonrecord_vars);
     writer->icopy_vars(global_nonrecord_vars);
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("done");
+    }
 
     // create a result and tally array for each variable in the dataset
     // these arrays are created on the world process group
@@ -413,6 +456,11 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     }
 
     // create the process groups
+    if (cmd.is_verbose()) {
+        pagoda::print_zero("creating "
+                + pagoda::to_string(cmd.get_number_of_groups())
+                + " process groups...");
+    }
 #if ROUND_ROBIN_GROUPS
     color = pagoda::me%cmd.get_number_of_groups();
 #else
@@ -421,6 +469,9 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     ASSERT(cmd.get_number_of_groups() <= pagoda::npe);
     ASSERT(color >= 0);
     group = ProcessGroup(color);
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("done");
+    }
 
     filenames = cmd.get_input_filenames();
     ASSERT(filenames.size() >= cmd.get_number_of_groups());
@@ -434,7 +485,13 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         int64_t r = 0;
 
         if (i%cmd.get_number_of_groups() != color) {
+            if (cmd.is_verbose()) {
+                pagoda::println_sync("skipping " + filenames[i]);
+            }
             continue; // skip files to be handled by another group
+        }
+        if (cmd.is_verbose()) {
+            pagoda::println_sync(" reading " + filenames[i]);
         }
 
         local_dataset = Dataset::open(filenames[i], group);
@@ -538,6 +595,9 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     }
     local_arrays.clear();
 
+    if (cmd.is_verbose()) {
+        pagoda::print_zero("accumulating results...");
+    }
     // accumulate local results to global results
     // we copy one-group-array-at-a-time to a temporary global array and
     // perform the global accumulation
@@ -596,6 +656,9 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
             }
         }
     }
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("done");
+    }
 
     // we can delete the local results and tallys now
     for (iter=local_results.begin(); iter!=local_results.end(); ++iter) {
@@ -647,7 +710,13 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
 
         writer->iwrite(result, name, 0);
     }
+    if (cmd.is_verbose()) {
+        pagoda::print_zero("writing results...");
+    }
     writer->wait();
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("done");
+    }
 
     // we can delete the global results and tallys now
     for (iter=global_results.begin(); iter!=global_results.end(); ++iter) {
