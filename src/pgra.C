@@ -57,6 +57,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
 void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
         FileWriter *writer, const string &op, PgraCommands &cmd);
 
+void reduce(const string &op, Array *result, Array *array, Array *tally, bool needs_square=true);
 
 int main(int argc, char **argv)
 {
@@ -88,8 +89,12 @@ int main(int argc, char **argv)
         }
 
         // clean up
-        delete dataset;
-        delete writer;
+        if (dataset) {
+            delete dataset;
+        }
+        if (writer) {
+            delete writer;
+        }
 
         pagoda::finalize();
     }
@@ -112,6 +117,68 @@ int main(int argc, char **argv)
     }
 
     return EXIT_SUCCESS;
+}
+
+
+void reduce(const string &op, Array *result, Array *array, Array *tally, bool needs_square)
+{
+    if (op == OP_MAX) {
+        result->imax(array);
+    }
+    else if (op == OP_MIN) {
+        result->imin(array);
+    }
+    else {
+        if (needs_square) {
+            if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
+                // square the values
+                array->imul(array);
+            }
+        }
+        // sum the values or squares, keep a tally
+        result->set_counter(tally);
+        result->iadd(array);
+        result->set_counter(NULL);
+    }
+}
+
+
+static void finalize_avg(
+        const string &op, Variable *var, Array *result,
+        Array *tally, int64_t nrec)
+{
+    // normalize, multiply, etc where necessary
+    if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
+            || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
+        if (NULL != tally) {
+            finalize_tally(result, tally, var->get_validator(0));
+            result->idiv(tally);
+        } else {
+            ScalarArray scalar(result->get_type());
+            scalar.fill_value(nrec);
+            result->idiv(&scalar);
+        }
+    }
+    else if (op == OP_RMSSDN) {
+        if (NULL != tally) {
+            ScalarArray scalar(tally->get_type());
+            scalar.fill_value(1);
+            tally->isub(&scalar);
+            finalize_tally(result, tally, var->get_validator(0));
+            result->idiv(tally);
+        } else {
+            ScalarArray scalar(result->get_type());
+            scalar.fill_value(nrec-1);
+            result->idiv(&scalar);
+        }
+    }
+    // some operations require additional processing */
+    if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
+        result->ipow(0.5);
+    }
+    else if (op == OP_SQRAVG) {
+        result->imul(result);
+    }
 }
 
 
@@ -159,22 +226,7 @@ void pgra_blocking(Dataset *dataset, const vector<Variable*> &vars,
             // read the rest of the records
             for (int64_t rec=1; rec<nrec; ++rec) {
                 array = var->read(rec, array);
-                if (op == OP_MAX) {
-                    result->imax(array);
-                }
-                else if (op == OP_MIN) {
-                    result->imin(array);
-                }
-                else {
-                    if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
-                        // square the values
-                        array->imul(array);
-                    }
-                    // sum the values or squares, keep a tally
-                    result->set_counter(tally);
-                    result->iadd(array);
-                    result->set_counter(NULL);
-                }
+                reduce(op, result, array, tally);
                 if (cmd.is_verbose()) {
                     pagoda::println_zero("\tfinished reading record "
                             + pagoda::to_string(rec));
@@ -182,40 +234,7 @@ void pgra_blocking(Dataset *dataset, const vector<Variable*> &vars,
             }
 
             // normalize, multiply, etc where necessary
-            if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
-                    || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
-                if (NULL != tally) {
-                    finalize_tally(result, tally,
-                            var->get_validator(0));
-                    result->idiv(tally);
-                } else {
-                    ScalarArray scalar(result->get_type());
-                    scalar.fill_value(nrec);
-                    result->idiv(&scalar);
-                }
-            }
-            else if (op == OP_RMSSDN) {
-                if (NULL != tally) {
-                    ScalarArray scalar(tally->get_type());
-                    scalar.fill_value(1);
-                    tally->isub(&scalar);
-                    finalize_tally(result, tally,
-                            var->get_validator(0));
-                    result->idiv(tally);
-                } else {
-                    ScalarArray scalar(result->get_type());
-                    scalar.fill_value(nrec-1);
-                    result->idiv(&scalar);
-                }
-            }
-
-            // some operations require additional processing */
-            if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
-                result->ipow(0.5);
-            }
-            else if (op == OP_SQRAVG) {
-                result->imul(result);
-            }
+            finalize_avg(op, var, result, tally, nrec);
 
             writer->write(result, var->get_name(), 0);
             if (cmd.is_verbose()) {
@@ -241,7 +260,7 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
         FileWriter *writer, const string &op, PgraCommands &cmd)
 {
     vector<Variable*> record_vars;
-    vector<Variable*> nonrecord_vars;
+    vector<Variable*> fixed_vars;
     vector<Array*> nb_arrays;
     vector<Array*> nb_results;
     vector<Array*> nb_tallys;
@@ -249,10 +268,10 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
     int64_t nrec = NULL != udim ? udim->get_size() : 0;
 
     if (cmd.is_verbose()) {
-        pagoda::print_zero("copying nonrecord variables...");
+        pagoda::print_zero("copying fixed variables...");
     }
-    Variable::split(vars, record_vars, nonrecord_vars);
-    writer->icopy_vars(nonrecord_vars);
+    Variable::split(vars, record_vars, fixed_vars);
+    writer->icopy_vars(fixed_vars);
     if (cmd.is_verbose()) {
         pagoda::println_zero("done");
     }
@@ -311,22 +330,7 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
             if (nb_results[i]->get_type() == DataType::CHAR) {
                 continue;
             }
-            if (op == OP_MAX) {
-                nb_results[i]->imax(nb_arrays[i]);
-            }
-            else if (op == OP_MIN) {
-                nb_results[i]->imin(nb_arrays[i]);
-            }
-            else {
-                if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
-                    // square the values
-                    nb_arrays[i]->imul(nb_arrays[i]);
-                }
-                // sum the values or squares, keep a tally
-                nb_results[i]->set_counter(nb_tallys[i]);
-                nb_results[i]->iadd(nb_arrays[i]);
-                nb_results[i]->set_counter(NULL);
-            }
+            reduce(op, nb_results[i], nb_arrays[i], nb_tallys[i]);
         }
         if (cmd.is_verbose()) {
             pagoda::println_zero("finished processing record "
@@ -345,40 +349,7 @@ void pgra_nonblocking(Dataset *dataset, const vector<Variable*> &vars,
                     + var->get_name());
         }
         // normalize, multiply, etc where necessary
-        if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
-                || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
-            if (NULL != nb_tallys[i]) {
-                finalize_tally(nb_results[i], nb_tallys[i],
-                        var->get_validator(0));
-                nb_results[i]->idiv(nb_tallys[i]);
-            } else {
-                ScalarArray scalar(nb_results[i]->get_type());
-                scalar.fill_value(nrec);
-                nb_results[i]->idiv(&scalar);
-            }
-        }
-        else if (op == OP_RMSSDN) {
-            if (NULL != nb_tallys[i]) {
-                ScalarArray scalar(nb_tallys[i]->get_type());
-                scalar.fill_value(1);
-                nb_tallys[i]->isub(&scalar);
-                finalize_tally(nb_results[i], nb_tallys[i],
-                        var->get_validator(0));
-                nb_results[i]->idiv(nb_tallys[i]);
-            } else {
-                ScalarArray scalar(nb_results[i]->get_type());
-                scalar.fill_value(nrec-1);
-                nb_results[i]->idiv(&scalar);
-            }
-        }
-
-        // some operations require additional processing */
-        if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
-            nb_results[i]->ipow(0.5);
-        }
-        else if (op == OP_SQRAVG) {
-            nb_results[i]->imul(nb_results[i]);
-        }
+        finalize_avg(op, var, nb_results[i], nb_tallys[i], nrec);
 
         writer->iwrite(nb_results[i], var->get_name(), 0);
     }
@@ -409,7 +380,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
 {
     vector<string> filenames;
     vector<Variable*> global_record_vars;
-    vector<Variable*> global_nonrecord_vars;
+    vector<Variable*> global_fixed_vars;
     map<string,Array*> global_arrays;
     map<string,Array*> global_results;
     map<string,Array*> global_tallys;
@@ -426,33 +397,15 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     global_udim = dataset->get_udim();
     global_nrec = (NULL != global_udim) ? global_udim->get_size() : 0;
 
-    // nonblocking copy of nonrecord variables
+    // nonblocking copy of fixed variables
     // from global dataset to global writer
     if (cmd.is_verbose()) {
-        pagoda::print_zero("copying nonrecord variables...");
+        pagoda::print_zero("copying fixed variables...");
     }
-    Variable::split(vars, global_record_vars, global_nonrecord_vars);
-    writer->icopy_vars(global_nonrecord_vars);
+    Variable::split(vars, global_record_vars, global_fixed_vars);
+    writer->icopy_vars(global_fixed_vars);
     if (cmd.is_verbose()) {
         pagoda::println_zero("done");
-    }
-
-    // create a result and tally array for each variable in the dataset
-    // these arrays are created on the world process group
-    for (size_t i=0; i<global_record_vars.size(); ++i) {
-        Variable *var = global_record_vars[i];
-        string name = var->get_name();
-        Array *array = var->alloc(true);
-        Array *result = var->alloc(true);
-        array->fill_value(0); // TODO might not need this
-        result->fill_value(0); // TODO might not need this
-        global_arrays.insert(make_pair(name,array));
-        global_results.insert(make_pair(name,result));
-        if (var->has_validator(0)) {
-            Array *tally = Array::create(DataType::INT,array->get_shape());
-            tally->fill_value(0); // TODO might not need this
-            global_tallys.insert(make_pair(name,tally));
-        }
     }
 
     // create the process groups
@@ -479,30 +432,20 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         Dataset *local_dataset;
         vector<Variable*> local_vars;
         vector<Variable*> local_record_vars;
-        vector<Variable*> local_nonrecord_vars;
+        vector<Variable*> local_fixed_vars;
         Dimension *local_udim;
         int64_t local_nrec;
         int64_t r = 0;
 
         if (i%cmd.get_number_of_groups() != color) {
-#if 0
-            if (cmd.is_verbose()) {
-                pagoda::println_sync("skipping " + filenames[i]);
-            }
-#endif
             continue; // skip files to be handled by another group
         }
-#if 0
-        if (cmd.is_verbose()) {
-            pagoda::println_sync(" reading " + filenames[i]);
-        }
-#endif
 
         local_dataset = Dataset::open(filenames[i], group);
         local_udim = local_dataset->get_udim();
         local_nrec = (NULL != local_udim) ? local_udim->get_size() : 0;
         local_vars = cmd.get_variables(local_dataset);
-        Variable::split(local_vars, local_record_vars, local_nonrecord_vars);
+        Variable::split(local_vars, local_record_vars, local_fixed_vars);
         
         // create local arrays if needed
         for (size_t i=0; i<local_record_vars.size(); ++i) {
@@ -511,7 +454,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
             if (local_results.count(name) == 0) {
                 Array *array = var->alloc(true);
                 Array *result = var->alloc(true);
-                result->fill_value(0);
+                //result->fill_value(0); // TODO might not need this
                 if (var->has_validator(0)) {
                     Array *tally = Array::create(
                             DataType::INT, array->get_shape());
@@ -525,14 +468,13 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
 
         // first record is optimized
         if (first_record) {
+            first_record = false;
             for (size_t i=0; i<local_record_vars.size(); ++i) {
                 Variable *var = local_record_vars[i];
                 Array *result = local_results.find(var->get_name())->second;
                 (void)var->iread(int64_t(0), result);
             }
             local_dataset->wait();
-            r = 1;
-            first_record = false;
             for (size_t i=0; i<local_record_vars.size(); ++i) {
                 Variable *var = local_record_vars[i];
                 Array *result = local_results.find(var->get_name())->second;
@@ -551,6 +493,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                     result->imul(result);
                 }
             }
+            r = 1;
         } else {
             r = 0;
         }
@@ -574,30 +517,35 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                 if (result->get_type() == DataType::CHAR) {
                     continue;
                 }
-                if (op == OP_MAX) {
-                    result->imax(array);
-                }
-                else if (op == OP_MIN) {
-                    result->imin(array);
-                }
-                else {
-                    if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
-                        // square the values
-                        array->imul(array);
-                    }
-                    // sum the values or squares, keep a tally
-                    result->set_counter(tally);
-                    result->iadd(array);
-                    result->set_counter(NULL);
-                }
+                reduce(op, result, array, tally);
             }
         }
     }
-    // we can delete the temporary arrays now
+    // we can delete the temporary local arrays now
     for (iter=local_arrays.begin(); iter!=local_arrays.end(); ++iter) {
         delete iter->second;
     }
     local_arrays.clear();
+
+    ProcessGroup::set_default(ProcessGroup::get_world());
+
+    // create a result and tally array for each variable in the dataset
+    // these arrays are created on the world process group
+    for (size_t i=0; i<global_record_vars.size(); ++i) {
+        Variable *var = global_record_vars[i];
+        string name = var->get_name();
+        Array *array = var->alloc(true);
+        Array *result = var->alloc(true);
+        //array->fill_value(0); // TODO might not need this
+        //result->fill_value(0); // TODO might not need this
+        global_arrays.insert(make_pair(name,array));
+        global_results.insert(make_pair(name,result));
+        if (var->has_validator(0)) {
+            Array *tally = Array::create(DataType::INT,array->get_shape());
+            tally->fill_value(0); // TODO might not need this
+            global_tallys.insert(make_pair(name,tally));
+        }
+    }
 
     if (cmd.is_verbose()) {
         pagoda::print_zero("accumulating results...");
@@ -607,7 +555,6 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     // perform the global accumulation
     ASSERT(local_results.size() == global_results.size());
     ASSERT(local_tallys.size() == global_tallys.size());
-    ProcessGroup::set_default(ProcessGroup::get_world());
     for (iter=global_results.begin(); iter!=global_results.end(); ++iter) {
         string name = iter->first;
         Array *global_result = iter->second;
@@ -622,6 +569,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         }
         for (int i=0; i<cmd.get_number_of_groups(); ++i) {
             if (first) {
+                first = false;
                 // first group's array is copied directly to result
                 if (i == color) {
                     if (local_result->owns_data()) {
@@ -631,8 +579,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                         global_result->put(buf,lo,hi);
                     }
                 }
-                pagoda::barrier();
-                first = false;
+                //pagoda::barrier(); // this one isn't needed
                 continue;
             } else {
                 // subsequent groups' arrays are copied and modified
@@ -645,18 +592,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                     }
                 }
                 pagoda::barrier();
-                if (op == OP_MAX) {
-                    global_result->imax(global_array);
-                }
-                else if (op == OP_MIN) {
-                    global_result->imin(global_array);
-                }
-                else {
-                    // sum the values or squares, keep a tally
-                    global_result->set_counter(global_tally);
-                    global_result->iadd(global_array);
-                    global_result->set_counter(NULL);
-                }
+                reduce(op, global_result, global_array, global_tally, false);
             }
         }
     }
@@ -664,53 +600,30 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         pagoda::println_zero("done");
     }
 
-    // we can delete the local results and tallys now
+    // we can delete the local results, local tallys, and global arrays now
     for (iter=local_results.begin(); iter!=local_results.end(); ++iter) {
         delete iter->second;
     }
+    local_results.clear();
     for (iter=local_tallys.begin(); iter!=local_tallys.end(); ++iter) {
         delete iter->second;
     }
+    local_tallys.clear();
+    for (iter=global_arrays.begin(); iter!=global_arrays.end(); ++iter) {
+        delete iter->second;
+    }
+    global_arrays.clear();
 
     for (size_t i=0; i<global_record_vars.size(); ++i) {
         Variable *var = global_record_vars[i];
         string name = var->get_name();
         Array *result = global_results.find(name)->second;
+        Array *tally = NULL;
+        if (global_tallys.count(name) == 1) {
+            Array *tally = global_tallys.find(name)->second;
+        }
         // normalize, multiply, etc where necessary
-        if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
-                || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
-            if (global_tallys.count(name) == 1) {
-                Array *tally = global_tallys.find(name)->second;
-                finalize_tally(result, tally, var->get_validator(0));
-                result->idiv(tally);
-            } else {
-                ScalarArray scalar(result->get_type());
-                scalar.fill_value(global_nrec);
-                result->idiv(&scalar);
-            }
-        }
-        else if (op == OP_RMSSDN) {
-            if (global_tallys.count(name) == 1) {
-                Array *tally = global_tallys.find(name)->second;
-                ScalarArray scalar(tally->get_type());
-                scalar.fill_value(1);
-                tally->isub(&scalar);
-                finalize_tally(result, tally, var->get_validator(0));
-                result->idiv(tally);
-            } else {
-                ScalarArray scalar(result->get_type());
-                scalar.fill_value(global_nrec-1);
-                result->idiv(&scalar);
-            }
-        }
-
-        // some operations require additional processing */
-        if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
-            result->ipow(0.5);
-        }
-        else if (op == OP_SQRAVG) {
-            result->imul(result);
-        }
+        finalize_avg(op, var, result, tally, global_nrec);
 
         writer->iwrite(result, name, 0);
     }
@@ -736,17 +649,17 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
         FileWriter *writer, const string &op, PgraCommands &cmd)
 {
     vector<Variable*> record_vars;
-    vector<Variable*> nonrecord_vars;
+    vector<Variable*> fixed_vars;
     vector<vector<Array*> > nb_arrays;
     vector<Array*> nb_results;
     vector<Array*> nb_tallys;
     Dimension *udim = dataset->get_udim();
     int64_t nrec = NULL != udim ? udim->get_size() : 0;
 
-    // we process record and non-record variables separately
-    Variable::split(vars, record_vars, nonrecord_vars);
-    // copy non-record variables unchanged to output
-    writer->icopy_vars(nonrecord_vars);
+    // we process record and fixed variables separately
+    Variable::split(vars, record_vars, fixed_vars);
+    // copy fixed variables unchanged to output
+    writer->icopy_vars(fixed_vars);
     // prefill/size nb_XXX vectors
     nb_arrays.assign(record_vars.size(), vector<Array*>(nrec, 0));
     nb_tallys.assign(record_vars.size(), NULL);
@@ -789,22 +702,7 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
             if (nb_results[v]->get_type() == DataType::CHAR) {
                 continue;
             }
-            if (op == OP_MAX) {
-                nb_results[v]->imax(array);
-            }
-            else if (op == OP_MIN) {
-                nb_results[v]->imin(array);
-            }
-            else {
-                if (op == OP_RMS || op == OP_RMSSDN || op == OP_AVGSQR) {
-                    // square the values
-                    array->imul(array);
-                }
-                // sum the values or squares, keep a tally
-                nb_results[v]->set_counter(nb_tallys[v]);
-                nb_results[v]->iadd(array);
-                nb_results[v]->set_counter(NULL);
-            }
+            reduce(op, nb_results[v], array, nb_tallys[v]);
         }
     }
     // we can delete the temporary arrays now
@@ -819,40 +717,7 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
     for (size_t v=0; v<record_vars.size(); ++v) {
         Variable *var = record_vars[v];
         // normalize, multiply, etc where necessary
-        if (op == OP_AVG || op == OP_SQRT || op == OP_SQRAVG
-                || op == OP_RMS || op == OP_RMS || op == OP_AVGSQR) {
-            if (NULL != nb_tallys[v]) {
-                finalize_tally(nb_results[v], nb_tallys[v],
-                        var->get_validator(0));
-                nb_results[v]->idiv(nb_tallys[v]);
-            } else {
-                ScalarArray scalar(nb_results[v]->get_type());
-                scalar.fill_value(nrec);
-                nb_results[v]->idiv(&scalar);
-            }
-        }
-        else if (op == OP_RMSSDN) {
-            if (NULL != nb_tallys[v]) {
-                ScalarArray scalar(nb_tallys[v]->get_type());
-                scalar.fill_value(1);
-                nb_tallys[v]->isub(&scalar);
-                finalize_tally(nb_results[v], nb_tallys[v],
-                        var->get_validator(0));
-                nb_results[v]->idiv(nb_tallys[v]);
-            } else {
-                ScalarArray scalar(nb_results[v]->get_type());
-                scalar.fill_value(nrec-1);
-                nb_results[v]->idiv(&scalar);
-            }
-        }
-
-        // some operation results require even more additional processing
-        if (op == OP_RMS || op == OP_RMSSDN || op == OP_SQRT) {
-            nb_results[v]->ipow(0.5);
-        }
-        else if (op == OP_SQRAVG) {
-            nb_results[v]->imul(nb_results[v]);
-        }
+        finalize_avg(op, var, nb_results[v], nb_tallys[v], nrec);
 
         writer->iwrite(nb_results[v], var->get_name(), 0);
     }
