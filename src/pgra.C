@@ -366,24 +366,24 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                     }
                     maybe_square(op, local_result);
                 } else {
+                    rec = 0;
                     local_result = local_results.find(name)->second;
                     if (local_tallys.count(name) == 1) {
                         local_tally = local_tallys.find(name)->second;
                     }
-                    if (local_arrays.count(name) == 1) {
-                        local_array = local_arrays.find(name)->second;
-                    } else {
-                        local_array = var->alloc(true);
-                        local_arrays.insert(make_pair(name, local_array));
-                    }
+                }
+                // create local array if needed
+                if (local_arrays.count(name) == 1) {
+                    local_array = local_arrays.find(name)->second;
+                } else {
+                    local_array = var->alloc(true);
+                    local_arrays.insert(make_pair(name, local_array));
                 }
                 // read the rest of the records
                 for (/*empty*/; rec<local_nrec; ++rec) {
                     local_array = var->read(rec, local_array);
                     reduce(op, local_result, local_array, local_tally);
                 }
-                // normalize, multiply, etc where necessary
-                finalize_avg(op, var, local_result, local_tally, local_nrec);
             } else {
                 // only read the fixed variable if we haven't already
                 if (local_results.count(name) == 0) {
@@ -417,6 +417,7 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         string name = var->get_name();
         Array *array = NULL;
         Array *result = NULL;
+
         if (var->has_record() && var->get_nrec() > 0) {
             array = var->alloc(true);
             result = var->alloc(true);
@@ -471,11 +472,13 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                         void *buf = local_result->access();
                         local_result->get_distribution(lo,hi);
                         global_result->put(buf,lo,hi);
+                        local_result->release();
                     }
                 }
                 //pagoda::barrier(); // this one isn't needed
                 continue;
-            } else if (var->has_record() && var->get_nrec() > 0) {
+            }
+            if (var->has_record() && var->get_nrec() > 0) {
                 // subsequent groups' arrays are copied and modified
                 // but only for record variables
                 if (i == color) {
@@ -484,6 +487,7 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                         void *buf = local_result->access();
                         local_result->get_distribution(lo,hi);
                         global_array->put(buf,lo,hi);
+                        local_result->release();
                     }
                 }
                 pagoda::barrier();
@@ -852,6 +856,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                         void *buf = local_result->access();
                         local_result->get_distribution(lo,hi);
                         global_result->put(buf,lo,hi);
+                        local_result->release();
                     }
                 }
                 //pagoda::barrier(); // this one isn't needed
@@ -864,6 +869,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
                         void *buf = local_result->access();
                         local_result->get_distribution(lo,hi);
                         global_array->put(buf,lo,hi);
+                        local_result->release();
                     }
                 }
                 pagoda::barrier();
