@@ -17,6 +17,9 @@
 /* Define if F77 and FC dummy `main' functions are identical. */
 #undef FC_DUMMY_MAIN_EQ_F77
 
+/* set to 1 if we have the indicated package */
+#undef HAVE_BIL
+
 /* Define to 1 if you have the `clock' function. */
 #undef HAVE_CLOCK
 

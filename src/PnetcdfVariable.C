@@ -5,6 +5,9 @@
 #include <stdint.h>
 
 #include <pnetcdf.h>
+#if HAVE_BIL
+#   include <bil.h>
+#endif
 
 #include <algorithm>
 
@@ -419,15 +422,88 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 }
 
 
+static void* allocate(const DataType &type, const int64_t &n)
+{
+    void *ptr = NULL;
+#define allocate(TYPE, DT) \
+    if (type == DT) { \
+        ptr = new TYPE[n]; \
+    } else
+    allocate(unsigned char, DataType::UCHAR)
+    allocate(signed char,   DataType::SCHAR)
+    allocate(char,          DataType::CHAR)
+    allocate(int,           DataType::INT)
+    allocate(long,          DataType::LONG)
+    allocate(float,         DataType::FLOAT)
+    allocate(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef allocate
+    return ptr;
+}
+
+
+static void deallocate(const DataType &type, void *ptr)
+{
+#define deallocate(TYPE, DT)                       \
+    if (type == DT) {                              \
+        TYPE *typed_ptr = static_cast<TYPE*>(ptr); \
+        delete [] typed_ptr;                       \
+        typed_ptr = NULL;                          \
+    } else
+    deallocate(unsigned char, DataType::UCHAR)
+    deallocate(signed char,   DataType::SCHAR)
+    deallocate(char,          DataType::CHAR)
+    deallocate(int,           DataType::INT)
+    deallocate(long,          DataType::LONG)
+    deallocate(float,         DataType::FLOAT)
+    deallocate(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef deallocate
+}
+
+
 void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
                               const vector<MPI_Offset> &count,
                               bool found_bit) const
 {
+#if HAVE_BIL
+    const DataType read_type = dst->get_read_type();
+    const DataType type = dst->get_type();
+    string nc_varname = get_name();
+    string nc_filename = get_netcdf_dataset()->get_filename();
+    vector<int> block_start(start.begin(), start.end());
+    vector<int> block_size(count.begin(), count.end());
+    void *ptr = NULL;
+    int64_t n = dst->get_local_size();
+
+    if (dst->owns_data() && found_bit) {
+        if (read_type == type) {
+            ptr = dst->access();
+        } else {
+            ptr = allocate(read_type, n);
+        }
+        BIL_Add_block_nc(start.size(), &block_start[0], &block_size[0],
+                nc_filename.c_str(), nc_varname.c_str(), &ptr);
+    }
+    BIL_Read();
+    if (dst->owns_data() && found_bit) {
+        if (read_type != type) {
+            void *gabuf = NULL;
+            gabuf = dst->access();
+            pagoda::copy(read_type,ptr,type,gabuf,n);
+            deallocate(read_type, ptr);
+        }
+        dst->release_update();
+    }
+#else
     int ncid = get_netcdf_dataset()->get_id();
     const DataType read_type = dst->get_read_type();
     const DataType type = dst->get_type();
-
-#define read_var_all(TYPE, DT) \
+#   define read_var_all(TYPE, DT) \
     if (read_type == DT) { \
         TYPE *ptr = NULL; \
         int64_t n = dst->get_local_size(); \
@@ -459,7 +535,8 @@ void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
     {
         EXCEPT(DataTypeException, "DataType not handled", read_type);
     }
-#undef read_var_all
+#   undef read_var_all
+#endif
 }
 
 

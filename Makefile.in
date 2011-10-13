@@ -287,43 +287,43 @@ am__DEPENDENCIES_1 =
 @GA_USES_FLIBS_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 pgbo_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgcmp_OBJECTS = src/pgcmp.$(OBJEXT)
 pgcmp_OBJECTS = $(am_pgcmp_OBJECTS)
 pgcmp_LDADD = $(LDADD)
 pgcmp_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgdump_OBJECTS = src/pgdump.$(OBJEXT)
 pgdump_OBJECTS = $(am_pgdump_OBJECTS)
 pgdump_LDADD = $(LDADD)
 pgdump_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgea_OBJECTS = src/pgea.$(OBJEXT)
 pgea_OBJECTS = $(am_pgea_OBJECTS)
 pgea_LDADD = $(LDADD)
 pgea_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgflint_OBJECTS = src/pgflint.$(OBJEXT)
 pgflint_OBJECTS = $(am_pgflint_OBJECTS)
 pgflint_LDADD = $(LDADD)
 pgflint_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgra_OBJECTS = src/pgra.$(OBJEXT)
 pgra_OBJECTS = $(am_pgra_OBJECTS)
 pgra_LDADD = $(LDADD)
 pgra_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgsub_OBJECTS = src/pgsub.$(OBJEXT)
 pgsub_OBJECTS = $(am_pgsub_OBJECTS)
 pgsub_LDADD = $(LDADD)
 pgsub_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestArray_SOURCES_DIST = sandbox/TestArray.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestArray_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestArray.$(OBJEXT)
@@ -331,7 +331,7 @@ sandbox_TestArray_OBJECTS = $(am_sandbox_TestArray_OBJECTS)
 sandbox_TestArray_LDADD = $(LDADD)
 sandbox_TestArray_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestBin_SOURCES_DIST = sandbox/TestBin.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestBin_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestBin.$(OBJEXT)
@@ -339,7 +339,7 @@ sandbox_TestBin_OBJECTS = $(am_sandbox_TestBin_OBJECTS)
 sandbox_TestBin_LDADD = $(LDADD)
 sandbox_TestBin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestCommandLine_SOURCES_DIST = sandbox/TestCommandLine.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestCommandLine_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestCommandLine.$(OBJEXT)
@@ -348,7 +348,8 @@ sandbox_TestCommandLine_OBJECTS =  \
 sandbox_TestCommandLine_LDADD = $(LDADD)
 sandbox_TestCommandLine_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestDimension_SOURCES_DIST = sandbox/TestDimension.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestDimension_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestDimension.$(OBJEXT)
@@ -356,7 +357,8 @@ sandbox_TestDimension_OBJECTS = $(am_sandbox_TestDimension_OBJECTS)
 sandbox_TestDimension_LDADD = $(LDADD)
 sandbox_TestDimension_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestDistance_SOURCES_DIST = sandbox/TestDistance.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestDistance_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestDistance.$(OBJEXT)
@@ -364,7 +366,7 @@ sandbox_TestDistance_OBJECTS = $(am_sandbox_TestDistance_OBJECTS)
 sandbox_TestDistance_LDADD = $(LDADD)
 sandbox_TestDistance_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestEnum_SOURCES_DIST = sandbox/TestEnum.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestEnum_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestEnum.$(OBJEXT)
@@ -372,7 +374,7 @@ sandbox_TestEnum_OBJECTS = $(am_sandbox_TestEnum_OBJECTS)
 sandbox_TestEnum_LDADD = $(LDADD)
 sandbox_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestGet_SOURCES_DIST = sandbox/TestGet.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestGet_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGet.$(OBJEXT)
@@ -380,7 +382,7 @@ sandbox_TestGet_OBJECTS = $(am_sandbox_TestGet_OBJECTS)
 sandbox_TestGet_LDADD = $(LDADD)
 sandbox_TestGet_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestGrid_SOURCES_DIST = sandbox/TestGrid.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestGrid_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGrid.$(OBJEXT)
@@ -388,7 +390,7 @@ sandbox_TestGrid_OBJECTS = $(am_sandbox_TestGrid_OBJECTS)
 sandbox_TestGrid_LDADD = $(LDADD)
 sandbox_TestGrid_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestGroups_SOURCES_DIST = sandbox/TestGroups.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestGroups_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGroups.$(OBJEXT)
@@ -396,7 +398,7 @@ sandbox_TestGroups_OBJECTS = $(am_sandbox_TestGroups_OBJECTS)
 sandbox_TestGroups_LDADD = $(LDADD)
 sandbox_TestGroups_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestJoin_SOURCES_DIST = sandbox/TestJoin.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestJoin_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestJoin.$(OBJEXT)
@@ -404,7 +406,7 @@ sandbox_TestJoin_OBJECTS = $(am_sandbox_TestJoin_OBJECTS)
 sandbox_TestJoin_LDADD = $(LDADD)
 sandbox_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestMaskMap_SOURCES_DIST = sandbox/TestMaskMap.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestMaskMap_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestMaskMap.$(OBJEXT)
@@ -412,7 +414,7 @@ sandbox_TestMaskMap_OBJECTS = $(am_sandbox_TestMaskMap_OBJECTS)
 sandbox_TestMaskMap_LDADD = $(LDADD)
 sandbox_TestMaskMap_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestPartialSum_SOURCES_DIST = sandbox/TestPartialSum.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestPartialSum_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum.$(OBJEXT)
@@ -420,7 +422,8 @@ sandbox_TestPartialSum_OBJECTS = $(am_sandbox_TestPartialSum_OBJECTS)
 sandbox_TestPartialSum_LDADD = $(LDADD)
 sandbox_TestPartialSum_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestPnetcdfAttribute_SOURCES_DIST =  \
 	sandbox/TestPnetcdfAttribute.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestPnetcdfAttribute_OBJECTS =  \
@@ -430,7 +433,8 @@ sandbox_TestPnetcdfAttribute_OBJECTS =  \
 sandbox_TestPnetcdfAttribute_LDADD = $(LDADD)
 sandbox_TestPnetcdfAttribute_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestPnetcdfDataset_SOURCES_DIST =  \
 	sandbox/TestPnetcdfDataset.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestPnetcdfDataset_OBJECTS =  \
@@ -440,7 +444,8 @@ sandbox_TestPnetcdfDataset_OBJECTS =  \
 sandbox_TestPnetcdfDataset_LDADD = $(LDADD)
 sandbox_TestPnetcdfDataset_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestRavel_SOURCES_DIST = sandbox/TestRavel.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRavel_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel.$(OBJEXT)
@@ -448,7 +453,7 @@ sandbox_TestRavel_OBJECTS = $(am_sandbox_TestRavel_OBJECTS)
 sandbox_TestRavel_LDADD = $(LDADD)
 sandbox_TestRavel_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestRead_SOURCES_DIST = sandbox/TestRead.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRead_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead.$(OBJEXT)
@@ -456,7 +461,7 @@ sandbox_TestRead_OBJECTS = $(am_sandbox_TestRead_OBJECTS)
 sandbox_TestRead_LDADD = $(LDADD)
 sandbox_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestRead2_SOURCES_DIST = sandbox/TestRead2.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRead2_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead2.$(OBJEXT)
@@ -464,7 +469,7 @@ sandbox_TestRead2_OBJECTS = $(am_sandbox_TestRead2_OBJECTS)
 sandbox_TestRead2_LDADD = $(LDADD)
 sandbox_TestRead2_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestRead2b_SOURCES_DIST = sandbox/TestRead2b.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRead2b_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead2b.$(OBJEXT)
@@ -472,7 +477,7 @@ sandbox_TestRead2b_OBJECTS = $(am_sandbox_TestRead2b_OBJECTS)
 sandbox_TestRead2b_LDADD = $(LDADD)
 sandbox_TestRead2b_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestRead2c_SOURCES_DIST = sandbox/TestRead2c.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRead2c_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead2c.$(OBJEXT)
@@ -480,7 +485,7 @@ sandbox_TestRead2c_OBJECTS = $(am_sandbox_TestRead2c_OBJECTS)
 sandbox_TestRead2c_LDADD = $(LDADD)
 sandbox_TestRead2c_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestRead2d_SOURCES_DIST = sandbox/TestRead2d.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRead2d_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead2d.$(OBJEXT)
@@ -488,7 +493,7 @@ sandbox_TestRead2d_OBJECTS = $(am_sandbox_TestRead2d_OBJECTS)
 sandbox_TestRead2d_LDADD = $(LDADD)
 sandbox_TestRead2d_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestRead3_SOURCES_DIST = sandbox/TestRead3.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestRead3_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead3.$(OBJEXT)
@@ -496,7 +501,7 @@ sandbox_TestRead3_OBJECTS = $(am_sandbox_TestRead3_OBJECTS)
 sandbox_TestRead3_LDADD = $(LDADD)
 sandbox_TestRead3_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestScatter_SOURCES_DIST = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestScatter_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter.$(OBJEXT)
@@ -504,7 +509,7 @@ sandbox_TestScatter_OBJECTS = $(am_sandbox_TestScatter_OBJECTS)
 sandbox_TestScatter_LDADD = $(LDADD)
 sandbox_TestScatter_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestSlice_SOURCES_DIST = sandbox/TestSlice.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestSlice_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice.$(OBJEXT)
@@ -512,7 +517,7 @@ sandbox_TestSlice_OBJECTS = $(am_sandbox_TestSlice_OBJECTS)
 sandbox_TestSlice_LDADD = $(LDADD)
 sandbox_TestSlice_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestUnion_SOURCES_DIST = sandbox/TestUnion.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestUnion_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestUnion.$(OBJEXT)
@@ -520,7 +525,7 @@ sandbox_TestUnion_OBJECTS = $(am_sandbox_TestUnion_OBJECTS)
 sandbox_TestUnion_LDADD = $(LDADD)
 sandbox_TestUnion_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestVecBool_SOURCES_DIST = sandbox/TestVecBool.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestVecBool_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool.$(OBJEXT)
@@ -528,7 +533,7 @@ sandbox_TestVecBool_OBJECTS = $(am_sandbox_TestVecBool_OBJECTS)
 sandbox_TestVecBool_LDADD = $(LDADD)
 sandbox_TestVecBool_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestWrite_SOURCES_DIST = sandbox/TestWrite.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestWrite_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestWrite.$(OBJEXT)
@@ -536,7 +541,7 @@ sandbox_TestWrite_OBJECTS = $(am_sandbox_TestWrite_OBJECTS)
 sandbox_TestWrite_LDADD = $(LDADD)
 sandbox_TestWrite_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestAttribute_SOURCES_DIST =  \
 	sandbox/ga/TestAttribute.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestAttribute_OBJECTS = sandbox/ga/TestAttribute.$(OBJEXT)
@@ -545,14 +550,15 @@ sandbox_ga_TestAttribute_OBJECTS =  \
 sandbox_ga_TestAttribute_LDADD = $(LDADD)
 sandbox_ga_TestAttribute_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestBin_SOURCES_DIST = sandbox/ga/TestBin.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestBin_OBJECTS = sandbox/ga/TestBin.$(OBJEXT)
 sandbox_ga_TestBin_OBJECTS = $(am_sandbox_ga_TestBin_OBJECTS)
 sandbox_ga_TestBin_LDADD = $(LDADD)
 sandbox_ga_TestBin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestDimension_SOURCES_DIST =  \
 	sandbox/ga/TestDimension.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestDimension_OBJECTS = sandbox/ga/TestDimension.$(OBJEXT)
@@ -561,7 +567,8 @@ sandbox_ga_TestDimension_OBJECTS =  \
 sandbox_ga_TestDimension_LDADD = $(LDADD)
 sandbox_ga_TestDimension_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestDistance_SOURCES_DIST = sandbox/ga/TestDistance.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestDistance_OBJECTS = sandbox/ga/TestDistance.$(OBJEXT)
 sandbox_ga_TestDistance_OBJECTS =  \
@@ -569,19 +576,21 @@ sandbox_ga_TestDistance_OBJECTS =  \
 sandbox_ga_TestDistance_LDADD = $(LDADD)
 sandbox_ga_TestDistance_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestEnum_SOURCES_DIST = sandbox/ga/TestEnum.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestEnum_OBJECTS = sandbox/ga/TestEnum.$(OBJEXT)
 sandbox_ga_TestEnum_OBJECTS = $(am_sandbox_ga_TestEnum_OBJECTS)
 sandbox_ga_TestEnum_LDADD = $(LDADD)
 sandbox_ga_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestGet_SOURCES_DIST = sandbox/ga/TestGet.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestGet_OBJECTS = sandbox/ga/TestGet.$(OBJEXT)
 sandbox_ga_TestGet_OBJECTS = $(am_sandbox_ga_TestGet_OBJECTS)
 am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_3)
 am__sandbox_ga_TestJoin_SOURCES_DIST = sandbox/ga/TestJoin.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestJoin_OBJECTS = sandbox/ga/TestJoin.$(OBJEXT)
@@ -589,7 +598,7 @@ sandbox_ga_TestJoin_OBJECTS = $(am_sandbox_ga_TestJoin_OBJECTS)
 sandbox_ga_TestJoin_LDADD = $(LDADD)
 sandbox_ga_TestJoin_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestLocateRegion_SOURCES_DIST =  \
 	sandbox/ga/TestLocateRegion.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestLocateRegion_OBJECTS = sandbox/ga/TestLocateRegion.$(OBJEXT)
@@ -598,7 +607,8 @@ sandbox_ga_TestLocateRegion_OBJECTS =  \
 sandbox_ga_TestLocateRegion_LDADD = $(LDADD)
 sandbox_ga_TestLocateRegion_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestPartialSum_SOURCES_DIST =  \
 	sandbox/ga/TestPartialSum.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestPartialSum_OBJECTS = sandbox/ga/TestPartialSum.$(OBJEXT)
@@ -607,7 +617,8 @@ sandbox_ga_TestPartialSum_OBJECTS =  \
 sandbox_ga_TestPartialSum_LDADD = $(LDADD)
 sandbox_ga_TestPartialSum_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestPnetcdfDataset_SOURCES_DIST =  \
 	sandbox/ga/TestPnetcdfDataset.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestPnetcdfDataset_OBJECTS = sandbox/ga/TestPnetcdfDataset.$(OBJEXT)
@@ -616,49 +627,52 @@ sandbox_ga_TestPnetcdfDataset_OBJECTS =  \
 sandbox_ga_TestPnetcdfDataset_LDADD = $(LDADD)
 sandbox_ga_TestPnetcdfDataset_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestRavel_SOURCES_DIST = sandbox/ga/TestRavel.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestRavel_OBJECTS = sandbox/ga/TestRavel.$(OBJEXT)
 sandbox_ga_TestRavel_OBJECTS = $(am_sandbox_ga_TestRavel_OBJECTS)
 sandbox_ga_TestRavel_LDADD = $(LDADD)
 sandbox_ga_TestRavel_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestRead_SOURCES_DIST = sandbox/ga/TestRead.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestRead_OBJECTS = sandbox/ga/TestRead.$(OBJEXT)
 sandbox_ga_TestRead_OBJECTS = $(am_sandbox_ga_TestRead_OBJECTS)
 sandbox_ga_TestRead_LDADD = $(LDADD)
 sandbox_ga_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestScanAdd_SOURCES_DIST = sandbox/ga/TestScanAdd.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestScanAdd_OBJECTS = sandbox/ga/TestScanAdd.$(OBJEXT)
 sandbox_ga_TestScanAdd_OBJECTS = $(am_sandbox_ga_TestScanAdd_OBJECTS)
 sandbox_ga_TestScanAdd_LDADD = $(LDADD)
 sandbox_ga_TestScanAdd_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestSort_SOURCES_DIST = sandbox/ga/TestSort.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestSort_OBJECTS = sandbox/ga/TestSort.$(OBJEXT)
 sandbox_ga_TestSort_OBJECTS = $(am_sandbox_ga_TestSort_OBJECTS)
 sandbox_ga_TestSort_LDADD = $(LDADD)
 sandbox_ga_TestSort_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestUnion_SOURCES_DIST = sandbox/ga/TestUnion.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestUnion_OBJECTS = sandbox/ga/TestUnion.$(OBJEXT)
 sandbox_ga_TestUnion_OBJECTS = $(am_sandbox_ga_TestUnion_OBJECTS)
 sandbox_ga_TestUnion_LDADD = $(LDADD)
 sandbox_ga_TestUnion_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_ga_TestUnpack_SOURCES_DIST = sandbox/ga/TestUnpack.c
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestUnpack_OBJECTS = sandbox/ga/TestUnpack.$(OBJEXT)
 sandbox_ga_TestUnpack_OBJECTS = $(am_sandbox_ga_TestUnpack_OBJECTS)
 sandbox_ga_TestUnpack_LDADD = $(LDADD)
 sandbox_ga_TestUnpack_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -799,6 +813,9 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BIL_CPPFLAGS = @BIL_CPPFLAGS@
+BIL_LDFLAGS = @BIL_LDFLAGS@
+BIL_LIBS = @BIL_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -905,6 +922,7 @@ dvidir = @dvidir@
 enable_sandbox = @enable_sandbox@
 enable_sandbox_ga = @enable_sandbox_ga@
 exec_prefix = @exec_prefix@
+have_bil = @have_bil@
 have_netcdf4 = @have_netcdf4@
 have_pnetcdf = @have_pnetcdf@
 host = @host@
@@ -938,15 +956,15 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 @WARNINGS_TRUE@WALL = -Wall
 @PROFILE_TRUE@PROFILE = -pg
-AM_CPPFLAGS = -I$(top_srcdir)/src $(PNETCDF_CPPFLAGS) $(NETCDF4_CPPFLAGS) $(GA_CPPFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src $(BIL_CPPFLAGS) $(PNETCDF_CPPFLAGS) $(NETCDF4_CPPFLAGS) $(GA_CPPFLAGS)
 AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
-AM_LDFLAGS = $(PROFILE) $(PNETCDF_LDFLAGS) $(NETCDF4_LDFLAGS) $(GA_LDFLAGS)
-LDADD = libpagoda.la $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS) \
-	$(am__append_1)
-LDADD_STANDALONE = $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS) \
-	$(am__append_2)
+AM_LDFLAGS = $(PROFILE) $(BIL_LDFLAGS) $(PNETCDF_LDFLAGS) $(NETCDF4_LDFLAGS) $(GA_LDFLAGS)
+LDADD = libpagoda.la $(BIL_LIBS) $(PNETCDF_LIBS) $(NETCDF4_LIBS) \
+	$(GA_LIBS) $(am__append_1)
+LDADD_STANDALONE = $(BIL_LIBS) $(PNETCDF_LIBS) $(NETCDF4_LIBS) \
+	$(GA_LIBS) $(am__append_2)
 EXTRA_DIST = $(TESTSUITE_AT) $(PACKAGE_M4) $(TESTSUITE) $(ATLOCAL_IN) \
 	$(LOCAL_AT) $(PGRA_AT)
 MOSTLYCLEANFILES = 

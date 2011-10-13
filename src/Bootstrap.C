@@ -8,6 +8,9 @@
 #if HAVE_GA
 #   include <ga.h>
 #endif
+#if HAVE_BIL
+#   include <bil.h>
+#endif
 
 #include "Bootstrap.H"
 #include "Dataset.H"
@@ -41,6 +44,9 @@ void pagoda::initialize(int *argc, char ***argv)
     if (mpierr != MPI_SUCCESS) {
         MPI_Abort(MPI_COMM_WORLD, -6);
     }
+#if HAVE_BIL
+    BIL_Init(pagoda::COMM_WORLD);
+#endif
 #if HAVE_GA
     GA_Initialize();
     // avoid using MA in GA

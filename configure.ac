@@ -168,6 +168,11 @@ PAGODA_PNETCDF_NB_INT
 # Does pnetcdf have ncmpi_inq_format function?
 PAGODA_PNETCDF_INQ_FORMAT
 
+# Check for BIL.
+PAGODA_CHECK_PACKAGE([bil], [bil.h], [bil], [BIL_Init], [-lpnetcdf])
+AM_CONDITIONAL([HAVE_BIL], [test "x$pg_cv_bil_found" = xyes])
+AC_SUBST([have_bil], [$pg_cv_bil_found])
+
 # Check for netcdf4.
 PAGODA_CHECK_PACKAGE([netcdf4], [netcdf.h], [netcdf], [nc_open_par],
     [-lhdf5_hl -lhdf5 -lz -lm],

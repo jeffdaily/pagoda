@@ -657,6 +657,12 @@ HAVE_NETCDF4_TRUE
 NETCDF4_CPPFLAGS
 NETCDF4_LDFLAGS
 NETCDF4_LIBS
+have_bil
+HAVE_BIL_FALSE
+HAVE_BIL_TRUE
+BIL_CPPFLAGS
+BIL_LDFLAGS
+BIL_LIBS
 have_pnetcdf
 HAVE_PNETCDF_FALSE
 HAVE_PNETCDF_TRUE
@@ -778,6 +784,7 @@ enable_dependency_tracking
 with_mpi
 with_ga
 with_pnetcdf
+with_bil
 with_netcdf4
 enable_debug
 enable_trace
@@ -1454,6 +1461,7 @@ Optional Packages:
   --with-ga[=ARG]         specify location of ga install and/or other flags
   --with-pnetcdf[=ARG]    specify location of pnetcdf install and/or other
                           flags
+  --with-bil[=ARG]        specify location of bil install and/or other flags
   --with-netcdf4[=ARG]    specify location of netcdf4 install and/or other
                           flags
   --with-pic              try to use only PIC/non-PIC objects [default=use
@@ -9768,6 +9776,196 @@ done
 
 LDFLAGS="$save_LDFLAGS"
 LIBS="$save_LIBS"
+
+
+# Check for BIL.
+
+
+
+
+
+
+BIL_LIBS=
+BIL_LDFLAGS=
+BIL_CPPFLAGS=
+
+# Check whether --with-bil was given.
+if test "${with_bil+set}" = set; then :
+  withval=$with_bil;
+else
+  with_bil=yes
+fi
+
+case $with_bil in #(
+  yes) :
+     ;; #(
+  no) :
+    pg_cv_bil_found=skipped ;; #(
+  *) :
+    for arg in $with_bil ; do
+    case $arg in #(
+  yes) :
+     ;; #(
+  no) :
+     ;; #(
+  -l*) :
+    BIL_LIBS="$BIL_LIBS $arg" ;; #(
+  -L*) :
+    BIL_LDFLAGS="$BIL_LDFLAGS $arg" ;; #(
+  -WL*) :
+    BIL_LDFLAGS="$BIL_LDFLAGS $arg" ;; #(
+  -Wl*) :
+    BIL_LDFLAGS="$BIL_LDFLAGS $arg" ;; #(
+  -I*) :
+    BIL_CPPFLAGS="$BIL_CPPFLAGS $arg" ;; #(
+  -*lib*) :
+    BIL_LDFLAGS="$BIL_LDFLAGS $arg" ;; #(
+  *lib*) :
+    if test -d $arg; then :
+  BIL_LDFLAGS="$BIL_LDFLAGS -L$arg"
+fi ;; #(
+  -*include*) :
+    BIL_CPPFLAGS="$BIL_CPPFLAGS $arg" ;; #(
+  *include*) :
+    if test -d $arg; then :
+  BIL_CPPFLAGS="$BIL_CPPFLAGS -I$arg"
+fi ;; #(
+  *) :
+    if test -d $arg/lib; then :
+  BIL_LDFLAGS="$BIL_LDFLAGS -L$arg/lib"
+fi
+                         if test -d $arg/include; then :
+  BIL_CPPFLAGS="$BIL_CPPFLAGS -I$arg/include"
+fi ;;
+esac
+done ;;
+esac
+if test "x$pg_cv_bil_found" = x""skipped; then :
+  ac_cv_search_BIL_Init=no
+else
+
+# Save user variables.
+pagoda_save_CPPFLAGS="$CPPFLAGS"
+pagoda_save_LDFLAGS="$LDFLAGS"
+pagoda_save_LIBS="$LIBS"
+# Check for header.
+# Always add user-supplied PKG_CPPFLAGS to CPPFLAGS first.
+CPPFLAGS="$CPPFLAGS $BIL_CPPFLAGS"
+ac_fn_cxx_check_header_mongrel "$LINENO" "bil.h" "ac_cv_header_bil_h" "$ac_includes_default"
+if test "x$ac_cv_header_bil_h" = x""yes; then :
+
+fi
+
+
+# Restore user variable.
+CPPFLAGS="$pagoda_save_CPPFLAGS"
+# Check for library.
+# Always add user-supplied PKG_LDFLAGS and PKG_LIBS.
+LDFLAGS="$LDFLAGS $BIL_LDFLAGS"
+LIBS="$BIL_LIBS $LIBS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing BIL_Init" >&5
+$as_echo_n "checking for library containing BIL_Init... " >&6; }
+if test "${ac_cv_search_BIL_Init+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char BIL_Init ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return BIL_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' bil; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib -lpnetcdf $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_search_BIL_Init=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if test "${ac_cv_search_BIL_Init+set}" = set; then :
+  break
+fi
+done
+if test "${ac_cv_search_BIL_Init+set}" = set; then :
+
+else
+  ac_cv_search_BIL_Init=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_BIL_Init" >&5
+$as_echo "$ac_cv_search_BIL_Init" >&6; }
+ac_res=$ac_cv_search_BIL_Init
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+fi
+
+# If a library was required and found, ac_res is set appropriately.
+if test "x$ac_res" != xno; then :
+  if test "x$ac_res" != "none required"; then :
+  BIL_LIBS="$ac_res"
+fi
+fi
+# Restore user variables.
+LDFLAGS="$pagoda_save_LDFLAGS"
+LIBS="$pagoda_save_LIBS"
+
+fi
+
+
+
+if test "x$ac_cv_search_BIL_Init" != xno; then :
+
+
+$as_echo "#define HAVE_BIL 1" >>confdefs.h
+
+     pg_cv_bil_found=yes
+else
+
+     pg_cv_bil_found=no
+fi
+
+
+
+
+
+
+ if test "x$pg_cv_bil_found" = xyes; then
+  HAVE_BIL_TRUE=
+  HAVE_BIL_FALSE='#'
+else
+  HAVE_BIL_TRUE='#'
+  HAVE_BIL_FALSE=
+fi
+
+have_bil=$pg_cv_bil_found
 
 
 # Check for netcdf4.
@@ -23441,6 +23639,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_PNETCDF_TRUE}" && test -z "${HAVE_PNETCDF_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_PNETCDF\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_BIL_TRUE}" && test -z "${HAVE_BIL_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_BIL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_NETCDF4_TRUE}" && test -z "${HAVE_NETCDF4_FALSE}"; then
