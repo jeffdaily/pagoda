@@ -9478,12 +9478,12 @@ LDFLAGS="$save_LDFLAGS"
 LIBS="$save_LIBS"
 save_LDFLAGS="$LDFLAGS"; LDFLAGS="$LDFLAGS $GA_LDFLAGS"
 save_LIBS="$LIBS"; LIBS="$LIBS $GA_LIBS $FLIBS"
-for ac_func in ga_mpi_pgroup_communicator
+for ac_func in GA_MPI_Comm_pgroup
 do :
-  ac_fn_cxx_check_func "$LINENO" "ga_mpi_pgroup_communicator" "ac_cv_func_ga_mpi_pgroup_communicator"
-if test "x$ac_cv_func_ga_mpi_pgroup_communicator" = x""yes; then :
+  ac_fn_cxx_check_func "$LINENO" "GA_MPI_Comm_pgroup" "ac_cv_func_GA_MPI_Comm_pgroup"
+if test "x$ac_cv_func_GA_MPI_Comm_pgroup" = x""yes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_GA_MPI_PGROUP_COMMUNICATOR 1
+#define HAVE_GA_MPI_COMM_PGROUP 1
 _ACEOF
 
 fi

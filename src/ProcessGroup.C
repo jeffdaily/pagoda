@@ -43,7 +43,7 @@ ProcessGroup::ProcessGroup()
 
 
 #if HAVE_GA
-extern "C" MPI_Comm ga_mpi_pgroup_communicator(int p_grp);
+extern "C" MPI_Comm GA_MPI_Comm_pgroup(int p_grp);
 #endif
 
 ProcessGroup::ProcessGroup(int color)
@@ -79,10 +79,10 @@ ProcessGroup::ProcessGroup(int color)
             }
         }
         tmp_ga_id = GA_Pgroup_create(&the_list[0], the_list.size());
-#if HAVE_GA_MPI_PGROUP_COMMUNICATOR
+#if HAVE_GA_MPI_COMM_PGROUP
         if (group_id == color) {
             id = tmp_ga_id;
-            comm = ga_mpi_pgroup_communicator(id);
+            comm = GA_MPI_Comm_pgroup(id);
             default_to_set = this;
         }
 #else
