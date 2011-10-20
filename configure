@@ -4693,7 +4693,7 @@ unless ($naked_lines) {
     exit 1;
 }
 # Can the naked lines be found within the wrapped lines?
-if ($wrapped_lines =~ /$naked_lines/) {
+if ($wrapped_lines =~ /\Q$naked_lines\E/) {
     #print "Found as substring\n";
     exit 0;
 }
@@ -4713,10 +4713,11 @@ case $wrapped in #(
   *_r) :
     compilers="bgxlc_r xlc_r" ;; #(
   *) :
-    compilers="bgxlc xlc pgcc pathcc icc sxcc fcc opencc suncc gcc ecc cl ccc cc" ;; #(
+    compilers="bgxlc xlc pgcc pathcc icc sxcc fcc opencc suncc craycc gcc ecc cl ccc cc" ;; #(
   *) :
      ;;
 esac
+
 
 
 
@@ -4726,7 +4727,7 @@ if test "${pg_cv_mpic_naked+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
-base="`$wrapped -show | sed 's/[ \t].*$//' | head -1`"
+base="`$wrapped -show 2>/dev/null | sed 's/[ 	].*$//' | head -1`"
 pg_save_CC="$CC"
 CC="$base"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4741,7 +4742,7 @@ main ()
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  pg_cv_mpic_naked=$base
+  pg_cv_mpic_naked="$base"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -4751,6 +4752,8 @@ found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$pg_cv_mpic_naked" = x; then :
 
+# prepend any CC/CXX/F77 the user may have specified
+compilers="$pg_orig_CC $compilers"
 echo "only comparing stdout" >&5
 for version in $versions
 do
@@ -4785,9 +4788,9 @@ fi
 # In this case we have to do a brute force match regardless of exit status.
 if test "x$found_wrapped_version" = x0; then :
 
-echo "no zero exit status found for MPI compilers" >&5
 if test "x$pg_cv_mpic_naked" = x; then :
 
+echo "no zero exit status found for MPI compilers" >&5
 for version in $versions
 do
     echo "trying version=$version" >&5
@@ -4888,10 +4891,12 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pg_cv_mpic_naked" >&5
 $as_echo "$pg_cv_mpic_naked" >&6; }
 if test "x$pg_cv_mpic_naked" = x; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not determine the C compiler wrapped by MPI" >&5
-$as_echo "$as_me: WARNING: Could not determine the C compiler wrapped by MPI" >&2;}
-     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This is usually okay" >&5
-$as_echo "$as_me: WARNING: This is usually okay" >&2;}
+  as_fn_error $? "Could not determine the C compiler wrapped by MPI" "$LINENO" 5
+else
+  if test "x$pg_orig_CC" != x && test "x$pg_orig_CC" != "x$pg_cv_mpic_naked"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unwrapped $wrapped ($pg_cv_mpic_naked) does not match user-specified $pg_orig_CC" >&5
+$as_echo "$as_me: WARNING: unwrapped $wrapped ($pg_cv_mpic_naked) does not match user-specified $pg_orig_CC" >&2;}
+fi
 fi
 
 
@@ -5845,7 +5850,7 @@ unless ($naked_lines) {
     exit 1;
 }
 # Can the naked lines be found within the wrapped lines?
-if ($wrapped_lines =~ /$naked_lines/) {
+if ($wrapped_lines =~ /\Q$naked_lines\E/) {
     #print "Found as substring\n";
     exit 0;
 }
@@ -5865,10 +5870,11 @@ case $wrapped in #(
   *_r) :
     compilers="bgxlf95_r xlf95_r bgxlf90_r xlf90_r bgxlf_r xlf_r" ;; #(
   *) :
-    compilers="gfortran g95 bgxlf95 xlf95 f95 fort ifort ifc efc pgf95 pathf95 lf95 openf95 sunf95 bgxlf90 xlf90 f90 pgf90 pathf90 pghpf epcf90 sxf90 openf90 sunf90 g77 bgxlf xlf f77 frt pgf77 pathf77 cf77 fort77 fl32 af77" ;; #(
+    compilers="gfortran g95 bgxlf95 xlf95 f95 fort ifort ifc efc pgf95 pathf95 lf95 openf95 sunf95 crayftn bgxlf90 xlf90 f90 pgf90 pathf90 pghpf epcf90 sxf90 openf90 sunf90 g77 bgxlf xlf f77 frt pgf77 pathf77 cf77 fort77 fl32 af77" ;; #(
   *) :
      ;;
 esac
+
 
 
 
@@ -5878,7 +5884,7 @@ if test "${pg_cv_mpif77_naked+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
-base="`$wrapped -show | sed 's/[ \t].*$//' | head -1`"
+base="`$wrapped -show 2>/dev/null | sed 's/[ 	].*$//' | head -1`"
 pg_save_F77="$F77"
 F77="$base"
 cat > conftest.$ac_ext <<_ACEOF
@@ -5887,7 +5893,7 @@ cat > conftest.$ac_ext <<_ACEOF
       end
 _ACEOF
 if ac_fn_f77_try_link "$LINENO"; then :
-  pg_cv_mpif77_naked=$base
+  pg_cv_mpif77_naked="$base"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -5897,6 +5903,8 @@ found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$pg_cv_mpif77_naked" = x; then :
 
+# prepend any CC/CXX/F77 the user may have specified
+compilers="$pg_orig_F77 $compilers"
 echo "only comparing stdout" >&5
 for version in $versions
 do
@@ -5931,9 +5939,9 @@ fi
 # In this case we have to do a brute force match regardless of exit status.
 if test "x$found_wrapped_version" = x0; then :
 
-echo "no zero exit status found for MPI compilers" >&5
 if test "x$pg_cv_mpif77_naked" = x; then :
 
+echo "no zero exit status found for MPI compilers" >&5
 for version in $versions
 do
     echo "trying version=$version" >&5
@@ -6034,10 +6042,12 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pg_cv_mpif77_naked" >&5
 $as_echo "$pg_cv_mpif77_naked" >&6; }
 if test "x$pg_cv_mpif77_naked" = x; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not determine the Fortran 77 compiler wrapped by MPI" >&5
-$as_echo "$as_me: WARNING: Could not determine the Fortran 77 compiler wrapped by MPI" >&2;}
-     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This is usually okay" >&5
-$as_echo "$as_me: WARNING: This is usually okay" >&2;}
+  as_fn_error $? "Could not determine the Fortran 77 compiler wrapped by MPI" "$LINENO" 5
+else
+  if test "x$pg_orig_F77" != x && test "x$pg_orig_F77" != "x$pg_cv_mpif77_naked"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unwrapped $wrapped ($pg_cv_mpif77_naked) does not match user-specified $pg_orig_F77" >&5
+$as_echo "$as_me: WARNING: unwrapped $wrapped ($pg_cv_mpif77_naked) does not match user-specified $pg_orig_F77" >&2;}
+fi
 fi
 
 
@@ -7237,7 +7247,7 @@ unless ($naked_lines) {
     exit 1;
 }
 # Can the naked lines be found within the wrapped lines?
-if ($wrapped_lines =~ /$naked_lines/) {
+if ($wrapped_lines =~ /\Q$naked_lines\E/) {
     #print "Found as substring\n";
     exit 0;
 }
@@ -7257,10 +7267,11 @@ case $wrapped in #(
   *_r) :
     compilers="bgxlC_r xlC_r" ;; #(
   *) :
-    compilers="icpc pgCC pathCC sxc++ xlC bgxlC openCC sunCC g++ c++ gpp aCC cxx cc++ cl.exe FCC KCC RCC CC" ;; #(
+    compilers="icpc pgCC pathCC sxc++ xlC bgxlC openCC sunCC crayCC g++ c++ gpp aCC cxx cc++ cl.exe FCC KCC RCC CC" ;; #(
   *) :
      ;;
 esac
+
 
 
 
@@ -7270,7 +7281,7 @@ if test "${pg_cv_mpicxx_naked+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
 
-base="`$wrapped -show | sed 's/[ \t].*$//' | head -1`"
+base="`$wrapped -show 2>/dev/null | sed 's/[ 	].*$//' | head -1`"
 pg_save_CXX="$CXX"
 CXX="$base"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -7293,7 +7304,7 @@ main ()
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  pg_cv_mpicxx_naked=$base
+  pg_cv_mpicxx_naked="$base"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -7303,6 +7314,8 @@ found_wrapped_version=0
 # Try separating stdout and stderr. Only compare stdout.
 if test "x$pg_cv_mpicxx_naked" = x; then :
 
+# prepend any CC/CXX/F77 the user may have specified
+compilers="$pg_orig_CXX $compilers"
 echo "only comparing stdout" >&5
 for version in $versions
 do
@@ -7337,9 +7350,9 @@ fi
 # In this case we have to do a brute force match regardless of exit status.
 if test "x$found_wrapped_version" = x0; then :
 
-echo "no zero exit status found for MPI compilers" >&5
 if test "x$pg_cv_mpicxx_naked" = x; then :
 
+echo "no zero exit status found for MPI compilers" >&5
 for version in $versions
 do
     echo "trying version=$version" >&5
@@ -7440,10 +7453,12 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $pg_cv_mpicxx_naked" >&5
 $as_echo "$pg_cv_mpicxx_naked" >&6; }
 if test "x$pg_cv_mpicxx_naked" = x; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Could not determine the C++ compiler wrapped by MPI" >&5
-$as_echo "$as_me: WARNING: Could not determine the C++ compiler wrapped by MPI" >&2;}
-     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This is usually okay" >&5
-$as_echo "$as_me: WARNING: This is usually okay" >&2;}
+  as_fn_error $? "Could not determine the C++ compiler wrapped by MPI" "$LINENO" 5
+else
+  if test "x$pg_orig_CXX" != x && test "x$pg_orig_CXX" != "x$pg_cv_mpicxx_naked"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unwrapped $wrapped ($pg_cv_mpicxx_naked) does not match user-specified $pg_orig_CXX" >&5
+$as_echo "$as_me: WARNING: unwrapped $wrapped ($pg_cv_mpicxx_naked) does not match user-specified $pg_orig_CXX" >&2;}
+fi
 fi
 
 
