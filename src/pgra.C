@@ -300,7 +300,7 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     Dimension *global_udim;
     int64_t global_nrec;
     int color;
-    bool first_record = true;
+    //bool first_record = true;
     ProcessGroup group; // defaults to world group
 
     global_udim = dataset->get_udim();
@@ -324,12 +324,12 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         pagoda::print_zero("reading input files, locally accumulating...");
     }
     filenames = cmd.get_input_filenames();
-    ASSERT(filenames.size() >= cmd.get_number_of_groups());
+    ASSERT(int(filenames.size()) >= cmd.get_number_of_groups());
     for (size_t i=0; i<filenames.size(); ++i) {
         Dataset *local_dataset;
         vector<Variable*> local_vars;
 
-        if (i%cmd.get_number_of_groups() != color) {
+        if (int(i%cmd.get_number_of_groups()) != color) {
             continue; // skip files to be handled by another group
         }
 
@@ -515,7 +515,7 @@ void pgra_blocking_groups(Dataset *dataset, const vector<Variable*> &vars,
 
         if (var->has_record() && var->get_nrec() > 0) {
             if (global_tallys.count(name) == 1) {
-                Array *tally = global_tallys.find(name)->second;
+                tally = global_tallys.find(name)->second;
             }
             // normalize, multiply, etc where necessary
             finalize_avg(op, var, result, tally, global_nrec);
@@ -712,7 +712,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
     }
 
     filenames = cmd.get_input_filenames();
-    ASSERT(filenames.size() >= cmd.get_number_of_groups());
+    ASSERT(int(filenames.size()) >= cmd.get_number_of_groups());
     for (size_t i=0; i<filenames.size(); ++i) {
         Dataset *local_dataset;
         vector<Variable*> local_vars;
@@ -722,7 +722,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         int64_t local_nrec;
         int64_t r = 0;
 
-        if (i%cmd.get_number_of_groups() != color) {
+        if (int(i%cmd.get_number_of_groups()) != color) {
             continue; // skip files to be handled by another group
         }
 
@@ -892,7 +892,7 @@ void pgra_nonblocking_groups(Dataset *dataset, const vector<Variable*> &vars,
         Array *result = global_results.find(name)->second;
         Array *tally = NULL;
         if (global_tallys.count(name) == 1) {
-            Array *tally = global_tallys.find(name)->second;
+            tally = global_tallys.find(name)->second;
         }
         // normalize, multiply, etc where necessary
         finalize_avg(op, var, result, tally, global_nrec);
@@ -923,6 +923,7 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
     vector<Array*> nb_tallys;
     Dimension *udim = dataset->get_udim();
     int64_t nrec = NULL != udim ? udim->get_size() : 0;
+    ASSERT(nrec >= 0);
 
     // we process record and fixed variables separately
     Variable::split(vars, record_vars, fixed_vars);
@@ -939,7 +940,7 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
         nb_results[v] = var->iread(int64_t(0));
     }
     // remaining records read into temporary buffers
-    for (int64_t r=1; r<nrec; ++r ) {
+    for (size_t r=1,limit=nrec; r<limit; ++r ) {
         for (size_t v=0; v<record_vars.size(); ++v) {
             Variable *var = record_vars[v];
             nb_arrays[v][r] = var->iread(r);
@@ -962,7 +963,7 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
     }
     // accumulate all records per variable
     for (size_t v=0; v<record_vars.size(); ++v) {
-        for (size_t r=1; r<nrec; ++r) {
+        for (size_t r=1,limit=nrec; r<limit; ++r) {
             Array *array = nb_arrays[v][r];
             if (nb_results[v]->get_type() == DataType::CHAR) {
                 continue;
@@ -972,7 +973,7 @@ void pgra_nonblocking_allrec(Dataset *dataset, const vector<Variable*> &vars,
     }
     // we can delete the temporary arrays now
     for (size_t v=0; v<record_vars.size(); ++v) {
-        for (size_t r=1; r<nrec; ++r) {
+        for (size_t r=1,limit=nrec; r<limit; ++r) {
             delete nb_arrays[v][r];
             nb_arrays[v][r] = NULL;
         }

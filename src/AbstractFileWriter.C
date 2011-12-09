@@ -125,7 +125,7 @@ void AbstractFileWriter::write_att(const string &name, Values *values,
                            DataType type, const string &var_name)
 {
     GenericAttribute att(name, values, type);
-    write_att(&att, name);
+    write_att(&att, var_name);
 }
 
 

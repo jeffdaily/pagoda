@@ -145,14 +145,18 @@ vector<Grid*> RegularGrid::get_grids(const Dataset *dataset)
 
 
 RegularGrid::RegularGrid()
-    :   dataset(NULL)
+    :   Grid()
+    ,   dataset(NULL)
+    ,   grid_var(NULL)
 {
     ERR("RegularGrid::RegularGrid() ctor not supported");
 }
 
 
 RegularGrid::RegularGrid(const RegularGrid &that)
-    :   dataset(that.dataset)
+    :   Grid()
+    ,   dataset(that.dataset)
+    ,   grid_var(NULL)
 {
     ERR("RegularGrid::RegularGrid() copy ctor not supported");
 }
@@ -162,7 +166,8 @@ RegularGrid::RegularGrid(const RegularGrid &that)
  * Constructor given a "grid" Variable.
  */
 RegularGrid::RegularGrid(const Dataset *dataset, const Variable *grid_var)
-    :   dataset(dataset)
+    :   Grid()
+    ,   dataset(dataset)
     ,   grid_var(grid_var)
 {
 }

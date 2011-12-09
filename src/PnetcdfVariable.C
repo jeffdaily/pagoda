@@ -422,6 +422,7 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 }
 
 
+#if HAVE_BIL
 static void* allocate(const DataType &type, const int64_t &n)
 {
     void *ptr = NULL;
@@ -464,6 +465,7 @@ static void deallocate(const DataType &type, void *ptr)
     }
 #undef deallocate
 }
+#endif
 
 
 void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,

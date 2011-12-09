@@ -407,16 +407,16 @@ string PnetcdfTiming::get_stats_calls(bool descending)
 string PnetcdfTiming::get_stats_aggregate()
 {
     ostringstream out;
-    uint64_t times_total=0;
+    //uint64_t times_total=0;
     uint64_t times_read=0;
-    uint64_t times_read_agg=0;
+    //uint64_t times_read_agg=0;
     uint64_t times_write=0;
-    uint64_t times_write_agg=0;
-    uint64_t bytes_total=0;
+    //uint64_t times_write_agg=0;
+    //uint64_t bytes_total=0;
     uint64_t bytes_read=0;
-    uint64_t bytes_read_agg=0;
+    //uint64_t bytes_read_agg=0;
     uint64_t bytes_write=0;
-    uint64_t bytes_write_agg=0;
+    //uint64_t bytes_write_agg=0;
     double bw_read=0;
     double bw_read_agg=0;
     double bw_write=0;
