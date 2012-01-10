@@ -8,37 +8,71 @@ if PROFILE
 PROFILE = -pg
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)/src $(BIL_CPPFLAGS) $(PNETCDF_CPPFLAGS) $(NETCDF4_CPPFLAGS) $(GA_CPPFLAGS)
+AM_CPPFLAGS =
+AM_CPPFLAGS += -I$(top_srcdir)/src
+AM_CPPFLAGS += $(BIL_CPPFLAGS)
+AM_CPPFLAGS += $(PNETCDF_CPPFLAGS)
+AM_CPPFLAGS += $(NETCDF4_CPPFLAGS)
+AM_CPPFLAGS += $(GA_CPPFLAGS)
+
 AM_FFLAGS = $(WALL) $(PROFILE)
 AM_CFLAGS = $(WALL) $(PROFILE)
 AM_CXXFLAGS = $(WALL) $(PROFILE)
-AM_LDFLAGS = $(PROFILE) $(BIL_LDFLAGS) $(PNETCDF_LDFLAGS) $(NETCDF4_LDFLAGS) $(GA_LDFLAGS)
-LDADD = libpagoda.la $(BIL_LIBS) $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS)
-LDADD_STANDALONE = $(BIL_LIBS) $(PNETCDF_LIBS) $(NETCDF4_LIBS) $(GA_LIBS)
+
+AM_LDFLAGS =
+AM_LDFLAGS += $(PROFILE)
+AM_LDFLAGS += $(BIL_LDFLAGS)
+AM_LDFLAGS += $(PNETCDF_LDFLAGS)
+AM_LDFLAGS += $(NETCDF4_LDFLAGS)
+AM_LDFLAGS += $(GA_LDFLAGS)
+
+LDADD =
+LDADD += libpagoda.la
+LDADD += $(BIL_LIBS)
+LDADD += $(PNETCDF_LIBS)
+LDADD += $(NETCDF4_LIBS)
+LDADD += $(GA_LIBS)
+
+LDADD_STANDALONE =
+LDADD_STANDALONE += $(BIL_LIBS)
+LDADD_STANDALONE += $(PNETCDF_LIBS)
+LDADD_STANDALONE += $(NETCDF4_LIBS)
+LDADD_STANDALONE += $(GA_LIBS)
+
 if GA_USES_FLIBS
 LDADD += $(FLIBS)
 LDADD_STANDALONE += $(FLIBS)
 endif
+
 EXTRA_DIST =
 MOSTLYCLEANFILES =
 CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
-bin_PROGRAMS = pgdump pgsub pgbo pgra pgea pgcmp pgflint
+bin_PROGRAMS =
+bin_PROGRAMS += pgbo
+bin_PROGRAMS += pgcmp
+bin_PROGRAMS += pgdump
+bin_PROGRAMS += pgea
+bin_PROGRAMS += pgflint
+bin_PROGRAMS += pgra
+bin_PROGRAMS += pgsub
+bin_PROGRAMS += pgwa
 lib_LTLIBRARIES = libpagoda.la
 check_PROGRAMS =
 check_DATA =
 pkginclude_HEADERS =
 pagodadir = $(datadir)/pagoda
 
-pgdump_SOURCES = src/pgdump.C
-pgsub_SOURCES = src/pgsub.C
-pgbo_SOURCES = src/pgbo.C
-pgra_SOURCES = src/pgra.C
-pgea_SOURCES = src/pgea.C
-pgcmp_SOURCES = src/pgcmp.C
+pgbo_SOURCES    = src/pgbo.C
+pgcmp_SOURCES   = src/pgcmp.C
+pgdump_SOURCES  = src/pgdump.C
+pgea_SOURCES    = src/pgea.C
 pgflint_SOURCES = src/pgflint.C
+pgra_SOURCES    = src/pgra.C
+pgsub_SOURCES   = src/pgsub.C
+pgwa_SOURCES    = src/pgwa.C
 
 pkginclude_HEADERS += src/AbstractArray.H
 pkginclude_HEADERS += src/AbstractDataset.H
@@ -84,6 +118,7 @@ pkginclude_HEADERS += src/PgboCommands.H
 pkginclude_HEADERS += src/PgeaCommands.H
 pkginclude_HEADERS += src/PgflintCommands.H
 pkginclude_HEADERS += src/PgraCommands.H
+pkginclude_HEADERS += src/PgwaCommands.H
 pkginclude_HEADERS += src/Print.H
 pkginclude_HEADERS += src/ProcessGroup.H
 pkginclude_HEADERS += src/RangeException.H
@@ -144,6 +179,7 @@ libpagoda_la_SOURCES += src/PgboCommands.C
 libpagoda_la_SOURCES += src/PgeaCommands.C
 libpagoda_la_SOURCES += src/PgflintCommands.C
 libpagoda_la_SOURCES += src/PgraCommands.C
+libpagoda_la_SOURCES += src/PgwaCommands.C
 libpagoda_la_SOURCES += src/Print.C
 libpagoda_la_SOURCES += src/ProcessGroup.C
 libpagoda_la_SOURCES += src/RegularGrid.C
@@ -277,6 +313,7 @@ check_PROGRAMS += sandbox/ga/TestPnetcdfDataset
 check_PROGRAMS += sandbox/ga/TestPartialSum
 check_PROGRAMS += sandbox/ga/TestRavel
 check_PROGRAMS += sandbox/ga/TestRead
+check_PROGRAMS += sandbox/ga/TestReduction
 check_PROGRAMS += sandbox/ga/TestScanAdd
 check_PROGRAMS += sandbox/ga/TestSort
 check_PROGRAMS += sandbox/ga/TestUnion
@@ -294,6 +331,7 @@ sandbox_ga_TestPnetcdfDataset_SOURCES = sandbox/ga/TestPnetcdfDataset.C
 sandbox_ga_TestPartialSum_SOURCES     = sandbox/ga/TestPartialSum.C
 sandbox_ga_TestRavel_SOURCES          = sandbox/ga/TestRavel.C
 sandbox_ga_TestRead_SOURCES           = sandbox/ga/TestRead.C
+sandbox_ga_TestReduction_SOURCES      = sandbox/ga/TestReduction.C
 sandbox_ga_TestScanAdd_SOURCES        = sandbox/ga/TestScanAdd.C
 sandbox_ga_TestSort_SOURCES           = sandbox/ga/TestSort.C
 sandbox_ga_TestUnion_SOURCES          = sandbox/ga/TestUnion.C

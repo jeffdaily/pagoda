@@ -58,13 +58,13 @@ void PgboCommands::parse(int argc, char **argv)
     operand_filename = input_filenames[1];
     input_filenames.resize(1); // pop
 
-    if (parser.count("op_typ")) {
+    if (parser.count(CommandLineOption::BINARY_OPERATION)) {
         vector<string> valid;
         valid.insert(valid.end(), ADD.begin(), ADD.end());
         valid.insert(valid.end(), SUB.begin(), SUB.end());
         valid.insert(valid.end(), MUL.begin(), MUL.end());
         valid.insert(valid.end(), DIV.begin(), DIV.end());
-        op_type = parser.get_argument("op_typ");
+        op_type = parser.get_argument(CommandLineOption::BINARY_OPERATION);
         if (find(valid.begin(),valid.end(),op_type) == valid.end()) {
             throw CommandException("operator '" + op_type + "' not recognized");
         }
@@ -156,10 +156,10 @@ string PgboCommands::get_operator() const
 
 void PgboCommands::init()
 {
-    parser.push_back(&CommandLineOption::OP_TYPE);
+    parser.push_back(CommandLineOption::BINARY_OPERATION);
     // erase the aggregation ops
-    parser.erase(&CommandLineOption::JOIN);
-    parser.erase(&CommandLineOption::UNION);
+    parser.erase(CommandLineOption::JOIN);
+    parser.erase(CommandLineOption::UNION);
 
     if (ADD.empty()) {
         ADD.push_back("add");

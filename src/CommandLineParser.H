@@ -23,12 +23,20 @@ class CommandLineParser
         CommandLineParser();
         ~CommandLineParser();
 
-        void push_back(CommandLineOption *option);
-        void erase(CommandLineOption *option);
+        void push_back(CommandLineOption &option);
+        void erase(CommandLineOption &option);
+
         void parse(int argc, char **argv);
+
         int count(const string &name) const;
+        int count(const CommandLineOption &option) const;
+
         string get_argument(const string &name) const;
+        string get_argument(const CommandLineOption &option) const;
+
         vector<string> get_arguments(const string &name) const;
+        vector<string> get_arguments(const CommandLineOption &option) const;
+
         vector<string> get_positional_arguments() const;
 
         string get_usage() const;

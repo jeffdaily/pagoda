@@ -24,6 +24,18 @@ static string OP_ADD("+");
 static string OP_DIV("/");
 static string OP_MUL("*");
 static string OP_SUB("-");
+static string OP_EQ("eq");
+static string OP_NE("ne");
+static string OP_GE("ge");
+static string OP_LE("le");
+static string OP_GT("gt");
+static string OP_LT("lt");
+static string OP_EQ_SYM("=");
+static string OP_NE_SYM("!=");
+static string OP_GE_SYM(">=");
+static string OP_LE_SYM("<=");
+static string OP_GT_SYM(">");
+static string OP_LT_SYM("<");
 
 /** The types of averages supported. */
 enum AverageOperator {
@@ -61,7 +73,8 @@ class CommandLineOption
         CommandLineOption(const int &value, const string &name,
                           const bool &argument, const string &description,
                           const string &extra_name1="",
-                          const string &extra_name2="");
+                          const string &extra_name2="",
+                          const string &extra_name3="");
         ~CommandLineOption();
 
         void set_value(const int &value);
@@ -92,7 +105,9 @@ class CommandLineOption
         static CommandLineOption ALPHABETIZE;
         static CommandLineOption APPEND;
         static CommandLineOption AUXILIARY;
-        static CommandLineOption AVG_TYPE;
+        static CommandLineOption AVERAGE_OPERATION;
+        static CommandLineOption AVERAGE_DIMENSIONS;
+        static CommandLineOption BINARY_OPERATION;
         static CommandLineOption CB_BUFFER_SIZE;
         static CommandLineOption CDF1;
         static CommandLineOption CDF2;
@@ -110,16 +125,20 @@ class CommandLineOption
         static CommandLineOption INTERPOLATE;
         static CommandLineOption JOIN;
         static CommandLineOption LATLONBOX;
+        static CommandLineOption MASK_COMPARATOR;
+        static CommandLineOption MASK_CONDITION;
+        static CommandLineOption MASK_NAME;
+        static CommandLineOption MASK_VALUE;
         static CommandLineOption NC4;
         static CommandLineOption NC4_CLASSIC;
         static CommandLineOption NO_COORDS;
+        static CommandLineOption NO_NORMALIZATION;
         static CommandLineOption NONBLOCKING_IO;
-        static CommandLineOption OPERATION;
-        static CommandLineOption OP_TYPE;
         static CommandLineOption OUTPUT;
         static CommandLineOption OVERWRITE;
         static CommandLineOption READ_ALL_RECORDS;
         static CommandLineOption READ_ALL_VARIABLES;
+        static CommandLineOption RETAIN_DEGENERATE_DIMENSIONS;
         static CommandLineOption ROMIO_CB_READ;
         static CommandLineOption ROMIO_DS_READ;
         static CommandLineOption ROMIO_NO_INDEP_RW;
@@ -129,7 +148,9 @@ class CommandLineOption
         static CommandLineOption VARIABLE;
         static CommandLineOption VERBOSE;
         static CommandLineOption VERS;
-        static CommandLineOption WEIGHT;
+        static CommandLineOption WEIGHTS_OF_FILES;
+        static CommandLineOption WEIGHTING_VARIABLE_NAME;
+        static CommandLineOption WEIGHT_MASK_COORDINATE_VARIABLES;
 
     protected:
         int _value;

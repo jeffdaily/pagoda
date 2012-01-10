@@ -54,9 +54,9 @@ int main(int argc, char **argv)
 
     pagoda::initialize(&argc,&argv);
 
-    parser.push_back(&TYPE);
-    parser.push_back(&HAS_RECORD);
-    parser.push_back(&HELP);
+    parser.push_back(TYPE);
+    parser.push_back(HAS_RECORD);
+    parser.push_back(HELP);
     parser.parse(argc,argv);
 
     if (parser.get_positional_arguments().empty() || parser.count("help")) {

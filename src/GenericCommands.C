@@ -108,42 +108,43 @@ GenericCommands::GenericCommands(int argc, char **argv)
 
 void GenericCommands::init()
 {
-    parser.push_back(&CommandLineOption::HELP);
-    parser.push_back(&CommandLineOption::VERS);
-    parser.push_back(&CommandLineOption::VERBOSE);
-    parser.push_back(&CommandLineOption::CDF1);
-    parser.push_back(&CommandLineOption::CDF2);
-    parser.push_back(&CommandLineOption::CDF5);
-    parser.push_back(&CommandLineOption::NC4);
-    parser.push_back(&CommandLineOption::NC4_CLASSIC);
-    parser.push_back(&CommandLineOption::FILE_FORMAT);
-    parser.push_back(&CommandLineOption::NONBLOCKING_IO);
-    parser.push_back(&CommandLineOption::CB_BUFFER_SIZE);
-    parser.push_back(&CommandLineOption::ROMIO_CB_READ);
-    parser.push_back(&CommandLineOption::ROMIO_DS_READ);
-    parser.push_back(&CommandLineOption::ROMIO_NO_INDEP_RW);
-    parser.push_back(&CommandLineOption::STRIPING_UNIT);
-    parser.push_back(&CommandLineOption::GROUPS);
-    parser.push_back(&CommandLineOption::READ_ALL_RECORDS);
-    parser.push_back(&CommandLineOption::READ_ALL_VARIABLES);
-    parser.push_back(&CommandLineOption::APPEND);
-    parser.push_back(&CommandLineOption::ALPHABETIZE);
-    parser.push_back(&CommandLineOption::NO_COORDS);
-    parser.push_back(&CommandLineOption::COORDS);
-    parser.push_back(&CommandLineOption::TOPOLOGY);
-    parser.push_back(&CommandLineOption::DIMENSION);
-    parser.push_back(&CommandLineOption::FIX_RECORD_DIMENSION);
-    parser.push_back(&CommandLineOption::HEADER_PAD);
-    parser.push_back(&CommandLineOption::HISTORY);
-    parser.push_back(&CommandLineOption::OUTPUT);
-    parser.push_back(&CommandLineOption::OVERWRITE);
-    parser.push_back(&CommandLineOption::INPUT_PATH);
-    parser.push_back(&CommandLineOption::VARIABLE);
-    parser.push_back(&CommandLineOption::AUXILIARY);
-    parser.push_back(&CommandLineOption::EXCLUDE);
-    parser.push_back(&CommandLineOption::JOIN);
-    parser.push_back(&CommandLineOption::UNION);
-    parser.push_back(&CommandLineOption::LATLONBOX);
+    parser.push_back(CommandLineOption::HELP);
+    parser.push_back(CommandLineOption::VERS);
+    parser.push_back(CommandLineOption::VERBOSE);
+    parser.push_back(CommandLineOption::CDF1);
+    parser.push_back(CommandLineOption::CDF2);
+    parser.push_back(CommandLineOption::CDF5);
+    parser.push_back(CommandLineOption::NC4);
+    parser.push_back(CommandLineOption::NC4_CLASSIC);
+    parser.push_back(CommandLineOption::FILE_FORMAT);
+    parser.push_back(CommandLineOption::NONBLOCKING_IO);
+    parser.push_back(CommandLineOption::CB_BUFFER_SIZE);
+    parser.push_back(CommandLineOption::ROMIO_CB_READ);
+    parser.push_back(CommandLineOption::ROMIO_DS_READ);
+    parser.push_back(CommandLineOption::ROMIO_NO_INDEP_RW);
+    parser.push_back(CommandLineOption::STRIPING_UNIT);
+    parser.push_back(CommandLineOption::GROUPS);
+    parser.push_back(CommandLineOption::READ_ALL_RECORDS);
+    parser.push_back(CommandLineOption::READ_ALL_VARIABLES);
+    parser.push_back(CommandLineOption::APPEND);
+    parser.push_back(CommandLineOption::ALPHABETIZE);
+    parser.push_back(CommandLineOption::NO_COORDS);
+    parser.push_back(CommandLineOption::COORDS);
+    parser.push_back(CommandLineOption::TOPOLOGY);
+    parser.push_back(CommandLineOption::DIMENSION);
+    parser.push_back(CommandLineOption::FIX_RECORD_DIMENSION);
+    parser.push_back(CommandLineOption::HEADER_PAD);
+    parser.push_back(CommandLineOption::HISTORY);
+    parser.push_back(CommandLineOption::OUTPUT);
+    parser.push_back(CommandLineOption::OVERWRITE);
+    parser.push_back(CommandLineOption::INPUT_PATH);
+    parser.push_back(CommandLineOption::VARIABLE);
+    parser.push_back(CommandLineOption::AUXILIARY);
+    parser.push_back(CommandLineOption::EXCLUDE);
+    parser.push_back(CommandLineOption::JOIN);
+    parser.push_back(CommandLineOption::UNION);
+    // the following conflicts with -b in pgwa
+    //parser.push_back(CommandLineOption::LATLONBOX);
 }
 
 
@@ -169,43 +170,44 @@ void GenericCommands::parse(int argc, char **argv)
     parser.parse(argc,argv);
     positional_arguments = parser.get_positional_arguments();
 
-    if (parser.count("help")) {
+    if (parser.count(CommandLineOption::HELP)) {
         pagoda::print_zero(get_usage());
         pagoda::finalize();
         exit(EXIT_SUCCESS);
     }
 
-    if (parser.count("version")) {
+    if (parser.count(CommandLineOption::VERS)) {
         pagoda::print_zero(get_version());
         pagoda::finalize();
         exit(EXIT_SUCCESS);
     }
 
     if (positional_arguments.empty()) {
-        if (parser.count("output")) {
+        if (parser.count(CommandLineOption::OUTPUT)) {
             throw CommandException("input file(s) required");
         } else {
             throw CommandException("input and output file arguments required");
         }
     }
-    else if (1 == positional_arguments.size() && 0 == parser.count("output")) {
+    else if (1 == positional_arguments.size()
+            && 0 == parser.count(CommandLineOption::OUTPUT)) {
         throw CommandException("output file argument required");
     }
     else {
         input_filenames = positional_arguments;
-        if (parser.count("output") == 0) {
+        if (parser.count(CommandLineOption::OUTPUT) == 0) {
             input_filenames.resize(input_filenames.size()-1); // pop
         }
     }
 
-    if (parser.count("output")) {
-        output_filename = parser.get_argument("output");
+    if (parser.count(CommandLineOption::OUTPUT)) {
+        output_filename = parser.get_argument(CommandLineOption::OUTPUT);
     } else {
         output_filename = positional_arguments.back();
     }
 
-    if (parser.count("path")) {
-        input_path = parser.get_argument("path");
+    if (parser.count(CommandLineOption::INPUT_PATH)) {
+        input_path = parser.get_argument(CommandLineOption::INPUT_PATH);
         if (input_path.empty()) {
             throw CommandException("empty input path");
         }
@@ -228,26 +230,26 @@ void GenericCommands::parse(int argc, char **argv)
         }
     }
 
-    if (parser.count("auxiliary")) {
-        vector<string> args = parser.get_arguments("auxiliary");
+    if (parser.count(CommandLineOption::AUXILIARY)) {
+        vector<string> args = parser.get_arguments(CommandLineOption::AUXILIARY);
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
             boxes.push_back(LatLonBox(*it, true));
         }
     }
 
-    if (parser.count("box")) {
-        vector<string> args = parser.get_arguments("box");
+    if (parser.count(CommandLineOption::LATLONBOX)) {
+        vector<string> args = parser.get_arguments(CommandLineOption::LATLONBOX);
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
             boxes.push_back(LatLonBox(*it, false));
         }
     }
 
-    if (parser.count("exclude")) {
+    if (parser.count(CommandLineOption::EXCLUDE)) {
         exclude_variables = true;
     }
 
-    if (parser.count("variable")) {
-        vector<string> args = parser.get_arguments("variable");
+    if (parser.count(CommandLineOption::VARIABLE)) {
+        vector<string> args = parser.get_arguments(CommandLineOption::VARIABLE);
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
             istringstream iss(*it);
             while (iss) {
@@ -260,8 +262,8 @@ void GenericCommands::parse(int argc, char **argv)
         }
     }
 
-    if (parser.count("dimension")) {
-        vector<string> args = parser.get_arguments("dimension");
+    if (parser.count(CommandLineOption::DIMENSION)) {
+        vector<string> args = parser.get_arguments(CommandLineOption::DIMENSION);
         for (vector<string>::iterator it=args.begin(); it!=args.end(); ++it) {
             if (it->find(".") == string::npos) {
                 index_hyperslabs.push_back(IndexHyperslab(*it));
@@ -271,35 +273,35 @@ void GenericCommands::parse(int argc, char **argv)
         }
     }
 
-    if (parser.count("join")) {
-        join_name = parser.get_argument("join");
+    if (parser.count(CommandLineOption::JOIN)) {
+        join_name = parser.get_argument(CommandLineOption::JOIN);
     }
 
-    if (parser.count("union")) {
+    if (parser.count(CommandLineOption::UNION)) {
     }
 
-    if (parser.count("alphabetize")) {
+    if (parser.count(CommandLineOption::ALPHABETIZE)) {
         alphabetize = false;
     }
 
-    if (parser.count("coords")) {
+    if (parser.count(CommandLineOption::COORDS)) {
         process_all_coords = true;
     }
 
-    if (parser.count("no-coords")) {
+    if (parser.count(CommandLineOption::NO_COORDS)) {
         process_coords = false;
     }
 
-    if (parser.count("history")) {
+    if (parser.count(CommandLineOption::HISTORY)) {
         modify_history = false;
     }
 
-    if (parser.count("topology")) {
+    if (parser.count(CommandLineOption::TOPOLOGY)) {
         process_topology = false;
     }
 
-    if (parser.count("file_format")) {
-        vector<string> args = parser.get_arguments("file_format");
+    if (parser.count(CommandLineOption::FILE_FORMAT)) {
+        vector<string> args = parser.get_arguments(CommandLineOption::FILE_FORMAT);
         string val;
         if (args.empty()) {
             throw CommandException("file format requires an argument");
@@ -328,48 +330,48 @@ void GenericCommands::parse(int argc, char **argv)
         }
     }
 
-    if (parser.count("3")) {
+    if (parser.count(CommandLineOption::CDF1)) {
         file_format = FF_CDF1;
     }
 
-    if (parser.count("64")) {
+    if (parser.count(CommandLineOption::CDF2)) {
         file_format = FF_CDF2;
     }
 
-    if (parser.count("5")) {
+    if (parser.count(CommandLineOption::CDF5)) {
         file_format = FF_CDF5;
     }
 
-    if (parser.count("nbio")) {
+    if (parser.count(CommandLineOption::NONBLOCKING_IO)) {
         nonblocking_io = true;
     }
 
-    if (parser.count("allrec")) {
+    if (parser.count(CommandLineOption::READ_ALL_RECORDS)) {
         reading_all_records = true;
     }
 
-    if (parser.count("allvar")) {
+    if (parser.count(CommandLineOption::READ_ALL_VARIABLES)) {
         reading_all_variables = true;
     }
 
-    if (parser.count("append")) {
+    if (parser.count(CommandLineOption::APPEND)) {
         append = true;
     }
 
-    if (parser.count("overwrite")) {
+    if (parser.count(CommandLineOption::OVERWRITE)) {
         overwrite = true;
     }
 
-    if (parser.count("fix_rec_dmn")) {
+    if (parser.count(CommandLineOption::FIX_RECORD_DIMENSION)) {
         fix_record_dimension = true;
     }
 
-    if (parser.count("verbose")) {
+    if (parser.count(CommandLineOption::VERBOSE)) {
         verbose = true;
     }
 
-    if (parser.count("header_pad")) {
-        string arg = parser.get_argument("header_pad");
+    if (parser.count(CommandLineOption::HEADER_PAD)) {
+        string arg = parser.get_argument(CommandLineOption::HEADER_PAD);
         istringstream s(arg);
         s >> header_pad;
         if (s.fail()) {
@@ -377,8 +379,8 @@ void GenericCommands::parse(int argc, char **argv)
         }
     }
 
-    if (parser.count("groups")) {
-        string arg = parser.get_argument("groups");
+    if (parser.count(CommandLineOption::GROUPS)) {
+        string arg = parser.get_argument(CommandLineOption::GROUPS);
         istringstream s(arg);
         s >> number_of_groups;
         if (s.fail()) {
@@ -386,20 +388,20 @@ void GenericCommands::parse(int argc, char **argv)
         }
     }
 
-    if (parser.count("cb_buffer_size")) {
-        Hints::cb_buffer_size = parser.get_argument("cb_buffer_size");
+    if (parser.count(CommandLineOption::CB_BUFFER_SIZE)) {
+        Hints::cb_buffer_size = parser.get_argument(CommandLineOption::CB_BUFFER_SIZE);
     }
-    if (parser.count("romio_cb_read")) {
-        Hints::romio_cb_read = parser.get_argument("romio_cb_read");
+    if (parser.count(CommandLineOption::ROMIO_CB_READ)) {
+        Hints::romio_cb_read = parser.get_argument(CommandLineOption::ROMIO_CB_READ);
     }
-    if (parser.count("romio_ds_read")) {
-        Hints::romio_ds_read = parser.get_argument("romio_ds_read");
+    if (parser.count(CommandLineOption::ROMIO_DS_READ)) {
+        Hints::romio_ds_read = parser.get_argument(CommandLineOption::ROMIO_DS_READ);
     }
-    if (parser.count("striping_unit")) {
-        Hints::striping_unit = parser.get_argument("striping_unit");
+    if (parser.count(CommandLineOption::STRIPING_UNIT)) {
+        Hints::striping_unit = parser.get_argument(CommandLineOption::STRIPING_UNIT);
     }
-    if (parser.count("romio_no_indep_rw")) {
-        Hints::romio_no_indep_rw = parser.get_argument("romio_no_indep_rw");
+    if (parser.count(CommandLineOption::ROMIO_NO_INDEP_RW)) {
+        Hints::romio_no_indep_rw = parser.get_argument(CommandLineOption::ROMIO_NO_INDEP_RW);
     }
     //pagoda::println_zero("Hints\n" + Hints::to_string());
 }

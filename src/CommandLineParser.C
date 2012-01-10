@@ -27,23 +27,31 @@ CommandLineParser::~CommandLineParser()
 }
 
 
-void CommandLineParser::push_back(CommandLineOption *option)
+void CommandLineParser::push_back(CommandLineOption &option)
 {
-    options.push_back(option);
-    vector<string> names = option->get_names();
+    options.push_back(&option);
+    vector<string> names = option.get_names();
     for (vector<string>::iterator name_it=names.begin();
             name_it!=names.end(); ++name_it) {
-        options_map[*name_it] = option;
+        options_map[*name_it] = &option;
     }
 }
 
 
-void CommandLineParser::erase(CommandLineOption *option)
+void CommandLineParser::erase(CommandLineOption &option)
 {
     optvec_t::iterator it;
-    it = std::find(options.begin(), options.end(), option);
+    vector<string> names;
+
+    it = std::find(options.begin(), options.end(), &option);
     assert(it != options.end());
     options.erase(it);
+
+    names = option.get_names();
+    for (vector<string>::iterator name_it=names.begin();
+            name_it!=names.end(); ++name_it) {
+        options_map.erase(*name_it);
+    }
 }
 
 
@@ -101,6 +109,12 @@ int CommandLineParser::count(const string &name) const
 }
 
 
+int CommandLineParser::count(const CommandLineOption &option) const
+{
+    return count(option.get_name());
+}
+
+
 string CommandLineParser::get_argument(const string &name) const
 {
     optmap_t::const_iterator it = options_map.find(name);
@@ -111,6 +125,12 @@ string CommandLineParser::get_argument(const string &name) const
 }
 
 
+string CommandLineParser::get_argument(const CommandLineOption &option) const
+{
+    return get_argument(option.get_name());
+}
+
+
 vector<string> CommandLineParser::get_arguments(const string &name) const
 {
     optmap_t::const_iterator it = options_map.find(name);
@@ -118,6 +138,12 @@ vector<string> CommandLineParser::get_arguments(const string &name) const
         return it->second->get_arguments();
     }
     return vector<string>();
+}
+
+
+vector<string> CommandLineParser::get_arguments(const CommandLineOption &option) const
+{
+    return get_arguments(option.get_name());
 }
 
 

@@ -22,9 +22,18 @@ CommandLineOption CommandLineOption::APPEND(
 CommandLineOption CommandLineOption::AUXILIARY(
     'X', "auxiliary", true,
     "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");
-CommandLineOption CommandLineOption::AVG_TYPE(
-    'y', "op_typ", true,
-    "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl");
+CommandLineOption CommandLineOption::AVERAGE_OPERATION(
+    'y', "operation", true,
+    "average operation: avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl",
+    "op_typ");
+CommandLineOption CommandLineOption::AVERAGE_DIMENSIONS(
+    'a', "average", true,
+    "average dimensions",
+    "avg");
+CommandLineOption CommandLineOption::BINARY_OPERATION(
+    'y', "operation", true,
+    "binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)",
+    "op_typ");
 CommandLineOption CommandLineOption::CB_BUFFER_SIZE(
     0, "cb_buffer_size", true,
     "buffer size for collective IO (in bytes)");
@@ -84,6 +93,26 @@ CommandLineOption CommandLineOption::JOIN(
 CommandLineOption CommandLineOption::LATLONBOX(
     'b', "box", true,
     "north,south,east,west lat/lon bounding box");
+CommandLineOption CommandLineOption::MASK_COMPARATOR(
+    'T', "mask_comparator", true,
+    "comparator for mask condition: eq,ne,ge,le,gt,lt",
+    "msk_cmp_typ",
+    "op_rlt");
+CommandLineOption CommandLineOption::MASK_CONDITION(
+    'B', "mask_condition", true,
+    "mask condition (e.g. \"ORO < 1\")",
+    "msk_cnd");
+CommandLineOption CommandLineOption::MASK_NAME(
+    'm', "mask_variable", true,
+    "masking variable name",
+    "mask-variable",
+    "msk_var",
+    "msk_nm");
+CommandLineOption CommandLineOption::MASK_VALUE(
+    'M', "mask_value", true,
+    "masking value (default is 1.0)",
+    "mask-value",
+    "msk_val");
 CommandLineOption CommandLineOption::NC4(
     0, "netcdf4", false,
     "output file in netCDF4 data format");
@@ -93,15 +122,13 @@ CommandLineOption CommandLineOption::NC4_CLASSIC(
 CommandLineOption CommandLineOption::NO_COORDS(
     'C', "no-coords", false,
     "associated coordinate variables should not be processed");
+CommandLineOption CommandLineOption::NO_NORMALIZATION(
+    'N', "numerator", false,
+    "no normalization",
+    "nmr");
 CommandLineOption CommandLineOption::NONBLOCKING_IO(
     0, "nbio", false,
     "use non-blocking IO, if possible");
-CommandLineOption CommandLineOption::OPERATION(
-    'y', "operation", true,
-    "one of {avg,sqravg,avgsqr,max,min,rms,rmssdn,sqrt,ttl}");
-CommandLineOption CommandLineOption::OP_TYPE(
-    'y', "op_typ", true,
-    "binary arithmetic operation: add,sbt,mlt,dvd (+,-,*,/)");
 CommandLineOption CommandLineOption::OUTPUT(
     'o', "output", true,
     "output file name (or use last positional argument)",
@@ -116,6 +143,10 @@ CommandLineOption CommandLineOption::READ_ALL_RECORDS(
 CommandLineOption CommandLineOption::READ_ALL_VARIABLES(
     0, "allvar", false,
     "read all variables per file rather than variable-at-a-time");
+CommandLineOption CommandLineOption::RETAIN_DEGENERATE_DIMENSIONS(
+    'b', "retain-degenerate-dimensions", false,
+    "retain degenerate dimensions",
+    "rdd");
 CommandLineOption CommandLineOption::ROMIO_CB_READ(
     0, "romio_cb_read", true,
     "enable/disable/automatic collective buffering during read operations");
@@ -143,15 +174,26 @@ CommandLineOption CommandLineOption::VERBOSE(
 CommandLineOption CommandLineOption::VERS(
     'V', "version", false,
     "print version information and exit");
-CommandLineOption CommandLineOption::WEIGHT(
+CommandLineOption CommandLineOption::WEIGHTS_OF_FILES(
     'w', "weight", true,
-    "weight(s) of files",
+    "weight(s) of file(s)",
     "wgt_var");
+CommandLineOption CommandLineOption::WEIGHTING_VARIABLE_NAME(
+    'w', "weight", true,
+    "weighting variable name",
+    "wgt_var");
+CommandLineOption CommandLineOption::WEIGHT_MASK_COORDINATE_VARIABLES(
+    'I', "wgt_msk_crd_var", false,
+    "do not weight or mask coordinate variables");
 
 
-CommandLineOption::CommandLineOption(const int &value, const string &name,
-                                     const bool &argument, const string &description,
-                                     const string &extra_name1, const string &extra_name2)
+CommandLineOption::CommandLineOption(const int &value,
+                                     const string &name,
+                                     const bool &argument,
+                                     const string &description,
+                                     const string &extra_name1,
+                                     const string &extra_name2,
+                                     const string &extra_name3)
     :   _value(value)
     ,   _names()
     ,   _has_argument(argument)
@@ -166,6 +208,9 @@ CommandLineOption::CommandLineOption(const int &value, const string &name,
     }
     if (!extra_name2.empty()) {
         _names.push_back(extra_name2);
+    }
+    if (!extra_name3.empty()) {
+        _names.push_back(extra_name3);
     }
 }
 

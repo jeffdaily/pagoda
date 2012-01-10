@@ -47,8 +47,8 @@ void PgeaCommands::parse(int argc, char **argv)
 {
     GenericCommands::parse(argc,argv);
 
-    if (parser.count("op_typ")) {
-        op_type = parser.get_argument("op_typ");
+    if (parser.count(CommandLineOption::AVERAGE_OPERATION)) {
+        op_type = parser.get_argument(CommandLineOption::AVERAGE_OPERATION);
         if (find(VALID.begin(),VALID.end(),op_type) == VALID.end()) {
             throw CommandException("operator '" + op_type + "' not recognized");
         }
@@ -150,10 +150,10 @@ string PgeaCommands::get_operator() const
 
 void PgeaCommands::init()
 {
-    parser.push_back(&CommandLineOption::AVG_TYPE);
+    parser.push_back(CommandLineOption::AVERAGE_OPERATION);
     // erase the aggregation ops
-    parser.erase(&CommandLineOption::JOIN);
-    parser.erase(&CommandLineOption::UNION);
+    parser.erase(CommandLineOption::JOIN);
+    parser.erase(CommandLineOption::UNION);
 
     if (VALID.empty()) {
         VALID.push_back(OP_AVG);

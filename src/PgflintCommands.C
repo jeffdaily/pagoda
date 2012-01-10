@@ -62,13 +62,14 @@ void PgflintCommands::parse(int argc, char **argv)
     input_filenames.resize(1); // pop
 
 #if ENABLE_INTERPOLANT
-    if (parser.count("weight") && parser.count("interpolate")) {
+    if (parser.count(CommandLineOption::WEIGHTING_VARIABLE_NAME)
+            && parser.count(CommandLineOption::INTERPOLATE)) {
         throw CommandException("cannot specify both weight and interpolate");
     }
-    else if (parser.count("weight")) {
+    else if (parser.count(CommandLineOption::WEIGHTING_VARIABLE_NAME)) {
 #endif
-    if (parser.count("weight")) {
-        string weight = parser.get_argument("weight");
+    if (parser.count(CommandLineOption::WEIGHTING_VARIABLE_NAME)) {
+        string weight = parser.get_argument(CommandLineOption::WEIGHTING_VARIABLE_NAME);
         vector<string> parts = pagoda::split(weight,',');
         if (parts.size() != 1 && parts.size() != 2) {
             throw CommandException("invalid weight string");
@@ -91,8 +92,8 @@ void PgflintCommands::parse(int argc, char **argv)
         }
     }
 #if ENABLE_INTERPOLANT
-    else if (parser.count("interpolate")) {
-        string interpolant_string = parser.get_argument("interpolate");
+    else if (parser.count(CommandLineOption::INTERPOLATE)) {
+        string interpolant_string = parser.get_argument(CommandLineOption::INTERPOLATE);
         vector<string> parts = pagoda::split(interpolant_string,',');
         if (parts.size() != 2) {
             throw CommandException("invalid interpolate string");
@@ -203,10 +204,10 @@ double PgflintCommands::get_weight2() const
 void PgflintCommands::init()
 {
 #if ENABLE_INTERPOLANT
-    parser.push_back(&CommandLineOption::INTERPOLATE);
+    parser.push_back(CommandLineOption::INTERPOLATE);
 #endif
-    parser.push_back(&CommandLineOption::WEIGHT);
+    parser.push_back(CommandLineOption::WEIGHTS_OF_FILES);
     // erase the aggregation ops
-    parser.erase(&CommandLineOption::JOIN);
-    parser.erase(&CommandLineOption::UNION);
+    parser.erase(CommandLineOption::JOIN);
+    parser.erase(CommandLineOption::UNION);
 }
