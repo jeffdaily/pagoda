@@ -11,6 +11,7 @@
 #include "Copy.H"
 #include "DataType.H"
 #include "Error.H"
+#include "Mask.H"
 #include "Util.H"
 #include "Validator.H"
 
@@ -427,6 +428,52 @@ Validator* AbstractArray::get_validator() const
 void AbstractArray::set_counter(Array *counter)
 {
     this->counter = counter;
+}
+
+
+Mask* AbstractArray::get_mask() const
+{
+    Mask *mask = Mask::create(get_shape());
+    int *mask_data = NULL;
+    const void *my_data = NULL;
+    DataType type = get_type();
+
+    if (NULL == validator) {
+        return mask;
+    }
+
+    if (!owns_data()) {
+        return mask;
+    }
+
+    ASSERT(same_distribution(mask));
+
+    mask_data = static_cast<int*>(mask->access());
+    my_data = access();
+
+#define adjust_op(DTYPE,TYPE)                                    \
+    if (type == DTYPE) {                                         \
+        const TYPE *data = static_cast<const TYPE*>(my_data);    \
+        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+            if (!validator->is_valid(&data[i])) {                \
+                mask_data[i] = 0;                                \
+            }                                                    \
+        }                                                        \
+    } else
+    adjust_op(DataType::INT,int)
+    adjust_op(DataType::LONG,long)
+    adjust_op(DataType::LONGLONG,long long)
+    adjust_op(DataType::FLOAT,float)
+    adjust_op(DataType::DOUBLE,double)
+    adjust_op(DataType::LONGDOUBLE,long double) {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef adjust_op
+
+    release();
+    mask->release_update();
+
+    return mask;
 }
 
 

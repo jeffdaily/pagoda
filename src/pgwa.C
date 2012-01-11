@@ -45,6 +45,10 @@ int F77_DUMMY_MAIN()
 #endif
 
 
+void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgwaCommands &cmd);
+
+
 int main(int argc, char **argv)
 {
     PgwaCommands cmd;
@@ -74,7 +78,7 @@ int main(int argc, char **argv)
             if (cmd.get_number_of_groups() > 1) {
                 //pgra_blocking_groups(dataset, vars, writer, op, cmd);
             } else {
-                //pgra_blocking(dataset, vars, writer, op, cmd);
+                pgwa_blocking(dataset, vars, writer, op, cmd);
             }
         }
 
@@ -108,3 +112,11 @@ int main(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
+
+
+void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
+        FileWriter *writer, const string &op, PgwaCommands &cmd)
+{
+
+}
+

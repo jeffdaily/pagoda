@@ -27,6 +27,17 @@ Mask* Mask::create(const Dimension *dim)
 }
 
 
+Mask* Mask::create(const vector<int64_t> &shape)
+{
+    Mask *mask;
+
+    mask = new GlobalMask(shape);
+    mask->reset();
+
+    return mask;
+}
+
+
 Mask::Mask()
     :   AbstractArray(DataType::NOT_A_TYPE)
 {

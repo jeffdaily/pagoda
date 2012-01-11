@@ -49,6 +49,13 @@ class Mask : public AbstractArray
         static Mask* create(const Dimension *dim);
 
         /**
+         * Factory Mask creation for N-dimensional masks.
+         *
+         * @param[in] shape of the mask
+         */
+        static Mask* create(const vector<int64_t> &shape);
+
+        /**
          * Mask destructor.
          */
         virtual ~Mask();

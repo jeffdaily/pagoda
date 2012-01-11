@@ -3,6 +3,7 @@
 #endif
 
 #include <algorithm>
+#include <sstream>
 
 #include "Aggregation.H"
 #include "AggregationJoinExisting.H"
@@ -15,8 +16,11 @@
 #include "GenericCommands.H"
 #include "PgwaCommands.H"
 #include "Util.H"
+#include "ValidMaskCondition.H"
+#include "Variable.H"
 
 using std::find;
+using std::ostringstream;
 
 
 vector<string> PgwaCommands::VALID;
@@ -67,14 +71,76 @@ void PgwaCommands::parse(int argc, char **argv)
 
     if (parser.count(CommandLineOption::MASK_CONDITION)) {
         // mask conditions are of the form "ORO < 1"
-        vector<string> pieces = pagoda::split(
-                parser.get_argument(CommandLineOption::MASK_CONDITION));
-        if (pieces.size() != 3) {
-            throw CommandException("invalid mask condition");
+        // mask conditions are of the form "ORO<1"
+        string arg = parser.get_argument(CommandLineOption::MASK_CONDITION);
+        vector<string> ops;
+        string op;
+        string front;
+        string back;
+        size_t pos;
+        double value;
+        istringstream value_string;
+
+        ops.push_back(OP_EQ_SYM);
+        ops.push_back(OP_NE_SYM);
+        ops.push_back(OP_GE_SYM);
+        ops.push_back(OP_LE_SYM);
+        ops.push_back(OP_GT_SYM);
+        ops.push_back(OP_LT_SYM);
+        for (vector<string>::iterator it=ops.begin(); it!=ops.end(); ++it) {
+            op = *it;
+            if (string::npos != (pos = arg.find(op))) {
+                break;
+            }
         }
-        mask_variable   = pieces.at(0);
-        mask_comparator = pieces.at(1);
-        mask_value      = pieces.at(2);
+        if (string::npos == pos) {
+            ostringstream err;
+            err << "Mask string ("
+                << arg
+                << ") does not contain valid comparison operator";
+            throw CommandException(err.str());
+        }
+        front = arg.substr(0, pos);
+        back = arg.substr(pos+op.size());
+        pagoda::trim(front);
+        pagoda::trim(back);
+        /* which of front or back is the variable and which is the number? */
+        value_string.str(front);
+        value_string >> value;
+        if (value_string) {
+            mask_value = front;
+            mask_variable = back;
+            mask_comparator = op;
+        }
+        else {
+            /* try the back as the number */
+            value_string.clear();
+            value_string.str(back);
+            value_string >> value;
+            if (value_string) {
+                mask_value = back;
+                mask_variable = front;
+                mask_comparator = op;
+            }
+            else {
+                ostringstream err;
+                err << "Mask string ("
+                    << arg
+                    << ") does not contain valid number";
+                throw CommandException(err.str());
+            }
+        }
+        /* make sure the assumed mask variable isn't also a number */
+        value_string.clear();
+        value_string.str(mask_variable);
+        value_string >> value;
+        if (value_string) {
+            ostringstream err;
+            err << "Mask string ("
+                << arg
+                << ") does not contain valid variable name";
+            throw CommandException(err.str());
+        }
     }
     else {
         mask_value = "1.0";
@@ -109,6 +175,45 @@ void PgwaCommands::parse(int argc, char **argv)
 string PgwaCommands::get_operator() const
 {
     return op_type;
+}
+
+
+Variable* PgwaCommands::get_mask_variable()
+{
+    Dataset *dataset = NULL;
+    Variable *var = NULL;
+    DataType type(DataType::NOT_A_TYPE);
+    Validator *validator = NULL;
+
+    /* return immediately if no mask variable was specified */
+    if (mask_variable.empty()) {
+        return NULL;
+    }
+
+    dataset = get_dataset();
+    var = dataset->get_var(mask_variable);
+
+    if (NULL == var) {
+        ostringstream err;
+        err << "requested variable '"
+            << mask_variable
+            << "' is not in input file";
+        throw CommandException(err.str());
+    }
+
+    type = var->get_type();
+#define DATATYPE_EXPAND(DT,T) \
+    if (type == DT) { \
+        validator = new ValidMaskCondition<T>(mask_comparator, mask_value); \
+    } else
+#include "DataType.def"
+    {
+        ERR("DataType not handled");
+    }
+
+    var->set_validator(validator);
+
+    return var;
 }
 
 

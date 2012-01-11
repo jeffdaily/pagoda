@@ -12,6 +12,7 @@ using std::vector;
 #include "ProcessGroup.H"
 
 class Dimension;
+class Mask;
 class Validator;
 
 /**
@@ -612,6 +613,14 @@ class Array
          * @param[in] counter
          */
         virtual void set_counter(Array *counter) = 0;
+
+        /**
+         * Returns a bitmask Array with the same shape as this Array using the
+         * current validator.
+         *
+         * @return the result as an Array
+         */
+        virtual Mask* get_mask() const = 0;
 
         /**
          * Virtual friend implementation of stream insertion operator.

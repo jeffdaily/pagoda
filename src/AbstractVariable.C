@@ -111,13 +111,17 @@ string AbstractVariable::get_long_name() const
 
 bool AbstractVariable::has_validator(int64_t index) const
 {
-    vector<string> names;
-    names.push_back("_FillValue");
-    names.push_back("missing_value");
-    names.push_back("valid_min");
-    names.push_back("valid_max");
-    names.push_back("valid_range");
-    return NULL != get_att(names);
+    if (this->validator != NULL) {
+        return true;
+    } else {
+        vector<string> names;
+        names.push_back("_FillValue");
+        names.push_back("missing_value");
+        names.push_back("valid_min");
+        names.push_back("valid_max");
+        names.push_back("valid_range");
+        return NULL != get_att(names);
+    }
 }
 
 
@@ -125,10 +129,19 @@ Validator* AbstractVariable::get_validator(int64_t index) const
 {
     Validator *validator = NULL;
     DataType type_var = get_type();
-    Attribute *att_valid_range = get_att("valid_range");
-    Attribute *att_valid_min = get_att("valid_min");
-    Attribute *att_valid_max = get_att("valid_max");
-    Attribute *att_fill_value = get_att("_FillValue");
+    Attribute *att_valid_range = NULL;
+    Attribute *att_valid_min = NULL;
+    Attribute *att_valid_max = NULL;
+    Attribute *att_fill_value = NULL;
+
+    if (this->validator != NULL) {
+        return this->validator;
+    }
+
+    att_valid_range = get_att("valid_range");
+    att_valid_min = get_att("valid_min");
+    att_valid_max = get_att("valid_max");
+    att_fill_value = get_att("_FillValue");
     if (!att_fill_value) {
         att_fill_value = get_att("missing_value");
     }
@@ -282,6 +295,12 @@ Validator* AbstractVariable::get_validator(int64_t index) const
     }
 
     return validator;
+}
+
+
+void AbstractVariable::set_validator(Validator *validator)
+{
+    this->validator = validator;
 }
 
 

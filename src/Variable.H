@@ -77,6 +77,13 @@ class Variable
          */
         virtual Validator* get_validator(int64_t index=-1) const = 0;
 
+        /**
+         * Overrides the fill/missing value.
+         *
+         * @param[in] validator representing the missing value
+         */
+        virtual void set_validator(Validator *validator) = 0;
+
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const = 0;
         virtual Attribute* get_att(const vector<string> &names,

@@ -12,6 +12,7 @@
 #include <macdecls.h>
 
 #include "Array.H"
+#include "CommandLineOption.H"
 #include "Common.H"
 #include "Dimension.H"
 #include "GlobalArray.H"
@@ -44,8 +45,29 @@ GlobalMask::GlobalMask(const string &name, int64_t size)
     ,   dirty_count(true)
     ,   name(name)
 {
-
     mask = new GlobalArray(DataType::INT, vector<int64_t>(1,size));
+    mask->fill_value(1);
+}
+
+
+/**
+ * Construct GlobalMask based on the given shape.
+ *
+ * @param[in] shape of the Mask
+ */
+GlobalMask::GlobalMask(const vector<int64_t> &shape)
+    :   Mask()
+    ,   mask(NULL)
+    ,   index(NULL)
+    ,   sum(NULL)
+    ,   count(-1)
+    ,   last_excl(false)
+    ,   dirty_index(true)
+    ,   dirty_sum(true)
+    ,   dirty_count(true)
+    ,   name("")
+{
+    mask = new GlobalArray(DataType::INT, shape);
     mask->fill_value(1);
 }
 
@@ -67,7 +89,6 @@ GlobalMask::GlobalMask(const GlobalMask &that)
     ,   dirty_count(true)
     ,   name(that.name)
 {
-
     mask = new GlobalArray(*mask);
 }
 
@@ -77,7 +98,6 @@ GlobalMask::GlobalMask(const GlobalMask &that)
  */
 GlobalMask::~GlobalMask()
 {
-
     delete mask;
     delete index;
     delete sum;
@@ -99,7 +119,6 @@ string GlobalMask::get_name() const
  */
 int64_t GlobalMask::get_count()
 {
-
     if (dirty_count) {
         int64_t ZERO = 0;
         vector<int64_t> counts(pagoda::num_nodes(), ZERO);
@@ -127,7 +146,6 @@ int64_t GlobalMask::get_count()
  */
 void GlobalMask::clear()
 {
-
     mask->fill_value(0);
 }
 
@@ -137,13 +155,14 @@ void GlobalMask::clear()
  */
 void GlobalMask::reset()
 {
-
     mask->fill_value(1);
 }
 
 
 /**
  * Set bits based on the given hyperslab notation.
+ *
+ * This method is intended for 1-dimensional Mask instances.
  *
  * @param[in] hyperslab the dimension hyperslab
  */
@@ -156,6 +175,7 @@ void GlobalMask::modify(const IndexHyperslab &hyperslab)
     vector<int64_t> lo;
     vector<int64_t> hi;
 
+    ASSERT(get_ndim() == 1);
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -225,6 +245,7 @@ void GlobalMask::modify(const LatLonBox &box, const Array *lat, const Array *lon
     int64_t size = get_local_size();
     DataType type = lat->get_type();
 
+    ASSERT(get_ndim() == 1);
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -283,7 +304,6 @@ void GlobalMask::modify(double min, double max, const Array *var)
     const void *var_data;
     DataType type = var->get_type();
 
-
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
     dirty_count = true;
@@ -326,12 +346,11 @@ void GlobalMask::modify(double min, double max, const Array *var)
 }
 
 
-void GlobalMask::modify_gt(double value, const Array *var)
+void GlobalMask::modify(const string& op, double value, const Array *var)
 {
     int *mask_data;
     const void *var_data;
     DataType type = var->get_type();
-
 
     dirty_index = true; // aggresive dirtiness
     dirty_sum = true;
@@ -351,15 +370,43 @@ void GlobalMask::modify_gt(double value, const Array *var)
     mask_data = static_cast<int*>(access());
     var_data = var->access();
 
-#define adjust_op(DTYPE,TYPE) \
-    if (type == DTYPE) { \
-        const TYPE *pdata = static_cast<const TYPE*>(var_data); \
-        TYPE pvalue = static_cast<TYPE>(value); \
-        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
-            if (pdata[i] > pvalue) { \
-                mask_data[i] = 1; \
-            } \
-        } \
+#define adjust_op(DTYPE,TYPE)                                        \
+    if (type == DTYPE) {                                             \
+        const TYPE *pdata = static_cast<const TYPE*>(var_data);      \
+        TYPE pvalue = static_cast<TYPE>(value);                      \
+        if (op == OP_EQ || op == OP_EQ_SYM) {                        \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                if (pdata[i] == pvalue) { mask_data[i] = 1; }        \
+            }                                                        \
+        }                                                            \
+        else if (op == OP_NE || op == OP_NE_SYM) {                   \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                if (pdata[i] != pvalue) { mask_data[i] = 1; }        \
+            }                                                        \
+        }                                                            \
+        else if (op == OP_GE || op == OP_GE_SYM) {                   \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                if (pdata[i] >= pvalue) { mask_data[i] = 1; }        \
+            }                                                        \
+        }                                                            \
+        else if (op == OP_LE || op == OP_LE_SYM) {                   \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                if (pdata[i] <= pvalue) { mask_data[i] = 1; }        \
+            }                                                        \
+        }                                                            \
+        else if (op == OP_GT || op == OP_GT_SYM) {                   \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                if (pdata[i] > pvalue) { mask_data[i] = 1; }         \
+            }                                                        \
+        }                                                            \
+        else if (op == OP_LT || op == OP_LT_SYM) {                   \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                if (pdata[i] < pvalue) { mask_data[i] = 1; }         \
+            }                                                        \
+        }                                                            \
+        else {                                                       \
+            ERR("unrecognized comparator");                          \
+        }                                                            \
     } else
     adjust_op(DataType::INT,int)
     adjust_op(DataType::LONG,long)
@@ -376,53 +423,15 @@ void GlobalMask::modify_gt(double value, const Array *var)
 }
 
 
+void GlobalMask::modify_gt(double value, const Array *var)
+{
+    modify(OP_GT, value, var);
+}
+
+
 void GlobalMask::modify_lt(double value, const Array *var)
 {
-    int *mask_data;
-    const void *var_data;
-    DataType type = var->get_type();
-
-
-    dirty_index = true; // aggresive dirtiness
-    dirty_sum = true;
-    dirty_count = true;
-
-    // bail if we don't own any of the data
-    if (!owns_data()) {
-        return;
-    }
-
-    if (get_shape() != var->get_shape()) {
-        pagoda::abort("GlobalMask::modify mask var shape mismatch", 0);
-    }
-
-    // it is assumed that they have the same distributions
-    ASSERT(same_distribution(var));
-    mask_data = static_cast<int*>(access());
-    var_data = var->access();
-
-#define adjust_op(DTYPE,TYPE) \
-    if (type == DTYPE) { \
-        const TYPE *pdata = static_cast<const TYPE*>(var_data); \
-        TYPE pvalue = static_cast<TYPE>(value); \
-        for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
-            if (pdata[i] < pvalue) { \
-                mask_data[i] = 1; \
-            } \
-        } \
-    } else
-    adjust_op(DataType::INT,int)
-    adjust_op(DataType::LONG,long)
-    adjust_op(DataType::LONGLONG,long long)
-    adjust_op(DataType::FLOAT,float)
-    adjust_op(DataType::DOUBLE,double)
-    adjust_op(DataType::LONGDOUBLE,long double) {
-        EXCEPT(DataTypeException, "DataType not handled", type);
-    }
-#undef adjust_op
-
-    release_update();
-    var->release();
+    modify(OP_LT, value, var);
 }
 
 
@@ -431,7 +440,6 @@ void GlobalMask::modify_lt(double value, const Array *var)
  */
 void GlobalMask::normalize()
 {
-
     if (owns_data()) {
         int *mask_data = static_cast<int*>(access());
         for (int64_t i=0,limit=get_local_size(); i<limit; ++i) {
@@ -447,10 +455,10 @@ void GlobalMask::normalize()
 /**
  * Return a new Array, enumerating each non-zero bit stating from zero.
  *
- * A new Array is created based on the size of this GlobalMask.  Then, based on the
- * set bits of this GlobalMask, the new Array is enumerated such the first set bit
- * is 0, the next set bit is 1, and so on.  Any unset bit is set to the value
- * of -1.
+ * A new Array is created based on the size of this GlobalMask.  Then, based on
+ * the set bits of this GlobalMask, the new Array is enumerated such the first
+ * set bit is 0, the next set bit is 1, and so on.  Any unset bit is set to the
+ * value of -1.
  *
  * For example:
  *
@@ -465,6 +473,7 @@ Array* GlobalMask::reindex()
     vector<int64_t> size(1, get_size());
     Array *tmp;
 
+    ASSERT(get_ndim() == 1);
 
     if (dirty_index) {
         if (!index) {
@@ -484,14 +493,13 @@ Array* GlobalMask::reindex()
         dirty_index = false;
     }
 
-
     return index;
 }
 
 
 Array* GlobalMask::partial_sum(bool excl)
 {
-
+    ASSERT(get_ndim() == 1);
 
     if (last_excl != excl) {
         dirty_sum = true;

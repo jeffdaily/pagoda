@@ -49,6 +49,7 @@ class AbstractVariable : public Variable
         virtual string get_long_name() const;
         virtual bool has_validator(int64_t index=-1) const;
         virtual Validator* get_validator(int64_t index=-1) const;
+        virtual void set_validator(Validator *validator);
         virtual Attribute* get_att(const string &name,
                                    bool ignore_case=false) const;
         virtual Attribute* get_att(const vector<string> &names,
@@ -144,6 +145,7 @@ class AbstractVariable : public Variable
         Array* iread_alloc(int64_t record);
 
         bool enable_record_translation;
+        Validator *validator;
 };
 
 

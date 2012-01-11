@@ -11,6 +11,8 @@
 
 using std::vector;
 
+class Mask;
+
 
 /**
  * Abstract implementation of Array interface.
@@ -192,6 +194,9 @@ class AbstractArray : public Array
 
         /** @copydoc Array::set_counter(Array*) */
         virtual void set_counter(Array *counter);
+
+        /** @copydoc Array::get_mask() */
+        virtual Mask* get_mask() const;
 
         /** @copydoc Array::print(ostream&) const */
         virtual ostream& print(ostream &os) const = 0;

@@ -24,6 +24,7 @@ class GlobalMask : public Mask
 {
     public:
         GlobalMask(const string &name, int64_t size);
+        GlobalMask(const vector<int64_t> &shape);
         GlobalMask(const GlobalMask &that);
         virtual ~GlobalMask();
 
@@ -37,6 +38,7 @@ class GlobalMask : public Mask
         virtual void modify(const LatLonBox &box,
                             const Array *lat, const Array *lon);
         virtual void modify(double low, double hi, const Array *var);
+        virtual void modify(const string &op, double value, const Array *var);
         virtual void modify_gt(double value, const Array *var);
         virtual void modify_lt(double value, const Array *var);
 

@@ -21,6 +21,7 @@ class PgwaCommands : public GenericCommands
         virtual void parse(int argc, char **argv);
 
         string get_operator() const;
+        Variable* get_mask_variable();
 
     protected:
         void init();
