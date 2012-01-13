@@ -41,8 +41,9 @@ host_triplet = @host@
 bin_PROGRAMS = pgbo$(EXEEXT) pgcmp$(EXEEXT) pgdump$(EXEEXT) \
 	pgea$(EXEEXT) pgflint$(EXEEXT) pgra$(EXEEXT) pgsub$(EXEEXT) \
 	pgwa$(EXEEXT)
-check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
-	$(am__EXEEXT_4)
+check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
+	tests/TestPartialSum$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
+	$(am__EXEEXT_3) $(am__EXEEXT_4)
 
 #libpagoda_la_SOURCES += src/gax.C
 #libpagoda_la_SOURCES += src/gax.H
@@ -94,10 +95,10 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestDimension sandbox/TestEnum \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGet sandbox/TestGrid \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGroups sandbox/TestMaskMap \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum sandbox/TestRavel \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestRead sandbox/TestScatter \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestUnion \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool sandbox/TestWrite
+@ENABLE_SANDBOX_TRUE@	sandbox/TestRavel sandbox/TestRead \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestScatter sandbox/TestSlice \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestUnion sandbox/TestVecBool \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestWrite
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@am__append_8 =  \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestBin \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestDistance \
@@ -264,7 +265,6 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGrid$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGroups$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestMaskMap$(EXEEXT) \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter$(EXEEXT) \
@@ -424,15 +424,6 @@ sandbox_TestMaskMap_LDADD = $(LDADD)
 sandbox_TestMaskMap_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
-am__sandbox_TestPartialSum_SOURCES_DIST = sandbox/TestPartialSum.C
-@ENABLE_SANDBOX_TRUE@am_sandbox_TestPartialSum_OBJECTS =  \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestPartialSum.$(OBJEXT)
-sandbox_TestPartialSum_OBJECTS = $(am_sandbox_TestPartialSum_OBJECTS)
-sandbox_TestPartialSum_LDADD = $(LDADD)
-sandbox_TestPartialSum_DEPENDENCIES = libpagoda.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
 am__sandbox_TestPnetcdfAttribute_SOURCES_DIST =  \
 	sandbox/TestPnetcdfAttribute.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestPnetcdfAttribute_OBJECTS =  \
@@ -692,6 +683,19 @@ sandbox_ga_TestUnpack_DEPENDENCIES = libpagoda.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2)
+am_tests_TestArrayGetMask_OBJECTS = tests/TestArrayGetMask.$(OBJEXT)
+tests_TestArrayGetMask_OBJECTS = $(am_tests_TestArrayGetMask_OBJECTS)
+tests_TestArrayGetMask_LDADD = $(LDADD)
+tests_TestArrayGetMask_DEPENDENCIES = libpagoda.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
+am_tests_TestPartialSum_OBJECTS = tests/TestPartialSum.$(OBJEXT)
+tests_TestPartialSum_OBJECTS = $(am_tests_TestPartialSum_OBJECTS)
+tests_TestPartialSum_LDADD = $(LDADD)
+tests_TestPartialSum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -744,7 +748,6 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestGet_SOURCES) $(sandbox_TestGrid_SOURCES) \
 	$(sandbox_TestGroups_SOURCES) $(sandbox_TestJoin_SOURCES) \
 	$(sandbox_TestMaskMap_SOURCES) \
-	$(sandbox_TestPartialSum_SOURCES) \
 	$(sandbox_TestPnetcdfAttribute_SOURCES) \
 	$(sandbox_TestPnetcdfDataset_SOURCES) \
 	$(sandbox_TestRavel_SOURCES) $(sandbox_TestRead_SOURCES) \
@@ -766,7 +769,9 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_ga_TestReduction_SOURCES) \
 	$(sandbox_ga_TestScanAdd_SOURCES) \
 	$(sandbox_ga_TestSort_SOURCES) $(sandbox_ga_TestUnion_SOURCES) \
-	$(sandbox_ga_TestUnpack_SOURCES)
+	$(sandbox_ga_TestUnpack_SOURCES) \
+	$(tests_TestArrayGetMask_SOURCES) \
+	$(tests_TestPartialSum_SOURCES)
 DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(pgcmp_SOURCES) $(pgdump_SOURCES) $(pgea_SOURCES) \
 	$(pgflint_SOURCES) $(pgra_SOURCES) $(pgsub_SOURCES) \
@@ -781,7 +786,6 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestGroups_SOURCES_DIST) \
 	$(am__sandbox_TestJoin_SOURCES_DIST) \
 	$(am__sandbox_TestMaskMap_SOURCES_DIST) \
-	$(am__sandbox_TestPartialSum_SOURCES_DIST) \
 	$(am__sandbox_TestPnetcdfAttribute_SOURCES_DIST) \
 	$(am__sandbox_TestPnetcdfDataset_SOURCES_DIST) \
 	$(am__sandbox_TestRavel_SOURCES_DIST) \
@@ -812,7 +816,9 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_ga_TestScanAdd_SOURCES_DIST) \
 	$(am__sandbox_ga_TestSort_SOURCES_DIST) \
 	$(am__sandbox_ga_TestUnion_SOURCES_DIST) \
-	$(am__sandbox_ga_TestUnpack_SOURCES_DIST)
+	$(am__sandbox_ga_TestUnpack_SOURCES_DIST) \
+	$(tests_TestArrayGetMask_SOURCES) \
+	$(tests_TestPartialSum_SOURCES)
 HEADERS = $(pkginclude_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -1048,10 +1054,8 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
 	src/Validator.C src/Values.C src/Variable.C $(am__append_3) \
 	$(am__append_4) $(am__append_5)
-
-#############################################################################
-# tests (autotest suite)
-#
+tests_TestArrayGetMask_SOURCES = tests/TestArrayGetMask.C
+tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 TEST_DIR = tests
 TESTSUITE_AT = $(TESTSUITE).at
 TESTSUITE = $(TEST_DIR)/suite
@@ -1094,7 +1098,6 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestPnetcdfAttribute_SOURCES = sandbox/TestPnetcdfAttribute.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestPnetcdfDataset_SOURCES = sandbox/TestPnetcdfDataset.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestMaskMap_SOURCES = sandbox/TestMaskMap.C
-@ENABLE_SANDBOX_TRUE@sandbox_TestPartialSum_SOURCES = sandbox/TestPartialSum.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRavel_SOURCES = sandbox/TestRavel.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead_SOURCES = sandbox/TestRead.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead2_SOURCES = sandbox/TestRead2.C
@@ -1456,11 +1459,6 @@ sandbox/TestMaskMap.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestMaskMap$(EXEEXT): $(sandbox_TestMaskMap_OBJECTS) $(sandbox_TestMaskMap_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestMaskMap$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestMaskMap_OBJECTS) $(sandbox_TestMaskMap_LDADD) $(LIBS)
-sandbox/TestPartialSum.$(OBJEXT): sandbox/$(am__dirstamp) \
-	sandbox/$(DEPDIR)/$(am__dirstamp)
-sandbox/TestPartialSum$(EXEEXT): $(sandbox_TestPartialSum_OBJECTS) $(sandbox_TestPartialSum_DEPENDENCIES) sandbox/$(am__dirstamp)
-	@rm -f sandbox/TestPartialSum$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestPartialSum_OBJECTS) $(sandbox_TestPartialSum_LDADD) $(LIBS)
 sandbox/TestPnetcdfAttribute.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestPnetcdfAttribute$(EXEEXT): $(sandbox_TestPnetcdfAttribute_OBJECTS) $(sandbox_TestPnetcdfAttribute_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1622,6 +1620,22 @@ sandbox/ga/TestUnpack.$(OBJEXT): sandbox/ga/$(am__dirstamp) \
 sandbox/ga/TestUnpack$(EXEEXT): $(sandbox_ga_TestUnpack_OBJECTS) $(sandbox_ga_TestUnpack_DEPENDENCIES) sandbox/ga/$(am__dirstamp)
 	@rm -f sandbox/ga/TestUnpack$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(sandbox_ga_TestUnpack_OBJECTS) $(sandbox_ga_TestUnpack_LDADD) $(LIBS)
+tests/$(am__dirstamp):
+	@$(MKDIR_P) tests
+	@: > tests/$(am__dirstamp)
+tests/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) tests/$(DEPDIR)
+	@: > tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestArrayGetMask.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestArrayGetMask$(EXEEXT): $(tests_TestArrayGetMask_OBJECTS) $(tests_TestArrayGetMask_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestArrayGetMask$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestArrayGetMask_OBJECTS) $(tests_TestArrayGetMask_LDADD) $(LIBS)
+tests/TestPartialSum.$(OBJEXT): tests/$(am__dirstamp) \
+	tests/$(DEPDIR)/$(am__dirstamp)
+tests/TestPartialSum$(EXEEXT): $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_DEPENDENCIES) tests/$(am__dirstamp)
+	@rm -f tests/TestPartialSum$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tests_TestPartialSum_OBJECTS) $(tests_TestPartialSum_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1636,7 +1650,6 @@ mostlyclean-compile:
 	-rm -f sandbox/TestGroups.$(OBJEXT)
 	-rm -f sandbox/TestJoin.$(OBJEXT)
 	-rm -f sandbox/TestMaskMap.$(OBJEXT)
-	-rm -f sandbox/TestPartialSum.$(OBJEXT)
 	-rm -f sandbox/TestPnetcdfAttribute.$(OBJEXT)
 	-rm -f sandbox/TestPnetcdfDataset.$(OBJEXT)
 	-rm -f sandbox/TestRavel.$(OBJEXT)
@@ -1816,6 +1829,8 @@ mostlyclean-compile:
 	-rm -f src/pgra.$(OBJEXT)
 	-rm -f src/pgsub.$(OBJEXT)
 	-rm -f src/pgwa.$(OBJEXT)
+	-rm -f tests/TestArrayGetMask.$(OBJEXT)
+	-rm -f tests/TestPartialSum.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1831,7 +1846,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestGroups.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestJoin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestMaskMap.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestPartialSum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestPnetcdfAttribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestPnetcdfDataset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRavel.Po@am__quote@
@@ -1941,6 +1955,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgra.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgsub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgwa.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestArrayGetMask.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -2004,6 +2020,7 @@ clean-libtool:
 	-rm -rf sandbox/.libs sandbox/_libs
 	-rm -rf sandbox/ga/.libs sandbox/ga/_libs
 	-rm -rf src/.libs src/_libs
+	-rm -rf tests/.libs tests/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
@@ -2267,6 +2284,8 @@ distclean-generic:
 	-rm -f sandbox/ga/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
+	-rm -f tests/$(DEPDIR)/$(am__dirstamp)
+	-rm -f tests/$(am__dirstamp)
 	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
@@ -2280,7 +2299,7 @@ clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR)
+	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR) tests/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -2328,7 +2347,7 @@ installcheck-am: installcheck-local
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR)
+	-rm -rf sandbox/$(DEPDIR) sandbox/ga/$(DEPDIR) src/$(DEPDIR) tests/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

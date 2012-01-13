@@ -13,6 +13,7 @@ class ValidMaskCondition : public Validator
 {
     public:
         ValidMaskCondition(const string &op, const string &value);
+        ValidMaskCondition(const string &op, const T &value);
         ValidMaskCondition(const ValidMaskCondition<T> &that);
         virtual ~ValidMaskCondition();
 
@@ -36,6 +37,15 @@ ValidMaskCondition<T>::ValidMaskCondition(const string &op, const string &value)
     value_string.str(value);
     value_string >> this->value;
     ASSERT(value_string);
+}
+
+
+template <class T>
+ValidMaskCondition<T>::ValidMaskCondition(const string &op, const T &value)
+    :   Validator()
+    ,   op(op)
+    ,   value(value)
+{
 }
 
 

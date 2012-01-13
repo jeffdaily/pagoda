@@ -244,6 +244,12 @@ endif
 #############################################################################
 # tests (autotest suite)
 #
+check_PROGRAMS += tests/TestArrayGetMask
+check_PROGRAMS += tests/TestPartialSum
+
+tests_TestArrayGetMask_SOURCES = tests/TestArrayGetMask.C
+tests_TestPartialSum_SOURCES   = tests/TestPartialSum.C
+
 TEST_DIR     = tests
 TESTSUITE_AT = $(TESTSUITE).at
 TESTSUITE    = $(TEST_DIR)/suite
@@ -348,7 +354,6 @@ check_PROGRAMS += sandbox/TestGet
 check_PROGRAMS += sandbox/TestGrid
 check_PROGRAMS += sandbox/TestGroups
 check_PROGRAMS += sandbox/TestMaskMap
-check_PROGRAMS += sandbox/TestPartialSum
 check_PROGRAMS += sandbox/TestRavel
 check_PROGRAMS += sandbox/TestRead
 check_PROGRAMS += sandbox/TestScatter
@@ -384,7 +389,6 @@ sandbox_TestJoin_SOURCES              = sandbox/TestJoin.C
 sandbox_TestPnetcdfAttribute_SOURCES  = sandbox/TestPnetcdfAttribute.C
 sandbox_TestPnetcdfDataset_SOURCES    = sandbox/TestPnetcdfDataset.C
 sandbox_TestMaskMap_SOURCES           = sandbox/TestMaskMap.C
-sandbox_TestPartialSum_SOURCES        = sandbox/TestPartialSum.C
 sandbox_TestRavel_SOURCES             = sandbox/TestRavel.C
 sandbox_TestRead_SOURCES              = sandbox/TestRead.C
 sandbox_TestRead2_SOURCES             = sandbox/TestRead2.C

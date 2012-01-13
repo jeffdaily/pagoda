@@ -215,11 +215,12 @@ Array* AbstractArray::cast(DataType new_type) const
 void* AbstractArray::get(void *buffer) const
 {
     vector<int64_t> my_shape = get_shape();
-    vector<int64_t> lo(0, my_shape.size());
+    vector<int64_t> lo(my_shape.size(), 0);
     vector<int64_t> hi(my_shape.begin(), my_shape.end());
 
     // indexing is inclusive i.e. shape is 1 too big
-    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+    std::transform(hi.begin(), hi.end(), hi.begin(),
+            std::bind2nd(std::minus<int64_t>(),1));
 
     return get(lo, hi, buffer);
 }
@@ -234,11 +235,12 @@ void* AbstractArray::get(int64_t lo, int64_t hi, void *buffer) const
 void AbstractArray::put(void *buffer)
 {
     vector<int64_t> my_shape = get_shape();
-    vector<int64_t> lo(0, my_shape.size());
+    vector<int64_t> lo(my_shape.size(), 0);
     vector<int64_t> hi(my_shape.begin(), my_shape.end());
 
     // indexing is inclusive i.e. shape is 1 too big
-    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+    std::transform(hi.begin(), hi.end(), hi.begin(),
+            std::bind2nd(std::minus<int64_t>(),1));
 
     put(buffer, lo, hi);
 }
@@ -257,7 +259,8 @@ void AbstractArray::acc(void *buffer, void *alpha)
     vector<int64_t> hi(my_shape.begin(), my_shape.end());
 
     // indexing is inclusive i.e. shape is 1 too big
-    std::for_each(hi.begin(), hi.end(), std::bind2nd(std::minus<int64_t>(),1));
+    std::transform(hi.begin(), hi.end(), hi.begin(),
+            std::bind2nd(std::minus<int64_t>(),1));
 
     acc(buffer, lo, hi, alpha);
 }

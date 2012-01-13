@@ -82,6 +82,32 @@ namespace pagoda
         return os.str();
     }
 
+    template <class Collection>
+    string arr_to_string(
+        const Collection &collection,
+        const int &size,
+        char const * delimiter=",",
+        const string &name="")
+    {
+        std::ostringstream os;
+
+        if (!name.empty()) {
+            os << name << "=";
+        }
+
+        if (0 == size) {
+            os << "{}";
+        } else {
+            os << "{" << collection[0];
+            for (int i=1; i < size; ++i) {
+                os << delimiter << collection[i];
+            }
+            os << "}";
+        }
+
+        return os.str();
+    }
+
 }
 
 #endif // PRINT_H_
