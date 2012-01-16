@@ -12,11 +12,12 @@
 #include <string>
 #include <vector>
 
+#if HAVE_MPI
+#   include <mpi.h>
+#endif
 #if HAVE_GA
 #   include <ga.h>
 #   include <macdecls.h>
-#elif HAVE_MPI
-#   include <mpi.h>
 #endif
 
 #include "DataType.H"
@@ -112,77 +113,56 @@ void pagoda::abort(const string &message, int errorcode)
 }
 
 
-/**
- * Returns the minimum of all values from all processes.
- *
- * @param[in,out] values the values to take the minimums of
- */
-void pagoda::gop_min(vector<long> &values)
-{
-#if HAVE_GA
-    GA_Lgop(&values[0], values.size(), MIN);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG, MPI_MIN, ProcessGroup::get_default().get_comm());
+#if HAVE_MPI
+#   define GOP_IMPL(N,C,M,O)                                      \
+void pagoda::N(vector<C> &values)                                 \
+{                                                                 \
+    MPI_Allreduce(&values[0], &values[0], values.size(),          \
+                  M, O, ProcessGroup::get_default().get_comm());  \
+}
 #else
 #   error
 #endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(vector<int> &values)
-{
-#if HAVE_GA
-    GA_Igop(&values[0], values.size(), SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(vector<long> &values)
-{
-#if HAVE_GA
-    GA_Lgop(&values[0], values.size(), SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(vector<long long> &values)
-{
-#if HAVE_GA && HAVE_GA_LLGOP
-    GA_Llgop(&values[0], values.size(), SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
+GOP_IMPL(gop_min,char,              MPI_CHAR,               MPI_MIN)
+GOP_IMPL(gop_min,short,             MPI_SHORT,              MPI_MIN)
+GOP_IMPL(gop_min,int,               MPI_INT,                MPI_MIN)
+GOP_IMPL(gop_min,long,              MPI_LONG,               MPI_MIN)
+GOP_IMPL(gop_min,long long,         MPI_LONG_LONG,          MPI_MIN)
+GOP_IMPL(gop_min,float,             MPI_FLOAT,              MPI_MIN)
+GOP_IMPL(gop_min,double,            MPI_DOUBLE,             MPI_MIN)
+GOP_IMPL(gop_min,long double,       MPI_LONG_DOUBLE,        MPI_MIN)
+GOP_IMPL(gop_min,unsigned char,     MPI_UNSIGNED_CHAR,      MPI_MIN)
+GOP_IMPL(gop_min,unsigned short,    MPI_UNSIGNED_SHORT,     MPI_MIN)
+GOP_IMPL(gop_min,unsigned int,      MPI_UNSIGNED,           MPI_MIN)
+GOP_IMPL(gop_min,unsigned long,     MPI_UNSIGNED_LONG,      MPI_MIN)
+//GOP_IMPL(gop_min,unsigned long long,MPI_UNSIGNED_LONG_LONG, MPI_MIN)
+GOP_IMPL(gop_max,char,              MPI_CHAR,               MPI_MAX)
+GOP_IMPL(gop_max,short,             MPI_SHORT,              MPI_MAX)
+GOP_IMPL(gop_max,int,               MPI_INT,                MPI_MAX)
+GOP_IMPL(gop_max,long,              MPI_LONG,               MPI_MAX)
+GOP_IMPL(gop_max,long long,         MPI_LONG_LONG,          MPI_MAX)
+GOP_IMPL(gop_max,float,             MPI_FLOAT,              MPI_MAX)
+GOP_IMPL(gop_max,double,            MPI_DOUBLE,             MPI_MAX)
+GOP_IMPL(gop_max,long double,       MPI_LONG_DOUBLE,        MPI_MAX)
+GOP_IMPL(gop_max,unsigned char,     MPI_UNSIGNED_CHAR,      MPI_MAX)
+GOP_IMPL(gop_max,unsigned short,    MPI_UNSIGNED_SHORT,     MPI_MAX)
+GOP_IMPL(gop_max,unsigned int,      MPI_UNSIGNED,           MPI_MAX)
+GOP_IMPL(gop_max,unsigned long,     MPI_UNSIGNED_LONG,      MPI_MAX)
+//GOP_IMPL(gop_max,unsigned long long,MPI_UNSIGNED_LONG_LONG, MPI_MAX)
+GOP_IMPL(gop_sum,char,              MPI_CHAR,               MPI_SUM)
+GOP_IMPL(gop_sum,short,             MPI_SHORT,              MPI_SUM)
+GOP_IMPL(gop_sum,int,               MPI_INT,                MPI_SUM)
+GOP_IMPL(gop_sum,long,              MPI_LONG,               MPI_SUM)
+GOP_IMPL(gop_sum,long long,         MPI_LONG_LONG,          MPI_SUM)
+GOP_IMPL(gop_sum,float,             MPI_FLOAT,              MPI_SUM)
+GOP_IMPL(gop_sum,double,            MPI_DOUBLE,             MPI_SUM)
+GOP_IMPL(gop_sum,long double,       MPI_LONG_DOUBLE,        MPI_SUM)
+GOP_IMPL(gop_sum,unsigned char,     MPI_UNSIGNED_CHAR,      MPI_SUM)
+GOP_IMPL(gop_sum,unsigned short,    MPI_UNSIGNED_SHORT,     MPI_SUM)
+GOP_IMPL(gop_sum,unsigned int,      MPI_UNSIGNED,           MPI_SUM)
+GOP_IMPL(gop_sum,unsigned long,     MPI_UNSIGNED_LONG,      MPI_SUM)
+//GOP_IMPL(gop_sum,unsigned long long,MPI_UNSIGNED_LONG_LONG, MPI_SUM)
+#undef GOP_IMPL
 
 #if NEED_VECTOR_INT64_T_GOP
 /**
@@ -192,129 +172,72 @@ void pagoda::gop_sum(vector<long long> &values)
  */
 void pagoda::gop_sum(vector<int64_t> &values)
 {
-#   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
-    GA_Llgop(&values[0], values.size(), SUM);
-#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG
-    GA_Lgop(&values[0], values.size(), SUM);
-#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
-    GA_Igop(&values[0], values.size(), SUM);
-#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
+#if HAVE_MPI
+#   if SIZEOF_INT64_T == SIZEOF_LONG_LONG
     MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
+#   elif SIZEOF_INT64_T == SIZEOF_LONG
     MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_INT
+#   elif SIZEOF_INT64_T == SIZEOF_INT
     MPI_Allreduce(&values[0], &values[0], values.size(), MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   else
 #       error
 #   endif
+#else
+#   error
+#endif
 }
 #endif /* NEED_VECTOR_INT64_T_GOP */
 
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(vector<float> &values)
-{
-#if HAVE_GA
-    GA_Fgop(&values[0], values.size(), SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_FLOAT, MPI_SUM, ProcessGroup::get_default().get_comm());
+#if HAVE_MPI
+#   define GOP_IMPL(N,C,M,O)                                      \
+void pagoda::N(C &value)                                          \
+{                                                                 \
+    MPI_Allreduce(&value, &value, 1,                              \
+                  M, O, ProcessGroup::get_default().get_comm());  \
+}
 #else
 #   error
 #endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(vector<double> &values)
-{
-#if HAVE_GA
-    GA_Dgop(&values[0], values.size(), SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(vector<long double> &values)
-{
-#if HAVE_GA && HAVE_GA_LDGOP
-    GA_Ldgop(&values[0], values.size(), SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&values[0], &values[0], values.size(),
-                  MPI_LONG_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(int &value)
-{
-#if HAVE_GA
-    GA_Igop(&value, 1, SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(long &value)
-{
-#if HAVE_GA
-    GA_Lgop(&value, 1, SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(long long &value)
-{
-#if HAVE_GA && HAVE_GA_LLGOP
-    GA_Llgop(&value, 1, SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
+GOP_IMPL(gop_min,char,              MPI_CHAR,               MPI_MIN)
+GOP_IMPL(gop_min,short,             MPI_SHORT,              MPI_MIN)
+GOP_IMPL(gop_min,int,               MPI_INT,                MPI_MIN)
+GOP_IMPL(gop_min,long,              MPI_LONG,               MPI_MIN)
+GOP_IMPL(gop_min,long long,         MPI_LONG_LONG,          MPI_MIN)
+GOP_IMPL(gop_min,float,             MPI_FLOAT,              MPI_MIN)
+GOP_IMPL(gop_min,double,            MPI_DOUBLE,             MPI_MIN)
+GOP_IMPL(gop_min,long double,       MPI_LONG_DOUBLE,        MPI_MIN)
+GOP_IMPL(gop_min,unsigned char,     MPI_UNSIGNED_CHAR,      MPI_MIN)
+GOP_IMPL(gop_min,unsigned short,    MPI_UNSIGNED_SHORT,     MPI_MIN)
+GOP_IMPL(gop_min,unsigned int,      MPI_UNSIGNED,           MPI_MIN)
+GOP_IMPL(gop_min,unsigned long,     MPI_UNSIGNED_LONG,      MPI_MIN)
+//GOP_IMPL(gop_min,unsigned long long,MPI_UNSIGNED_LONG_LONG, MPI_MIN)
+GOP_IMPL(gop_max,char,              MPI_CHAR,               MPI_MAX)
+GOP_IMPL(gop_max,short,             MPI_SHORT,              MPI_MAX)
+GOP_IMPL(gop_max,int,               MPI_INT,                MPI_MAX)
+GOP_IMPL(gop_max,long,              MPI_LONG,               MPI_MAX)
+GOP_IMPL(gop_max,long long,         MPI_LONG_LONG,          MPI_MAX)
+GOP_IMPL(gop_max,float,             MPI_FLOAT,              MPI_MAX)
+GOP_IMPL(gop_max,double,            MPI_DOUBLE,             MPI_MAX)
+GOP_IMPL(gop_max,long double,       MPI_LONG_DOUBLE,        MPI_MAX)
+GOP_IMPL(gop_max,unsigned char,     MPI_UNSIGNED_CHAR,      MPI_MAX)
+GOP_IMPL(gop_max,unsigned short,    MPI_UNSIGNED_SHORT,     MPI_MAX)
+GOP_IMPL(gop_max,unsigned int,      MPI_UNSIGNED,           MPI_MAX)
+GOP_IMPL(gop_max,unsigned long,     MPI_UNSIGNED_LONG,      MPI_MAX)
+//GOP_IMPL(gop_max,unsigned long long,MPI_UNSIGNED_LONG_LONG, MPI_MAX)
+GOP_IMPL(gop_sum,char,              MPI_CHAR,               MPI_SUM)
+GOP_IMPL(gop_sum,short,             MPI_SHORT,              MPI_SUM)
+GOP_IMPL(gop_sum,int,               MPI_INT,                MPI_SUM)
+GOP_IMPL(gop_sum,long,              MPI_LONG,               MPI_SUM)
+GOP_IMPL(gop_sum,long long,         MPI_LONG_LONG,          MPI_SUM)
+GOP_IMPL(gop_sum,float,             MPI_FLOAT,              MPI_SUM)
+GOP_IMPL(gop_sum,double,            MPI_DOUBLE,             MPI_SUM)
+GOP_IMPL(gop_sum,long double,       MPI_LONG_DOUBLE,        MPI_SUM)
+GOP_IMPL(gop_sum,unsigned char,     MPI_UNSIGNED_CHAR,      MPI_SUM)
+GOP_IMPL(gop_sum,unsigned short,    MPI_UNSIGNED_SHORT,     MPI_SUM)
+GOP_IMPL(gop_sum,unsigned int,      MPI_UNSIGNED,           MPI_SUM)
+GOP_IMPL(gop_sum,unsigned long,     MPI_UNSIGNED_LONG,      MPI_SUM)
+//GOP_IMPL(gop_sum,unsigned long long,MPI_UNSIGNED_LONG_LONG, MPI_SUM)
+#undef GOP_IMPL
 
 #if NEED_VECTOR_INT64_T_GOP
 /**
@@ -324,83 +247,24 @@ void pagoda::gop_sum(long long &value)
  */
 void pagoda::gop_sum(int64_t &value)
 {
-#   if HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG_LONG && HAVE_GA_LLGOP
-    GA_Llgop(&value, 1, SUM);
-#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_LONG
-    GA_Lgop(&value, 1, SUM);
-#   elif HAVE_GA && SIZEOF_INT64_T == SIZEOF_INT
-    GA_Igop(&value, 1, SUM);
-#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG_LONG
+#if HAVE_MPI
+#   if SIZEOF_INT64_T == SIZEOF_LONG_LONG
     MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_LONG
+#   elif SIZEOF_INT64_T == SIZEOF_LONG
     MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
-#   elif HAVE_MPI && SIZEOF_INT64_T == SIZEOF_INT
+#   elif SIZEOF_INT64_T == SIZEOF_INT
     MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   else
 #       error
 #   endif
+#else
+#   error
+#endif
 }
 #endif /* NEED_VECTOR_INT64_T_GOP */
 
 
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(float &value)
-{
-#if HAVE_GA
-    GA_Fgop(&value, 1, SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_FLOAT, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(double &value)
-{
-#if HAVE_GA
-    GA_Dgop(&value, 1, SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-/**
- * Returns the sum of all values from all processes.
- *
- * @param[in,out] values the values to take the sums of
- */
-void pagoda::gop_sum(long double &value)
-{
-#if HAVE_GA && HAVE_GA_LDGOP
-    GA_Ldgop(&value, 1, SUM);
-#elif HAVE_MPI
-    MPI_Allreduce(&value, &value, 1, MPI_LONG_DOUBLE, MPI_SUM, ProcessGroup::get_default().get_comm());
-#else
-#   error
-#endif
-}
-
-
-#if HAVE_GA
-#   define broadcast_impl(T)                              \
-void pagoda::broadcast(vector<T> &values, int root)       \
-{                                                         \
-    GA_Brdcst(&values[0], values.size()*sizeof(T), root); \
-}
-#elif HAVE_MPI
+#if HAVE_MPI
 #   define broadcast_impl(T)                                         \
 void pagoda::broadcast(vector<T> &values, int root)                  \
 {                                                                    \
@@ -419,13 +283,7 @@ broadcast_impl(long double)
 #undef broadcast_impl
 
 
-#if HAVE_GA
-#   define broadcast_impl(T)                              \
-void pagoda::broadcast(T &value, int root)                \
-{                                                         \
-    GA_Brdcst(&value, sizeof(T), root);                   \
-}
-#elif HAVE_MPI
+#if HAVE_MPI
 #   define broadcast_impl(T)                                         \
 void pagoda::broadcast(T &value, int root)                           \
 {                                                                    \
