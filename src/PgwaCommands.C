@@ -33,6 +33,7 @@ PgwaCommands::PgwaCommands()
     ,   mask_variable("")
     ,   mask_comparator("")
     ,   dimensions()
+    ,   retain_degenerate_dimensions(false)
 {
     init();
 }
@@ -155,6 +156,10 @@ void PgwaCommands::parse(int argc, char **argv)
         }
     }
 
+    if (parser.count(CommandLineOption::RETAIN_DEGENERATE_DIMENSIONS)) {
+        retain_degenerate_dimensions = true;
+    }
+
     if (parser.count(CommandLineOption::AVERAGE_DIMENSIONS)) {
         vector<string> args =
             parser.get_arguments(CommandLineOption::AVERAGE_DIMENSIONS);
@@ -167,6 +172,54 @@ void PgwaCommands::parse(int argc, char **argv)
                     dimensions.insert(value);
                 }
             }
+        }
+    }
+}
+
+
+void PgwaCommands::get_inputs_and_outputs(Dataset *&dataset,
+        vector<Variable*> &vars, FileWriter* &writer)
+{
+    vector<Attribute*> atts;
+    vector<Dimension*> dims;
+
+    get_inputs(dataset, vars, dims, atts);
+    writer = get_output();
+    writer->write_atts(atts);
+    for (vector<Dimension*>::iterator dim_it=dims.begin();
+            dim_it!=dims.end(); ++dim_it) {
+        Dimension *dim = *dim_it;
+        if (dimensions.empty() || dimensions.count(dim->get_name()) != 0) {
+            if (retain_degenerate_dimensions) {
+                writer->def_dim(dim->get_name(), 1);
+            }
+        } else {
+            writer->def_dim(dim);
+        }
+    }
+    if (retain_degenerate_dimensions) {
+        // a var's dims are defined by name, so the dim sizes here don't matter
+        writer->def_vars(vars);
+    } else {
+        // we must define the vars without the dimensions getting removed
+        for (vector<Variable*>::iterator var_it=vars.begin();
+                var_it!=vars.end(); ++var_it) {
+            Variable *var = *var_it;
+            vector<Dimension*> dims = var->get_dims();
+            vector<string> dim_names;
+            for (vector<Dimension*>::iterator dim_it=dims.begin();
+                    dim_it!=dims.end(); ++dim_it) {
+                Dimension *dim = *dim_it;
+                if (dimensions.empty()
+                        || dimensions.count(dim->get_name()) != 0) {
+                    /* this dim is eliminated */
+                }
+                else {
+                    dim_names.push_back(dim->get_name());
+                }
+            }
+            writer->def_var(var->get_name(), dim_names, var->get_type(),
+                    var->get_atts());
         }
     }
 }
@@ -214,6 +267,12 @@ Variable* PgwaCommands::get_mask_variable()
     var->set_validator(validator);
 
     return var;
+}
+
+
+set<string> PgwaCommands::get_reduced_dimensions() const
+{
+    return dimensions;
 }
 
 

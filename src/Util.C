@@ -114,11 +114,12 @@ void pagoda::abort(const string &message, int errorcode)
 
 
 #if HAVE_MPI
-#   define GOP_IMPL(N,C,M,O)                                      \
-void pagoda::N(vector<C> &values)                                 \
-{                                                                 \
-    MPI_Allreduce(&values[0], &values[0], values.size(),          \
-                  M, O, ProcessGroup::get_default().get_comm());  \
+#   define GOP_IMPL(N,C,M,O)                                        \
+void pagoda::N(vector<C> &values)                                   \
+{                                                                   \
+    vector<C> values_copy(values);                                  \
+    MPI_Allreduce(&values_copy[0], &values[0], values.size(),       \
+                  M, O, ProcessGroup::get_default().get_comm());    \
 }
 #else
 #   error
@@ -172,13 +173,14 @@ GOP_IMPL(gop_sum,unsigned long,     MPI_UNSIGNED_LONG,      MPI_SUM)
  */
 void pagoda::gop_sum(vector<int64_t> &values)
 {
+    vector<int64_t> values_copy(values);
 #if HAVE_MPI
 #   if SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
+    MPI_Allreduce(&values_copy[0], &values[0], values.size(), MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif SIZEOF_INT64_T == SIZEOF_LONG
-    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
+    MPI_Allreduce(&values_copy[0], &values[0], values.size(), MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif SIZEOF_INT64_T == SIZEOF_INT
-    MPI_Allreduce(&values[0], &values[0], values.size(), MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
+    MPI_Allreduce(&values_copy[0], &values[0], values.size(), MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   else
 #       error
 #   endif
@@ -189,11 +191,12 @@ void pagoda::gop_sum(vector<int64_t> &values)
 #endif /* NEED_VECTOR_INT64_T_GOP */
 
 #if HAVE_MPI
-#   define GOP_IMPL(N,C,M,O)                                      \
-void pagoda::N(C &value)                                          \
-{                                                                 \
-    MPI_Allreduce(&value, &value, 1,                              \
-                  M, O, ProcessGroup::get_default().get_comm());  \
+#   define GOP_IMPL(N,C,M,O)                                        \
+void pagoda::N(C &value)                                            \
+{                                                                   \
+    C value_copy(value);                                            \
+    MPI_Allreduce(&value_copy, &value, 1,                           \
+                  M, O, ProcessGroup::get_default().get_comm());    \
 }
 #else
 #   error
@@ -247,13 +250,14 @@ GOP_IMPL(gop_sum,unsigned long,     MPI_UNSIGNED_LONG,      MPI_SUM)
  */
 void pagoda::gop_sum(int64_t &value)
 {
+    int64_t value_copy(value);
 #if HAVE_MPI
 #   if SIZEOF_INT64_T == SIZEOF_LONG_LONG
-    MPI_Allreduce(&value, &value, 1, MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
+    MPI_Allreduce(&value_copy, &value, 1, MPI_LONG_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif SIZEOF_INT64_T == SIZEOF_LONG
-    MPI_Allreduce(&value, &value, 1, MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
+    MPI_Allreduce(&value_copy, &value, 1, MPI_LONG, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   elif SIZEOF_INT64_T == SIZEOF_INT
-    MPI_Allreduce(&value, &value, 1, MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
+    MPI_Allreduce(&value_copy, &value, 1, MPI_INT, MPI_SUM, ProcessGroup::get_default().get_comm());
 #   else
 #       error
 #   endif

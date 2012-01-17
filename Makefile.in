@@ -85,7 +85,6 @@ check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestPartialSum \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestRavel \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestRead \
-@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestReduction \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestScanAdd \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestSort \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestUnion \
@@ -96,9 +95,9 @@ check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGet sandbox/TestGrid \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGroups sandbox/TestMaskMap \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel sandbox/TestRead \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestScatter sandbox/TestSlice \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestUnion sandbox/TestVecBool \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestWrite
+@ENABLE_SANDBOX_TRUE@	sandbox/TestReduction sandbox/TestScatter \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestUnion \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool sandbox/TestWrite
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@am__append_8 =  \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestBin \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestDistance \
@@ -252,7 +251,6 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestPartialSum$(EXEEXT) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestRavel$(EXEEXT) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestRead$(EXEEXT) \
-@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestReduction$(EXEEXT) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestScanAdd$(EXEEXT) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestSort$(EXEEXT) \
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@	sandbox/ga/TestUnion$(EXEEXT) \
@@ -267,6 +265,7 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@	sandbox/TestMaskMap$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRead$(EXEEXT) \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestReduction$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestUnion$(EXEEXT) \
@@ -502,6 +501,15 @@ sandbox_TestRead3_LDADD = $(LDADD)
 sandbox_TestRead3_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+am__sandbox_TestReduction_SOURCES_DIST = sandbox/TestReduction.C
+@ENABLE_SANDBOX_TRUE@am_sandbox_TestReduction_OBJECTS =  \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestReduction.$(OBJEXT)
+sandbox_TestReduction_OBJECTS = $(am_sandbox_TestReduction_OBJECTS)
+sandbox_TestReduction_LDADD = $(LDADD)
+sandbox_TestReduction_DEPENDENCIES = libpagoda.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestScatter_SOURCES_DIST = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestScatter_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter.$(OBJEXT)
@@ -643,16 +651,6 @@ sandbox_ga_TestRead_LDADD = $(LDADD)
 sandbox_ga_TestRead_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
-am__sandbox_ga_TestReduction_SOURCES_DIST =  \
-	sandbox/ga/TestReduction.C
-@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestReduction_OBJECTS = sandbox/ga/TestReduction.$(OBJEXT)
-sandbox_ga_TestReduction_OBJECTS =  \
-	$(am_sandbox_ga_TestReduction_OBJECTS)
-sandbox_ga_TestReduction_LDADD = $(LDADD)
-sandbox_ga_TestReduction_DEPENDENCIES = libpagoda.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
 am__sandbox_ga_TestScanAdd_SOURCES_DIST = sandbox/ga/TestScanAdd.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestScanAdd_OBJECTS = sandbox/ga/TestScanAdd.$(OBJEXT)
 sandbox_ga_TestScanAdd_OBJECTS = $(am_sandbox_ga_TestScanAdd_OBJECTS)
@@ -753,9 +751,10 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestRavel_SOURCES) $(sandbox_TestRead_SOURCES) \
 	$(sandbox_TestRead2_SOURCES) $(sandbox_TestRead2b_SOURCES) \
 	$(sandbox_TestRead2c_SOURCES) $(sandbox_TestRead2d_SOURCES) \
-	$(sandbox_TestRead3_SOURCES) $(sandbox_TestScatter_SOURCES) \
-	$(sandbox_TestSlice_SOURCES) $(sandbox_TestUnion_SOURCES) \
-	$(sandbox_TestVecBool_SOURCES) $(sandbox_TestWrite_SOURCES) \
+	$(sandbox_TestRead3_SOURCES) $(sandbox_TestReduction_SOURCES) \
+	$(sandbox_TestScatter_SOURCES) $(sandbox_TestSlice_SOURCES) \
+	$(sandbox_TestUnion_SOURCES) $(sandbox_TestVecBool_SOURCES) \
+	$(sandbox_TestWrite_SOURCES) \
 	$(sandbox_ga_TestAttribute_SOURCES) \
 	$(sandbox_ga_TestBin_SOURCES) \
 	$(sandbox_ga_TestDimension_SOURCES) \
@@ -766,7 +765,6 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_ga_TestPartialSum_SOURCES) \
 	$(sandbox_ga_TestPnetcdfDataset_SOURCES) \
 	$(sandbox_ga_TestRavel_SOURCES) $(sandbox_ga_TestRead_SOURCES) \
-	$(sandbox_ga_TestReduction_SOURCES) \
 	$(sandbox_ga_TestScanAdd_SOURCES) \
 	$(sandbox_ga_TestSort_SOURCES) $(sandbox_ga_TestUnion_SOURCES) \
 	$(sandbox_ga_TestUnpack_SOURCES) \
@@ -795,6 +793,7 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestRead2c_SOURCES_DIST) \
 	$(am__sandbox_TestRead2d_SOURCES_DIST) \
 	$(am__sandbox_TestRead3_SOURCES_DIST) \
+	$(am__sandbox_TestReduction_SOURCES_DIST) \
 	$(am__sandbox_TestScatter_SOURCES_DIST) \
 	$(am__sandbox_TestSlice_SOURCES_DIST) \
 	$(am__sandbox_TestUnion_SOURCES_DIST) \
@@ -812,7 +811,6 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_ga_TestPnetcdfDataset_SOURCES_DIST) \
 	$(am__sandbox_ga_TestRavel_SOURCES_DIST) \
 	$(am__sandbox_ga_TestRead_SOURCES_DIST) \
-	$(am__sandbox_ga_TestReduction_SOURCES_DIST) \
 	$(am__sandbox_ga_TestScanAdd_SOURCES_DIST) \
 	$(am__sandbox_ga_TestSort_SOURCES_DIST) \
 	$(am__sandbox_ga_TestUnion_SOURCES_DIST) \
@@ -1079,7 +1077,6 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestPartialSum_SOURCES = sandbox/ga/TestPartialSum.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestRavel_SOURCES = sandbox/ga/TestRavel.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestRead_SOURCES = sandbox/ga/TestRead.C
-@ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestReduction_SOURCES = sandbox/ga/TestReduction.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestScanAdd_SOURCES = sandbox/ga/TestScanAdd.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestSort_SOURCES = sandbox/ga/TestSort.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestUnion_SOURCES = sandbox/ga/TestUnion.C
@@ -1105,6 +1102,7 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead2c_SOURCES = sandbox/TestRead2c.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead2d_SOURCES = sandbox/TestRead2d.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestRead3_SOURCES = sandbox/TestRead3.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestReduction_SOURCES = sandbox/TestReduction.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestScatter_SOURCES = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestSlice_SOURCES = sandbox/TestSlice.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestUnion_SOURCES = sandbox/TestUnion.C
@@ -1504,6 +1502,11 @@ sandbox/TestRead3.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestRead3$(EXEEXT): $(sandbox_TestRead3_OBJECTS) $(sandbox_TestRead3_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestRead3$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestRead3_OBJECTS) $(sandbox_TestRead3_LDADD) $(LIBS)
+sandbox/TestReduction.$(OBJEXT): sandbox/$(am__dirstamp) \
+	sandbox/$(DEPDIR)/$(am__dirstamp)
+sandbox/TestReduction$(EXEEXT): $(sandbox_TestReduction_OBJECTS) $(sandbox_TestReduction_DEPENDENCIES) sandbox/$(am__dirstamp)
+	@rm -f sandbox/TestReduction$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestReduction_OBJECTS) $(sandbox_TestReduction_LDADD) $(LIBS)
 sandbox/TestScatter.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestScatter$(EXEEXT): $(sandbox_TestScatter_OBJECTS) $(sandbox_TestScatter_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1595,11 +1598,6 @@ sandbox/ga/TestRead.$(OBJEXT): sandbox/ga/$(am__dirstamp) \
 sandbox/ga/TestRead$(EXEEXT): $(sandbox_ga_TestRead_OBJECTS) $(sandbox_ga_TestRead_DEPENDENCIES) sandbox/ga/$(am__dirstamp)
 	@rm -f sandbox/ga/TestRead$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_ga_TestRead_OBJECTS) $(sandbox_ga_TestRead_LDADD) $(LIBS)
-sandbox/ga/TestReduction.$(OBJEXT): sandbox/ga/$(am__dirstamp) \
-	sandbox/ga/$(DEPDIR)/$(am__dirstamp)
-sandbox/ga/TestReduction$(EXEEXT): $(sandbox_ga_TestReduction_OBJECTS) $(sandbox_ga_TestReduction_DEPENDENCIES) sandbox/ga/$(am__dirstamp)
-	@rm -f sandbox/ga/TestReduction$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_ga_TestReduction_OBJECTS) $(sandbox_ga_TestReduction_LDADD) $(LIBS)
 sandbox/ga/TestScanAdd.$(OBJEXT): sandbox/ga/$(am__dirstamp) \
 	sandbox/ga/$(DEPDIR)/$(am__dirstamp)
 sandbox/ga/TestScanAdd$(EXEEXT): $(sandbox_ga_TestScanAdd_OBJECTS) $(sandbox_ga_TestScanAdd_DEPENDENCIES) sandbox/ga/$(am__dirstamp)
@@ -1659,6 +1657,7 @@ mostlyclean-compile:
 	-rm -f sandbox/TestRead2c.$(OBJEXT)
 	-rm -f sandbox/TestRead2d.$(OBJEXT)
 	-rm -f sandbox/TestRead3.$(OBJEXT)
+	-rm -f sandbox/TestReduction.$(OBJEXT)
 	-rm -f sandbox/TestScatter.$(OBJEXT)
 	-rm -f sandbox/TestSlice.$(OBJEXT)
 	-rm -f sandbox/TestUnion.$(OBJEXT)
@@ -1676,7 +1675,6 @@ mostlyclean-compile:
 	-rm -f sandbox/ga/TestPnetcdfDataset.$(OBJEXT)
 	-rm -f sandbox/ga/TestRavel.$(OBJEXT)
 	-rm -f sandbox/ga/TestRead.$(OBJEXT)
-	-rm -f sandbox/ga/TestReduction.$(OBJEXT)
 	-rm -f sandbox/ga/TestScanAdd.$(OBJEXT)
 	-rm -f sandbox/ga/TestSort.$(OBJEXT)
 	-rm -f sandbox/ga/TestUnion.$(OBJEXT)
@@ -1855,6 +1853,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead2c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead2d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestRead3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestReduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestScatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestSlice.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestUnion.Po@am__quote@
@@ -1872,7 +1871,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestPnetcdfDataset.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestRavel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestRead.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestReduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestScanAdd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestSort.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/ga/$(DEPDIR)/TestUnion.Po@am__quote@

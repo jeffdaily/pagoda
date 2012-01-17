@@ -183,6 +183,15 @@ class AbstractArray : public Array
         /** @copydoc Array::ipow(double) */
         virtual Array* ipow(double exponent);
 
+        /** @copydoc Array::reduce_add() */
+        virtual Array* reduce_add() const;
+
+        /** @copydoc Array::reduce_max() */
+        virtual Array* reduce_max() const;
+
+        /** @copydoc Array::reduce_min() */
+        virtual Array* reduce_min() const;
+
         /** @copydoc Array::set_validator(double) */
         virtual void set_validator(Validator* value);
 
@@ -272,6 +281,16 @@ class AbstractArray : public Array
          * @todo TODO document
          */
         void operate_scalar_validator_counter(const void *rhs, DataType rhs_type, const int op);
+
+        /**
+         * @todo TODO document
+         */
+        Array* operate_reduce(const int op) const;
+
+        /**
+         * @todo TODO document
+         */
+        Array* operate_reduce_validator(const int op) const;
 
         Validator *validator; /**< @todo document */
         Array *counter; /**< @todo document */

@@ -9,6 +9,7 @@
 #include "AbstractArray.H"
 #include "DataType.H"
 #include "Error.H"
+#include "ScalarArray.H"
 #include "Validator.H"
 
 template <class L, class R>
@@ -115,6 +116,73 @@ static void op_imin(L *lhs, const R *rhs, int64_t count,
     }
 }
 
+template <class T>
+static void op_reduce_add(const T *buf, int64_t count, Validator *validator,
+        double &val, int64_t &tally)
+{
+    int64_t i;
+
+    ASSERT(buf != NULL);
+    ASSERT(validator != NULL);
+    tally = 0;
+
+    for (i=0; i<count; ++i) {
+        if (validator->is_valid(&buf[i])) {
+            val = buf[i];
+            ++tally;
+            break;
+        }
+    }
+    for (/*empty*/; i<count; ++i) {
+        if (validator->is_valid(&buf[i])) {
+            val += buf[i];
+            ++tally;
+        }
+    }
+}
+template <class T>
+static void op_reduce_max(const T *buf, int64_t count, Validator *validator,
+        double &val)
+{
+    int64_t i;
+
+    ASSERT(buf != NULL);
+    ASSERT(validator != NULL);
+
+    for (i=0; i<count; ++i) {
+        if (validator->is_valid(&buf[i])) {
+            val = buf[i];
+            break;
+        }
+    }
+    for (/*empty*/; i<count; ++i) {
+        if (validator->is_valid(&buf[i]) && buf[i] > val) {
+            val = buf[i];
+        }
+    }
+}
+template <class T>
+static void op_reduce_min(const T *buf, int64_t count, Validator *validator,
+        double &val)
+{
+    int64_t i;
+
+    ASSERT(buf != NULL);
+    ASSERT(validator != NULL);
+
+    for (i=0; i<count; ++i) {
+        if (validator->is_valid(&buf[i])) {
+            val = buf[i];
+            break;
+        }
+    }
+    for (/*empty*/; i<count; ++i) {
+        if (validator->is_valid(&buf[i]) && buf[i] < val) {
+            val = buf[i];
+        }
+    }
+}
+
 
 void AbstractArray::operate_array_validator(const Array *rhs, const int op)
 {
@@ -179,4 +247,59 @@ void AbstractArray::operate_array_validator(const Array *rhs, const int op)
         }
         release_update();
     }
+}
+
+
+Array* AbstractArray::operate_reduce_validator(const int op) const
+{
+    Array *ret = NULL;
+    const void *ptr = access();
+    DataType type = get_type();
+    double val = 0.0;
+    int64_t tally = 0;
+
+    if (NULL != ptr) {
+        int64_t size = get_local_size();
+#define DATATYPE_EXPAND(DT,T)                                        \
+        if (DT == type) {                                            \
+            const T *buf = static_cast<const T*>(ptr);               \
+            switch (op) {                                            \
+                case OP_ADD:                                         \
+                    op_reduce_add(buf, size, validator, val, tally); \
+                break;                                               \
+                case OP_MAX:                                         \
+                    op_reduce_max(buf, size, validator, val);        \
+                break;                                               \
+                case OP_MIN:                                         \
+                    op_reduce_min(buf, size, validator, val);        \
+                break;                                               \
+                default: ERRCODE("operation not supported", op);     \
+            }                                                        \
+        } else
+#include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
+        release();
+    }
+
+    switch (op) {
+        case OP_ADD:
+            pagoda::gop_sum(val);
+            pagoda::gop_sum(tally);
+            val = val/tally;
+            break;
+        case OP_MAX:
+            pagoda::gop_max(val);
+            break;
+        case OP_MIN:
+            pagoda::gop_min(val);
+            break;
+        default:
+            ERRCODE("operation not supported", op);
+    }
+
+    ret = new ScalarArray(type);
+    ret->fill_value(val);
+    return ret;
 }

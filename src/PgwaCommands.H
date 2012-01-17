@@ -20,8 +20,13 @@ class PgwaCommands : public GenericCommands
 
         virtual void parse(int argc, char **argv);
 
+        virtual void get_inputs_and_outputs(Dataset* &dataset,
+                                            vector<Variable*> &vars,
+                                            FileWriter* &writer);
+
         string get_operator() const;
         Variable* get_mask_variable();
+        set<string> get_reduced_dimensions() const;
 
     protected:
         void init();
@@ -33,6 +38,7 @@ class PgwaCommands : public GenericCommands
         string mask_variable;
         string mask_comparator;
         set<string> dimensions;
+        bool retain_degenerate_dimensions;
 };
 
 #endif // PGWACOMMANDS_H_

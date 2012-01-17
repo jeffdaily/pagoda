@@ -12,6 +12,7 @@
 #include "DataType.H"
 #include "Error.H"
 #include "Mask.H"
+#include "ScalarArray.H"
 #include "Util.H"
 #include "Validator.H"
 
@@ -543,5 +544,35 @@ void AbstractArray::operate(const Array *rhs, const int op)
         }
     } else if (broadcast_check(rhs)) {
         ERR("operate_array_broadcast not implemented");
+    }
+}
+
+
+Array* AbstractArray::reduce_add() const
+{
+    if (NULL != validator) {
+        return operate_reduce_validator(OP_ADD);
+    } else {
+        return operate_reduce(OP_ADD);
+    }
+}
+
+
+Array* AbstractArray::reduce_max() const
+{
+    if (NULL != validator) {
+        return operate_reduce_validator(OP_MAX);
+    } else {
+        return operate_reduce(OP_MAX);
+    }
+}
+
+
+Array* AbstractArray::reduce_min() const
+{
+    if (NULL != validator) {
+        return operate_reduce_validator(OP_MIN);
+    } else {
+        return operate_reduce(OP_MIN);
     }
 }

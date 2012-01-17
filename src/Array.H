@@ -463,6 +463,27 @@ class Array
         virtual Array* iadd(const Array *rhs) = 0;
 
         /**
+         * Reduces this Array to a single value using addition.
+         *
+         * If the Array has an associated Validator it will be consulted.
+         */
+        virtual Array* reduce_add() const = 0;
+
+        /**
+         * Reduces this Array to a single, maximum value.
+         *
+         * If the Array has an associated Validator it will be consulted.
+         */
+        virtual Array* reduce_max() const = 0;
+
+        /**
+         * Reduces this Array to a single, minimum value.
+         *
+         * If the Array has an associated Validator it will be consulted.
+         */
+        virtual Array* reduce_min() const = 0;
+
+        /**
          * Subtracts two Arrays.
          *
          * If the given Array has fewer Dimensions, but the shape is otherwise

@@ -9,6 +9,7 @@
 #include "AbstractArray.H"
 #include "DataType.H"
 #include "Error.H"
+#include "ScalarArray.H"
 #include "Validator.H"
 
 template <class L, class R>
@@ -66,6 +67,38 @@ static inline void op_imin(L *lhs, const R *rhs, int64_t count)
     for (int64_t i=0; i<count; ++i) {
         const L rval = static_cast<L>(rhs[i]);
         lhs[i] = lhs[i] < rval ? lhs[i] : rval;
+    }
+}
+
+template <class T>
+static void op_reduce_add(const T *buf, int64_t count, double &val)
+{
+    ASSERT(buf != NULL);
+    val = buf[0];
+    for (int64_t i=1; i<count; ++i) {
+        val += buf[i];
+    }
+}
+template <class T>
+static void op_reduce_max(const T *buf, int64_t count, double &val)
+{
+    ASSERT(buf != NULL);
+    val = buf[0];
+    for (int64_t i=1; i<count; ++i) {
+        if (buf[i] > val) {
+            val = buf[i];
+        }
+    }
+}
+template <class T>
+static void op_reduce_min(const T *buf, int64_t count, double &val)
+{
+    ASSERT(buf != NULL);
+    val = buf[0];
+    for (int64_t i=1; i<count; ++i) {
+        if (buf[i] < val) {
+            val = buf[i];
+        }
     }
 }
 
@@ -127,4 +160,58 @@ void AbstractArray::operate_array(const Array *rhs, const int op)
         }
         release_update();
     }
+}
+
+
+Array* AbstractArray::operate_reduce(const int op) const
+{
+    Array *ret = NULL;
+    const void *ptr = access();
+    DataType type = get_type();
+    double val = 0.0;
+
+    if (NULL != ptr) {
+        int64_t size = get_local_size();
+#define DATATYPE_EXPAND(DT,T)                                       \
+        if (DT == type) {                                           \
+            const T *buf = static_cast<const T*>(ptr);              \
+            switch (op) {                                           \
+                case OP_ADD:                                        \
+                    op_reduce_add(buf, size, val);                  \
+                break;                                              \
+                case OP_MAX:                                        \
+                    op_reduce_max(buf, size, val);                  \
+                break;                                              \
+                case OP_MIN:                                        \
+                    op_reduce_min(buf, size, val);                  \
+                break;                                              \
+                default: ERRCODE("operation not supported", op);    \
+            }                                                       \
+        } else
+#include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
+        release();
+    }
+
+    switch (op) {
+        case OP_ADD:
+            pagoda::gop_sum(val);
+            break;
+        case OP_MAX:
+            pagoda::gop_max(val);
+            break;
+        case OP_MIN:
+            pagoda::gop_min(val);
+            break;
+        default:
+            ERRCODE("operation not supported", op);
+    }
+
+    ret = new ScalarArray(type);
+    ret->set_read_type(get_read_type());
+    ret->set_write_type(get_write_type());
+    ret->fill_value(val);
+    return ret;
 }

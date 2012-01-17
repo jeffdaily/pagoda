@@ -494,8 +494,16 @@ Array* AbstractVariable::alloc(bool remove_record) const
     if (remove_record) {
         shape.erase(shape.begin());
     }
-    if (Variable::promote_to_float && get_type() != DataType::DOUBLE) {
-        dst = Array::create(DataType::FLOAT, shape);
+    if (Variable::promote_to_float
+            && get_type() != DataType::FLOAT
+            && get_type() != DataType::DOUBLE) {
+        dst = Array::create(DataType::DOUBLE, shape);
+        // netcdf can't automatically convert char's to another type like it
+        // can with other number types
+        if (get_type() == DataType::CHAR) {
+            dst->set_read_type(DataType::CHAR);
+            dst->set_write_type(DataType::CHAR);
+        }
     }
     else {
         dst = Array::create(get_type(), shape);
