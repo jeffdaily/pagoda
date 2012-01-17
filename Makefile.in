@@ -96,8 +96,9 @@ check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGroups sandbox/TestMaskMap \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel sandbox/TestRead \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestReduction sandbox/TestScatter \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestUnion \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool sandbox/TestWrite
+@ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestTranspose \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestUnion sandbox/TestVecBool \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestWrite
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@am__append_8 =  \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestBin \
 @ENABLE_SANDBOX_TRUE@@HAVE_PNETCDF_TRUE@	sandbox/TestDistance \
@@ -268,6 +269,7 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@	sandbox/TestReduction$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice$(EXEEXT) \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestUnion$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestWrite$(EXEEXT)
@@ -526,6 +528,15 @@ sandbox_TestSlice_LDADD = $(LDADD)
 sandbox_TestSlice_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+am__sandbox_TestTranspose_SOURCES_DIST = sandbox/TestTranspose.C
+@ENABLE_SANDBOX_TRUE@am_sandbox_TestTranspose_OBJECTS =  \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose.$(OBJEXT)
+sandbox_TestTranspose_OBJECTS = $(am_sandbox_TestTranspose_OBJECTS)
+sandbox_TestTranspose_LDADD = $(LDADD)
+sandbox_TestTranspose_DEPENDENCIES = libpagoda.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am__sandbox_TestUnion_SOURCES_DIST = sandbox/TestUnion.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestUnion_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestUnion.$(OBJEXT)
@@ -753,8 +764,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestRead2c_SOURCES) $(sandbox_TestRead2d_SOURCES) \
 	$(sandbox_TestRead3_SOURCES) $(sandbox_TestReduction_SOURCES) \
 	$(sandbox_TestScatter_SOURCES) $(sandbox_TestSlice_SOURCES) \
-	$(sandbox_TestUnion_SOURCES) $(sandbox_TestVecBool_SOURCES) \
-	$(sandbox_TestWrite_SOURCES) \
+	$(sandbox_TestTranspose_SOURCES) $(sandbox_TestUnion_SOURCES) \
+	$(sandbox_TestVecBool_SOURCES) $(sandbox_TestWrite_SOURCES) \
 	$(sandbox_ga_TestAttribute_SOURCES) \
 	$(sandbox_ga_TestBin_SOURCES) \
 	$(sandbox_ga_TestDimension_SOURCES) \
@@ -796,6 +807,7 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestReduction_SOURCES_DIST) \
 	$(am__sandbox_TestScatter_SOURCES_DIST) \
 	$(am__sandbox_TestSlice_SOURCES_DIST) \
+	$(am__sandbox_TestTranspose_SOURCES_DIST) \
 	$(am__sandbox_TestUnion_SOURCES_DIST) \
 	$(am__sandbox_TestVecBool_SOURCES_DIST) \
 	$(am__sandbox_TestWrite_SOURCES_DIST) \
@@ -1105,6 +1117,7 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestReduction_SOURCES = sandbox/TestReduction.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestScatter_SOURCES = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestSlice_SOURCES = sandbox/TestSlice.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestTranspose_SOURCES = sandbox/TestTranspose.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestUnion_SOURCES = sandbox/TestUnion.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestVecBool_SOURCES = sandbox/TestVecBool.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestWrite_SOURCES = sandbox/TestWrite.C
@@ -1517,6 +1530,11 @@ sandbox/TestSlice.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestSlice$(EXEEXT): $(sandbox_TestSlice_OBJECTS) $(sandbox_TestSlice_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestSlice$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestSlice_OBJECTS) $(sandbox_TestSlice_LDADD) $(LIBS)
+sandbox/TestTranspose.$(OBJEXT): sandbox/$(am__dirstamp) \
+	sandbox/$(DEPDIR)/$(am__dirstamp)
+sandbox/TestTranspose$(EXEEXT): $(sandbox_TestTranspose_OBJECTS) $(sandbox_TestTranspose_DEPENDENCIES) sandbox/$(am__dirstamp)
+	@rm -f sandbox/TestTranspose$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestTranspose_OBJECTS) $(sandbox_TestTranspose_LDADD) $(LIBS)
 sandbox/TestUnion.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestUnion$(EXEEXT): $(sandbox_TestUnion_OBJECTS) $(sandbox_TestUnion_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1660,6 +1678,7 @@ mostlyclean-compile:
 	-rm -f sandbox/TestReduction.$(OBJEXT)
 	-rm -f sandbox/TestScatter.$(OBJEXT)
 	-rm -f sandbox/TestSlice.$(OBJEXT)
+	-rm -f sandbox/TestTranspose.$(OBJEXT)
 	-rm -f sandbox/TestUnion.$(OBJEXT)
 	-rm -f sandbox/TestVecBool.$(OBJEXT)
 	-rm -f sandbox/TestWrite.$(OBJEXT)
@@ -1856,6 +1875,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestReduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestScatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestSlice.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestTranspose.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestUnion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestVecBool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestWrite.Po@am__quote@
