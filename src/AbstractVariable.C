@@ -31,6 +31,7 @@ using std::ostringstream;
 AbstractVariable::AbstractVariable()
     :   Variable()
     ,   enable_record_translation(true)
+    ,   validator(NULL)
 {
 }
 
