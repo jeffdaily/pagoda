@@ -1,20 +1,31 @@
 /**
- * Find a way to perform multidimensional array transposition using iterators.
+ * Perform multidimensional array transposition using iterators.
  */
+#include <cassert>
+#include <cstdlib>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
-
-#include "Print.H"
-#include "Util.H"
+#include <sstream>
+#include <string>
+#include <vector>
 
 using std::accumulate;
 using std::cout;
 using std::endl;
+using std::fill;
+using std::generate;
+using std::istringstream;
 using std::multiplies;
 using std::setw;
+using std::string;
+using std::vector;
 
+#include "Print.H"
+#include "Util.H"
+
+#define DEBUG 1
 #if DEBUG
 #   define STR_ARR(vec,n) pagoda::arr_to_string(vec,n,",",#vec)
 #endif
@@ -27,68 +38,122 @@ typedef struct gen_enum {
 
 int main(int argc, char **argv)
 {
-    double  *src_buf;
-    double  *src_ptr;
-    int64_t  src_ndim = 4;
-    int64_t  src_nd_m1 = src_ndim-1;
+    double  *src_buf = NULL;
+    double  *src_ptr = NULL;
+    int64_t  src_ndim = -1;
+    int64_t  src_nd_m1 = -1;
     int64_t  src_elems_prod = 1;
-    vector<int64_t> src_elems(src_ndim);
-    vector<int64_t> src_coords(src_ndim);
-    vector<int64_t> src_dims_m1(src_ndim);
-    vector<int64_t> src_strides(src_ndim);
-    vector<int64_t> src_backstrides(src_ndim);
+    vector<int64_t> src_elems;
+    vector<int64_t> src_coords;
+    vector<int64_t> src_dims_m1;
+    vector<int64_t> src_strides;
+    vector<int64_t> src_backstrides;
 
-    double  *dst_buf;
-    double  *dst_ptr;
-    int64_t  dst_ndim = 4;
-    int64_t  dst_nd_m1 = dst_ndim-1;
+    double  *dst_buf = NULL;
+    double  *dst_ptr = NULL;;
+    int64_t  dst_ndim = -1;
+    int64_t  dst_nd_m1 = -1;
     int64_t  dst_elems_prod = 1;
-    vector<int64_t> dst_elems(dst_ndim);
-    vector<int64_t> dst_coords(dst_ndim);
-    vector<int64_t> dst_dims_m1(dst_ndim);
-    vector<int64_t> dst_strides(dst_ndim);
-    vector<int64_t> dst_backstrides(dst_ndim);
+    vector<int64_t> dst_elems;
+    vector<int64_t> dst_coords;
+    vector<int64_t> dst_dims_m1;
+    vector<int64_t> dst_strides;
+    vector<int64_t> dst_backstrides;
 
-    vector<int64_t> dim_permute_user(src_ndim);
-    vector<int64_t> dim_map(src_ndim);
+    vector<int64_t> dim_permute_user;
+    vector<int64_t> dim_map;
 #if DEBUG
-    vector<int64_t> trn_coords(src_ndim);
+    vector<int64_t> trn_coords;
 #endif
 
-    dim_permute_user[0] = 0;
-    dim_permute_user[1] = 3;
-    dim_permute_user[2] = 1;
-    dim_permute_user[3] = 2;
-    dim_map[dim_permute_user[0]] = 0;
-    dim_map[dim_permute_user[1]] = 1;
-    dim_map[dim_permute_user[2]] = 2;
-    dim_map[dim_permute_user[3]] = 3;
+    /* parse command line */
+    if (argc != 3) {
+        cout << "usage: TestTranspose 1,2,3 3,2,1" << endl;
+        return EXIT_FAILURE;
+    }
+    else {
+        istringstream iss(argv[1]);
 
-    /* source shape */
-    src_elems[0] = 2;
-    src_elems[1] = 3;
-    src_elems[2] = 4;
-    src_elems[3] = 5;
+        while (!iss.eof()) {
+            string token;
+            istringstream token_as_stream;
+            int64_t length;
+
+            getline(iss, token, ',');
+            token_as_stream.str(token);
+            token_as_stream >> length;
+            src_elems.push_back(length);
+        }
+
+        iss.clear();
+        iss.str(argv[2]);
+        while (!iss.eof()) {
+            string token;
+            istringstream token_as_stream;
+            int64_t length;
+
+            getline(iss, token, ',');
+            token_as_stream.str(token);
+            token_as_stream >> length;
+            dst_elems.push_back(length);
+        }
+    }
+    if (src_elems.size() != dst_elems.size()) {
+        cout << "source and destination shapes must have the same number of elements" << endl;
+        return EXIT_FAILURE;
+    }
+
+    src_ndim = src_elems.size();
+    src_nd_m1 = src_ndim-1;
+    src_coords.resize(src_ndim);
+    src_dims_m1.resize(src_ndim);
+    src_strides.resize(src_ndim);
+    src_backstrides.resize(src_ndim);
+
+    dst_ndim = dst_elems.size();
+    dst_nd_m1 = dst_ndim-1;
+    dst_coords.resize(dst_ndim);
+    dst_dims_m1.resize(dst_ndim);
+    dst_strides.resize(dst_ndim);
+    dst_backstrides.resize(dst_ndim);
+
+    dim_permute_user.resize(src_ndim);
+    dim_map.resize(src_ndim);
+#if DEBUG
+    trn_coords.resize(src_ndim);
+#endif
+
+    for (size_t i=0; i<src_ndim; ++i) {
+        vector<int64_t>::iterator pos;
+        pos = find(dst_elems.begin(), dst_elems.end(), src_elems[i]);
+        if (pos == dst_elems.end()) {
+            cout << "dst does not related to src" << endl;
+            return EXIT_FAILURE;
+        }
+        dim_map[i] = pos - dst_elems.begin();
+    }
+    for (size_t i=0; i<src_ndim; ++i ) {
+        dim_permute_user[dim_map[i]] = i;
+    }
+
+    /* number of source elements */
     src_elems_prod = accumulate(
             src_elems.begin(), src_elems.end(), 1, multiplies<int64_t>());
     src_buf = new double[src_elems_prod];
     /* fill src_buf with enumeration */
-    std::generate(src_buf, src_buf+src_elems_prod, gen_enum_t());
+    generate(src_buf, src_buf+src_elems_prod, gen_enum_t());
 
-    /* dst shape, transposing as given above in dim_map */
-    dst_elems[dim_map[0]] = src_elems[0];
-    dst_elems[dim_map[1]] = src_elems[1];
-    dst_elems[dim_map[2]] = src_elems[2];
-    dst_elems[dim_map[3]] = src_elems[3];
+    /* number of destination elements */
     dst_elems_prod = accumulate(
             dst_elems.begin(), dst_elems.end(), 1, multiplies<int64_t>());
     dst_buf = new double[dst_elems_prod];
-    std::fill(dst_buf, dst_buf+dst_elems_prod, -1);
+    fill(dst_buf, dst_buf+dst_elems_prod, -1);
+    assert(src_elems_prod == dst_elems_prod);
 #if DEBUG
-    pagoda::println_sync(STR_ARR(dim_permute_user,src_ndim));
-    pagoda::println_sync(STR_ARR(dim_map,src_ndim));
-    pagoda::println_sync(STR_ARR(src_elems,src_ndim));
-    pagoda::println_sync(STR_ARR(dst_elems,dst_ndim));
+    cout << STR_ARR(dim_permute_user,src_ndim) << endl;
+    cout << STR_ARR(dim_map,src_ndim) << endl;
+    cout << STR_ARR(src_elems,src_ndim) << endl;
+    cout << STR_ARR(dst_elems,dst_ndim) << endl;
 #endif
 
     /* src iterator setup */
@@ -99,8 +164,8 @@ int main(int argc, char **argv)
         src_backstrides[i] = src_dims_m1[i]*src_strides[i];
     }
 #if DEBUG
-    pagoda::println_sync(STR_ARR(src_strides,src_ndim));
-    pagoda::println_sync(STR_ARR(src_backstrides,src_ndim));
+    cout << STR_ARR(src_strides,src_ndim) << endl;
+    cout << STR_ARR(src_backstrides,src_ndim) << endl;
 #endif
 
     /* dst iterator setup */
@@ -112,8 +177,8 @@ int main(int argc, char **argv)
         dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
     }
 #if DEBUG
-    pagoda::println_sync(STR_ARR(dst_strides,dst_ndim));
-    pagoda::println_sync(STR_ARR(dst_backstrides,dst_ndim));
+    cout << STR_ARR(dst_strides,dst_ndim) << endl;
+    cout << STR_ARR(dst_backstrides,dst_ndim) << endl;
 #endif
 
     src_ptr = src_buf;
@@ -151,14 +216,16 @@ int main(int argc, char **argv)
     double sum=0;
     for (int64_t i=0; i<dst_elems_prod; ++i) {
         sum += dst_buf[i];
-        if (i%13 == 0) {
+        if (i%17 == 0) {
             cout << endl;
         }
-        cout << setw(4) << dst_buf[i] << ',';
+        cout << setw(4) << dst_buf[i];
     }
     cout << endl;
     cout << sum << endl;
 
     delete [] src_buf;
     delete [] dst_buf;
+
+    return EXIT_SUCCESS;
 }
