@@ -64,6 +64,8 @@ static int g_log10_adjustment = 3;
 #if HAVE_CLOCK_GETTIME
 // converts bytes/nanosecond to gigabytes/second
 static double g_io_multiplier = 1000000000.0/1073741824.0; // 0.931322575
+// converts nanoseconds to seconds
+static double g_time_multiplier = 1.0/1000000000.0;
 static string UNIT_SIZE("bytes");
 static string UNIT_TIME("nanoseconds");
 #elif HAVE_GETTIMEOFDAY
@@ -421,6 +423,8 @@ string PnetcdfTiming::get_stats_aggregate()
     double bw_read_agg=0;
     double bw_write=0;
     double bw_write_agg=0;
+    double times_total=0;
+    double times_total_agg=0;
 #if   SIZEOF_UINT64_T == SIZEOF_UNSIGNED_INT
     MPI_Datatype type = MPI_UNSIGNED;
 #elif SIZEOF_UINT64_T == SIZEOF_UNSIGNED_LONG
@@ -444,9 +448,10 @@ string PnetcdfTiming::get_stats_aggregate()
         }
     }
     times_read += time_wait_read;
-    pagoda::println_sync("time_wait_read " + pagoda::to_string(time_wait_read));
+    //pagoda::println_sync("time_wait_read " + pagoda::to_string(time_wait_read));
     times_write += time_wait_write;
-    pagoda::println_sync("time_wait_write " + pagoda::to_string(time_wait_write));
+    //pagoda::println_sync("time_wait_write " + pagoda::to_string(time_wait_write));
+
     // calculate total bytes
     for (PnetcdfIOMap::const_iterator it=bytes.begin(), end=bytes.end();
             it != end; ++it) {
@@ -461,9 +466,11 @@ string PnetcdfTiming::get_stats_aggregate()
 
     bw_read = static_cast<double>(bytes_read)/static_cast<double>(times_read);
     bw_write = static_cast<double>(bytes_write)/static_cast<double>(times_write);
+    times_total = (times_read + times_write) * g_time_multiplier;
     type = MPI_DOUBLE;
     MPI_Allreduce(&bw_read,&bw_read_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
     MPI_Allreduce(&bw_write,&bw_write_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
+    MPI_Allreduce(&times_total,&times_total_agg,1,type,MPI_SUM,pagoda::COMM_WORLD);
 
     double io_read  = g_io_multiplier * bw_read_agg;
     double io_write = g_io_multiplier * bw_write_agg;
@@ -541,6 +548,9 @@ string PnetcdfTiming::get_stats_aggregate()
         <<    io_total << " gigabytes/sec"
         << endl
 #endif
+        << "Total Time Spent in IO" << endl
+        << times_total_agg << " seconds" << " / "
+        << pagoda::npe << " PEs = " << times_total_agg / pagoda::npe << endl
         << endl;
 
     return out.str();
