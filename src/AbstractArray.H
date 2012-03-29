@@ -75,6 +75,9 @@ class AbstractArray : public Array
         /** @copydoc Array::cast(DataType) const */
         virtual Array* cast(DataType new_type) const;
 
+        /** @copydoc Array::transpose(const vector<int64_t>&) */
+        virtual Array* transpose(const vector<int64_t> &axes) const;
+
         /** @copydoc Array::clone() const */
         virtual Array* clone() const = 0;
 

@@ -213,6 +213,50 @@ Array* AbstractArray::cast(DataType new_type) const
 }
 
 
+Array* AbstractArray::transpose(const vector<int64_t> &axes) const
+{
+    Array *dst_array = NULL;
+    vector<int64_t> dim_map(axes.size(), -1);
+    vector<int64_t> src_shape = get_shape();
+    vector<int64_t> dst_shape(src_shape.size(), -1);
+    vector<int64_t> local_shape = get_local_shape();
+    DataType type = get_type();
+    void *src_data = NULL;
+
+    assert(axes.size() == src_shape.size());
+    for (int64_t i=0,limit=src_shape.size(); i<limit; ++i) {
+        dim_map.at(axes[i]) = i;
+        dst_shape[i] = src_shape.at(axes[i]);
+    }
+
+    dst_array = Array::create(type, dst_shape);
+
+#if 0
+    void *data = access();
+    DataType type = get_type();
+
+    // PLACEHOLDER -- COPY AND PASTED FROM ANOTHER ROUTINE
+    if (NULL != data) {
+#define DATATYPE_EXPAND(DT,T) \
+        if (DT == type) { \
+            T tvalue = *static_cast<T*>(value); \
+            T *tdata =  static_cast<T*>(data); \
+            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
+                tdata[i] = tvalue; \
+            } \
+        } else
+#include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
+        release_update();
+    }
+#endif
+
+    return dst_array;
+}
+
+
 void* AbstractArray::get(void *buffer) const
 {
     vector<int64_t> my_shape = get_shape();

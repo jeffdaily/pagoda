@@ -211,8 +211,25 @@ class Array
 
         /**
          * Duplicates this Array buy as a new type.
+         *
+         * @param[in] new_type the type of the new Array
+         * @return the new Array, cast to the given type
          */
         virtual Array* cast(DataType new_type) const = 0;
+
+        /**
+         * Duplicates this Array and tranposes the elements.
+         *
+         * Here, tranpose can mean an arbitrary transpose i.e.
+         * 2,3,4,5 --> 5,4,3,2 --or--
+         * 2,3,4,5 --> 2,5,3,4
+         *
+         * @param[in] axes how to reorder the Array dimensions
+         *            for example 2,3,4 --> 4,2,3 needs 2,0,1
+         *            for example 2,3,4 --> 4,3,2 needs 2,1,0
+         * @return the new Array, transposed appropriately
+         */
+        virtual Array* transpose(const vector<int64_t> &axes) const = 0;
 
         /**
          * Duplicates this Array.

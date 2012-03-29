@@ -177,7 +177,9 @@ namespace pagoda
     template <class T> string to_string(const T &value);
     bool file_exists(const string &filename);
     void print_backtrace();
-
+    template <typename T> void transpose(
+            const T *src, const vector<int64_t> &shape,
+            T *dst, const vector<int64_t> &axes);
 
     /**
      * Generic unary function for calling "delete" on the given object.
@@ -283,6 +285,87 @@ namespace pagoda
         return os.str();
     }
 
+    /**
+     * Transpose the given array.
+     *
+     * @param[in] src the source buffer, contiguous
+     * @param[in] shape the shape of the source buffer
+     * @param[in,out] dst the destination buffer, contiguous
+     * @param[in] axes the new order of the axes for the shape
+     */
+    template <typename T> void transpose(
+            const T *src, const vector<int64_t> &shape,
+            T *dst, const vector<int64_t> &axes)
+    {
+        int64_t src_ndim = shape.size();
+        int64_t src_nd_m1 = src_ndim-1;
+        int64_t src_elems_prod = 1;
+        vector<int64_t> src_elems = shape;
+        vector<int64_t> src_coords(shape.size());
+        vector<int64_t> src_dims_m1(shape.size());
+        vector<int64_t> src_strides(shape.size());
+        vector<int64_t> src_backstrides(shape.size());
+
+        int64_t dst_ndim = shape.size();
+        int64_t dst_nd_m1 = dst_ndim-1;
+        int64_t dst_elems_prod = 1;
+        vector<int64_t> dst_elems(shape.size());
+        vector<int64_t> dst_coords(shape.size());
+        vector<int64_t> dst_dims_m1(shape.size());
+        vector<int64_t> dst_strides(shape.size());
+        vector<int64_t> dst_backstrides(shape.size());
+
+        vector<int64_t> dim_permute_user = axes;
+        vector<int64_t> dim_map(shape.size());
+
+        assert(axes.size() == shape.size());
+        for (int64_t i=0,limit=src_elems.size(); i<limit; ++i) {
+            dim_map.at(dim_permute_user[i]) = i;
+            dst_elems[i] = src_elems.at(dim_permute_user[i]);
+        }
+
+        /* number of source elements */
+        src_elems_prod = accumulate(
+                src_elems.begin(), src_elems.end(), 1, multiplies<int64_t>());
+
+        /* number of destination elements */
+        dst_elems_prod = accumulate(
+                dst_elems.begin(), dst_elems.end(), 1, multiplies<int64_t>());
+        assert(src_elems_prod == dst_elems_prod);
+
+        /* src iterator setup */
+        for (int64_t i=src_nd_m1; i>=0; --i) {
+            src_coords[i] = 0;
+            src_dims_m1[i] = src_elems[i]-1;
+            src_strides[i] = (i == src_nd_m1) ? 1 : src_strides[i+1]*src_elems[i+1];
+            src_backstrides[i] = src_dims_m1[i]*src_strides[i];
+        }
+
+        /* dst iterator setup */
+        for (int64_t i=dst_nd_m1; i>=0; --i) {
+            dst_coords[i] = 0;
+            dst_dims_m1[i] = dst_elems[i]-1;
+            dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems[i+1];
+            dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
+        }
+
+        for (int64_t elem=0; elem<src_elems_prod; ++elem) {
+            *dst = *src;
+            for (int64_t i=src_nd_m1; i>=0; --i) {
+                if (src_coords[i] < src_dims_m1[i]) {
+                    ++src_coords[i];
+                    src += src_strides[i];
+                    dst += dst_strides[dim_map[i]];
+                    break;
+                }
+                else {
+                    src_coords[i] = 0;
+                    src -= src_backstrides[i];
+                    dst -= dst_backstrides[dim_map[i]];
+                }
+            }
+        }
+    }
 } // namespace pagoda
 
 #endif // UTIL_H_

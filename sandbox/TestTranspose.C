@@ -1,5 +1,15 @@
 /**
  * Perform multidimensional array transposition using iterators.
+ *
+ * Transpose is determined based on command line arguments.
+ * For example, the usual coplete transpose is 
+ *      TestTranspose 1,2,3 3,2,1
+ * But we could transpose arbitrarily
+ *      TestTranspose 1,2,3 2,3,1
+ *
+ * The transpose is determined based on matching between the two command line
+ * parameters rather than by giving the array shape followed by the newly
+ * specified order in terms of axis indices.
  */
 #include <cassert>
 #include <cstdlib>
