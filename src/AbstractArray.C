@@ -10,11 +10,19 @@
 #include "Array.H"
 #include "Copy.H"
 #include "DataType.H"
+#include "Debug.H"
 #include "Error.H"
 #include "Mask.H"
 #include "ScalarArray.H"
 #include "Util.H"
 #include "Validator.H"
+
+#if DEBUG
+#include <iostream>
+using std::cout;
+using std::endl;
+#define STR_ARR(vec,n) pagoda::arr_to_string(vec,n,",",#vec)
+#endif
 
 
 AbstractArray::AbstractArray(DataType type)
@@ -215,43 +223,72 @@ Array* AbstractArray::cast(DataType new_type) const
 
 Array* AbstractArray::transpose(const vector<int64_t> &axes) const
 {
+    DataType type = get_type();
     Array *dst_array = NULL;
-    vector<int64_t> dim_map(axes.size(), -1);
+    int64_t ndim = get_ndim();
     vector<int64_t> src_shape = get_shape();
     vector<int64_t> dst_shape(src_shape.size(), -1);
-    vector<int64_t> local_shape = get_local_shape();
-    DataType type = get_type();
-    void *src_data = NULL;
+    vector<int64_t> src_lo(ndim);
+    vector<int64_t> src_hi(ndim);
+    vector<int64_t> src_map(ndim);
+    vector<int64_t> dst_lo;
+    vector<int64_t> dst_hi;
+    vector<int64_t> src_local_shape;
+    int64_t dst_local_size = -1;
+    void *dst_data = NULL;
 
-    assert(axes.size() == src_shape.size());
+    ASSERT(axes.size() == src_shape.size());
+    /* sanity check that axes is valid */
+    for (int64_t i=0,limit=axes.size(); i<limit; ++i)  {
+        ASSERT(axes[i] >= 0 && axes[i] <= src_shape.size());
+    }
     for (int64_t i=0,limit=src_shape.size(); i<limit; ++i) {
-        dim_map.at(axes[i]) = i;
-        dst_shape[i] = src_shape.at(axes[i]);
+        dst_shape[i] = src_shape[axes[i]];
+        src_map[axes[i]] = i;
     }
 
     dst_array = Array::create(type, dst_shape);
+    dst_local_size = dst_array->get_local_size();
+    dst_array->get_distribution(dst_lo,dst_hi);
+    for (int64_t i=0,limit=src_shape.size(); i<limit; ++i) {
+        src_lo[i] = dst_lo[src_map[i]];
+        src_hi[i] = dst_hi[src_map[i]];
+    }
+    src_local_shape = pagoda::get_shape(src_lo, src_hi);
 
-#if 0
-    void *data = access();
-    DataType type = get_type();
+#if DEBUG
+    for (int64_t i=0,limit=pagoda::num_nodes(); i<limit; ++i) {
+        if (i == pagoda::nodeid()) {
+            cout << "[" << i << "] " << STR_ARR(axes, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(src_map, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(src_shape, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(dst_shape, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(src_lo, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(src_hi, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(dst_lo, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(dst_hi, ndim) << endl;
+        }
+        pagoda::barrier();
+    }
+#endif
 
-    // PLACEHOLDER -- COPY AND PASTED FROM ANOTHER ROUTINE
-    if (NULL != data) {
-#define DATATYPE_EXPAND(DT,T) \
-        if (DT == type) { \
-            T tvalue = *static_cast<T*>(value); \
-            T *tdata =  static_cast<T*>(data); \
-            for (int64_t i=0,limit=get_local_size(); i<limit; ++i) { \
-                tdata[i] = tvalue; \
-            } \
+    dst_data = dst_array->access();
+    if (NULL != dst_data) {
+#define DATATYPE_EXPAND(DT,T)                                   \
+        if (DT == type) {                                       \
+            T *src = static_cast<T*>(get(src_lo, src_hi));      \
+            T *dst = static_cast<T*>(dst_data);                 \
+            std::fill(dst,dst+dst_local_size,-1);               \
+            pagoda::transpose(src, src_local_shape, dst, axes); \
+            dst_array->release_update();                        \
+            delete [] src;                                      \
         } else
 #include "DataType.def"
         {
             EXCEPT(DataTypeException, "DataType not handled", type);
         }
-        release_update();
     }
-#endif
+    pagoda::barrier();
 
     return dst_array;
 }

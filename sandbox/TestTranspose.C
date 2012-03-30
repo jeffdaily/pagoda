@@ -183,7 +183,6 @@ int main(int argc, char **argv)
         dst_coords[i] = 0;
         dst_dims_m1[i] = dst_elems[i]-1;
         dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems[i+1];
-        dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems[i+1];
         dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
     }
 #if DEBUG
