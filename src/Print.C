@@ -12,6 +12,7 @@ using std::fprintf;
 using std::string;
 
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "Print.H"
 #include "Util.H"
 

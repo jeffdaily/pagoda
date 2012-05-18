@@ -14,6 +14,7 @@
 #include "AbstractFileWriter.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "Copy.H"
 #include "Dataset.H"
 #include "Dimension.H"

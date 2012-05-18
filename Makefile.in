@@ -174,7 +174,7 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/Aggregation.C src/AggregationDimension.C \
 	src/AggregationJoinExisting.C src/AggregationUnion.C \
 	src/AggregationVariable.C src/Array.C src/Attribute.C \
-	src/Bootstrap.C src/CommandLineOption.C \
+	src/Bootstrap.C src/Collectives.C src/CommandLineOption.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
 	src/Dataset.C src/DataType.C src/Dimension.C src/FileFormat.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
@@ -224,7 +224,7 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/Aggregation.lo src/AggregationDimension.lo \
 	src/AggregationJoinExisting.lo src/AggregationUnion.lo \
 	src/AggregationVariable.lo src/Array.lo src/Attribute.lo \
-	src/Bootstrap.lo src/CommandLineOption.lo \
+	src/Bootstrap.lo src/Collectives.lo src/CommandLineOption.lo \
 	src/CommandLineParser.lo src/Copy.lo src/CoordHyperslab.lo \
 	src/Dataset.lo src/DataType.lo src/Dimension.lo \
 	src/FileFormat.lo src/FileWriter.lo src/GenericAttribute.lo \
@@ -1044,21 +1044,22 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/AggregationDimension.H src/Aggregation.H \
 	src/AggregationJoinExisting.H src/AggregationUnion.H \
 	src/AggregationVariable.H src/AllNodeArray.H src/Array.H \
-	src/Attribute.H src/Bootstrap.H src/CommandLineOption.H \
-	src/CommandLineParser.H src/Common.H src/Copy.H \
-	src/CoordHyperslab.H src/Dataset.H src/DataType.def \
+	src/Attribute.H src/Bootstrap.H src/Collectives.H \
+	src/CommandLineOption.H src/CommandLineParser.H src/Common.H \
+	src/Copy.H src/CoordHyperslab.H src/Dataset.H src/DataType.def \
 	src/DataType2.def src/DataType.H src/Debug.H src/Dimension.H \
 	src/Error.H src/FileFormat.H src/FileWriter.H \
 	src/GenericCommands.H src/GeoGrid.H src/Grid.H src/Hints.H \
 	src/IndexHyperslab.H src/LatLonBox.H src/Mask.H src/MaskMap.H \
-	src/NodeZeroArray.H src/NotImplementedException.H src/pagoda.H \
-	src/Pack.H src/PagodaException.H src/PgboCommands.H \
-	src/PgeaCommands.H src/PgflintCommands.H src/PgraCommands.H \
-	src/PgwaCommands.H src/Print.H src/ProcessGroup.H \
-	src/RangeException.H src/RegularGrid.H src/ScalarArray.H \
-	src/Slice.H src/StringComparator.H src/SubsetterCommands.H \
-	src/TypedValues.H src/Util.H src/Validator.H src/ValidMax.H \
-	src/ValidMin.H src/ValidRange.H src/Values.H src/Variable.H
+	src/NodeZeroArray.H src/NotImplementedException.H \
+	src/Numeric.H src/pagoda.H src/Pack.H src/PagodaException.H \
+	src/PgboCommands.H src/PgeaCommands.H src/PgflintCommands.H \
+	src/PgraCommands.H src/PgwaCommands.H src/Print.H \
+	src/ProcessGroup.H src/RangeException.H src/RegularGrid.H \
+	src/ScalarArray.H src/Slice.H src/StringComparator.H \
+	src/SubsetterCommands.H src/TypedValues.H src/Util.H \
+	src/Validator.H src/ValidMax.H src/ValidMin.H src/ValidRange.H \
+	src/Values.H src/Variable.H
 pagodadir = $(datadir)/pagoda
 pgbo_SOURCES = src/pgbo.C
 pgcmp_SOURCES = src/pgcmp.C
@@ -1077,7 +1078,7 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/Aggregation.C src/AggregationDimension.C \
 	src/AggregationJoinExisting.C src/AggregationUnion.C \
 	src/AggregationVariable.C src/Array.C src/Attribute.C \
-	src/Bootstrap.C src/CommandLineOption.C \
+	src/Bootstrap.C src/Collectives.C src/CommandLineOption.C \
 	src/CommandLineParser.C src/Copy.C src/CoordHyperslab.C \
 	src/Dataset.C src/DataType.C src/Dimension.C src/FileFormat.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
@@ -1275,6 +1276,7 @@ src/AggregationVariable.lo: src/$(am__dirstamp) \
 src/Array.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Attribute.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Bootstrap.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Collectives.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/CommandLineOption.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/CommandLineParser.lo: src/$(am__dirstamp) \
@@ -1773,6 +1775,8 @@ mostlyclean-compile:
 	-rm -f src/Attribute.lo
 	-rm -f src/Bootstrap.$(OBJEXT)
 	-rm -f src/Bootstrap.lo
+	-rm -f src/Collectives.$(OBJEXT)
+	-rm -f src/Collectives.lo
 	-rm -f src/CommandLineOption.$(OBJEXT)
 	-rm -f src/CommandLineOption.lo
 	-rm -f src/CommandLineParser.$(OBJEXT)
@@ -1954,6 +1958,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Attribute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Bootstrap.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Collectives.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CommandLineOption.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CommandLineParser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/CoordHyperslab.Plo@am__quote@

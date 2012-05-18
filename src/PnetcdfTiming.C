@@ -30,6 +30,7 @@
 #include <pnetcdf.h>
 
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "PnetcdfError.H"
 #include "PnetcdfTiming.H"
 #include "Print.H"

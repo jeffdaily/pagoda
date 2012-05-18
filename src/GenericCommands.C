@@ -11,6 +11,7 @@
 #include "AggregationUnion.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "CommandException.H"
 #include "CommandLineOption.H"
 #include "CommandLineParser.H"

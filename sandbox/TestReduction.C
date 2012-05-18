@@ -2,11 +2,12 @@
  * Find a way to perform multidimensional array reductions using iterators.
  */
 #include <iostream>
+#include "Numeric.H"
 
 using std::cout;
 using std::endl;
 
-int main(int argc, char **argv)
+void test1()
 {
     double  *src_buf;
     double  *src_ptr;
@@ -48,7 +49,7 @@ int main(int argc, char **argv)
     }
 
     /* dst shape (we will reduce two of the dimensions */
-    dst_elems[0] = 3;
+    dst_elems[0] = 4;
     dst_elems[1] = 5;
     dst_elems_prod = dst_elems[0]*dst_elems[1];
     dst_buf = new double[dst_elems_prod];
@@ -75,12 +76,16 @@ int main(int argc, char **argv)
     }
 
     /* for the dst strides we set the reduced dims to 0 */
-    brd_strides[0] = dst_strides[0];
-    brd_strides[1] = 0;
+    //brd_strides[0] = dst_strides[0];
+    //brd_strides[1] = 0;
+    brd_strides[0] = 0;
+    brd_strides[1] = dst_strides[0];
     brd_strides[2] = dst_strides[1];
     brd_strides[3] = 0;
-    brd_backstrides[0] = dst_backstrides[0];
-    brd_backstrides[1] = 0;
+    //brd_backstrides[0] = dst_backstrides[0];
+    //brd_backstrides[1] = 0;
+    brd_backstrides[0] = 0;
+    brd_backstrides[1] = dst_backstrides[0];
     brd_backstrides[2] = dst_backstrides[1];
     brd_backstrides[3] = 0;
 
@@ -116,6 +121,7 @@ int main(int argc, char **argv)
         }
         cout << endl;
     }
+    cout << endl;
 
     delete [] src_elems;
     delete [] src_coords;
@@ -131,4 +137,153 @@ int main(int argc, char **argv)
     delete [] brd_backstrides;
     delete [] src_buf;
     delete [] dst_buf;
+}
+
+void test2()
+{
+    /* source shape */
+    vector<int64_t> src_shape;
+    src_shape.push_back(3);
+    src_shape.push_back(4);
+    src_shape.push_back(5);
+    src_shape.push_back(6);
+    vector<int64_t> dst_shape = src_shape;
+    dst_shape[0] = 0;
+    dst_shape[3] = 0;
+    vector<int64_t> dst_shape_nonzero;
+    for (int64_t i=0; i<dst_shape.size(); ++i) {
+        if (dst_shape[i] > 0) {
+            dst_shape_nonzero.push_back(dst_shape[i]);
+        }
+    }
+    int64_t src_nelems = std::accumulate(
+            src_shape.begin(), src_shape.end(), 1, std::multiplies<int64_t>());
+    int64_t dst_nelems = std::accumulate(
+            dst_shape_nonzero.begin(), dst_shape_nonzero.end(),
+            1, std::multiplies<int64_t>());
+    double *src_buf = new double[src_nelems];
+    double *dst_buf = new double[dst_nelems];
+    /* fill src_buf with enumeration */
+    for (int i=0; i<src_nelems; ++i) {
+        src_buf[i] = i;
+    }
+    /* fill dst_buf with 0 */
+    for (int i=0; i<dst_nelems; ++i) {
+        dst_buf[i] = 0;
+    }
+
+    pagoda::reduce_sum(src_buf, src_shape, dst_buf, dst_shape);
+
+    for (int64_t i=0; i<dst_shape_nonzero[0]; ++i) {
+        for (int64_t j=0; j<dst_shape_nonzero[1]; ++j) {
+            cout << dst_buf[i*dst_shape_nonzero[1] + j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    delete [] src_buf;
+    delete [] dst_buf;
+
+}
+
+void test3()
+{
+    /* source shape */
+    vector<int64_t> src_shape;
+    src_shape.push_back(3);
+    src_shape.push_back(4);
+    src_shape.push_back(5);
+    src_shape.push_back(6);
+    vector<int64_t> dst_shape = src_shape;
+    dst_shape[0] = 0;
+    dst_shape[1] = 0;
+    dst_shape[3] = 0;
+    vector<int64_t> dst_shape_nonzero;
+    for (int64_t i=0; i<dst_shape.size(); ++i) {
+        if (dst_shape[i] > 0) {
+            dst_shape_nonzero.push_back(dst_shape[i]);
+        }
+    }
+    int64_t src_nelems = std::accumulate(
+            src_shape.begin(), src_shape.end(), 1, std::multiplies<int64_t>());
+    int64_t dst_nelems = std::accumulate(
+            dst_shape_nonzero.begin(), dst_shape_nonzero.end(),
+            1, std::multiplies<int64_t>());
+    double *src_buf = new double[src_nelems];
+    double *dst_buf = new double[dst_nelems];
+    /* fill src_buf with enumeration */
+    for (int i=0; i<src_nelems; ++i) {
+        src_buf[i] = i;
+    }
+    /* fill dst_buf with 0 */
+    for (int i=0; i<dst_nelems; ++i) {
+        dst_buf[i] = 0;
+    }
+
+    pagoda::reduce_sum(src_buf, src_shape, dst_buf, dst_shape);
+
+    for (int64_t i=0; i<dst_shape_nonzero[0]; ++i) {
+        cout << dst_buf[i] << " ";
+    }
+    cout << endl;
+    cout << endl;
+
+    delete [] src_buf;
+    delete [] dst_buf;
+
+}
+
+void test4()
+{
+    /* source shape */
+    vector<int64_t> src_shape;
+    src_shape.push_back(3);
+    src_shape.push_back(4);
+    src_shape.push_back(5);
+    src_shape.push_back(6);
+    vector<int64_t> dst_shape = src_shape;
+    dst_shape[0] = 0;
+    dst_shape[1] = 0;
+    dst_shape[2] = 0;
+    dst_shape[3] = 0;
+    vector<int64_t> dst_shape_nonzero;
+    for (int64_t i=0; i<dst_shape.size(); ++i) {
+        if (dst_shape[i] > 0) {
+            dst_shape_nonzero.push_back(dst_shape[i]);
+        }
+    }
+    int64_t src_nelems = std::accumulate(
+            src_shape.begin(), src_shape.end(), 1, std::multiplies<int64_t>());
+    int64_t dst_nelems = std::accumulate(
+            dst_shape_nonzero.begin(), dst_shape_nonzero.end(),
+            1, std::multiplies<int64_t>());
+    double *src_buf = new double[src_nelems];
+    double *dst_buf = new double[dst_nelems];
+    /* fill src_buf with enumeration */
+    for (int i=0; i<src_nelems; ++i) {
+        src_buf[i] = i;
+    }
+    /* fill dst_buf with 0 */
+    for (int i=0; i<dst_nelems; ++i) {
+        dst_buf[i] = 0;
+    }
+
+    pagoda::reduce_sum(src_buf, src_shape, dst_buf, dst_shape);
+
+    cout << dst_buf[0] << " ";
+    cout << endl;
+    cout << endl;
+
+    delete [] src_buf;
+    delete [] dst_buf;
+
+}
+
+int main(int argc, char **argv)
+{
+    test1();
+    test2();
+    test3();
+    test4();
 }

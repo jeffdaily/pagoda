@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "AbstractArray.H"
+#include "Collectives.H"
 #include "DataType.H"
 #include "Error.H"
 #include "ScalarArray.H"

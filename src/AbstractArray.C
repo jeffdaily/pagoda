@@ -8,11 +8,13 @@
 
 #include "AbstractArray.H"
 #include "Array.H"
+#include "Collectives.H"
 #include "Copy.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Error.H"
 #include "Mask.H"
+#include "Numeric.H"
 #include "ScalarArray.H"
 #include "Util.H"
 #include "Validator.H"

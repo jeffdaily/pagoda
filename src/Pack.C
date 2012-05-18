@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "Array.H"
+#include "Bootstrap.H"
+#include "Collectives.H"
 #include "Error.H"
 #include "Mask.H"
 #include "Pack.H"

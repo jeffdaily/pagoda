@@ -12,6 +12,7 @@
 #include <ga.h>
 #include <macdecls.h>
 
+#include "Bootstrap.H"
 #include "Copy.H"
 #include "DataType.H"
 #include "Debug.H"

@@ -13,6 +13,7 @@
 
 #include "Array.H"
 #include "Attribute.H"
+#include "Bootstrap.H"
 #include "Common.H"
 #include "Copy.H"
 #include "Error.H"

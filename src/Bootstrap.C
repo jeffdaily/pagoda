@@ -93,3 +93,66 @@ void pagoda::finalize()
 #endif
     MPI_Finalize();
 }
+
+
+/**
+ * Abort the parallel application.
+ *
+ * @param[in] message message to print before aborting
+ */
+void pagoda::abort(const string &message)
+{
+#if HAVE_GA
+    GA_Error(const_cast<char*>(message.c_str()), 1);
+#elif HAVE_MPI
+    cerr << "[" << nodeid() << "] " << message << endl;
+    MPI_Abort(MPI_COMM_WORLD, 1);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Abort the parallel application.
+ *
+ * @param[in] message message to print before aborting
+ * @param[in] errorcode
+ */
+void pagoda::abort(const string &message, int errorcode)
+{
+#if HAVE_GA
+    GA_Error(const_cast<char*>(message.c_str()), errorcode);
+#elif HAVE_MPI
+    cerr << "[" << nodeid() << "] " << message << " :: " << errorcode << endl;
+    MPI_Abort(MPI_COMM_WORLD, errorcode);
+#else
+#   error
+#endif
+}
+
+
+/**
+ * Returns the number of nodes in this calculation.
+ *
+ * This abstracts away the chosen messaging library.
+ *
+ * @return the number of nodes in this calculation
+ */
+int64_t pagoda::num_nodes()
+{
+    return ProcessGroup::get_default().get_size();
+}
+
+
+/**
+ * Returns the ID of this node in this calculation.
+ *
+ * This abstracts away the chosen messaging library.
+ *
+ * @return the ID of this node in this calculation.
+ */
+int64_t pagoda::nodeid()
+{
+    return ProcessGroup::get_default().get_rank();
+}

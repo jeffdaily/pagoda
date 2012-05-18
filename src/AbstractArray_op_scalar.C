@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <cmath>
 
 #include "AbstractArray.H"
 #include "DataType.H"

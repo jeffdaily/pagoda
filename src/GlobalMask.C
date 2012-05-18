@@ -12,6 +12,8 @@
 #include <macdecls.h>
 
 #include "Array.H"
+#include "Bootstrap.H"
+#include "Collectives.H"
 #include "CommandLineOption.H"
 #include "Common.H"
 #include "Dimension.H"
