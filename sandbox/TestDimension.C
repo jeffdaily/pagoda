@@ -11,6 +11,7 @@
 
 // C++ includes
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "Dataset.H"
 #include "Dimension.H"
 #include "Mask.H"

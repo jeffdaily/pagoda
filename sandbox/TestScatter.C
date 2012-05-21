@@ -17,6 +17,7 @@ using namespace std;
 
 #include "Array.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Pack.H"

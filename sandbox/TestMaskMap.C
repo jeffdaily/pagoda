@@ -15,6 +15,7 @@ using namespace std;
 
 #include "Array.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "DataType.H"
 #include "Dimension.H"
 #include "Debug.H"

@@ -32,6 +32,7 @@ using std::string;
 using std::vector;
 
 #include "Print.H"
+#include "Numeric.H"
 #include "Util.H"
 
 #define DEBUG 1

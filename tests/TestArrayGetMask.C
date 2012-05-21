@@ -23,6 +23,7 @@ using std::vector;
 
 #include "Array.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "DataType.H"
 #include "Debug.H"
 #include "Mask.H"

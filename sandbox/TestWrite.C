@@ -15,6 +15,7 @@ using std::endl;
 using std::vector;
 
 #include "Array.H"
+#include "Collectives.H"
 #include "Bootstrap.H"
 #include "Dataset.H"
 #include "Debug.H"
