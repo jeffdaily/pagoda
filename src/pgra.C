@@ -14,6 +14,7 @@
 
 #include "Array.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "CommandException.H"
 #include "CommandLineOption.H"
 #include "Dataset.H"
