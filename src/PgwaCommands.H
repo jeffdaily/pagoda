@@ -26,6 +26,7 @@ class PgwaCommands : public GenericCommands
 
         string get_operator() const;
         Variable* get_mask_variable();
+        Variable* get_weight_variable();
         set<string> get_reduced_dimensions() const;
 
     protected:
@@ -37,6 +38,7 @@ class PgwaCommands : public GenericCommands
         string mask_value;
         string mask_variable;
         string mask_comparator;
+        string weight_variable;
         set<string> dimensions;
         bool retain_degenerate_dimensions;
 };

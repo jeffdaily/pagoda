@@ -18,6 +18,7 @@
 #endif
 
 #include "Bootstrap.H"
+#include "Error.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -276,4 +277,54 @@ void pagoda::print_backtrace()
 
     free(strings);
 #endif
+}
+
+
+void* pagoda::allocate(const DataType &type, const int64_t &n)
+{
+    void *ptr = NULL;
+#define allocate(TYPE, DT) \
+    if (type == DT) { \
+        ptr = new TYPE[n]; \
+    } else
+    allocate(unsigned char, DataType::UCHAR)
+    allocate(signed char,   DataType::SCHAR)
+    allocate(char,          DataType::CHAR)
+    allocate(int,           DataType::INT)
+    allocate(long,          DataType::LONG)
+    allocate(float,         DataType::FLOAT)
+    allocate(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef allocate
+    return ptr;
+}
+
+
+void* pagoda::allocate(const DataType &type, const vector<int64_t> &shape)
+{
+    return allocate(type, shape_to_size(shape));
+}
+
+
+void pagoda::deallocate(const DataType &type, void *ptr)
+{
+#define deallocate(TYPE, DT)                       \
+    if (type == DT) {                              \
+        TYPE *typed_ptr = static_cast<TYPE*>(ptr); \
+        delete [] typed_ptr;                       \
+        typed_ptr = NULL;                          \
+    } else
+    deallocate(unsigned char, DataType::UCHAR)
+    deallocate(signed char,   DataType::SCHAR)
+    deallocate(char,          DataType::CHAR)
+    deallocate(int,           DataType::INT)
+    deallocate(long,          DataType::LONG)
+    deallocate(float,         DataType::FLOAT)
+    deallocate(double,        DataType::DOUBLE)
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef deallocate
 }

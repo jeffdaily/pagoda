@@ -32,6 +32,7 @@ PgwaCommands::PgwaCommands()
     ,   mask_value("")
     ,   mask_variable("")
     ,   mask_comparator("")
+    ,   weight_variable("")
     ,   dimensions()
     ,   retain_degenerate_dimensions(false)
 {
@@ -45,6 +46,7 @@ PgwaCommands::PgwaCommands(int argc, char **argv)
     ,   mask_value("")
     ,   mask_variable("")
     ,   mask_comparator("")
+    ,   weight_variable("")
 {
     init();
     parse(argc, argv);
@@ -174,6 +176,11 @@ void PgwaCommands::parse(int argc, char **argv)
             }
         }
     }
+
+    if (parser.count(CommandLineOption::WEIGHTING_VARIABLE_NAME)) {
+        weight_variable = parser.get_argument(
+                CommandLineOption::WEIGHTING_VARIABLE_NAME);
+    }
 }
 
 
@@ -270,6 +277,31 @@ Variable* PgwaCommands::get_mask_variable()
 }
 
 
+Variable* PgwaCommands::get_weight_variable()
+{
+    Dataset *dataset = NULL;
+    Variable *var = NULL;
+
+    /* return immediately if no weight variable was specified */
+    if (weight_variable.empty()) {
+        return NULL;
+    }
+
+    dataset = get_dataset();
+    var = dataset->get_var(weight_variable);
+
+    if (NULL == var) {
+        ostringstream err;
+        err << "requested variable '"
+            << weight_variable
+            << "' is not in input file";
+        throw CommandException(err.str());
+    }
+
+    return var;
+}
+
+
 set<string> PgwaCommands::get_reduced_dimensions() const
 {
     return dimensions;
@@ -287,6 +319,7 @@ void PgwaCommands::init()
     parser.push_back(CommandLineOption::MASK_NAME);
     parser.push_back(CommandLineOption::MASK_VALUE);
     parser.push_back(CommandLineOption::WEIGHT_MASK_COORDINATE_VARIABLES);
+    parser.push_back(CommandLineOption::WEIGHTING_VARIABLE_NAME);
     parser.push_back(CommandLineOption::NO_NORMALIZATION);
     parser.push_back(CommandLineOption::RETAIN_DEGENERATE_DIMENSIONS);
     // erase the aggregation ops

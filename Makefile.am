@@ -177,6 +177,7 @@ libpagoda_la_SOURCES += src/IndexHyperslab.C
 libpagoda_la_SOURCES += src/LatLonBox.C
 libpagoda_la_SOURCES += src/Mask.C
 libpagoda_la_SOURCES += src/MaskMap.C
+libpagoda_la_SOURCES += src/Numeric.C
 libpagoda_la_SOURCES += src/Pack.C
 libpagoda_la_SOURCES += src/PgboCommands.C
 libpagoda_la_SOURCES += src/PgeaCommands.C
@@ -360,6 +361,7 @@ check_PROGRAMS += sandbox/TestRead
 check_PROGRAMS += sandbox/TestReduction
 check_PROGRAMS += sandbox/TestScatter
 check_PROGRAMS += sandbox/TestSlice
+check_PROGRAMS += sandbox/TestTemplates
 check_PROGRAMS += sandbox/TestTranspose
 check_PROGRAMS += sandbox/TestTranspose2
 check_PROGRAMS += sandbox/TestTranspose3
@@ -404,12 +406,15 @@ sandbox_TestRead3_SOURCES             = sandbox/TestRead3.C
 sandbox_TestReduction_SOURCES         = sandbox/TestReduction.C
 sandbox_TestScatter_SOURCES           = sandbox/TestScatter.C
 sandbox_TestSlice_SOURCES             = sandbox/TestSlice.C
+sandbox_TestTemplates_SOURCES         = sandbox/TestTemplates.C
 sandbox_TestTranspose_SOURCES         = sandbox/TestTranspose.C
 sandbox_TestTranspose2_SOURCES        = sandbox/TestTranspose2.C
 sandbox_TestTranspose3_SOURCES        = sandbox/TestTranspose3.C
 sandbox_TestUnion_SOURCES             = sandbox/TestUnion.C
 sandbox_TestVecBool_SOURCES           = sandbox/TestVecBool.C
 sandbox_TestWrite_SOURCES             = sandbox/TestWrite.C
+
+sandbox_TestTemplates_LDADD = $(LDADD_STANDALONE)
 
 checkprogs: $(check_PROGRAMS)
 

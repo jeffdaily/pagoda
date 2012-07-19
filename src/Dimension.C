@@ -74,6 +74,32 @@ bool Dimension::equal(
 }
 
 
+bool Dimension::conforms(
+        const vector<Dimension*> &left, const vector<Dimension*> &right)
+{
+    if (left.size() < right.size()) {
+        return false;
+    }
+ 
+    // set intersection assuming same ordering of vectors
+    size_t index_left=0, limit_left=left.size();
+    size_t index_right=0, limit_right=right.size();
+    size_t count=0;
+    while (index_left < limit_left && index_right < limit_right) {
+        if (equal(left[index_left], right[index_right])) {
+            ++count;
+            ++index_left;
+            ++index_right;
+        }
+        else {
+            ++index_left;
+        }
+    }
+
+    return count == limit_right;
+}
+
+
 ostream& operator << (ostream &os, const Dimension *other)
 {
     return other->print(os);

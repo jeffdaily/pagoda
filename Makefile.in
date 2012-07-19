@@ -96,7 +96,8 @@ check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestGroups sandbox/TestMaskMap \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestRavel sandbox/TestRead \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestReduction sandbox/TestScatter \
-@ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestTranspose \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestSlice sandbox/TestTemplates \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose2 \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose3 sandbox/TestUnion \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestVecBool sandbox/TestWrite
@@ -179,12 +180,13 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/Dataset.C src/DataType.C src/Dimension.C src/FileFormat.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
 	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
-	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
-	src/PgboCommands.C src/PgeaCommands.C src/PgflintCommands.C \
-	src/PgraCommands.C src/PgwaCommands.C src/Print.C \
-	src/ProcessGroup.C src/RegularGrid.C src/ScalarArray.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
-	src/Validator.C src/Values.C src/Variable.C src/GlobalArray.C \
+	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Numeric.C \
+	src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
+	src/PgflintCommands.C src/PgraCommands.C src/PgwaCommands.C \
+	src/Print.C src/ProcessGroup.C src/RegularGrid.C \
+	src/ScalarArray.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Util.C src/Validator.C \
+	src/Values.C src/Variable.C src/GlobalArray.C \
 	src/GlobalArray.H src/GlobalArray.def src/GlobalScalar.C \
 	src/GlobalScalar.H src/GlobalMask.C src/GlobalMask.H \
 	src/Memory.c src/PnetcdfAttribute.C src/PnetcdfAttribute.H \
@@ -230,7 +232,7 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/FileFormat.lo src/FileWriter.lo src/GenericAttribute.lo \
 	src/GenericCommands.lo src/GeoGrid.lo src/Grid.lo src/Hints.lo \
 	src/IndexHyperslab.lo src/LatLonBox.lo src/Mask.lo \
-	src/MaskMap.lo src/Pack.lo src/PgboCommands.lo \
+	src/MaskMap.lo src/Numeric.lo src/Pack.lo src/PgboCommands.lo \
 	src/PgeaCommands.lo src/PgflintCommands.lo src/PgraCommands.lo \
 	src/PgwaCommands.lo src/Print.lo src/ProcessGroup.lo \
 	src/RegularGrid.lo src/ScalarArray.lo src/StringComparator.lo \
@@ -270,6 +272,7 @@ am__v_lt_0 = --silent
 @ENABLE_SANDBOX_TRUE@	sandbox/TestReduction$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestScatter$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestSlice$(EXEEXT) \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestTemplates$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose2$(EXEEXT) \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose3$(EXEEXT) \
@@ -531,6 +534,15 @@ sandbox_TestSlice_LDADD = $(LDADD)
 sandbox_TestSlice_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+am__sandbox_TestTemplates_SOURCES_DIST = sandbox/TestTemplates.C
+@ENABLE_SANDBOX_TRUE@am_sandbox_TestTemplates_OBJECTS =  \
+@ENABLE_SANDBOX_TRUE@	sandbox/TestTemplates.$(OBJEXT)
+sandbox_TestTemplates_OBJECTS = $(am_sandbox_TestTemplates_OBJECTS)
+am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
+@ENABLE_SANDBOX_TRUE@sandbox_TestTemplates_DEPENDENCIES =  \
+@ENABLE_SANDBOX_TRUE@	$(am__DEPENDENCIES_3)
 am__sandbox_TestTranspose_SOURCES_DIST = sandbox/TestTranspose.C
 @ENABLE_SANDBOX_TRUE@am_sandbox_TestTranspose_OBJECTS =  \
 @ENABLE_SANDBOX_TRUE@	sandbox/TestTranspose.$(OBJEXT)
@@ -628,9 +640,6 @@ sandbox_ga_TestEnum_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 am__sandbox_ga_TestGet_SOURCES_DIST = sandbox/ga/TestGet.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestGet_OBJECTS = sandbox/ga/TestGet.$(OBJEXT)
 sandbox_ga_TestGet_OBJECTS = $(am_sandbox_ga_TestGet_OBJECTS)
-am__DEPENDENCIES_3 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@sandbox_ga_TestGet_DEPENDENCIES = $(am__DEPENDENCIES_3)
 am__sandbox_ga_TestJoin_SOURCES_DIST = sandbox/ga/TestJoin.C
 @ENABLE_SANDBOX_GA_TRUE@@ENABLE_SANDBOX_TRUE@am_sandbox_ga_TestJoin_OBJECTS = sandbox/ga/TestJoin.$(OBJEXT)
@@ -785,6 +794,7 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(sandbox_TestRead2c_SOURCES) $(sandbox_TestRead2d_SOURCES) \
 	$(sandbox_TestRead3_SOURCES) $(sandbox_TestReduction_SOURCES) \
 	$(sandbox_TestScatter_SOURCES) $(sandbox_TestSlice_SOURCES) \
+	$(sandbox_TestTemplates_SOURCES) \
 	$(sandbox_TestTranspose_SOURCES) \
 	$(sandbox_TestTranspose2_SOURCES) \
 	$(sandbox_TestTranspose3_SOURCES) $(sandbox_TestUnion_SOURCES) \
@@ -830,6 +840,7 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(am__sandbox_TestReduction_SOURCES_DIST) \
 	$(am__sandbox_TestScatter_SOURCES_DIST) \
 	$(am__sandbox_TestSlice_SOURCES_DIST) \
+	$(am__sandbox_TestTemplates_SOURCES_DIST) \
 	$(am__sandbox_TestTranspose_SOURCES_DIST) \
 	$(am__sandbox_TestTranspose2_SOURCES_DIST) \
 	$(am__sandbox_TestTranspose3_SOURCES_DIST) \
@@ -1083,13 +1094,14 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/Dataset.C src/DataType.C src/Dimension.C src/FileFormat.C \
 	src/FileWriter.C src/GenericAttribute.C src/GenericCommands.C \
 	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
-	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Pack.C \
-	src/PgboCommands.C src/PgeaCommands.C src/PgflintCommands.C \
-	src/PgraCommands.C src/PgwaCommands.C src/Print.C \
-	src/ProcessGroup.C src/RegularGrid.C src/ScalarArray.C \
-	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
-	src/Validator.C src/Values.C src/Variable.C $(am__append_3) \
-	$(am__append_4) $(am__append_5)
+	src/LatLonBox.C src/Mask.C src/MaskMap.C src/Numeric.C \
+	src/Pack.C src/PgboCommands.C src/PgeaCommands.C \
+	src/PgflintCommands.C src/PgraCommands.C src/PgwaCommands.C \
+	src/Print.C src/ProcessGroup.C src/RegularGrid.C \
+	src/ScalarArray.C src/StringComparator.C \
+	src/SubsetterCommands.C src/Util.C src/Validator.C \
+	src/Values.C src/Variable.C $(am__append_3) $(am__append_4) \
+	$(am__append_5)
 tests_TestArrayGetMask_SOURCES = tests/TestArrayGetMask.C
 tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 TEST_DIR = tests
@@ -1143,12 +1155,14 @@ AUTOTEST = $(AUTOM4TE) --language=autotest
 @ENABLE_SANDBOX_TRUE@sandbox_TestReduction_SOURCES = sandbox/TestReduction.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestScatter_SOURCES = sandbox/TestScatter.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestSlice_SOURCES = sandbox/TestSlice.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestTemplates_SOURCES = sandbox/TestTemplates.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestTranspose_SOURCES = sandbox/TestTranspose.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestTranspose2_SOURCES = sandbox/TestTranspose2.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestTranspose3_SOURCES = sandbox/TestTranspose3.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestUnion_SOURCES = sandbox/TestUnion.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestVecBool_SOURCES = sandbox/TestVecBool.C
 @ENABLE_SANDBOX_TRUE@sandbox_TestWrite_SOURCES = sandbox/TestWrite.C
+@ENABLE_SANDBOX_TRUE@sandbox_TestTemplates_LDADD = $(LDADD_STANDALONE)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -1301,6 +1315,7 @@ src/IndexHyperslab.lo: src/$(am__dirstamp) \
 src/LatLonBox.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Mask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/MaskMap.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Numeric.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Pack.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PgboCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PgeaCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1559,6 +1574,11 @@ sandbox/TestSlice.$(OBJEXT): sandbox/$(am__dirstamp) \
 sandbox/TestSlice$(EXEEXT): $(sandbox_TestSlice_OBJECTS) $(sandbox_TestSlice_DEPENDENCIES) sandbox/$(am__dirstamp)
 	@rm -f sandbox/TestSlice$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestSlice_OBJECTS) $(sandbox_TestSlice_LDADD) $(LIBS)
+sandbox/TestTemplates.$(OBJEXT): sandbox/$(am__dirstamp) \
+	sandbox/$(DEPDIR)/$(am__dirstamp)
+sandbox/TestTemplates$(EXEEXT): $(sandbox_TestTemplates_OBJECTS) $(sandbox_TestTemplates_DEPENDENCIES) sandbox/$(am__dirstamp)
+	@rm -f sandbox/TestTemplates$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sandbox_TestTemplates_OBJECTS) $(sandbox_TestTemplates_LDADD) $(LIBS)
 sandbox/TestTranspose.$(OBJEXT): sandbox/$(am__dirstamp) \
 	sandbox/$(DEPDIR)/$(am__dirstamp)
 sandbox/TestTranspose$(EXEEXT): $(sandbox_TestTranspose_OBJECTS) $(sandbox_TestTranspose_DEPENDENCIES) sandbox/$(am__dirstamp)
@@ -1717,6 +1737,7 @@ mostlyclean-compile:
 	-rm -f sandbox/TestReduction.$(OBJEXT)
 	-rm -f sandbox/TestScatter.$(OBJEXT)
 	-rm -f sandbox/TestSlice.$(OBJEXT)
+	-rm -f sandbox/TestTemplates.$(OBJEXT)
 	-rm -f sandbox/TestTranspose.$(OBJEXT)
 	-rm -f sandbox/TestTranspose2.$(OBJEXT)
 	-rm -f sandbox/TestTranspose3.$(OBJEXT)
@@ -1835,6 +1856,8 @@ mostlyclean-compile:
 	-rm -f src/Netcdf4Timing.lo
 	-rm -f src/Netcdf4Variable.$(OBJEXT)
 	-rm -f src/Netcdf4Variable.lo
+	-rm -f src/Numeric.$(OBJEXT)
+	-rm -f src/Numeric.lo
 	-rm -f src/Pack.$(OBJEXT)
 	-rm -f src/Pack.lo
 	-rm -f src/PgboCommands.$(OBJEXT)
@@ -1918,6 +1941,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestReduction.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestScatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestSlice.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestTemplates.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestTranspose.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestTranspose2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sandbox/$(DEPDIR)/TestTranspose3.Po@am__quote@
@@ -1988,6 +2012,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Netcdf4FileWriter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Netcdf4Timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Netcdf4Variable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Numeric.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Pack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgboCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgeaCommands.Plo@am__quote@

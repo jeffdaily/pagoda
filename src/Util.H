@@ -21,6 +21,7 @@ using std::string;
 using std::transform;
 using std::vector;
 
+class DataType;
 class Variable;
 
 /**
@@ -43,6 +44,9 @@ namespace pagoda
     template <class T> T ravel_index(vector<T> indices, const vector<T> &dims);
     template <class T> string to_string(const T &value);
     void print_backtrace();
+    void*  allocate(const DataType &type, const int64_t &n);
+    void*  allocate(const DataType &type, const vector<int64_t> &shape);
+    void deallocate(const DataType &type, void *ptr);
 
     /**
      * Generic unary function for calling "delete" on the given object.

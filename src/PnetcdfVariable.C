@@ -423,52 +423,6 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 }
 
 
-#if HAVE_BIL
-static void* allocate(const DataType &type, const int64_t &n)
-{
-    void *ptr = NULL;
-#define allocate(TYPE, DT) \
-    if (type == DT) { \
-        ptr = new TYPE[n]; \
-    } else
-    allocate(unsigned char, DataType::UCHAR)
-    allocate(signed char,   DataType::SCHAR)
-    allocate(char,          DataType::CHAR)
-    allocate(int,           DataType::INT)
-    allocate(long,          DataType::LONG)
-    allocate(float,         DataType::FLOAT)
-    allocate(double,        DataType::DOUBLE)
-    {
-        EXCEPT(DataTypeException, "DataType not handled", type);
-    }
-#undef allocate
-    return ptr;
-}
-
-
-static void deallocate(const DataType &type, void *ptr)
-{
-#define deallocate(TYPE, DT)                       \
-    if (type == DT) {                              \
-        TYPE *typed_ptr = static_cast<TYPE*>(ptr); \
-        delete [] typed_ptr;                       \
-        typed_ptr = NULL;                          \
-    } else
-    deallocate(unsigned char, DataType::UCHAR)
-    deallocate(signed char,   DataType::SCHAR)
-    deallocate(char,          DataType::CHAR)
-    deallocate(int,           DataType::INT)
-    deallocate(long,          DataType::LONG)
-    deallocate(float,         DataType::FLOAT)
-    deallocate(double,        DataType::DOUBLE)
-    {
-        EXCEPT(DataTypeException, "DataType not handled", type);
-    }
-#undef deallocate
-}
-#endif
-
-
 void PnetcdfVariable::do_read(Array *dst, const vector<MPI_Offset> &start,
                               const vector<MPI_Offset> &count,
                               bool found_bit) const

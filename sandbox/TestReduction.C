@@ -280,10 +280,73 @@ void test4()
 
 }
 
+void test5()
+{
+    /* source shape */
+    vector<int64_t> src_shape;
+    src_shape.push_back(2);
+    src_shape.push_back(3);
+    vector<int64_t> dst_shape = src_shape;
+    dst_shape[0] = 0;
+    dst_shape[1] = 0;
+    vector<int64_t> msk_shape = src_shape;
+    msk_shape[0] = 2;
+    msk_shape[1] = 0;
+    vector<int64_t> dst_shape_nonzero;
+    for (int64_t i=0; i<dst_shape.size(); ++i) {
+        if (dst_shape[i] > 0) {
+            dst_shape_nonzero.push_back(dst_shape[i]);
+        }
+    }
+    vector<int64_t> msk_shape_nonzero;
+    for (int64_t i=0; i<msk_shape.size(); ++i) {
+        if (msk_shape[i] > 0) {
+            msk_shape_nonzero.push_back(msk_shape[i]);
+        }
+    }
+    int64_t src_nelems = std::accumulate(
+            src_shape.begin(), src_shape.end(), 1, std::multiplies<int64_t>());
+    int64_t dst_nelems = std::accumulate(
+            dst_shape_nonzero.begin(), dst_shape_nonzero.end(),
+            1, std::multiplies<int64_t>());
+    int64_t msk_nelems = std::accumulate(
+            msk_shape_nonzero.begin(), msk_shape_nonzero.end(),
+            1, std::multiplies<int64_t>());
+    double *src_buf = new double[src_nelems];
+    double *dst_buf = new double[dst_nelems];
+    double *msk_buf = new double[msk_nelems];
+    /* fill src_buf with enumeration */
+    for (int i=0; i<src_nelems; ++i) {
+        src_buf[i] = i+1;
+    }
+    /* fill dst_buf with 0 */
+    for (int i=0; i<dst_nelems; ++i) {
+        dst_buf[i] = 0;
+    }
+    /* fill msk_buf with enumeration */
+    for (int i=0; i<msk_nelems; ++i) {
+        msk_buf[i] = i+1;
+    }
+
+    pagoda::reduce_sum(src_buf, src_shape,
+            dst_buf, dst_shape,
+            msk_buf, msk_shape);
+
+    cout << dst_buf[0] << " ";
+    cout << endl;
+    cout << endl;
+
+    delete [] src_buf;
+    delete [] dst_buf;
+    delete [] msk_buf;
+
+}
+
 int main(int argc, char **argv)
 {
     test1();
     test2();
     test3();
     test4();
+    test5();
 }

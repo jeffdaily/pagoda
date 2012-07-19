@@ -658,7 +658,7 @@ class Array
          *
          * @return the result as an Array
          */
-        virtual Mask* get_mask() const = 0;
+        virtual Array* get_mask() const = 0;
 
         /**
          * Virtual friend implementation of stream insertion operator.

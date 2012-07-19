@@ -208,7 +208,7 @@ class AbstractArray : public Array
         virtual void set_counter(Array *counter);
 
         /** @copydoc Array::get_mask() */
-        virtual Mask* get_mask() const;
+        virtual Array* get_mask() const;
 
         /** @copydoc Array::print(ostream&) const */
         virtual ostream& print(ostream &os) const = 0;

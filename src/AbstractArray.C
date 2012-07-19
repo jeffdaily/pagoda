@@ -518,9 +518,9 @@ void AbstractArray::set_counter(Array *counter)
 }
 
 
-Mask* AbstractArray::get_mask() const
+Array* AbstractArray::get_mask() const
 {
-    Mask *mask = Mask::create(get_shape());
+    Array *mask = Array::create(DataType::INT, get_shape());
     int *mask_data = NULL;
     const void *my_data = NULL;
     DataType type = get_type();

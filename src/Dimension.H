@@ -86,10 +86,21 @@ class Dimension
         static bool equal(const Dimension *left, const Dimension *right);
 
         /**
-         * Compares two sets of  Dimensions.
+         * Tests two vectors of Dimension instances for equality.
          */
         static bool equal(const vector<Dimension*> &left,
                           const vector<Dimension*> &right);
+
+        /**
+         * Tests two vectors of Dimension instances for conformity.
+         *
+         *  Two vectors of Dimension instances conform if the right-hand side
+         *  has the same or fewer Dimension instances and the Dimension
+         *  instances in the right-hand side occur in the same order as the
+         *  left-hand side.
+         */
+        static bool conforms(const vector<Dimension*> &left,
+                             const vector<Dimension*> &right);
 
     protected:
         /**
