@@ -7,6 +7,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <string>
+#include <inttypes.h>
 
 using std::fprintf;
 using std::string;
