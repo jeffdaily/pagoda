@@ -55,7 +55,7 @@ AC_MSG_NOTICE
 AC_LANG_PUSH([Fortran 77])
 
 # Checks for Fortran 77 programs.
-AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn])
+AC_PROG_F77([mpif77 hf77 mpxlf_r mpxlf mpf77 cmpifc ftn mpif90])
 PAGODA_MPI_UNWRAP
 
 # Checks for Fortran 77 header files.
