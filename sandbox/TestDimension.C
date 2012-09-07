@@ -10,11 +10,11 @@
 #include <vector>
 
 // C++ includes
+#include "Array.H"
 #include "Bootstrap.H"
 #include "Collectives.H"
 #include "Dataset.H"
 #include "Dimension.H"
-#include "Mask.H"
 #include "Util.H"
 
 using std::cerr;
@@ -28,7 +28,7 @@ using std::vector;
 int main(int argc, char **argv)
 {
     Dataset *dataset = NULL;
-    Mask *mask = NULL;
+    Array *mask = NULL;
     vector<Dimension*> dims;
 
     pagoda::initialize(&argc,&argv);
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
         cout << dim << endl;
         if (dim->get_name() == "cells") {
-            mask = Mask::create(dim);
+            mask = Array::mask_create(dim);
         }
     }
 

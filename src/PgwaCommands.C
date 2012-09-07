@@ -98,7 +98,7 @@ void PgwaCommands::parse(int argc, char **argv)
         }
         if (string::npos == pos) {
             ostringstream err;
-            err << "Mask string ("
+            err << "mask string ("
                 << arg
                 << ") does not contain valid comparison operator";
             throw CommandException(err.str());
@@ -127,7 +127,7 @@ void PgwaCommands::parse(int argc, char **argv)
             }
             else {
                 ostringstream err;
-                err << "Mask string ("
+                err << "mask string ("
                     << arg
                     << ") does not contain valid number";
                 throw CommandException(err.str());
@@ -139,7 +139,7 @@ void PgwaCommands::parse(int argc, char **argv)
         value_string >> value;
         if (value_string) {
             ostringstream err;
-            err << "Mask string ("
+            err << "mask string ("
                 << arg
                 << ") does not contain valid variable name";
             throw CommandException(err.str());

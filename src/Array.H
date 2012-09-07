@@ -12,7 +12,8 @@ using std::vector;
 #include "ProcessGroup.H"
 
 class Dimension;
-class Mask;
+class IndexHyperslab;
+class LatLonBox;
 class Validator;
 
 /**
@@ -659,6 +660,156 @@ class Array
          * @return the result as an Array
          */
         virtual Array* get_mask() const = 0;
+
+        /* ################################################################
+         * THE FOLLOWING FUNCTIONS ARE SPECIFIC TO "MASK"
+         * ################################################################ */
+
+        /**
+         * Factory mask creation for 1-dimensional mask instances.
+         *
+         * @param[in] name the name of the mask
+         * @param[in] size the size of the mask
+         */
+        static Array* mask_create(const string &name, int64_t size);
+
+        /**
+         * Factory mask creation convenience function for 1-dimensional mask
+         * instances corresponding to a specific Dimension instance.
+         *
+         * The returned mask will have the same number of elements as the
+         * given Dimension.
+         *
+         * @param[in] dim the Dimension to mask
+         */
+        static Array* mask_create(const Dimension *dim);
+
+        /**
+         * Factory mask creation for N-dimensional masks.
+         *
+         * @param[in] shape of the mask
+         */
+        static Array* mask_create(const vector<int64_t> &shape);
+
+        /**
+         * Sets the name of the associated Dimension.
+         */
+        virtual void set_name(const string &name) = 0;
+
+        /**
+         * Returns the name of the associated Dimension, if any.
+         *
+         * @return the name of the associated Dimension, if any
+         */
+        virtual string get_name() const = 0;
+
+        /**
+         * Returns the number of set bits in this mask.
+         *
+         * A bit is set if it is any non-zero value.
+         *
+         * @return the number of set bits in this mask
+         */
+        virtual int64_t get_count() = 0;
+
+        /**
+         * Set all mask bits to zero.
+         */
+        virtual void clear() = 0;
+
+        /**
+         * Set all mask bits to one.
+         */
+        virtual void reset() = 0;
+
+        /**
+         * Set bits to one if they fall within the given hyperslab.
+         *
+         * This method is intended for 1-dimensional Array instances only.
+         *
+         * @param[in] hyperslab the specified hyperslab to mask
+         */
+        virtual void modify(const IndexHyperslab &hyperslab) = 0;
+
+        /**
+         * Set bits to one if they fall within the given LatLonBox.
+         *
+         * This version of modify assumes the lat and lon Arrays share a
+         * single Dimension.
+         *
+         * @param[in] box the latitude/longitude box
+         * @param[in] lat the latitude coordinate Array
+         * @param[in] lon the longitude coordinate Array
+         */
+        virtual void modify(const LatLonBox &box,
+                            const Array *lat, const Array *lon) = 0;
+
+        /**
+         * Set bits to one if they fall within the given low and hi range.
+         *
+         * Assumes the given Array has the same size as this mask.
+         * In other words, the given Array is a coordinate Array.
+         *
+         * @param[in] low the lower end of the range
+         * @param[in] hi the upper end of the range
+         * @param[in] var the values to compare against low and hi
+         */
+        virtual void modify(double low, double hi, const Array *var) = 0;
+
+        /**
+         * Set bits to one if they fall within the half-open range [value,..].
+         *
+         * Assumes the given Array has the same size as this mask.
+         * In other words, the given Array is a coordinate Array.
+         *
+         * @param[in] value values must be greater than this value
+         * @param[in] var the values to compare against low and hi
+         */
+        virtual void modify_gt(double value, const Array *var) = 0;
+
+        /**
+         * Set bits to one if they fall within the half-open range [..,value].
+         *
+         * Assumes the given Array has the same size as this mask.
+         * In other words, the given Array is a coordinate Array.
+         *
+         * @param[in] value values must be less than this value
+         * @param[in] var the values to compare against low and hi
+         */
+        virtual void modify_lt(double value, const Array *var) = 0;
+
+        /**
+         * Return a new Array containing the enumeration of this mask.
+         *
+         * The enumeration takes into account the masked bits.  The first set
+         * bit is 0, the next is 1, and so on.  Any unset bit is set to -1.
+         *
+         * The Array should NOT be deleted -- it is owned by this mask.  The
+         * enumeration will be recomputed only as needed, as well.
+         *
+         * For example:
+         * mask:   0  0  0  0  1  1  1  0  1  2 -1  0  1
+         * Rtrn:  -1 -1 -1 -1  0  1  2 -1  3  4  5 -1  6
+         *
+         * @return the enumerated, reindexed Array
+         */
+        virtual Array* reindex() = 0;
+
+        /**
+         * Return a new Array containing the partial sum of this mask.
+         *
+         * The Array should NOT be deleted -- it is owned by this mask.  The
+         * partial_sum will be recomputed only as needed, as well.
+         *
+         * @param[in] exclude whether the first value is always 0
+         * @return the partially summed Array
+         */
+        virtual Array* partial_sum(bool exclude) = 0;
+
+        /**
+         * Change any non-zero value to 1 within this Array.
+         */
+        virtual void normalize() = 0;
 
         /**
          * Virtual friend implementation of stream insertion operator.

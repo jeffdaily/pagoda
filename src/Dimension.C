@@ -2,9 +2,9 @@
 #   include <config.h>
 #endif
 
+#include "Array.H"
 #include "Dataset.H"
 #include "Dimension.H"
-#include "Mask.H"
 #include "MaskMap.H"
 
 
@@ -31,7 +31,7 @@ Dimension::~Dimension()
 }
 
 
-Mask* Dimension::get_mask() const
+Array* Dimension::get_mask() const
 {
     Dataset *dataset = get_dataset();
     MaskMap *masks = dataset->get_masks();

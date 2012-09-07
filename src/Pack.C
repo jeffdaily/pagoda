@@ -12,7 +12,6 @@
 #include "Bootstrap.H"
 #include "Collectives.H"
 #include "Error.H"
-#include "Mask.H"
 #include "Pack.H"
 #include "Util.H"
 
@@ -181,11 +180,11 @@ void pagoda::partial_sum(const Array *g_src, Array *g_dst, bool excl)
  * N-Dimensional packing/subsetting.
  */
 void pagoda::pack(const Array *g_src, Array *g_dst,
-                  const vector<Mask*> &g_masks)
+                  const vector<Array*> &g_masks)
 {
     vector<Array*> sums;
     vector<Array*> masks_copy(g_masks.begin(), g_masks.end());
-    vector<Mask*>::const_iterator it;
+    vector<Array*>::const_iterator it;
 
     for (it=g_masks.begin(); it!=g_masks.end(); ++it) {
         if (*it) {

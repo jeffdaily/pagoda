@@ -17,7 +17,6 @@
 #include "Common.H"
 #include "Copy.H"
 #include "Error.H"
-#include "Mask.H"
 #include "PnetcdfAttribute.H"
 #include "PnetcdfDataset.H"
 #include "PnetcdfDimension.H"
@@ -29,6 +28,14 @@
 #include "Util.H"
 
 using std::fill;
+
+#if DEBUG
+#include <iostream>
+using std::cout;
+using std::endl;
+#define STR_ARR(arr,n) pagoda::arr_to_string(arr,n,",",#arr)
+#define STR_VEC(vec) pagoda::vec_to_string(vec)
+#endif
 
 
 PnetcdfVariable::PnetcdfVariable(PnetcdfDataset *dataset, int varid)
@@ -232,7 +239,11 @@ Array* PnetcdfVariable::_read(Array *dst) const
 
 
     tmp = read_prep(dst, start, count, found_bit);
+    pagoda::println_sync("finished read_prep");
+    pagoda::println_sync(STR_VEC(start));
+    pagoda::println_sync(STR_VEC(count));
     do_read(tmp, start, count, found_bit);
+    pagoda::println_sync("finished do_read");
 
     // check whether a subset is needed
     if (needs_subset()) {
@@ -350,7 +361,7 @@ Array* PnetcdfVariable::_read(int64_t record, Array *dst) const
 
     // check whether a subset is needed
     if (needs_subset_record()) {
-        vector<Mask*> masks = get_masks();
+        vector<Array*> masks = get_masks();
         masks.erase(masks.begin());
         pagoda::pack(tmp, dst, masks);
         delete tmp;
@@ -403,7 +414,7 @@ bool PnetcdfVariable::find_bit(const vector<Dimension*> &adims,
 
     for (int64_t i=0; i<ndim; ++i) {
         bool current_found_bit = false;
-        Mask *mask = get_dataset()->get_masks()->get(adims[i]);
+        Array *mask = get_dataset()->get_masks()->get(adims[i]);
         if (mask) {
             int *data = mask->get(lo[i],hi[i]);
 
@@ -574,7 +585,7 @@ void PnetcdfVariable::after_wait()
             Array *dst = nb_arrays_to_pack_dst[i];
             Array *src = nb_arrays_to_pack_src[i];
             ASSERT(NULL != src);
-            vector<Mask*> masks = get_masks();
+            vector<Array*> masks = get_masks();
             if (int64_t(masks.size()) == (src->get_ndim()+1)) {
                 // assume this was a record subset
                 masks.erase(masks.begin());

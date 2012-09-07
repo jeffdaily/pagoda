@@ -8,7 +8,6 @@
 using std::vector;
 
 class Array;
-class Mask;
 
 
 /**
@@ -17,7 +16,7 @@ class Mask;
 namespace pagoda
 {
     void partial_sum(const Array *g_src, Array *g_dst, bool excl);
-    void pack(const Array *g_src, Array *g_dst, const vector<Mask*> &g_masks);
+    void pack(const Array *g_src, Array *g_dst, const vector<Array*> &g_masks);
     void pack(const Array *g_src, Array *g_dst,
               const vector<Array*> &g_masks,
               const vector<Array*> &g_masksums);

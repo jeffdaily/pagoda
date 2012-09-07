@@ -11,8 +11,6 @@
 
 using std::vector;
 
-class Mask;
-
 
 /**
  * Abstract implementation of Array interface.
@@ -216,6 +214,49 @@ class AbstractArray : public Array
         /** @copydoc Array::dump() const */
         virtual void dump() const = 0;
 
+        /** @copydoc Array::set_name() const */
+        virtual void set_name(const string &name);
+
+        /** @copydoc Array::get_name() const */
+        virtual string get_name() const;
+
+        /** @copydoc Array::get_count() */
+        virtual int64_t get_count();
+
+        /** @copydoc Array::clear() */
+        virtual void clear();
+
+        /** @copydoc Array::reset() */
+        virtual void reset();
+
+        /** @copydoc Array::modify(const IndexHyperslab&) */
+        virtual void modify(const IndexHyperslab &hyperslab);
+
+        /** @copydoc Array::modify(const LatLonBox&,const Array*,const Array*) */
+        virtual void modify(const LatLonBox &box,
+                            const Array *lat, const Array *lon);
+
+        /** @copydoc Array::modify(double,double,const Array*) */
+        virtual void modify(double low, double hi, const Array *var);
+
+        /** @copydoc Array::modify(const string&,double,const Array*) */
+        virtual void modify(const string &op, double value, const Array *var);
+
+        /** @copydoc Array::modify_gt(double,const Array*) */
+        virtual void modify_gt(double value, const Array *var);
+
+        /** @copydoc Array::modify_lt(double,const Array*) */
+        virtual void modify_lt(double value, const Array *var);
+
+        /** @copydoc Array::reindex() */
+        virtual Array* reindex();
+
+        /** @copydoc Array::partial_sum(bool) */
+        virtual Array* partial_sum(bool exclude);
+
+        /** @copydoc Array::normalize() */
+        virtual void normalize();
+
     protected:
         /** Constructs the AbstractArray. */
         AbstractArray(DataType type);
@@ -299,6 +340,14 @@ class AbstractArray : public Array
         Array *counter; /**< @todo document */
         DataType write_type;
         DataType read_type;
+        Array *index;
+        Array *sum;
+        int64_t count;
+        bool last_excl;
+        bool dirty_index;
+        bool dirty_sum;
+        bool dirty_count;
+        string name;
 };
 
 #endif /* ABSTRACTARRAY_H_ */

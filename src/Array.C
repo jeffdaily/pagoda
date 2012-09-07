@@ -27,6 +27,8 @@ Array* Array::create(DataType type, vector<int64_t> shape)
 }
 
 
+#include "Debug.H"
+#include "Print.H"
 Array* Array::create(DataType type, vector<int64_t> shape,
         const ProcessGroup &group)
 {
@@ -114,6 +116,30 @@ Array::Array()
 
 Array::~Array()
 {
+}
+
+
+Array* Array::mask_create(const string &name, int64_t size)
+{
+    vector<int64_t> shape(1, size);
+    Array *mask = Array::create(DataType::INT, shape);
+    mask->set_name(name);
+    mask->reset();
+    return mask;
+}
+
+
+Array* Array::mask_create(const Dimension *dim)
+{
+    return Array::mask_create(dim->get_name(), dim->get_size());
+}
+
+
+Array* Array::mask_create(const vector<int64_t> &shape)
+{
+    Array *mask = Array::create(DataType::INT, shape);
+    mask->reset();
+    return mask;
 }
 
 

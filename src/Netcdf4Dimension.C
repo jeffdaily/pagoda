@@ -8,7 +8,6 @@
 
 #include "Common.H"
 #include "Dataset.H"
-#include "Mask.H"
 #include "MaskMap.H"
 #include "Netcdf4Dataset.H"
 #include "Netcdf4Dimension.H"
@@ -46,7 +45,7 @@ string Netcdf4Dimension::get_name() const
 
 int64_t Netcdf4Dimension::get_size() const
 {
-    Mask *mask = NULL;
+    Array *mask = NULL;
     if ((mask = get_mask())) {
         return mask->get_count();
     }

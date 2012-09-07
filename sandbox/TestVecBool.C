@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     vector<bool> vec_bool;
     vector<int>  vec_int;
     vector<char> vec_char;
-    Mask *mask = NULL;
+    Array *mask = NULL;
     IndexHyperslab slab;
     unsigned long long timer_bool;
     unsigned long long timer_int;
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     timer_char = timer_end(timer_char);
 
     // now for the parallel part
-    mask = Mask::create("mask", nelem);
+    mask = Array::mask_create("mask", nelem);
     if (0 == pagoda::me) cout << "starting mask loop" << endl;
     timer_mask = timer_start();
     mask->modify(slab);

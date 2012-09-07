@@ -19,35 +19,35 @@ using std::vector;
 #include "IndexHyperslab.H"
 #include "LatLonBox.H"
 
+class Array;
 class Dataset;
 class Dimension;
 class Grid;
-class Mask;
 class Variable;
 
-typedef map<string,Mask*> masks_t;
+typedef map<string,Array*> masks_t;
 typedef map<string,int64_t> sizes_t;
 typedef set<string> cleared_t;
 
 
 /**
- * A Mask container.
+ * A mask container.
  *
- * All Mask information is kept here and can be passed around as a container.
- * The intent is to support multiple containers for Masks which can be set or
+ * All mask information is kept here and can be passed around as a container.
+ * The intent is to support multiple containers for masks which can be set or
  * unset from a Dataset.
  *
- * Masks cannot be shared between MaskMaps.  The destructor will delete all
- * Masks associated with the MaskMap instance.
+ * Masks cannot be shared between MaskMap instances.  The destructor will
+ * delete all masks associated with the MaskMap instance.
  *
  * Mask instances are either created up front or can be seeded.  Seeding a
- * Mask will store the name and size of the Mask without allocating any memory
- * for it.  A Mask instance will only be created upon request via get_mask()
- * or the operator[].  A seeded Mask will return false for has_mask().
+ * mask will store the name and size of the mask without allocating any memory
+ * for it.  A mask instance will only be created upon request via get_mask()
+ * or the operator[].  A seeded mask will return false for has_mask().
  *
  * Mask instances are initially created with all bits reset (set to 1)
- * effectively the same as having no Mask at all.  This initial condition must
- * be cleared before modifying any Masks, otherwise the operations will simply
+ * effectively the same as having no mask at all.  This initial condition must
+ * be cleared before modifying any masks, otherwise the operations will simply
  * overwrite the 1s with additional 1s.  The clearing operation happens once
  * by default for the modify functions defined here.
  */
@@ -76,19 +76,19 @@ class MaskMap
         void modify(const LatLonBox &box, Grid *grid);
 
         bool has_mask(const string &name) const;
-        Mask* get_mask(const string &name);
-        Mask* operator [](const string &name);
+        Array* get_mask(const string &name);
+        Array* operator [](const string &name);
 
         bool has_mask(const Dimension *dim) const;
-        Mask* get_mask(const Dimension *dim);
-        Mask* operator [](const Dimension *dim);
+        Array* get_mask(const Dimension *dim);
+        Array* operator [](const Dimension *dim);
 
         ostream& print(ostream &os) const;
         friend ostream& operator << (ostream &os, const MaskMap &maskmap);
         friend ostream& operator << (ostream &os, const MaskMap *maskmap);
 
     protected:
-        Mask* get_mask(const string &name, const Dimension *dim);
+        Array* get_mask(const string &name, const Dimension *dim);
 
         void modify(const LatLonBox &box,
                     const Variable *lat, const Variable *lon,

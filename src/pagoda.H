@@ -49,7 +49,6 @@
 #include "Grid.H"
 #include "IndexHyperslab.H"
 #include "LatLonBox.H"
-#include "Mask.H"
 #include "MaskMap.H"
 #include "NodeZeroArray.H"
 #include "NotImplementedException.H"

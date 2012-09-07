@@ -16,7 +16,6 @@ using std::vector;
 class Array;
 class Attribute;
 class Dimension;
-class Mask;
 class Netcdf4Attribute;
 class Netcdf4Dimension;
 class Netcdf4Variable;

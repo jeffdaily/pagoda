@@ -170,7 +170,7 @@ class Dataset
         virtual void set_masks(MaskMap *masks) = 0;
 
         /**
-         * Makes the given MaskMap the current Mask collection to use.
+         * Makes the given MaskMap the current mask collection to use.
          *
          * This is useful for temporarily suspending the automatic subsetting
          * which occurs during Variable::read() operations.  For example,

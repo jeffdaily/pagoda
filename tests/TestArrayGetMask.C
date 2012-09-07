@@ -26,7 +26,6 @@ using std::vector;
 #include "Collectives.H"
 #include "DataType.H"
 #include "Debug.H"
-#include "Mask.H"
 #include "Util.H"
 #include "ValidMaskCondition.H"
 
@@ -34,7 +33,7 @@ using std::vector;
 int main(int argc, char **argv)
 {
     Array *array = NULL;
-    Mask *mask = NULL;
+    Array *mask = NULL;
     vector<int64_t> shape;
     int64_t n = 0;
     vector<double> randomness;

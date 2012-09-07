@@ -6,9 +6,9 @@
 
 #include <pnetcdf.h>
 
+#include "Array.H"
 #include "Common.H"
 #include "Dataset.H"
-#include "Mask.H"
 #include "MaskMap.H"
 #include "PnetcdfDataset.H"
 #include "PnetcdfDimension.H"
@@ -46,7 +46,7 @@ string PnetcdfDimension::get_name() const
 
 int64_t PnetcdfDimension::get_size() const
 {
-    Mask *mask = NULL;
+    Array *mask = NULL;
     if ((mask = get_mask())) {
         return mask->get_count();
     }

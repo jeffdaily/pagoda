@@ -17,7 +17,6 @@
 #include "Dataset.H"
 #include "Dimension.H"
 #include "FileWriter.H"
-#include "Mask.H"
 #include "Netcdf4Dimension.H"
 #include "Netcdf4Error.H"
 #include "Netcdf4FileWriter.H"
@@ -344,7 +343,7 @@ void Netcdf4FileWriter::def_dim(const string &name, int64_t size)
 }
 
 
-void Netcdf4FileWriter::def_dim(Mask *mask)
+void Netcdf4FileWriter::def_dim(Array *mask)
 {
     AbstractFileWriter::def_dim(mask);
 }
@@ -397,7 +396,7 @@ void Netcdf4FileWriter::def_var(const string &name,
 
 
 void Netcdf4FileWriter::def_var(const string &name,
-                                const vector<Mask*> &dims,
+                                const vector<Array*> &dims,
                                 const DataType &type,
                                 const vector<Attribute*> &atts)
 {

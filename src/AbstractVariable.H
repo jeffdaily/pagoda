@@ -21,7 +21,6 @@ using std::vector;
 
 class Array;
 class Dataset;
-class Mask;
 
 
 /**
@@ -56,7 +55,7 @@ class AbstractVariable : public Variable
                                    bool ignore_case=false) const;
 
         virtual Dataset* get_dataset() const = 0;
-        virtual vector<Mask*> get_masks() const;
+        virtual vector<Array*> get_masks() const;
 
         virtual DataType get_type() const = 0;
 
@@ -75,7 +74,7 @@ class AbstractVariable : public Variable
         virtual int64_t get_bytes() const;
 
         /**
-         * If there is a Mask over the record Dimension, translate the given
+         * If there is a mask over the record Dimension, translate the given
          * record from the index space of the mask into the index space of the
          * whole data.
          *

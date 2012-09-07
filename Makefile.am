@@ -108,7 +108,6 @@ pkginclude_HEADERS += src/Grid.H
 pkginclude_HEADERS += src/Hints.H
 pkginclude_HEADERS += src/IndexHyperslab.H
 pkginclude_HEADERS += src/LatLonBox.H
-pkginclude_HEADERS += src/Mask.H
 pkginclude_HEADERS += src/MaskMap.H
 pkginclude_HEADERS += src/NodeZeroArray.H
 pkginclude_HEADERS += src/NotImplementedException.H
@@ -175,7 +174,6 @@ libpagoda_la_SOURCES += src/Grid.C
 libpagoda_la_SOURCES += src/Hints.C
 libpagoda_la_SOURCES += src/IndexHyperslab.C
 libpagoda_la_SOURCES += src/LatLonBox.C
-libpagoda_la_SOURCES += src/Mask.C
 libpagoda_la_SOURCES += src/MaskMap.C
 libpagoda_la_SOURCES += src/Numeric.C
 libpagoda_la_SOURCES += src/Pack.C
@@ -204,8 +202,6 @@ libpagoda_la_SOURCES += src/GlobalArray.H
 libpagoda_la_SOURCES += src/GlobalArray.def
 libpagoda_la_SOURCES += src/GlobalScalar.C
 libpagoda_la_SOURCES += src/GlobalScalar.H
-libpagoda_la_SOURCES += src/GlobalMask.C
-libpagoda_la_SOURCES += src/GlobalMask.H
 libpagoda_la_SOURCES += src/Memory.c
 endif
 

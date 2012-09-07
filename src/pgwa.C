@@ -147,6 +147,13 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
             Array *result = NULL;
             Array *array = NULL; // reuse allocated array each record
 
+            /* -- steps --
+             * - are the mask dimensions compatible with the current var?
+             * -- get variable mask as a bitmask
+             * -- transpose bitmask if needed
+             */
+
+
             array = var->read(0, array);
             if (cmd.is_verbose()) {
                 pagoda::println_zero("\tfinished reading record 0");

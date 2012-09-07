@@ -14,7 +14,6 @@ class Attribute;
 class DataType;
 class Dataset;
 class Dimension;
-class Mask;
 class Values;
 class Variable;
 
@@ -59,9 +58,9 @@ class FileWriter
         virtual void def_dataset(Dataset *dataset) = 0;
 
         virtual void def_dim(const string &name, int64_t size) = 0;
-        virtual void def_dim(Mask *mask) = 0;
+        virtual void def_dim(Array *mask) = 0;
         virtual void def_dim(Dimension *dim) = 0;
-        virtual void def_dims(const vector<Mask*> &masks) = 0;
+        virtual void def_dims(const vector<Array*> &masks) = 0;
         virtual void def_dims(const vector<Dimension*> &dims) = 0;
 
         virtual void def_var(const string &name,
@@ -73,7 +72,7 @@ class FileWriter
                              const DataType &type,
                              const vector<Attribute*> &atts=vector<Attribute*>()) = 0;
         virtual void def_var(const string &name,
-                             const vector<Mask*> &dims,
+                             const vector<Array*> &dims,
                              const DataType &type,
                              const vector<Attribute*> &atts=vector<Attribute*>()) = 0;
         virtual void def_var(Variable *var) = 0;

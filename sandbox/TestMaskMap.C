@@ -21,7 +21,6 @@ using namespace std;
 #include "Debug.H"
 #include "IndexHyperslab.H"
 #include "MaskMap.H"
-#include "Mask.H"
 #include "Util.H"
 
 

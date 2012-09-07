@@ -12,6 +12,7 @@
 #include <pnetcdf.h>
 
 #include "AbstractFileWriter.H"
+#include "Array.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Collectives.H"
@@ -21,7 +22,6 @@
 #include "FileFormat.H"
 #include "FileWriter.H"
 #include "Hints.H"
-#include "Mask.H"
 #include "PnetcdfDimension.H"
 #include "PnetcdfError.H"
 #include "PnetcdfFileWriter.H"
@@ -349,7 +349,7 @@ void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 }
 
 
-void PnetcdfFileWriter::def_dim(Mask *mask)
+void PnetcdfFileWriter::def_dim(Array *mask)
 {
     AbstractFileWriter::def_dim(mask);
 }
@@ -402,7 +402,7 @@ void PnetcdfFileWriter::def_var(const string &name,
 
 
 void PnetcdfFileWriter::def_var(const string &name,
-                                const vector<Mask*> &dims,
+                                const vector<Array*> &dims,
                                 const DataType &type,
                                 const vector<Attribute*> &atts)
 {

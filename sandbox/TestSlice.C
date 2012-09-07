@@ -16,7 +16,6 @@ using namespace std;
 #include "Dimension.H"
 #include "Debug.H"
 #include "MaskMap.H"
-#include "Mask.H"
 #include "Slice.H"
 #include "Util.H"
 

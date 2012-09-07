@@ -14,7 +14,6 @@
 #include "Dimension.H"
 #include "Error.H"
 #include "Grid.H"
-#include "Mask.H"
 #include "Pack.H"
 #include "Print.H"
 #include "StringComparator.H"
@@ -347,9 +346,9 @@ Attribute* AbstractVariable::get_att(
 }
 
 
-vector<Mask*> AbstractVariable::get_masks() const
+vector<Array*> AbstractVariable::get_masks() const
 {
-    vector<Mask*> ret;
+    vector<Array*> ret;
 
     if (get_dataset()->get_masks()) {
         vector<Dimension*> dims = get_dims();
@@ -366,8 +365,8 @@ vector<Mask*> AbstractVariable::get_masks() const
 
 int64_t AbstractVariable::translate_record(int64_t record) const
 {
-    vector<Mask*> masks = get_masks();
-    Mask *mask = NULL;
+    vector<Array*> masks = get_masks();
+    Array *mask = NULL;
     int64_t size = -1;
     int *buf = NULL;
     int64_t count = -1;
@@ -404,16 +403,16 @@ void AbstractVariable::set_translate_record(bool value)
 }
 
 
-static bool needs_subset_common(const vector<Mask*> &masks)
+static bool needs_subset_common(const vector<Array*> &masks)
 {
-    vector<Mask*>::const_iterator mask_it;
+    vector<Array*>::const_iterator mask_it;
 
     if (masks.empty()) {
         return false;
     }
 
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
-        Mask *mask = *mask_it;
+        Array *mask = *mask_it;
         if (mask) {
             int64_t count = mask->get_count();
             int64_t size = mask->get_size();
@@ -435,7 +434,7 @@ bool AbstractVariable::needs_subset() const
 
 bool AbstractVariable::needs_subset_record() const
 {
-    vector<Mask*> masks = get_masks();
+    vector<Array*> masks = get_masks();
     if (!masks.empty()) {
         masks.erase(masks.begin());
     }
@@ -452,7 +451,7 @@ bool AbstractVariable::needs_renumber() const
         Grid *grid = *grid_it;
         if (grid->is_topology(this)) {
             Dimension *dim = grid->get_topology_dim(this);
-            Mask *mask = dim->get_mask();
+            Array *mask = dim->get_mask();
             if (mask) {
                 int64_t count = mask->get_count();
                 int64_t size = mask->get_size();
@@ -476,7 +475,7 @@ void AbstractVariable::renumber(Array *array) const
         Grid *grid = *grid_it;
         if (grid->is_topology(this)) {
             Dimension *dim = grid->get_topology_dim(this);
-            Mask *mask = dim->get_mask();
+            Array *mask = dim->get_mask();
             if (mask) {
                 pagoda::renumber(array, mask->reindex());
             }

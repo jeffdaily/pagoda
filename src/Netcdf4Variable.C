@@ -12,7 +12,6 @@
 #include "Array.H"
 #include "Attribute.H"
 #include "Common.H"
-#include "Mask.H"
 #include "Netcdf4Attribute.H"
 #include "Netcdf4Dataset.H"
 #include "Netcdf4Dimension.H"
@@ -256,7 +255,7 @@ Array* Netcdf4Variable::read_wrapper(int64_t record, Array *dst) const
 
     // check whether a subset is needed
     if (needs_subset_record()) {
-        vector<Mask*> masks = get_masks();
+        vector<Array*> masks = get_masks();
         masks.erase(masks.begin());
         pagoda::pack(tmp, dst, masks);
         delete tmp;
@@ -289,7 +288,7 @@ bool Netcdf4Variable::find_bit(const vector<Dimension*> &adims,
 
     for (int64_t i=0; i<ndim; ++i) {
         bool current_found_bit = false;
-        Mask *mask = get_dataset()->get_masks()->get(adims[i]);
+        Array *mask = get_dataset()->get_masks()->get(adims[i]);
         if (mask) {
             int *data = mask->get(lo[i],hi[i]);
 

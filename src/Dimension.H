@@ -11,8 +11,8 @@ using std::ostream;
 using std::string;
 using std::vector;
 
+class Array;
 class Dataset;
-class Mask;
 
 
 /**
@@ -62,11 +62,11 @@ class Dimension
         virtual Dataset* get_dataset() const = 0;
 
         /**
-         * Returns the Mask associated with this Dimension.
+         * Returns the mask associated with this Dimension.
          *
-         * @return the Mask associated with this Dimension.
+         * @return the mask associated with this Dimension.
          */
-        virtual Mask* get_mask() const;
+        virtual Array* get_mask() const;
 
         /**
          * Write this Dimension to the given stream.

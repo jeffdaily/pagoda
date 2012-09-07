@@ -9,11 +9,11 @@
 #include <vector>
 
 #include "AbstractFileWriter.H"
+#include "Array.H"
 #include "Dataset.H"
 #include "Dimension.H"
 #include "FileFormat.H"
 #include "GenericAttribute.H"
-#include "Mask.H"
 #include "Util.H"
 #include "Variable.H"
 
@@ -41,7 +41,7 @@ void AbstractFileWriter::def_dataset(Dataset *dataset)
 }
 
 
-void AbstractFileWriter::def_dim(Mask *mask)
+void AbstractFileWriter::def_dim(Array *mask)
 {
     def_dim(mask->get_name(), mask->get_count());
 }
@@ -58,9 +58,9 @@ void AbstractFileWriter::def_dim(Dimension *dim)
 }
 
 
-void AbstractFileWriter::def_dims(const vector<Mask*> &masks)
+void AbstractFileWriter::def_dims(const vector<Array*> &masks)
 {
-    vector<Mask*>::const_iterator msk_it;
+    vector<Array*>::const_iterator msk_it;
     for (msk_it=masks.begin(); msk_it!=masks.end(); ++msk_it) {
         def_dim(*msk_it);
     }
@@ -91,11 +91,11 @@ void AbstractFileWriter::def_var(const string &name, const vector<Dimension*> &d
 }
 
 
-void AbstractFileWriter::def_var(const string &name, const vector<Mask*> &masks,
+void AbstractFileWriter::def_var(const string &name, const vector<Array*> &masks,
                          const DataType &type, const vector<Attribute*> &atts)
 {
-    vector<Mask*>::const_iterator msk_it;
-    vector<Mask*>::const_iterator msk_end;
+    vector<Array*>::const_iterator msk_it;
+    vector<Array*>::const_iterator msk_end;
     vector<string> dim_names;
 
     for (msk_it=masks.begin(),msk_end=masks.end(); msk_it!=msk_end; ++msk_it) {

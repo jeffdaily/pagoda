@@ -44,7 +44,7 @@ class PnetcdfFileWriter : public AbstractFileWriter
         virtual FileWriter* overwrite(bool value);
 
         virtual void def_dim(const string &name, int64_t size);
-        virtual void def_dim(Mask *mask);
+        virtual void def_dim(Array *mask);
         virtual void def_dim(Dimension *dim);
 
         virtual void def_var(const string &name,
@@ -56,7 +56,7 @@ class PnetcdfFileWriter : public AbstractFileWriter
                              const DataType &type,
                              const vector<Attribute*> &atts=vector<Attribute*>());
         virtual void def_var(const string &name,
-                             const vector<Mask*> &dims,
+                             const vector<Array*> &dims,
                              const DataType &type,
                              const vector<Attribute*> &atts=vector<Attribute*>());
         virtual void def_var(Variable *var);
