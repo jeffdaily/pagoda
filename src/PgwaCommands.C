@@ -322,9 +322,6 @@ void PgwaCommands::init()
     parser.push_back(CommandLineOption::WEIGHTING_VARIABLE_NAME);
     parser.push_back(CommandLineOption::NO_NORMALIZATION);
     parser.push_back(CommandLineOption::RETAIN_DEGENERATE_DIMENSIONS);
-    // erase the aggregation ops
-    //parser.erase(CommandLineOption::JOIN);
-    //parser.erase(CommandLineOption::UNION);
 
     if (VALID.empty()) {
         VALID.push_back(OP_AVG);

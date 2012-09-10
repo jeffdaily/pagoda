@@ -76,6 +76,7 @@ Dataset* PgraCommands::get_dataset()
     }
     else {
         // we need to determine the record dimension
+        string join_name;
         Dataset *first_dataset = Dataset::open(input_filenames[0]);
         Dimension *udim = first_dataset->get_udim();
         if (udim == NULL) {
@@ -126,9 +127,6 @@ string PgraCommands::get_operator() const
 void PgraCommands::init()
 {
     parser.push_back(CommandLineOption::AVERAGE_OPERATION);
-    // erase the aggregation ops
-    parser.erase(CommandLineOption::JOIN);
-    parser.erase(CommandLineOption::UNION);
 
     if (VALID.empty()) {
         VALID.push_back(OP_AVG);

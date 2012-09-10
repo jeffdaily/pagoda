@@ -56,7 +56,6 @@ class GenericCommands
         virtual vector<string> get_input_filenames() const;
         virtual string get_output_filename() const;
         virtual set<string> get_variables() const;
-        virtual string get_join_name() const;
         virtual bool is_excluding_variables() const;
         virtual bool is_alphabetizing() const;
         virtual bool is_processing_all_coords() const;
@@ -88,7 +87,6 @@ class GenericCommands
         map<Dataset*,vector<Variable*> > variables_cache;
         map<Dataset*,vector<Dimension*> > dimensions_cache;
         bool exclude_variables;
-        string join_name;
         bool alphabetize;
         bool process_all_coords;
         bool process_coords;

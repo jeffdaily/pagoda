@@ -157,9 +157,6 @@ string PgboCommands::get_operator() const
 void PgboCommands::init()
 {
     parser.push_back(CommandLineOption::BINARY_OPERATION);
-    // erase the aggregation ops
-    parser.erase(CommandLineOption::JOIN);
-    parser.erase(CommandLineOption::UNION);
 
     if (ADD.empty()) {
         ADD.push_back("add");

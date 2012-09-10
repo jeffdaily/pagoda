@@ -145,6 +145,7 @@ class CommandLineOption
         static CommandLineOption STRIPING_UNIT;
         static CommandLineOption TOPOLOGY;
         static CommandLineOption UNION;
+        static CommandLineOption UNLIMITED_DIMENSION_NAME;
         static CommandLineOption VARIABLE;
         static CommandLineOption VERBOSE;
         static CommandLineOption VERS;

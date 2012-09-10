@@ -165,6 +165,10 @@ CommandLineOption CommandLineOption::TOPOLOGY(
 CommandLineOption CommandLineOption::UNION(
     'u', "union", false,
     "take the union of all input files");
+CommandLineOption CommandLineOption::UNLIMITED_DIMENSION_NAME(
+    'u', "ulm_nm", false,
+    "new unlimited (record) dimension name",
+    "rcd_nm");
 CommandLineOption CommandLineOption::VARIABLE(
     'v', "variable", true,
     "var1[,var2[,...]] variable(s) to process");

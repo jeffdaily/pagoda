@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "Aggregation.H"
-#include "AggregationJoinExisting.H"
 #include "AggregationUnion.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
@@ -47,7 +46,6 @@ GenericCommands::GenericCommands()
     ,   variables_cache()
     ,   dimensions_cache()
     ,   exclude_variables(false)
-    ,   join_name("")
     ,   alphabetize(true)
     ,   process_all_coords(false)
     ,   process_coords(true)
@@ -81,7 +79,6 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   variables_cache()
     ,   dimensions_cache()
     ,   exclude_variables(false)
-    ,   join_name("")
     ,   alphabetize(true)
     ,   process_all_coords(false)
     ,   process_coords(true)
@@ -142,8 +139,6 @@ void GenericCommands::init()
     parser.push_back(CommandLineOption::VARIABLE);
     parser.push_back(CommandLineOption::AUXILIARY);
     parser.push_back(CommandLineOption::EXCLUDE);
-    parser.push_back(CommandLineOption::JOIN);
-    parser.push_back(CommandLineOption::UNION);
     // the following conflicts with -b in pgwa
     //parser.push_back(CommandLineOption::LATLONBOX);
 }
@@ -272,13 +267,6 @@ void GenericCommands::parse(int argc, char **argv)
                 coord_hyperslabs.push_back(CoordHyperslab(*it));
             }
         }
-    }
-
-    if (parser.count(CommandLineOption::JOIN)) {
-        join_name = parser.get_argument(CommandLineOption::JOIN);
-    }
-
-    if (parser.count(CommandLineOption::UNION)) {
     }
 
     if (parser.count(CommandLineOption::ALPHABETIZE)) {
@@ -452,7 +440,7 @@ void GenericCommands::get_inputs(Dataset *&dataset, vector<Variable*> &vars,
 /**
  * Creates and returns a new Dataset.
  *
- * Interprets the command-line parameters for union and join aggregations.
+ * Interprets the command-line parameters for union aggregations.
  * Determines the file format and record size and stores locally (otherwise
  * this method would be const like the rest).
  */
@@ -469,12 +457,7 @@ Dataset* GenericCommands::get_dataset()
         dataset = Dataset::open(input_filenames[0]);
     }
     else {
-        if (join_name.empty()) {
-            dataset = agg = new AggregationUnion;
-        }
-        else {
-            dataset = agg = new AggregationJoinExisting(join_name);
-        }
+        dataset = agg = new AggregationUnion;
         for (size_t i=0,limit=input_filenames.size(); i<limit; ++i) {
             agg->add(Dataset::open(input_filenames[i]));
         }
@@ -801,12 +784,6 @@ string GenericCommands::get_output_filename() const
 set<string> GenericCommands::get_variables() const
 {
     return variables;
-}
-
-
-string GenericCommands::get_join_name() const
-{
-    return join_name;
 }
 
 

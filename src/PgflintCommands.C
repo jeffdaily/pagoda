@@ -207,7 +207,4 @@ void PgflintCommands::init()
     parser.push_back(CommandLineOption::INTERPOLATE);
 #endif
     parser.push_back(CommandLineOption::WEIGHTS_OF_FILES);
-    // erase the aggregation ops
-    parser.erase(CommandLineOption::JOIN);
-    parser.erase(CommandLineOption::UNION);
 }
