@@ -239,11 +239,7 @@ Array* PnetcdfVariable::_read(Array *dst) const
 
 
     tmp = read_prep(dst, start, count, found_bit);
-    pagoda::println_sync("finished read_prep");
-    pagoda::println_sync(STR_VEC(start));
-    pagoda::println_sync(STR_VEC(count));
     do_read(tmp, start, count, found_bit);
-    pagoda::println_sync("finished do_read");
 
     // check whether a subset is needed
     if (needs_subset()) {
