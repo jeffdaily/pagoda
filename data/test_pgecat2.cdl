@@ -1,0 +1,38 @@
+netcdf test_pgecat2 {
+dimensions:
+	two = 2 ;
+	three = 3 ;
+	time = UNLIMITED ; // (2 currently)
+variables:
+	float two(two) ;
+		two:name = "coordinate var for two" ;
+	float three(three) ;
+		three:name = "coordinate var for three" ;
+	double a(two, three) ;
+	int b(two) ;
+	int c(three, two) ;
+	double time(time) ;
+	double data(time, two) ;
+data:
+
+ two = 1, 2 ;
+
+ three = 1, 2, 3 ;
+
+ a =
+  1, 2, 3,
+  4, 5, 6 ;
+
+ b = 1, 2 ;
+
+ c =
+  1, 2,
+  3, 4,
+  5, 6 ;
+
+ time = 1.2, 5.6 ;
+
+ data =
+  1, 2,
+  5, 6 ;
+}

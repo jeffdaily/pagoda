@@ -16,10 +16,12 @@ class PgecatCommands : public GenericCommands
 
         virtual void parse(int argc, char **argv);
 
+        string get_unlimited_name() const;
+
     protected:
         void init();
 
-        string new_unlimited_name;
+        string unlimited_name;
 };
 
 #endif // PGECATCOMMANDS_H_

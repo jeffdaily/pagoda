@@ -8,7 +8,7 @@
 
 PgecatCommands::PgecatCommands()
     :   GenericCommands()
-    ,   new_unlimited_name("")
+    ,   unlimited_name("record")
 {
     init();
 }
@@ -16,7 +16,7 @@ PgecatCommands::PgecatCommands()
 
 PgecatCommands::PgecatCommands(int argc, char **argv)
     :   GenericCommands()
-    ,   new_unlimited_name("")
+    ,   unlimited_name("record")
 {
     init();
     parse(argc, argv);
@@ -33,9 +33,15 @@ void PgecatCommands::parse(int argc, char **argv)
     GenericCommands::parse(argc, argv);
 
     if (parser.count(CommandLineOption::UNLIMITED_DIMENSION_NAME)) {
-        new_unlimited_name = 
+        unlimited_name = 
             parser.get_argument(CommandLineOption::UNLIMITED_DIMENSION_NAME);
     }
+}
+
+
+string PgecatCommands::get_unlimited_name() const
+{
+    return unlimited_name;
 }
 
 
