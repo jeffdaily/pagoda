@@ -77,6 +77,54 @@ vector<int64_t> AbstractVariable::get_shape() const
 }
 
 
+bool AbstractVariable::is_coordinate() const
+{
+    Dataset *dataset = get_dataset();
+    if (dataset) {
+        Grid *grid = dataset->get_grid();
+        if (grid) {
+            if (grid->is_coordinate(this)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+bool AbstractVariable::is_topology() const
+{
+    Dataset *dataset = get_dataset();
+    if (dataset) {
+        Grid *grid = dataset->get_grid();
+        if (grid) {
+            if (grid->is_topology(this)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+bool AbstractVariable::is_grid() const
+{
+    Dataset *dataset = get_dataset();
+    if (dataset) {
+        Grid *grid = dataset->get_grid();
+        if (grid) {
+            if (grid->is_coordinate(this) || grid->is_topology(this)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
 int64_t AbstractVariable::num_atts() const
 {
     return get_atts().size();

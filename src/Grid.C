@@ -94,6 +94,10 @@ vector<Grid*> Grid::get_grids(const Dataset *dataset)
     for (grid_it=grids.begin(); grid_it!=grids.end(); ++grid_it) {
         ret.push_back(*grid_it);
     }
+    // we assume a RegularGrid if no grid was found by some other means
+    if (ret.empty()) {
+        ret.push_back(new RegularGrid(dataset));
+    }
 
     return ret;
 }

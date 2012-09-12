@@ -70,11 +70,15 @@ class PnetcdfFileWriter : public AbstractFileWriter
         virtual void write(Array *array, const string &name,
                            int64_t record);
         virtual void write(Array *array, const string &name,
+                           int64_t ensemble, int64_t record);
+        virtual void write(Array *array, const string &name,
                            const vector<int64_t> &start);
 
         virtual void iwrite(Array *array, const string &name);
         virtual void iwrite(Array *array, const string &name,
                             int64_t record);
+        virtual void iwrite(Array *array, const string &name,
+                            int64_t ensemble, int64_t record);
         virtual void iwrite(Array *array, const string &name,
                             const vector<int64_t> &start);
         virtual void wait();
@@ -101,6 +105,8 @@ class PnetcdfFileWriter : public AbstractFileWriter
         void write_wrapper(Array *array, const string &name, bool nonblocking);
         void write_wrapper(Array *array, const string &name,
                            int64_t record, bool nonblocking);
+        void write_wrapper(Array *array, const string &name,
+                           int64_t ensemble, int64_t record, bool nonblocking);
         void write_wrapper(Array *array, const string &name,
                            const vector<int64_t> &start, bool nonblocking);
         void do_write(Array *array, int varid, const vector<MPI_Offset> &start,

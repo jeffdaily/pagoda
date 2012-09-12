@@ -672,6 +672,66 @@ void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
 
 
 void PnetcdfFileWriter::write(Array *array, const string &name,
+        int64_t ensemble, int64_t record)
+{
+    write_wrapper(array, name, ensemble, record, false);
+}
+
+
+void PnetcdfFileWriter::iwrite(Array *array, const string &name,
+        int64_t ensemble, int64_t record)
+{
+    write_wrapper(array, name, ensemble, record, true);
+}
+
+
+void PnetcdfFileWriter::write_wrapper(Array *array, const string &name,
+        int64_t ensemble, int64_t record, bool nonblocking)
+{
+    DataType type = array->get_type();
+    vector<int64_t> array_shape = array->get_shape();
+    vector<int64_t> array_local_shape = array->get_local_shape();
+    vector<int64_t> shape = get_var_shape(name);
+    vector<MPI_Offset> start(shape.size(), 0);
+    vector<MPI_Offset> count(shape.size(), 0);
+    int varid = get_var_id(name);
+
+    if (array_shape.size()+2 != shape.size()) {
+        ERR("array rank mismatch");
+    }
+    shape.erase(shape.begin()); // remove ensemble dimension
+    shape.erase(shape.begin()); // remove record dimension
+    if (array_shape != shape) {
+        ERR("array shape mismatch");
+    }
+
+    maybe_enddef();
+
+    if (array->owns_data()) {
+        vector<int64_t> lo;
+        vector<int64_t> hi;
+
+        ASSERT(count.size() > 1);
+        count[0] = 1;
+        count[1] = 1;
+        if (count.size() > 2) {
+            std::copy(array_local_shape.begin(), array_local_shape.end(),
+                    count.begin()+2);
+        }
+        ASSERT(start.size() > 1);
+        start[0] = ensemble;
+        start[1] = record;
+        if (start.size() > 2) {
+            array->get_distribution(lo, hi);
+            std::copy(lo.begin(), lo.end(), start.begin()+2);
+        }
+    }
+
+    do_write(array, varid, start, count, nonblocking);
+}
+
+
+void PnetcdfFileWriter::write(Array *array, const string &name,
                               const vector<int64_t> &start)
 {
     write_wrapper(array, name, start, false);

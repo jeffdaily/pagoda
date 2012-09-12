@@ -73,11 +73,15 @@ class AbstractFileWriter : public FileWriter
         virtual void write(Array *array, const string &name,
                            int64_t record) = 0;
         virtual void write(Array *array, const string &name,
+                           int64_t ensemble, int64_t record) = 0;
+        virtual void write(Array *array, const string &name,
                            const vector<int64_t> &start) = 0;
 
         virtual void iwrite(Array *array, const string &name) = 0;
         virtual void iwrite(Array *array, const string &name,
                             int64_t record) = 0;
+        virtual void iwrite(Array *array, const string &name,
+                            int64_t ensemble, int64_t record) = 0;
         virtual void iwrite(Array *array, const string &name,
                             const vector<int64_t> &start) = 0;
 

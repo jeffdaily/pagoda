@@ -16,10 +16,18 @@ class PgecatCommands : public GenericCommands
 
         virtual void parse(int argc, char **argv);
 
+        virtual FileWriter* get_output() const;
+
+        vector<Dataset*> get_datasets();
+        vector<vector<Variable*> > get_variables(const vector<Dataset*> &datasets);
+        vector<vector<Dimension*> > get_dimensions(const vector<Dataset*> &datasets);
+
         string get_unlimited_name() const;
 
     protected:
         void init();
+
+        virtual Dataset* get_dataset(); // disable and override this method
 
         string unlimited_name;
 };

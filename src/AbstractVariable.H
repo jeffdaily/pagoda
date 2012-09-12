@@ -41,6 +41,9 @@ class AbstractVariable : public Variable
         virtual int64_t get_nrec() const;
         virtual int64_t get_ndim() const;
         virtual vector<int64_t> get_shape() const;
+        virtual bool is_coordinate() const;
+        virtual bool is_topology() const;
+        virtual bool is_grid() const;
 
         virtual vector<Attribute*> get_atts() const = 0;
         virtual int64_t num_atts() const;

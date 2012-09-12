@@ -15,7 +15,8 @@ unsigned int CommandLineOption::WIDTH(20);
 
 CommandLineOption CommandLineOption::ALPHABETIZE(
     'a', "alphabetize", false,
-    "disable alphabetization of extracted variables");
+    "disable alphabetization of extracted variables",
+    "abc");
 CommandLineOption CommandLineOption::APPEND(
     'A', "append", false,
     "append to existing output file, if any");

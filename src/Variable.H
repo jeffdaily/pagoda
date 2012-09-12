@@ -39,6 +39,9 @@ class Variable
         virtual int64_t get_nrec() const = 0;
         virtual int64_t get_ndim() const = 0;
         virtual vector<int64_t> get_shape() const = 0;
+        virtual bool is_coordinate() const = 0;
+        virtual bool is_topology() const = 0;
+        virtual bool is_grid() const = 0;
 
         virtual vector<Attribute*> get_atts() const = 0;
         virtual int64_t num_atts() const = 0;
