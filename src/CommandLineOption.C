@@ -167,7 +167,7 @@ CommandLineOption CommandLineOption::UNION(
     'u', "union", false,
     "take the union of all input files");
 CommandLineOption CommandLineOption::UNLIMITED_DIMENSION_NAME(
-    'u', "ulm_nm", false,
+    'u', "ulm_nm", true,
     "new unlimited (record) dimension name",
     "rcd_nm");
 CommandLineOption CommandLineOption::VARIABLE(

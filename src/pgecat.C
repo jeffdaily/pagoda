@@ -40,6 +40,7 @@ int F77_DUMMY_MAIN()
 #endif
 
 
+void pgecat_common_setup(PgecatCommands &cmd, ...);
 void pgecat_blocking(PgecatCommands &cmd);
 void pgecat_blocking_read_all(PgecatCommands &cmd);
 void pgecat_nonblocking(PgecatCommands &cmd);
@@ -85,15 +86,15 @@ int main(int argc, char **argv)
 }
 
 
-void pgecat_blocking(PgecatCommands &cmd)
+void pgecat_common_setup(
+        PgecatCommands &cmd,
+        vector<Dataset*> &datasets,
+        vector<vector<Variable*> > &all_vars,
+        vector<vector<Dimension*> > &all_dims,
+        vector<Grid*> &grids,
+        vector<MaskMap*> &masks,
+        FileWriter* &writer)
 {
-    vector<Dataset*> datasets;
-    vector<vector<Variable*> > all_vars;
-    vector<vector<Dimension*> > all_dims;
-    FileWriter *writer = NULL;
-    vector<Grid*> grids;
-    vector<MaskMap*> masks;
-
     datasets = cmd.get_datasets();
     all_vars = cmd.get_variables(datasets);
     all_dims = cmd.get_dimensions(datasets);
@@ -171,6 +172,19 @@ void pgecat_blocking(PgecatCommands &cmd)
                     var->get_atts());
         }
     }
+}
+
+
+void pgecat_blocking(PgecatCommands &cmd)
+{
+    vector<Dataset*> datasets;
+    vector<vector<Variable*> > all_vars;
+    vector<vector<Dimension*> > all_dims;
+    FileWriter *writer = NULL;
+    vector<Grid*> grids;
+    vector<MaskMap*> masks;
+
+    pgecat_common_setup(cmd, datasets, all_vars, all_dims, grids, masks, writer);
 
     // for each Dataset, process each Variable
     for (size_t i=0,i_limit=datasets.size(); i<i_limit; ++i) {
@@ -217,14 +231,159 @@ void pgecat_blocking(PgecatCommands &cmd)
 
 void pgecat_blocking_read_all(PgecatCommands &cmd)
 {
+    vector<Dataset*> datasets;
+    vector<vector<Variable*> > all_vars;
+    vector<vector<Dimension*> > all_dims;
+    FileWriter *writer = NULL;
+    vector<Grid*> grids;
+    vector<MaskMap*> masks;
+
+    pgecat_common_setup(cmd, datasets, all_vars, all_dims, grids, masks, writer);
+
+    // for each Dataset, process each Variable
+    for (size_t i=0,i_limit=datasets.size(); i<i_limit; ++i) {
+        Dataset *dataset = datasets[i];
+        for (size_t j=0,j_limit=all_vars[i].size(); j<j_limit; ++j) {
+            Variable *var = all_vars[i][j];
+            if (var->is_grid()) {
+                if (0 == i) {
+                    // we are the first dataset and we found a grid variable
+                    // copy the variable to the output
+                    Array *array = var->read();
+                    ASSERT(NULL != array);
+                    writer->write(array, var->get_name());
+                    delete array;
+                }
+            }
+            else {
+                Array *array = var->read();
+                ASSERT(NULL != array);
+                writer->write(array, var->get_name(), i);
+                delete array;
+            }
+        }
+    }
+
+    // clean up
+    for (size_t i=0,limit=datasets.size(); i<limit; ++i) {
+        delete datasets[i];
+        delete masks[i];
+    }
+    delete writer;
 }
 
 
 void pgecat_nonblocking(PgecatCommands &cmd)
 {
+    vector<Dataset*> datasets;
+    vector<vector<Variable*> > all_vars;
+    vector<vector<Dimension*> > all_dims;
+    FileWriter *writer = NULL;
+    vector<Grid*> grids;
+    vector<MaskMap*> masks;
+
+    pgecat_common_setup(cmd, datasets, all_vars, all_dims, grids, masks, writer);
+
+    // for each Dataset, process each Variable
+    for (size_t i=0,i_limit=datasets.size(); i<i_limit; ++i) {
+        Dataset *dataset = datasets[i];
+        vector<Variable*> record_vars;
+        vector<Variable*> nonrecord_vars;
+
+        // we process record and nonrecord vars separately
+        Variable::split(all_vars[i], record_vars, nonrecord_vars);
+
+        // copy nonrecord vars to outfile
+        {
+            map<string,Array*> nb_arrays;
+            size_t j=0;
+            size_t j_limit=nonrecord_vars.size();
+
+            for (j=0; j<j_limit; ++j) {
+                Variable *var = nonrecord_vars[j];
+                // coordinate/grid variables are only copied the first time
+                if (0 == i || (i>0 && !var->is_grid())) {
+                    nb_arrays[var->get_name()] = var->iread();
+                }
+            }
+            dataset->wait();
+            for (j=0; j<j_limit; ++j) {
+                Variable *var = nonrecord_vars[j];
+                string name = var->get_name();
+                Array *array = nb_arrays[name];
+                // coordinate/grid variables are only copied the first time
+                if (var->is_grid()) {
+                    if (0 == i) {
+                        writer->iwrite(array, name);
+                    }
+                }
+                else {
+                    writer->iwrite(array, name, i);
+                }
+            }
+            writer->wait();
+            for (map<string,Array*>::iterator it=nb_arrays.begin(),
+                    end=nb_arrays.end(); it!=end; ++it) {
+                delete it->second;
+            }
+        }
+
+        // copy record vars to outfile
+        {
+            map<string,Array*> nb_arrays;
+            size_t j=0;
+            size_t j_limit=record_vars.size();
+            Dimension *udim = dataset->get_udim();
+            int64_t r;
+            int64_t nrec = NULL != udim ? udim->get_size() : 0;
+
+            // set all nb_arrays to NULL
+            for (j=0; j<j_limit; ++j) {
+                Variable *var = record_vars[j];
+                nb_arrays[var->get_name()] = NULL;
+            }
+            for (r=0; r<nrec; ++r) {
+                for (j=0; j<j_limit; ++j) {
+                    Variable *var = record_vars[j];
+                    string name = var->get_name();
+                    Array *array = nb_arrays[name];
+                    if (0 == i || (i>0 && !var->is_grid())) {
+                        nb_arrays[name] = var->iread(r, array);
+                    }
+                }
+                dataset->wait();
+                for (j=0; j<j_limit; ++j) {
+                    Variable *var = record_vars[j];
+                    string name = var->get_name();
+                    Array *array = nb_arrays[name];
+                    if (var->is_grid()) {
+                        if (i == 0) {
+                            writer->iwrite(array, name, r);
+                        }
+                    }
+                    else {
+                        writer->iwrite(array, name, i, r);
+                    }
+                }
+                writer->wait();
+            }
+            for (map<string,Array*>::iterator it=nb_arrays.begin(),
+                    end=nb_arrays.end(); it!=end; ++it) {
+                delete it->second;
+            }
+        }
+    }
+
+    // clean up
+    for (size_t i=0,limit=datasets.size(); i<limit; ++i) {
+        delete datasets[i];
+        delete masks[i];
+    }
+    delete writer;
 }
 
 
 void pgecat_nonblocking_read_all(PgecatCommands &cmd)
 {
+    throw CommandException("--nbio with --allrec not implemented");
 }
