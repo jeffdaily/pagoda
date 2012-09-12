@@ -316,7 +316,13 @@ void GlobalArray::copy(const Array *src,
                          ga_src->handle, &src_lo_copy[0], &src_hi_copy[0],
                          handle,         &dst_lo_copy[0], &dst_hi_copy[0]);
     }
-    ERR("not implemented: GlobalArray::copy(Array*,vector<int64_t>,vector<int64_t>,vector<int64_t>,vector<int64_t>) of differing Array implementations");
+    else {
+        // dumbest implementation...
+        if (0 == pagoda::me) {
+            void *data = src->get(src_lo, src_hi);
+            this->put(data, dst_lo, dst_hi);
+        }
+    }
 }
 
 
