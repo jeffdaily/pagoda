@@ -65,6 +65,8 @@ int main(int argc, char **argv)
     int64_t  dst_nd_m1 = -1;
     int64_t  dst_elems_prod = 1;
     vector<int64_t> dst_elems;
+    vector<int64_t> dst_elems_abs;
+    vector<bool>    dst_reverse;
     vector<int64_t> dst_coords;
     vector<int64_t> dst_dims_m1;
     vector<int64_t> dst_strides;
@@ -106,6 +108,8 @@ int main(int argc, char **argv)
             token_as_stream.str(token);
             token_as_stream >> length;
             dst_elems.push_back(length);
+            dst_elems_abs.push_back(length < 0 ? -length : length);
+            dst_reverse.push_back(length < 0);
         }
     }
     if (src_elems.size() != dst_elems.size()) {
@@ -135,12 +139,12 @@ int main(int argc, char **argv)
 
     for (size_t i=0; i<src_ndim; ++i) {
         vector<int64_t>::iterator pos;
-        pos = find(dst_elems.begin(), dst_elems.end(), src_elems[i]);
-        if (pos == dst_elems.end()) {
+        pos = find(dst_elems_abs.begin(), dst_elems_abs.end(), src_elems[i]);
+        if (pos == dst_elems_abs.end()) {
             cout << "dst does not related to src" << endl;
             return EXIT_FAILURE;
         }
-        dim_map[i] = pos - dst_elems.begin();
+        dim_map[i] = pos - dst_elems_abs.begin();
     }
     for (size_t i=0; i<src_ndim; ++i ) {
         dim_permute_user[dim_map[i]] = i;
@@ -150,13 +154,15 @@ int main(int argc, char **argv)
     src_elems_prod = accumulate(
             src_elems.begin(), src_elems.end(), 1, multiplies<int64_t>());
     src_buf = new double[src_elems_prod];
+    src_ptr = src_buf;
     /* fill src_buf with enumeration */
     generate(src_buf, src_buf+src_elems_prod, gen_enum_t());
 
     /* number of destination elements */
     dst_elems_prod = accumulate(
-            dst_elems.begin(), dst_elems.end(), 1, multiplies<int64_t>());
+            dst_elems_abs.begin(), dst_elems_abs.end(), 1, multiplies<int64_t>());
     dst_buf = new double[dst_elems_prod];
+    dst_ptr = dst_buf;
     fill(dst_buf, dst_buf+dst_elems_prod, -1);
     assert(src_elems_prod == dst_elems_prod);
 #if DEBUG
@@ -181,17 +187,29 @@ int main(int argc, char **argv)
     /* dst iterator setup */
     for (int64_t i=dst_nd_m1; i>=0; --i) {
         dst_coords[i] = 0;
-        dst_dims_m1[i] = dst_elems[i]-1;
-        dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems[i+1];
+        dst_dims_m1[i] = dst_elems_abs[i]-1;
+        dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems_abs[i+1];
         dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
+    }
+    int64_t dst_buf_movement = 0;
+    for (int64_t i=dst_nd_m1; i>=0; --i) {
+        if (dst_elems[i] < 0) {
+            dst_buf_movement += dst_strides[i]*dst_dims_m1[i];
+        }
+    }
+    cout << "dst_buf_movement=" << dst_buf_movement << endl;
+    dst_ptr += dst_buf_movement;
+    for (int64_t i=dst_nd_m1; i>=0; --i) {
+        if (dst_elems[i] < 0) {
+            dst_strides[i] = -dst_strides[i];
+            dst_backstrides[i] = -dst_backstrides[i];
+        }
     }
 #if DEBUG
     cout << STR_ARR(dst_strides,dst_ndim) << endl;
     cout << STR_ARR(dst_backstrides,dst_ndim) << endl;
 #endif
 
-    src_ptr = src_buf;
-    dst_ptr = dst_buf;
     for (int64_t elem=0; elem<src_elems_prod; ++elem) {
 #if DEBUG
         cout << elem;
@@ -200,11 +218,16 @@ int main(int argc, char **argv)
         }
         cout << "\t-->\t";
         for (int64_t i=0; i<dst_ndim; ++i) {
-            cout << " " << src_coords[dim_map[i]];
+            if (dst_reverse[i]) {
+                cout << " " << (src_dims_m1[dim_map[i]]-src_coords[dim_map[i]]);
+            }
+            else {
+                cout << " " << src_coords[dim_map[i]];
+            }
             trn_coords[i] = src_coords[dim_map[i]];
         }
         cout << "\t";
-        cout << pagoda::ravel_index(trn_coords, dst_elems) << endl;
+        cout << pagoda::ravel_index(trn_coords, dst_elems_abs) << endl;
 #endif
         *dst_ptr = *src_ptr;
         for (int64_t i=src_nd_m1; i>=0; --i) {
