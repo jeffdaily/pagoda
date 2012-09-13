@@ -30,6 +30,10 @@ namespace pagoda
     void transpose(const DataType &type,
             const void *src, const vector<int64_t> &shape,
                   void *dst, const vector<int64_t> &axes);
+    void transpose(const DataType &type,
+            const void *src, const vector<int64_t> &shape,
+                  void *dst, const vector<int64_t> &axes,
+                             const vector<int64_t> &reverse);
     void reduce_sum(const DataType &type,
             const void *src, const vector<int64_t> &src_shape,
                   void *dst, const vector<int64_t> &dst_shape);
@@ -46,6 +50,10 @@ namespace pagoda
     template <typename T> void transpose(
             const T *src, const vector<int64_t> &shape,
                   T *dst, const vector<int64_t> &axes);
+    template <typename T> void transpose(
+            const T *src, const vector<int64_t> &shape,
+                  T *dst, const vector<int64_t> &axes,
+                          const vector<int64_t> &reverse);
     template <typename T> void reduce_sum(
             const T *src, const vector<int64_t> &src_shape,
                   T *dst, const vector<int64_t> &dst_shape);
@@ -70,6 +78,23 @@ namespace pagoda
     template <typename T> void transpose(
             const T *src, const vector<int64_t> &shape,
             T *dst, const vector<int64_t> &axes)
+    {
+        transpose(src, shape, dst, axes, vector<int64_t>(axes.size(),1));
+    }
+
+    /**
+     * Transpose the given array.
+     *
+     * @param[in] src the source buffer, contiguous
+     * @param[in] shape the shape of the source buffer
+     * @param[in,out] dst the destination buffer, contiguous
+     * @param[in] axes the new order of the axes for the shape
+     * @param[in] reverse whether to invert an of the axes (1 or -1)
+     */
+    template <typename T> void transpose(
+            const T *src, const vector<int64_t> &shape,
+            T *dst, const vector<int64_t> &axes,
+            const vector<int64_t> &reverse)
     {
         int64_t src_ndim = shape.size();
         int64_t src_nd_m1 = src_ndim-1;
@@ -121,6 +146,14 @@ namespace pagoda
             dst_dims_m1[i] = dst_elems[i]-1;
             dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems[i+1];
             dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
+        }
+        for (int64_t i=dst_nd_m1; i>=0; --i) {
+            ASSERT(reverse[i] == 1 || reverse[i] == -1);
+            if (reverse[i] == -1) {
+                dst += dst_strides[i]*dst_dims_m1[i];
+                dst_strides[i] = -dst_strides[i];
+                dst_backstrides[i] = -dst_backstrides[i];
+            }
         }
 
         for (int64_t elem=0; elem<src_elems_prod; ++elem) {

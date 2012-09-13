@@ -76,6 +76,10 @@ class AbstractArray : public Array
         /** @copydoc Array::transpose(const vector<int64_t>&) */
         virtual Array* transpose(const vector<int64_t> &axes) const;
 
+        /** @copydoc Array::transpose(const vector<int64_t>&,const vector<int64_t>&) */
+        virtual Array* transpose(const vector<int64_t> &axes,
+                                 const vector<int64_t> &reverse) const;
+
         /** @copydoc Array::clone() const */
         virtual Array* clone() const = 0;
 

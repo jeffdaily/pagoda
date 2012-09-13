@@ -233,6 +233,23 @@ class Array
         virtual Array* transpose(const vector<int64_t> &axes) const = 0;
 
         /**
+         * Duplicates this Array and tranposes the elements, possibly reversing
+         * some of the axes.
+         *
+         * Here, tranpose can mean an arbitrary transpose i.e.
+         * 2,3,4,5 --> 5,4,3,2 --or--
+         * 2,3,4,5 --> 2,5,3,4
+         *
+         * @param[in] axes how to reorder the Array dimensions
+         *            for example 2,3,4 --> 4,2,3 needs 2,0,1
+         *            for example 2,3,4 --> 4,3,2 needs 2,1,0
+         * @param[in] which axes to reverse (1 keep same, -1 reverse)
+         * @return the new Array, transposed appropriately
+         */
+        virtual Array* transpose(const vector<int64_t> &axes,
+                                 const vector<int64_t> &reverse) const = 0;
+
+        /**
          * Duplicates this Array.
          */
         virtual Array* clone() const = 0;

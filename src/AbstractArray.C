@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <cmath>
 
 #include "AbstractArray.H"
 #include "Array.H"
@@ -29,6 +30,8 @@ using std::cout;
 using std::endl;
 #define STR_ARR(vec,n) pagoda::arr_to_string(vec,n,",",#vec)
 #endif
+
+using std::abs;
 
 
 AbstractArray::AbstractArray(DataType type)
@@ -251,6 +254,13 @@ Array* AbstractArray::cast(DataType new_type) const
 
 Array* AbstractArray::transpose(const vector<int64_t> &axes) const
 {
+    transpose(axes, vector<int64_t>(axes.size(),1));
+}
+
+
+Array* AbstractArray::transpose(const vector<int64_t> &axes,
+                                const vector<int64_t> &reverse) const
+{
     DataType type = get_type();
     Array *dst_array = NULL;
     int64_t ndim = get_ndim();
@@ -266,9 +276,11 @@ Array* AbstractArray::transpose(const vector<int64_t> &axes) const
     void *dst_data = NULL;
 
     ASSERT(axes.size() == src_shape.size());
+    ASSERT(reverse.size() == src_shape.size());
     /* sanity check that axes is valid */
     for (int64_t i=0,limit=axes.size(); i<limit; ++i)  {
         ASSERT(axes[i] >= 0 && axes[i] <= src_shape.size());
+        ASSERT(reverse[i] == 1 || reverse[i] == -1);
     }
     for (int64_t i=0,limit=src_shape.size(); i<limit; ++i) {
         dst_shape[i] = src_shape[axes[i]];
@@ -288,6 +300,7 @@ Array* AbstractArray::transpose(const vector<int64_t> &axes) const
     for (int64_t i=0,limit=pagoda::num_nodes(); i<limit; ++i) {
         if (i == pagoda::nodeid()) {
             cout << "[" << i << "] " << STR_ARR(axes, ndim) << endl;
+            cout << "[" << i << "] " << STR_ARR(reverse, ndim) << endl;
             cout << "[" << i << "] " << STR_ARR(src_map, ndim) << endl;
             cout << "[" << i << "] " << STR_ARR(src_shape, ndim) << endl;
             cout << "[" << i << "] " << STR_ARR(dst_shape, ndim) << endl;
@@ -302,14 +315,14 @@ Array* AbstractArray::transpose(const vector<int64_t> &axes) const
 
     dst_data = dst_array->access();
     if (NULL != dst_data) {
-#define DATATYPE_EXPAND(DT,T)                                   \
-        if (DT == type) {                                       \
-            T *src = static_cast<T*>(get(src_lo, src_hi));      \
-            T *dst = static_cast<T*>(dst_data);                 \
-            std::fill(dst,dst+dst_local_size,-1);               \
-            pagoda::transpose(src, src_local_shape, dst, axes); \
-            dst_array->release_update();                        \
-            delete [] src;                                      \
+#define DATATYPE_EXPAND(DT,T)                                            \
+        if (DT == type) {                                                \
+            T *src = static_cast<T*>(get(src_lo, src_hi));               \
+            T *dst = static_cast<T*>(dst_data);                          \
+            std::fill(dst,dst+dst_local_size,-1);                        \
+            pagoda::transpose(src, src_local_shape, dst, axes, reverse); \
+            dst_array->release_update();                                 \
+            delete [] src;                                               \
         } else
 #include "DataType.def"
         {

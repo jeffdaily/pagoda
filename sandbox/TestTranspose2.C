@@ -66,6 +66,7 @@ int main(int argc, char **argv)
     Array *g_dst = NULL;
     int  *dst_buf = NULL;
     vector<int64_t> dst_elems;
+    vector<int64_t> dst_reverse;
 
     vector<int64_t> dim_permute_user;
     vector<int64_t> dim_map;
@@ -104,7 +105,14 @@ int main(int argc, char **argv)
             getline(iss, token, ',');
             token_as_stream.str(token);
             token_as_stream >> length;
-            dst_elems.push_back(length);
+            if (length < 0) {
+                dst_elems.push_back(-length);
+                dst_reverse.push_back(-1);
+            }
+            else {
+                dst_elems.push_back(length);
+                dst_reverse.push_back(1);
+            }
         }
     }
     if (src_elems.size() != dst_elems.size()) {
@@ -148,7 +156,7 @@ int main(int argc, char **argv)
     }
     pagoda::barrier();
 
-    g_dst = g_src->transpose(dim_permute_user);
+    g_dst = g_src->transpose(dim_permute_user, dst_reverse);
     assert(NULL != g_dst);
 
     if (0 == pagoda::me) {
