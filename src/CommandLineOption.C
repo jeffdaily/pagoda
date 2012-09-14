@@ -20,6 +20,12 @@ CommandLineOption CommandLineOption::ALPHABETIZE(
 CommandLineOption CommandLineOption::APPEND(
     'A', "append", false,
     "append to existing output file, if any");
+CommandLineOption CommandLineOption::ARRANGE(
+    'a', "arrange", true,
+    "[-]rdr_dim1[,[-]rdr_dim2[...]] re-order dimensions",
+    "permute",
+    "reorder",
+    "rdr");
 CommandLineOption CommandLineOption::AUXILIARY(
     'X', "auxiliary", true,
     "lon_min,lon_max,lat_min,lat_max auxiliary coordinate bounding box");

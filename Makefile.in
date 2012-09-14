@@ -56,8 +56,8 @@ host_triplet = @host@
 @GA_USES_FLIBS_TRUE@am__append_1 = $(FLIBS)
 @GA_USES_FLIBS_TRUE@am__append_2 = $(FLIBS)
 bin_PROGRAMS = pgbo$(EXEEXT) pgcmp$(EXEEXT) pgdump$(EXEEXT) \
-	pgea$(EXEEXT) pgecat$(EXEEXT) pgflint$(EXEEXT) pgra$(EXEEXT) \
-	pgrcat$(EXEEXT) pgsub$(EXEEXT) pgwa$(EXEEXT)
+	pgea$(EXEEXT) pgecat$(EXEEXT) pgflint$(EXEEXT) pgpdq$(EXEEXT) \
+	pgra$(EXEEXT) pgrcat$(EXEEXT) pgsub$(EXEEXT) pgwa$(EXEEXT)
 check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
 	$(am__EXEEXT_3) $(am__EXEEXT_4)
@@ -204,11 +204,11 @@ am__libpagoda_la_SOURCES_DIST = src/AbstractArray.C \
 	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
 	src/LatLonBox.C src/MaskMap.C src/Numeric.C src/Pack.C \
 	src/PgboCommands.C src/PgeaCommands.C src/PgecatCommands.C \
-	src/PgflintCommands.C src/PgraCommands.C src/PgrcatCommands.C \
-	src/PgwaCommands.C src/Print.C src/ProcessGroup.C \
-	src/RegularGrid.C src/ScalarArray.C src/StringComparator.C \
-	src/SubsetterCommands.C src/Util.C src/Validator.C \
-	src/Values.C src/Variable.C src/GlobalArray.C \
+	src/PgflintCommands.C src/PgpdqCommands.C src/PgraCommands.C \
+	src/PgrcatCommands.C src/PgwaCommands.C src/Print.C \
+	src/ProcessGroup.C src/RegularGrid.C src/ScalarArray.C \
+	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
+	src/Validator.C src/Values.C src/Variable.C src/GlobalArray.C \
 	src/GlobalArray.H src/GlobalArray.def src/GlobalScalar.C \
 	src/GlobalScalar.H src/Memory.c src/PnetcdfAttribute.C \
 	src/PnetcdfAttribute.H src/PnetcdfDataset.C \
@@ -256,12 +256,13 @@ am_libpagoda_la_OBJECTS = src/AbstractArray.lo src/AbstractArray_op.lo \
 	src/IndexHyperslab.lo src/LatLonBox.lo src/MaskMap.lo \
 	src/Numeric.lo src/Pack.lo src/PgboCommands.lo \
 	src/PgeaCommands.lo src/PgecatCommands.lo \
-	src/PgflintCommands.lo src/PgraCommands.lo \
-	src/PgrcatCommands.lo src/PgwaCommands.lo src/Print.lo \
-	src/ProcessGroup.lo src/RegularGrid.lo src/ScalarArray.lo \
-	src/StringComparator.lo src/SubsetterCommands.lo src/Util.lo \
-	src/Validator.lo src/Values.lo src/Variable.lo \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3)
+	src/PgflintCommands.lo src/PgpdqCommands.lo \
+	src/PgraCommands.lo src/PgrcatCommands.lo src/PgwaCommands.lo \
+	src/Print.lo src/ProcessGroup.lo src/RegularGrid.lo \
+	src/ScalarArray.lo src/StringComparator.lo \
+	src/SubsetterCommands.lo src/Util.lo src/Validator.lo \
+	src/Values.lo src/Variable.lo $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3)
 libpagoda_la_OBJECTS = $(am_libpagoda_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -349,6 +350,12 @@ am_pgflint_OBJECTS = src/pgflint.$(OBJEXT)
 pgflint_OBJECTS = $(am_pgflint_OBJECTS)
 pgflint_LDADD = $(LDADD)
 pgflint_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+am_pgpdq_OBJECTS = src/pgpdq.$(OBJEXT)
+pgpdq_OBJECTS = $(am_pgpdq_OBJECTS)
+pgpdq_LDADD = $(LDADD)
+pgpdq_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am_pgra_OBJECTS = src/pgra.$(OBJEXT)
@@ -814,9 +821,10 @@ am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(pgdump_SOURCES) $(pgea_SOURCES) $(pgecat_SOURCES) \
-	$(pgflint_SOURCES) $(pgra_SOURCES) $(pgrcat_SOURCES) \
-	$(pgsub_SOURCES) $(pgwa_SOURCES) $(sandbox_TestArray_SOURCES) \
-	$(sandbox_TestBin_SOURCES) $(sandbox_TestCommandLine_SOURCES) \
+	$(pgflint_SOURCES) $(pgpdq_SOURCES) $(pgra_SOURCES) \
+	$(pgrcat_SOURCES) $(pgsub_SOURCES) $(pgwa_SOURCES) \
+	$(sandbox_TestArray_SOURCES) $(sandbox_TestBin_SOURCES) \
+	$(sandbox_TestCommandLine_SOURCES) \
 	$(sandbox_TestDimension_SOURCES) \
 	$(sandbox_TestDistance_SOURCES) $(sandbox_TestEnum_SOURCES) \
 	$(sandbox_TestGet_SOURCES) $(sandbox_TestGrid_SOURCES) \
@@ -851,9 +859,9 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(tests_TestPartialSum_SOURCES)
 DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(pgcmp_SOURCES) $(pgdump_SOURCES) $(pgea_SOURCES) \
-	$(pgecat_SOURCES) $(pgflint_SOURCES) $(pgra_SOURCES) \
-	$(pgrcat_SOURCES) $(pgsub_SOURCES) $(pgwa_SOURCES) \
-	$(am__sandbox_TestArray_SOURCES_DIST) \
+	$(pgecat_SOURCES) $(pgflint_SOURCES) $(pgpdq_SOURCES) \
+	$(pgra_SOURCES) $(pgrcat_SOURCES) $(pgsub_SOURCES) \
+	$(pgwa_SOURCES) $(am__sandbox_TestArray_SOURCES_DIST) \
 	$(am__sandbox_TestBin_SOURCES_DIST) \
 	$(am__sandbox_TestCommandLine_SOURCES_DIST) \
 	$(am__sandbox_TestDimension_SOURCES_DIST) \
@@ -1110,12 +1118,13 @@ pkginclude_HEADERS = src/AbstractArray.H src/AbstractDataset.H \
 	src/NodeZeroArray.H src/NotImplementedException.H \
 	src/Numeric.H src/pagoda.H src/Pack.H src/PagodaException.H \
 	src/PgboCommands.H src/PgeaCommands.H src/PgecatCommands.H \
-	src/PgflintCommands.H src/PgraCommands.H src/PgrcatCommands.H \
-	src/PgwaCommands.H src/Print.H src/ProcessGroup.H \
-	src/RangeException.H src/RegularGrid.H src/ScalarArray.H \
-	src/Slice.H src/StringComparator.H src/SubsetterCommands.H \
-	src/TypedValues.H src/Util.H src/Validator.H src/ValidMax.H \
-	src/ValidMin.H src/ValidRange.H src/Values.H src/Variable.H
+	src/PgflintCommands.H src/PgpdqCommands.H src/PgraCommands.H \
+	src/PgrcatCommands.H src/PgwaCommands.H src/Print.H \
+	src/ProcessGroup.H src/RangeException.H src/RegularGrid.H \
+	src/ScalarArray.H src/Slice.H src/StringComparator.H \
+	src/SubsetterCommands.H src/TypedValues.H src/Util.H \
+	src/Validator.H src/ValidMax.H src/ValidMin.H src/ValidRange.H \
+	src/Values.H src/Variable.H
 pagodadir = $(datadir)/pagoda
 pgbo_SOURCES = src/pgbo.C
 pgcmp_SOURCES = src/pgcmp.C
@@ -1123,6 +1132,7 @@ pgdump_SOURCES = src/pgdump.C
 pgea_SOURCES = src/pgea.C
 pgecat_SOURCES = src/pgecat.C
 pgflint_SOURCES = src/pgflint.C
+pgpdq_SOURCES = src/pgpdq.C
 pgra_SOURCES = src/pgra.C
 pgrcat_SOURCES = src/pgrcat.C
 pgsub_SOURCES = src/pgsub.C
@@ -1143,12 +1153,12 @@ libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/GeoGrid.C src/Grid.C src/Hints.C src/IndexHyperslab.C \
 	src/LatLonBox.C src/MaskMap.C src/Numeric.C src/Pack.C \
 	src/PgboCommands.C src/PgeaCommands.C src/PgecatCommands.C \
-	src/PgflintCommands.C src/PgraCommands.C src/PgrcatCommands.C \
-	src/PgwaCommands.C src/Print.C src/ProcessGroup.C \
-	src/RegularGrid.C src/ScalarArray.C src/StringComparator.C \
-	src/SubsetterCommands.C src/Util.C src/Validator.C \
-	src/Values.C src/Variable.C $(am__append_3) $(am__append_4) \
-	$(am__append_5)
+	src/PgflintCommands.C src/PgpdqCommands.C src/PgraCommands.C \
+	src/PgrcatCommands.C src/PgwaCommands.C src/Print.C \
+	src/ProcessGroup.C src/RegularGrid.C src/ScalarArray.C \
+	src/StringComparator.C src/SubsetterCommands.C src/Util.C \
+	src/Validator.C src/Values.C src/Variable.C $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 tests_TestArrayGetMask_SOURCES = tests/TestArrayGetMask.C
 tests_TestPartialSum_SOURCES = tests/TestPartialSum.C
 TEST_DIR = tests
@@ -1368,6 +1378,8 @@ src/PgecatCommands.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/PgflintCommands.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/PgpdqCommands.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/PgraCommands.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/PgrcatCommands.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -1497,6 +1509,10 @@ src/pgflint.$(OBJEXT): src/$(am__dirstamp) \
 pgflint$(EXEEXT): $(pgflint_OBJECTS) $(pgflint_DEPENDENCIES) $(EXTRA_pgflint_DEPENDENCIES) 
 	@rm -f pgflint$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pgflint_OBJECTS) $(pgflint_LDADD) $(LIBS)
+src/pgpdq.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+pgpdq$(EXEEXT): $(pgpdq_OBJECTS) $(pgpdq_DEPENDENCIES) $(EXTRA_pgpdq_DEPENDENCIES) 
+	@rm -f pgpdq$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(pgpdq_OBJECTS) $(pgpdq_LDADD) $(LIBS)
 src/pgra.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 pgra$(EXEEXT): $(pgra_OBJECTS) $(pgra_DEPENDENCIES) $(EXTRA_pgra_DEPENDENCIES) 
 	@rm -f pgra$(EXEEXT)
@@ -1925,6 +1941,8 @@ mostlyclean-compile:
 	-rm -f src/PgecatCommands.lo
 	-rm -f src/PgflintCommands.$(OBJEXT)
 	-rm -f src/PgflintCommands.lo
+	-rm -f src/PgpdqCommands.$(OBJEXT)
+	-rm -f src/PgpdqCommands.lo
 	-rm -f src/PgraCommands.$(OBJEXT)
 	-rm -f src/PgraCommands.lo
 	-rm -f src/PgrcatCommands.$(OBJEXT)
@@ -1971,6 +1989,7 @@ mostlyclean-compile:
 	-rm -f src/pgea.$(OBJEXT)
 	-rm -f src/pgecat.$(OBJEXT)
 	-rm -f src/pgflint.$(OBJEXT)
+	-rm -f src/pgpdq.$(OBJEXT)
 	-rm -f src/pgra.$(OBJEXT)
 	-rm -f src/pgrcat.$(OBJEXT)
 	-rm -f src/pgsub.$(OBJEXT)
@@ -2079,6 +2098,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgeaCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgecatCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgflintCommands.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgpdqCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgraCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgrcatCommands.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/PgwaCommands.Plo@am__quote@
@@ -2105,6 +2125,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgea.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgecat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgflint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgpdq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgra.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgrcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgsub.Po@am__quote@

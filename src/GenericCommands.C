@@ -46,7 +46,6 @@ GenericCommands::GenericCommands()
     ,   variables_cache()
     ,   dimensions_cache()
     ,   exclude_variables(false)
-    ,   alphabetize(true)
     ,   process_all_coords(false)
     ,   process_coords(true)
     ,   modify_history(true)
@@ -79,7 +78,6 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   variables_cache()
     ,   dimensions_cache()
     ,   exclude_variables(false)
-    ,   alphabetize(true)
     ,   process_all_coords(false)
     ,   process_coords(true)
     ,   modify_history(true)
@@ -125,7 +123,6 @@ void GenericCommands::init()
     parser.push_back(CommandLineOption::READ_ALL_RECORDS);
     parser.push_back(CommandLineOption::READ_ALL_VARIABLES);
     parser.push_back(CommandLineOption::APPEND);
-    parser.push_back(CommandLineOption::ALPHABETIZE);
     parser.push_back(CommandLineOption::NO_COORDS);
     parser.push_back(CommandLineOption::COORDS);
     parser.push_back(CommandLineOption::TOPOLOGY);
@@ -267,10 +264,6 @@ void GenericCommands::parse(int argc, char **argv)
                 coord_hyperslabs.push_back(CoordHyperslab(*it));
             }
         }
-    }
-
-    if (parser.count(CommandLineOption::ALPHABETIZE)) {
-        alphabetize = false;
     }
 
     if (parser.count(CommandLineOption::COORDS)) {
@@ -492,18 +485,12 @@ FileWriter* GenericCommands::get_output() const
 }
 
 
-static bool var_cmp(Variable *left, Variable *right)
-{
-    return left->get_name() < right->get_name();
-}
-
-
 /**
  * Modify the set of Variables of the given Dataset based on the command-line
  * parameters.
  *
- * The user could select or exclude a set of Variables, choose to alphabetize
- * them, or whether to exclude coordinate Variables.
+ * The user could select or exclude a set of Variables or whether to exclude
+ * coordinate Variables.
  *
  * @param[in] dataset the Dataset
  * @return the Variables to operate over, possibly sorted by name
@@ -623,10 +610,6 @@ vector<Variable*> GenericCommands::get_variables(Dataset *dataset)
         }
     }
 
-    if (alphabetize) {
-        sort(vars_out.begin(), vars_out.end(), var_cmp);
-    }
-
     variables_cache[dataset] = vars_out;
 
     return vars_out;
@@ -676,10 +659,6 @@ vector<Dimension*> GenericCommands::get_dimensions(Dataset *dataset)
         if (dims_to_keep.count(dim->get_name())) {
             dims_out.push_back(dim);
         }
-    }
-
-    if (alphabetize) {
-        sort(dims_out.begin(), dims_out.end(), dim_cmp);
     }
 
     dimensions_cache[dataset] = dims_out;
@@ -790,12 +769,6 @@ set<string> GenericCommands::get_variables() const
 bool GenericCommands::is_excluding_variables() const
 {
     return exclude_variables;
-}
-
-
-bool GenericCommands::is_alphabetizing() const
-{
-    return alphabetize;
 }
 
 

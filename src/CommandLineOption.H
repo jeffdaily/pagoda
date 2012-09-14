@@ -104,6 +104,7 @@ class CommandLineOption
 
         static CommandLineOption ALPHABETIZE;
         static CommandLineOption APPEND;
+        static CommandLineOption ARRANGE;
         static CommandLineOption AUXILIARY;
         static CommandLineOption AVERAGE_OPERATION;
         static CommandLineOption AVERAGE_DIMENSIONS;
