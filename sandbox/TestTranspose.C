@@ -248,7 +248,8 @@ int main(int argc, char **argv)
     double sum=0;
     for (int64_t i=0; i<dst_elems_prod; ++i) {
         sum += dst_buf[i];
-        if (i%17 == 0) {
+        //if (i%17 == 0) {
+        if (i%13 == 0) {
             cout << endl;
         }
         cout << setw(4) << dst_buf[i];

@@ -228,9 +228,11 @@ class Array
          * @param[in] axes how to reorder the Array dimensions
          *            for example 2,3,4 --> 4,2,3 needs 2,0,1
          *            for example 2,3,4 --> 4,3,2 needs 2,1,0
+         * @param[in] dst_array a preallocated Array, or NULL to create one
          * @return the new Array, transposed appropriately
          */
-        virtual Array* transpose(const vector<int64_t> &axes) const = 0;
+        virtual Array* transpose(const vector<int64_t> &axes,
+                                 Array *dst_array=NULL) const = 0;
 
         /**
          * Duplicates this Array and tranposes the elements, possibly reversing
@@ -243,11 +245,13 @@ class Array
          * @param[in] axes how to reorder the Array dimensions
          *            for example 2,3,4 --> 4,2,3 needs 2,0,1
          *            for example 2,3,4 --> 4,3,2 needs 2,1,0
-         * @param[in] which axes to reverse (1 keep same, -1 reverse)
+         * @param[in] reverse which axes to reverse (1 keep same, -1 reverse)
+         * @param[in] dst_array a preallocated Array, or NULL to create one
          * @return the new Array, transposed appropriately
          */
         virtual Array* transpose(const vector<int64_t> &axes,
-                                 const vector<int64_t> &reverse) const = 0;
+                                 const vector<int64_t> &reverse,
+                                 Array *dst_array=NULL) const = 0;
 
         /**
          * Duplicates this Array.

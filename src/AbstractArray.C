@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 
@@ -24,6 +25,9 @@
 #include "Util.H"
 #include "Validator.H"
 
+using std::swap;
+
+#define DEBUG 0
 #if DEBUG
 #include <iostream>
 using std::cout;
@@ -252,23 +256,25 @@ Array* AbstractArray::cast(DataType new_type) const
 }
 
 
-Array* AbstractArray::transpose(const vector<int64_t> &axes) const
+Array* AbstractArray::transpose(const vector<int64_t> &axes,
+        Array *dst_array) const
 {
-    transpose(axes, vector<int64_t>(axes.size(),1));
+    transpose(axes, vector<int64_t>(axes.size(),1), dst_array);
 }
 
 
 Array* AbstractArray::transpose(const vector<int64_t> &axes,
-                                const vector<int64_t> &reverse) const
+                                const vector<int64_t> &reverse,
+                                Array *dst_array) const
 {
     DataType type = get_type();
-    Array *dst_array = NULL;
     int64_t ndim = get_ndim();
     vector<int64_t> src_shape = get_shape();
     vector<int64_t> dst_shape(src_shape.size(), -1);
     vector<int64_t> src_lo(ndim);
     vector<int64_t> src_hi(ndim);
     vector<int64_t> src_map(ndim);
+    vector<int64_t> axes_reverse(ndim);
     vector<int64_t> dst_lo;
     vector<int64_t> dst_hi;
     vector<int64_t> src_local_shape;
@@ -287,23 +293,38 @@ Array* AbstractArray::transpose(const vector<int64_t> &axes,
         src_map[axes[i]] = i;
     }
 
-    dst_array = Array::create(type, dst_shape);
+    if (NULL == dst_array) {
+        dst_array = Array::create(type, dst_shape);
+    }
+    else {
+        ASSERT(dst_shape == dst_array->get_shape());
+    }
     dst_local_size = dst_array->get_local_size();
     dst_array->get_distribution(dst_lo,dst_hi);
     for (int64_t i=0,limit=src_shape.size(); i<limit; ++i) {
         src_lo[i] = dst_lo[src_map[i]];
         src_hi[i] = dst_hi[src_map[i]];
     }
+    for (int64_t i=0,limit=reverse.size(); i<limit; ++i) {
+        if (-1 == reverse[i]) {
+            int64_t origin = axes[i];
+            src_lo[origin] = src_shape[origin] - 1 - src_lo[origin];
+            src_hi[origin] = src_shape[origin] - 1 - src_hi[origin];
+            swap(src_lo[origin],src_hi[origin]);
+        }
+    }
     src_local_shape = pagoda::get_shape(src_lo, src_hi);
 
 #if DEBUG
+    if (0 == pagoda::nodeid()) {
+        cout << STR_ARR(axes, ndim) << endl;
+        cout << STR_ARR(reverse, ndim) << endl;
+        cout << STR_ARR(src_map, ndim) << endl;
+        cout << STR_ARR(src_shape, ndim) << endl;
+        cout << STR_ARR(dst_shape, ndim) << endl;
+    }
     for (int64_t i=0,limit=pagoda::num_nodes(); i<limit; ++i) {
         if (i == pagoda::nodeid()) {
-            cout << "[" << i << "] " << STR_ARR(axes, ndim) << endl;
-            cout << "[" << i << "] " << STR_ARR(reverse, ndim) << endl;
-            cout << "[" << i << "] " << STR_ARR(src_map, ndim) << endl;
-            cout << "[" << i << "] " << STR_ARR(src_shape, ndim) << endl;
-            cout << "[" << i << "] " << STR_ARR(dst_shape, ndim) << endl;
             cout << "[" << i << "] " << STR_ARR(src_lo, ndim) << endl;
             cout << "[" << i << "] " << STR_ARR(src_hi, ndim) << endl;
             cout << "[" << i << "] " << STR_ARR(dst_lo, ndim) << endl;
