@@ -28,7 +28,7 @@ int main(int argc, char **argv)
         cout << "coord_hyperslabs=" << pagoda::vec_to_string(cmd.get_coord_hyperslabs(),";") << endl;
         cout << "inputs=" << pagoda::vec_to_string(cmd.get_input_filenames(),";") << endl;
         cout << "output=" << cmd.get_output_filename() << endl;
-        cout << "variables=" << pagoda::vec_to_string(cmd.get_variables(),";") << endl;
+        cout << "variables=" << pagoda::vec_to_string(cmd.get_variable_names(),";") << endl;
         cout << "exclude=" << cmd.is_excluding_variables() << endl;
         cout << "join=" << cmd.get_join_name() << endl;
     }

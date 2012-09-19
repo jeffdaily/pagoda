@@ -760,7 +760,7 @@ string GenericCommands::get_output_filename() const
 }
 
 
-set<string> GenericCommands::get_variables() const
+set<string> GenericCommands::get_variable_names() const
 {
     return variables;
 }

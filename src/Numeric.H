@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 
+#include "Error.H"
+
 using std::accumulate;
 using std::bind2nd;
 using std::cout;

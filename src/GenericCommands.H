@@ -55,7 +55,7 @@ class GenericCommands
         virtual vector<CoordHyperslab> get_coord_hyperslabs() const;
         virtual vector<string> get_input_filenames() const;
         virtual string get_output_filename() const;
-        virtual set<string> get_variables() const;
+        virtual set<string> get_variable_names() const;
         virtual bool is_excluding_variables() const;
         virtual bool is_processing_all_coords() const;
         virtual bool is_processing_coords() const;
