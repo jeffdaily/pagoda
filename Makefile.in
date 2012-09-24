@@ -57,7 +57,8 @@ host_triplet = @host@
 @GA_USES_FLIBS_TRUE@am__append_2 = $(FLIBS)
 bin_PROGRAMS = pgbo$(EXEEXT) pgcmp$(EXEEXT) pgdump$(EXEEXT) \
 	pgea$(EXEEXT) pgecat$(EXEEXT) pgflint$(EXEEXT) pgpdq$(EXEEXT) \
-	pgra$(EXEEXT) pgrcat$(EXEEXT) pgsub$(EXEEXT) pgwa$(EXEEXT)
+	pgra$(EXEEXT) pgrcat$(EXEEXT) pgsub$(EXEEXT) pgwa$(EXEEXT) \
+	pgwa_basic$(EXEEXT)
 check_PROGRAMS = tests/TestArrayGetMask$(EXEEXT) \
 	tests/TestPartialSum$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
 	$(am__EXEEXT_3) $(am__EXEEXT_4)
@@ -380,6 +381,12 @@ am_pgwa_OBJECTS = src/pgwa.$(OBJEXT)
 pgwa_OBJECTS = $(am_pgwa_OBJECTS)
 pgwa_LDADD = $(LDADD)
 pgwa_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+am_pgwa_basic_OBJECTS = src/pgwa_basic.$(OBJEXT)
+pgwa_basic_OBJECTS = $(am_pgwa_basic_OBJECTS)
+pgwa_basic_LDADD = $(LDADD)
+pgwa_basic_DEPENDENCIES = libpagoda.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 am__sandbox_TestArray_SOURCES_DIST = sandbox/TestArray.C
@@ -823,8 +830,8 @@ SOURCES = $(libpagoda_la_SOURCES) $(pgbo_SOURCES) $(pgcmp_SOURCES) \
 	$(pgdump_SOURCES) $(pgea_SOURCES) $(pgecat_SOURCES) \
 	$(pgflint_SOURCES) $(pgpdq_SOURCES) $(pgra_SOURCES) \
 	$(pgrcat_SOURCES) $(pgsub_SOURCES) $(pgwa_SOURCES) \
-	$(sandbox_TestArray_SOURCES) $(sandbox_TestBin_SOURCES) \
-	$(sandbox_TestCommandLine_SOURCES) \
+	$(pgwa_basic_SOURCES) $(sandbox_TestArray_SOURCES) \
+	$(sandbox_TestBin_SOURCES) $(sandbox_TestCommandLine_SOURCES) \
 	$(sandbox_TestDimension_SOURCES) \
 	$(sandbox_TestDistance_SOURCES) $(sandbox_TestEnum_SOURCES) \
 	$(sandbox_TestGet_SOURCES) $(sandbox_TestGrid_SOURCES) \
@@ -861,7 +868,8 @@ DIST_SOURCES = $(am__libpagoda_la_SOURCES_DIST) $(pgbo_SOURCES) \
 	$(pgcmp_SOURCES) $(pgdump_SOURCES) $(pgea_SOURCES) \
 	$(pgecat_SOURCES) $(pgflint_SOURCES) $(pgpdq_SOURCES) \
 	$(pgra_SOURCES) $(pgrcat_SOURCES) $(pgsub_SOURCES) \
-	$(pgwa_SOURCES) $(am__sandbox_TestArray_SOURCES_DIST) \
+	$(pgwa_SOURCES) $(pgwa_basic_SOURCES) \
+	$(am__sandbox_TestArray_SOURCES_DIST) \
 	$(am__sandbox_TestBin_SOURCES_DIST) \
 	$(am__sandbox_TestCommandLine_SOURCES_DIST) \
 	$(am__sandbox_TestDimension_SOURCES_DIST) \
@@ -1137,6 +1145,7 @@ pgra_SOURCES = src/pgra.C
 pgrcat_SOURCES = src/pgrcat.C
 pgsub_SOURCES = src/pgsub.C
 pgwa_SOURCES = src/pgwa.C
+pgwa_basic_SOURCES = src/pgwa_basic.C
 #libpagoda_la_SOURCES += src/Timing.C
 libpagoda_la_SOURCES = src/AbstractArray.C src/AbstractArray_op.C \
 	src/AbstractArray_op_v.C src/AbstractArray_op_vc.C \
@@ -1530,6 +1539,11 @@ src/pgwa.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 pgwa$(EXEEXT): $(pgwa_OBJECTS) $(pgwa_DEPENDENCIES) $(EXTRA_pgwa_DEPENDENCIES) 
 	@rm -f pgwa$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(pgwa_OBJECTS) $(pgwa_LDADD) $(LIBS)
+src/pgwa_basic.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+pgwa_basic$(EXEEXT): $(pgwa_basic_OBJECTS) $(pgwa_basic_DEPENDENCIES) $(EXTRA_pgwa_basic_DEPENDENCIES) 
+	@rm -f pgwa_basic$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(pgwa_basic_OBJECTS) $(pgwa_basic_LDADD) $(LIBS)
 sandbox/$(am__dirstamp):
 	@$(MKDIR_P) sandbox
 	@: > sandbox/$(am__dirstamp)
@@ -1994,6 +2008,7 @@ mostlyclean-compile:
 	-rm -f src/pgrcat.$(OBJEXT)
 	-rm -f src/pgsub.$(OBJEXT)
 	-rm -f src/pgwa.$(OBJEXT)
+	-rm -f src/pgwa_basic.$(OBJEXT)
 	-rm -f tests/TestArrayGetMask.$(OBJEXT)
 	-rm -f tests/TestPartialSum.$(OBJEXT)
 
@@ -2130,6 +2145,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgrcat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgsub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgwa.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pgwa_basic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestArrayGetMask.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tests/$(DEPDIR)/TestPartialSum.Po@am__quote@
 
