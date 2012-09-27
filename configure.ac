@@ -2,7 +2,7 @@
 # autoconf
 #####################################################3
 AC_PREREQ([2.64])
-AC_INIT([pagoda], [0.6], [pagoda-dev@googlegroups.com], [pagoda],
+AC_INIT([pagoda], [0.9], [pagoda-dev@googlegroups.com], [pagoda],
         [https://svn.pnl.gov/gcrm])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
