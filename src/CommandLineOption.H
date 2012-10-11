@@ -115,6 +115,7 @@ class CommandLineOption
         static CommandLineOption CDF5;
         static CommandLineOption COORDS;
         static CommandLineOption DIMENSION;
+        static CommandLineOption DIMENSION_MASK;
         static CommandLineOption EXCLUDE;
         static CommandLineOption FILE_FORMAT;
         static CommandLineOption FIX_RECORD_DIMENSION;

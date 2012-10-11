@@ -140,8 +140,20 @@ PAGODA_CHECK_PACKAGE([mpi], [mpi.h], [mpi], [MPI_Init], [], [],
 AM_CONDITIONAL([HAVE_MPI], [test "x$pg_cv_mpi_found" = xyes])
 
 # GA is required, for now.  Perhaps with MPI3 the GA could go...
-PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize],
-                     [$FLIBS], [pg_ga_uses_flibs=yes])
+ga_save_PATH="$PATH"
+AS_IF([test -d $with_ga], [PATH="$with_ga:$PATH"])
+AS_IF([test -d $with_ga/bin], [PATH="$with_ga/bin:$PATH"])
+AC_PATH_PROG([GA_CONFIG], [ga-config])
+PATH="$ga_save_PATH"
+AS_IF([test "x$GA_CONFIG" != x],
+    [pg_cv_ga_found=yes
+     GA_CPPFLAGS=`$GA_CONFIG --cppflags`
+     GA_LDFLAGS=`$GA_CONFIG --ldflags`
+     GA_LIBS=`$GA_CONFIG --libs`
+     GA_FLIBS=`$GA_CONFIG --flibs`])
+AS_IF([test "x$pg_cv_ga_found" = xno],
+    [PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize],
+                          [$FLIBS], [pg_ga_uses_flibs=yes])])
 AS_IF([test "x$pg_cv_ga_found" = xno],
     [AS_UNSET([ac_cv_search_GA_Initialize])
      PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize],

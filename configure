@@ -696,6 +696,7 @@ HAVE_GA_TRUE
 GA_CPPFLAGS
 GA_LDFLAGS
 GA_LIBS
+GA_CONFIG
 HAVE_MPI_FALSE
 HAVE_MPI_TRUE
 MPI_CPPFLAGS
@@ -9102,6 +9103,62 @@ fi
 
 
 # GA is required, for now.  Perhaps with MPI3 the GA could go...
+ga_save_PATH="$PATH"
+if test -d $with_ga; then :
+  PATH="$with_ga:$PATH"
+fi
+if test -d $with_ga/bin; then :
+  PATH="$with_ga/bin:$PATH"
+fi
+# Extract the first word of "ga-config", so it can be a program name with args.
+set dummy ga-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_GA_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $GA_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_GA_CONFIG="$GA_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_GA_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+GA_CONFIG=$ac_cv_path_GA_CONFIG
+if test -n "$GA_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $GA_CONFIG" >&5
+$as_echo "$GA_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+PATH="$ga_save_PATH"
+if test "x$GA_CONFIG" != x; then :
+  pg_cv_ga_found=yes
+     GA_CPPFLAGS=`$GA_CONFIG --cppflags`
+     GA_LDFLAGS=`$GA_CONFIG --ldflags`
+     GA_LIBS=`$GA_CONFIG --libs`
+     GA_FLIBS=`$GA_CONFIG --flibs`
+fi
+if test "x$pg_cv_ga_found" = xno; then :
 
 
 
@@ -9280,6 +9337,7 @@ fi
 
 
 
+fi
 if test "x$pg_cv_ga_found" = xno; then :
   { ac_cv_search_GA_Initialize=; unset ac_cv_search_GA_Initialize;}
 

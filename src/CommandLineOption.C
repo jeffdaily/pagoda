@@ -61,6 +61,10 @@ CommandLineOption CommandLineOption::DIMENSION(
     'd', "dimension", true,
     "dim[,min[,max[,stride]]]",
     "dmn");
+CommandLineOption CommandLineOption::DIMENSION_MASK(
+    0, "dimension_mask", true,
+    "mask name",
+    "dmn_msk", "dim_mask");
 CommandLineOption CommandLineOption::EXCLUDE(
     'x', "exclude", false,
     "extract all variables EXCEPT those specified with -v",
