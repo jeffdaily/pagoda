@@ -106,14 +106,19 @@ static void op_reduce_min(const T *buf, int64_t count, double &val)
 
 void AbstractArray::operate_array(const Array *rhs, const int op)
 {
+    void *lhs_ptr = NULL;
+    bool same_dist = false;
+
     // first, make sure input arrays are compatible
     ASSERT(get_shape() == rhs->get_shape());
-    void *lhs_ptr = access();
+    lhs_ptr = access();
+    same_dist = same_distribution(rhs);
+
     if (NULL != lhs_ptr) {
         DataType lhs_type = get_type();
         DataType rhs_type = rhs->get_type();
         const void *rhs_ptr = NULL;
-        if (same_distribution(rhs)) {
+        if (same_dist) {
             rhs_ptr = rhs->access();
         } else {
             vector<int64_t> lo,hi;
@@ -145,7 +150,7 @@ void AbstractArray::operate_array(const Array *rhs, const int op)
             EXCEPT(DataTypeException, "DataType not handled", lhs_type);
         }
         // clean up
-        if (same_distribution(rhs)) {
+        if (same_dist) {
             rhs->release();
         } else {
             DataType rhs_type = rhs->get_type();
