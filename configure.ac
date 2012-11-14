@@ -147,6 +147,7 @@ AC_PATH_PROG([GA_CONFIG], [ga-config])
 PATH="$ga_save_PATH"
 AS_IF([test "x$GA_CONFIG" != x],
     [pg_cv_ga_found=yes
+     pg_ga_uses_flibs=yes
      GA_CPPFLAGS=`$GA_CONFIG --cppflags`
      GA_LDFLAGS=`$GA_CONFIG --ldflags`
      GA_LIBS=`$GA_CONFIG --libs`

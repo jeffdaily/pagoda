@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -35,6 +36,7 @@ using std::exception;
 using std::map;
 using std::make_pair;
 using std::pair;
+using std::sort;
 using std::string;
 using std::vector;
 

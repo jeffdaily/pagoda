@@ -1,6 +1,8 @@
 #ifndef PAGODA_BOOTSTRAP_H_
 #define PAGODA_BOOTSTRAP_H_
 
+#include <stdint.h>
+
 #include <string>
 
 using std::string;

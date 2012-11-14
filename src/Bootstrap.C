@@ -2,8 +2,6 @@
 #   include <config.h>
 #endif
 
-#include <string>
-
 #include <mpi.h>
 #if HAVE_GA
 #   include <ga.h>
@@ -12,11 +10,19 @@
 #   include <bil.h>
 #endif
 
+#include <stdint.h>
+
+#include <iostream>
+#include <string>
+
 #include "Bootstrap.H"
 #include "Dataset.H"
 #include "FileWriter.H"
 #include "Print.H"
 #include "ProcessGroup.H"
+
+using std::cerr;
+using std::endl;
 
 #if HAVE_PNETCDF
 extern Dataset* pagoda_pnetcdf_open(const std::string&, const ProcessGroup&);
