@@ -438,6 +438,16 @@ void MaskMap::modify(const vector<LatLonBox> &boxes, Grid *grid)
 
 
 /**
+ * Modify the mask by assigning the given values directly.
+ */
+void MaskMap::modify(const string &name, Array *values)
+{
+    Array *mask = get_mask(name);
+    mask->copy(values);
+}
+
+
+/**
  * Modify the shared mask of the given lat/lon variables.
  *
  * For instance the lat/lon variables for corners, edges, and cells would have
@@ -598,6 +608,21 @@ void MaskMap::modify(
 }
 
 
+void MaskMap::clear_mask(const string &name)
+{
+    Array *mask = get_mask(name);
+
+    if (mask == NULL) {
+        pagoda::print_zero("Sliced dimension '%s' does not exist\n",
+                           name.c_str());
+    }
+    else {
+        cleared.insert(name);
+        mask->clear();
+    }
+}
+
+
 bool MaskMap::has_mask(const string &name) const
 {
     return masks.find(name) != masks.end();
@@ -626,6 +651,13 @@ Array* MaskMap::get_mask(const string &name)
 Array* MaskMap::operator [](const string &name)
 {
     return get_mask(name);
+}
+
+
+void MaskMap::clear_mask(const Dimension *dim)
+{
+    seed_mask(dim);
+    clear_mask(dim->get_name());
 }
 
 

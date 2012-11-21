@@ -63,6 +63,9 @@ void PgrsubCommands::parse(int argc, char **argv)
     if (parser.count(CommandLineOption::DIMENSION_MASK)) {
         dimension_masks = parser.get_arguments(CommandLineOption::DIMENSION_MASK);
     }
+    else {
+        throw CommandException("dimension mask argument required");
+    }
 }
 
 
@@ -153,7 +156,7 @@ vector<Dimension*> PgrsubCommands::get_dimensions(Dataset *dataset)
 }
 
 
-vector<string> PgrsubCommands::get_dimension_masks(Dataset *dataset)
+vector<string> PgrsubCommands::get_dimension_masks() const
 {
     return dimension_masks;
 }

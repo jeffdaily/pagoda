@@ -55,7 +55,9 @@ class GlobalArray : public AbstractArray
 
         virtual void fill(void *value);
 
+#if 0
         virtual void copy(const Array *src);
+#endif
         virtual void copy(const Array *src,
                           const vector<int64_t> &src_lo,
                           const vector<int64_t> &src_hi,

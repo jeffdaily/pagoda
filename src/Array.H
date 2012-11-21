@@ -211,7 +211,7 @@ class Array
                           const vector<int64_t> &dst_hi) = 0;
 
         /**
-         * Duplicates this Array buy as a new type.
+         * Duplicates this Array but as a new type.
          *
          * @param[in] new_type the type of the new Array
          * @return the new Array, cast to the given type
@@ -254,7 +254,7 @@ class Array
                                  Array *dst_array=NULL) const = 0;
 
         /**
-         * Duplicates this Array.
+         * Duplicates this Array i.e. same shape, type, and data.
          */
         virtual Array* clone() const = 0;
 

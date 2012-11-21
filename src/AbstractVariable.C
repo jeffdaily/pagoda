@@ -454,10 +454,7 @@ void AbstractVariable::set_translate_record(bool value)
 static bool needs_subset_common(const vector<Array*> &masks)
 {
     vector<Array*>::const_iterator mask_it;
-
-    if (masks.empty()) {
-        return false;
-    }
+    bool retval = false;
 
     for (mask_it=masks.begin(); mask_it!=masks.end(); ++mask_it) {
         Array *mask = *mask_it;
@@ -465,12 +462,13 @@ static bool needs_subset_common(const vector<Array*> &masks)
             int64_t count = mask->get_count();
             int64_t size = mask->get_size();
             if (count != size) {
-                return true;
+                retval = true;
+                break;
             }
         }
     }
 
-    return false;
+    return retval;
 }
 
 
@@ -494,6 +492,7 @@ bool AbstractVariable::needs_renumber() const
 {
     vector<Grid*> grids = get_dataset()->get_grids();
     vector<Grid*>::iterator grid_it;
+    bool retval = false;
 
     for (grid_it=grids.begin(); grid_it!=grids.end(); ++grid_it) {
         Grid *grid = *grid_it;
@@ -504,13 +503,13 @@ bool AbstractVariable::needs_renumber() const
                 int64_t count = mask->get_count();
                 int64_t size = mask->get_size();
                 if (count != size) {
-                    return true;
+                    retval = true;
                 }
             }
         }
     }
 
-    return false;
+    return retval;
 }
 
 

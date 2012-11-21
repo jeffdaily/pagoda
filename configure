@@ -9153,11 +9153,18 @@ fi
 PATH="$ga_save_PATH"
 if test "x$GA_CONFIG" != x; then :
   pg_cv_ga_found=yes
-     pg_ga_uses_flibs=yes
+
+$as_echo "#define HAVE_GA 1" >>confdefs.h
+
      GA_CPPFLAGS=`$GA_CONFIG --cppflags`
      GA_LDFLAGS=`$GA_CONFIG --ldflags`
      GA_LIBS=`$GA_CONFIG --libs`
-     GA_FLIBS=`$GA_CONFIG --flibs`
+     GA_USES_FLIBS=`$GA_CONFIG --enable-f77`
+     if test "x$GA_USES_FLIBS" = xyes; then :
+  pg_ga_uses_flibs=yes
+else
+  pg_ga_uses_flibs=no
+fi
 fi
 if test "x$pg_cv_ga_found" = xno; then :
 

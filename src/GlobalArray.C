@@ -273,6 +273,7 @@ void GlobalArray::fill(void *value)
 }
 
 
+#if 0
 void GlobalArray::copy(const Array *src)
 {
     const GlobalArray *ga_src = dynamic_cast<const GlobalArray*>(src);
@@ -295,6 +296,7 @@ void GlobalArray::copy(const Array *src)
         }
     }
 }
+#endif
 
 
 void GlobalArray::copy(const Array *src,

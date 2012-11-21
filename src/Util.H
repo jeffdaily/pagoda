@@ -47,6 +47,7 @@ namespace pagoda
     void*  allocate(const DataType &type, const int64_t &n);
     void*  allocate(const DataType &type, const vector<int64_t> &shape);
     void deallocate(const DataType &type, void *ptr);
+    void deallocate(const DataType &type, const void *ptr);
 
     /**
      * Generic unary function for calling "delete" on the given object.

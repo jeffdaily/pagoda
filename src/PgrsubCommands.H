@@ -29,7 +29,7 @@ class PgrsubCommands : public GenericCommands
         virtual Dataset* get_dataset();
         virtual vector<Variable*> get_variables(Dataset *dataset);
         virtual vector<Dimension*> get_dimensions(Dataset *dataset);
-        virtual vector<string> get_dimension_masks(Dataset *dataset=NULL);
+        virtual vector<string> get_dimension_masks() const;
         virtual string get_output_filename_with_index(int64_t index) const;
         virtual FileWriter* get_output_at(int64_t index) const;
 

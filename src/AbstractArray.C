@@ -185,18 +185,41 @@ void AbstractArray::fill(void *value)
 
 void AbstractArray::copy(const Array *src)
 {
-    /** @todo TODO implement */
-    ERR("Not implemented");
-#if 0
-    void *data = access();
+    bool same_dist = this->same_distribution(src);
 
-    ASSERT(same_distribution(src));
-    ASSERT(get_type() == src->get_type());
-    if (NULL != data) {
+    // types are different, so this is a cast
+    if (this->owns_data()) {
+        vector<int64_t> lo;
+        vector<int64_t> hi;
+        void *dst_data = NULL;
+        const void *src_data = NULL;
+        DataType type_dst = this->get_type();
+        DataType type_src = src->get_type();
 
-        release_update();
+        this->get_distribution(lo, hi);
+        if (same_dist) {
+            src_data = src->access();
+        } else {
+            src_data = src->get(lo, hi);
+        }
+        dst_data = this->access();
+#define DATATYPE_EXPAND(src_mt,src_t,dst_mt,dst_t) \
+        if (type_src == src_mt && type_dst == dst_mt) { \
+            const src_t *src = static_cast<const src_t*>(src_data); \
+            dst_t *dst = static_cast<dst_t*>(dst_data); \
+            pagoda::copy_cast<dst_t>(src,src+get_size(),dst); \
+        } else
+#include "DataType2_small.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type_src);
+        }
+        this->release_update();
+        if (same_dist) {
+            src->release();
+        } else {
+            pagoda::deallocate(type_src, src_data);
+        }
     }
-#endif
 }
 
 
@@ -210,47 +233,10 @@ Array* AbstractArray::cast(DataType new_type) const
         dst_array = clone();
     }
     else {
-        // types are different, so this is a cast
         dst_array = Array::create(new_type, shape);
-        if (dst_array->owns_data()) {
-            vector<int64_t> lo;
-            vector<int64_t> hi;
-            void *dst_data = NULL;
-            const void *src_data = NULL;
-            DataType type_dst = dst_array->get_type();
-            dst_array->get_distribution(lo, hi);
-            if (same_distribution(dst_array)) {
-                src_data = access();
-            } else {
-                src_data = get(lo, hi);
-            }
-            dst_data = dst_array->access();
-#define DATATYPE_EXPAND(src_mt,src_t,dst_mt,dst_t) \
-            if (type == src_mt && type_dst == dst_mt) { \
-                const src_t *src = static_cast<const src_t*>(src_data); \
-                dst_t *dst = static_cast<dst_t*>(dst_data); \
-                pagoda::copy_cast<dst_t>(src,src+get_size(),dst); \
-            } else
-#include "DataType2_small.def"
-            {
-                EXCEPT(DataTypeException, "DataType not handled", type);
-            }
-            dst_array->release_update();
-            if (same_distribution(dst_array)) {
-                release();
-            } else {
-#define DATATYPE_EXPAND(mt,t) \
-                if (type_dst == mt) { \
-                    const t *src = static_cast<const t*>(src_data); \
-                    delete [] src; \
-                } else 
-#include "DataType.def"
-                {
-                    EXCEPT(DataTypeException, "DataType not handled", type_dst);
-                }
-            }
-        }
     }
+
+    dst_array->copy(this);
 
     return dst_array;
 }
@@ -763,12 +749,20 @@ int64_t AbstractArray::get_count()
 
 void AbstractArray::clear()
 {
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
+
     fill_value(0);
 }
 
 
 void AbstractArray::reset()
 {
+    dirty_index = true; // aggresive dirtiness
+    dirty_sum = true;
+    dirty_count = true;
+
     fill_value(1);
 }
 

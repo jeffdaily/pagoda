@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
 void pgrsub_blocking(PgrsubCommands &cmd)
 {
-    Dataset *dataset;
+    Dataset *dataset = NULL;
     vector<Variable*> vars;
     vector<Dimension*> dims;
     vector<Attribute*> atts;
@@ -94,15 +94,63 @@ void pgrsub_blocking(PgrsubCommands &cmd)
     vector<Variable*>::const_iterator var_it;
     Dimension *udim = NULL;
     int64_t nrec = 0;
+    vector<string> dim_mask_names;
+    vector<Variable*> dim_mask_vars;
+    vector<string> dim_mask_dim_names;
+    MaskMap *masks = NULL;
+    vector<Grid*> grids;
+    Grid *grid = NULL;
+
 
     cmd.get_inputs(dataset, vars, dims, atts);
     udim = dataset->get_udim();
     nrec = NULL != udim ? udim->get_size() : 0;
+    masks = dataset->get_masks();
+    grids = dataset->get_grids();
+    if (!grids.empty()) {
+        grid = grids[0];
+    }
+
+    dim_mask_names = cmd.get_dimension_masks();
+    // dim masks should be of rank 2, with first dim the record dim
+    for (int64_t i=0; i<dim_mask_names.size(); ++i) {
+        Variable *var = dataset->get_var(dim_mask_names[i]);
+        vector<Dimension*> dims;
+        if (NULL == var) {
+            throw CommandException("invalid dimension mask -- variable not found");
+        }
+        dims = var->get_dims();
+        if (dims.size() != 2) {
+            throw CommandException("invalid dimension mask -- rank != 2");
+        }
+        if (!dims[0]->is_unlimited()) {
+            throw CommandException("invalid dimension mask -- not a record var");
+        }
+        dim_mask_vars.push_back(var);
+        dim_mask_dim_names.push_back(dims[1]->get_name());
+    }
 
     /* for each record, create new output file with a new mask based on the
      * current record index */
     for (int64_t rec=0; rec<nrec; ++rec) {
-        writer = cmd.get_output();
+        bool skip_zero = false;
+        for (int64_t i=0; i<dim_mask_vars.size(); ++i) {
+            Variable *var = dim_mask_vars[i];
+            Array *array = NULL;
+            dataset->push_masks(NULL);
+            array = var->read(rec);
+            (void)dataset->pop_masks();
+            masks->clear_mask(dim_mask_dim_names[i]);
+            masks->modify(dim_mask_dim_names[i], array);
+            if (array->get_count() == 0) {
+                skip_zero = true;
+            }
+            delete array;
+        }
+        if (skip_zero) {
+            continue;
+        }
+        writer = cmd.get_output_at(rec);
         writer->write_atts(atts);
         writer->def_dims(dims);
         writer->def_vars(vars);

@@ -310,21 +310,29 @@ void* pagoda::allocate(const DataType &type, const vector<int64_t> &shape)
 
 void pagoda::deallocate(const DataType &type, void *ptr)
 {
-#define deallocate(TYPE, DT)                       \
+#define DATATYPE_EXPAND(DT, TYPE)                  \
     if (type == DT) {                              \
         TYPE *typed_ptr = static_cast<TYPE*>(ptr); \
         delete [] typed_ptr;                       \
         typed_ptr = NULL;                          \
     } else
-    deallocate(unsigned char, DataType::UCHAR)
-    deallocate(signed char,   DataType::SCHAR)
-    deallocate(char,          DataType::CHAR)
-    deallocate(int,           DataType::INT)
-    deallocate(long,          DataType::LONG)
-    deallocate(float,         DataType::FLOAT)
-    deallocate(double,        DataType::DOUBLE)
+#include "DataType.def"
     {
         EXCEPT(DataTypeException, "DataType not handled", type);
     }
-#undef deallocate
+}
+
+
+void pagoda::deallocate(const DataType &type, const void *ptr)
+{
+#define DATATYPE_EXPAND(DT, TYPE)                               \
+    if (type == DT) {                                           \
+        const TYPE *typed_ptr = static_cast<const TYPE*>(ptr);  \
+        delete [] typed_ptr;                                    \
+        typed_ptr = NULL;                                       \
+    } else
+#include "DataType.def"
+    {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
 }

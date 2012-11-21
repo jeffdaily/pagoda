@@ -72,13 +72,16 @@ class MaskMap
         void modify(const vector<IndexHyperslab> &hyperslabs);
         void modify(const CoordHyperslab &hyperslab, Grid *grid);
         void modify(const vector<CoordHyperslab> &hyperslabs, Grid *grid);
-        void modify(const vector<LatLonBox> &boxes, Grid *grid);
         void modify(const LatLonBox &box, Grid *grid);
+        void modify(const vector<LatLonBox> &boxes, Grid *grid);
+        void modify(const string &name, Array *values);
 
+        void clear_mask(const string &name);
         bool has_mask(const string &name) const;
         Array* get_mask(const string &name);
         Array* operator [](const string &name);
 
+        void clear_mask(const Dimension *dim);
         bool has_mask(const Dimension *dim) const;
         Array* get_mask(const Dimension *dim);
         Array* operator [](const Dimension *dim);

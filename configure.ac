@@ -147,11 +147,14 @@ AC_PATH_PROG([GA_CONFIG], [ga-config])
 PATH="$ga_save_PATH"
 AS_IF([test "x$GA_CONFIG" != x],
     [pg_cv_ga_found=yes
-     pg_ga_uses_flibs=yes
+     AC_DEFINE([HAVE_GA], [1], [set to 1 if we have the indicated package])
      GA_CPPFLAGS=`$GA_CONFIG --cppflags`
      GA_LDFLAGS=`$GA_CONFIG --ldflags`
      GA_LIBS=`$GA_CONFIG --libs`
-     GA_FLIBS=`$GA_CONFIG --flibs`])
+     GA_USES_FLIBS=`$GA_CONFIG --enable-f77`
+     AS_IF([test "x$GA_USES_FLIBS" = xyes],
+           [pg_ga_uses_flibs=yes],
+           [pg_ga_uses_flibs=no])])
 AS_IF([test "x$pg_cv_ga_found" = xno],
     [PAGODA_CHECK_PACKAGE([ga], [ga.h], [ga], [GA_Initialize],
                           [$FLIBS], [pg_ga_uses_flibs=yes])])
