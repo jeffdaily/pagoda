@@ -187,7 +187,6 @@ void AbstractArray::copy(const Array *src)
 {
     bool same_dist = this->same_distribution(src);
 
-    // types are different, so this is a cast
     if (this->owns_data()) {
         vector<int64_t> lo;
         vector<int64_t> hi;
@@ -234,6 +233,7 @@ Array* AbstractArray::cast(DataType new_type) const
     }
     else {
         dst_array = Array::create(new_type, shape);
+        dst_array->copy(this);
     }
 
     dst_array->copy(this);
