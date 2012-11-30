@@ -137,6 +137,10 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
     Variable *var_mask = cmd.get_mask_variable();
     Variable *var_weight = cmd.get_weight_variable();
 
+    if (cmd.is_verbose()) {
+        pagoda::println_zero("op: " + op);
+    }
+
     // read each variable in order
     // for record variables, read one record at a time
     for (var_it=vars.begin(); var_it!=vars.end(); ++var_it) {
@@ -155,6 +159,9 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
              * -- transpose bitmask if needed
              */
 
+            if (cmd.is_verbose()) {
+                pagoda::println_zero("\trecord variable");
+            }
 
             array = var->read(0, array);
             if (cmd.is_verbose()) {
@@ -190,12 +197,17 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
             delete array;
         }
         else {
+            Array *result = NULL;
             Array *array = var->read();
             Array *mask = NULL;
             Array *missing = NULL;
             Array *weight = NULL;
             vector<int64_t> dim_map_mask;
             vector<int64_t> dim_map_weight;
+
+            if (cmd.is_verbose()) {
+                pagoda::println_zero("\tnon-record variable");
+            }
 
             ASSERT(NULL != array);
 
@@ -273,12 +285,20 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
                     throw NotImplementedException("TODO missing");
                 }
                 else {
-                    throw NotImplementedException("shouldn't happen");
+                    if (reduced_dims.empty() && op == OP_AVG) {
+                        ScalarArray *tally = NULL;
+
+                        result = array->reduce_add();
+                        tally = new ScalarArray(result->get_type());
+                        tally->fill_value(array->get_local_size());
+                        result->idiv(tally);
+                    }
                 }
             }
 
-            //writer->write(result, var->get_name());
+            writer->write(result, var->get_name());
 
+            delete result;
             delete array;
         }
     }

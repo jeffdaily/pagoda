@@ -13,6 +13,7 @@
 #include "Error.H"
 
 using std::accumulate;
+using std::binary_function;
 using std::bind2nd;
 using std::cout;
 using std::endl;
@@ -29,20 +30,57 @@ class DataType;
  */
 namespace pagoda
 {
+
+    template <class T, class U> void iadd(T& x, const U& y) {
+        x+=static_cast<const T>(y);
+    };
+
+    template <class T, class U> void isub(T& x, const U& y) {
+        x-=static_cast<const T>(y);
+    };
+
+    template <class T, class U> void imul(T& x, const U& y) {
+        x*=static_cast<T>(y);
+    };
+
+    template <class T, class U> void idiv(T& x, const U& y) {
+        x/=static_cast<T>(y);
+    };
+
+    template <class T, class U> void imax(T& x, const U& y) {
+        x = std::max(x,static_cast<T>(y));
+    };
+
+    template <class T, class U> void imin(T& x, const U& y) {
+        x = std::min(x,static_cast<T>(y));
+    };
+
     void transpose(const DataType &type,
             const void *src, const vector<int64_t> &shape,
                   void *dst, const vector<int64_t> &axes);
+
+    void in_place_broadcast_add(
+                  void *dst, const vector<int64_t> &dst_shape, const DataType &dst_type,
+            const void *src, const vector<int64_t> &src_shape, const DataType &src_type);
+
+    void in_place_broadcast_mul(
+                  void *dst, const vector<int64_t> &dst_shape, const DataType &dst_type,
+            const void *src, const vector<int64_t> &src_shape, const DataType &src_type);
+
     void transpose(const DataType &type,
             const void *src, const vector<int64_t> &shape,
                   void *dst, const vector<int64_t> &axes,
                              const vector<int64_t> &reverse);
+
     void reduce_sum(const DataType &type,
             const void *src, const vector<int64_t> &src_shape,
                   void *dst, const vector<int64_t> &dst_shape);
+    
     void reduce_sum(const DataType &type,
             const void *src, const vector<int64_t> &src_shape,
                   void *dst, const vector<int64_t> &dst_shape,
             const void *msk, const vector<int64_t> &msk_shape);
+
     void reduce_sum(const DataType &type, const DataType &wgt_type,
             const void *src, const vector<int64_t> &src_shape,
                   void *dst, const vector<int64_t> &dst_shape,
@@ -52,17 +90,27 @@ namespace pagoda
     template <typename T> void transpose(
             const T *src, const vector<int64_t> &shape,
                   T *dst, const vector<int64_t> &axes);
+
     template <typename T> void transpose(
             const T *src, const vector<int64_t> &shape,
                   T *dst, const vector<int64_t> &axes,
                           const vector<int64_t> &reverse);
+
+    template <typename T, typename U, class InPlaceOperator>
+        void in_place_broadcast_op(
+                  T *dst, const vector<int64_t> &dst_shape,
+            const U *src, const vector<int64_t> &src_shape,
+                          InPlaceOperator op);
+
     template <typename T> void reduce_sum(
             const T *src, const vector<int64_t> &src_shape,
                   T *dst, const vector<int64_t> &dst_shape);
+
     template <typename T, typename U> void reduce_sum(
             const T *src, const vector<int64_t> &src_shape,
                   T *dst, const vector<int64_t> &dst_shape,
             const U *msk, const vector<int64_t> &msk_shape);
+
     template <typename T, typename U, typename V> void reduce_sum(
             const T *src, const vector<int64_t> &src_shape,
                   T *dst, const vector<int64_t> &dst_shape,
@@ -174,6 +222,122 @@ namespace pagoda
                 }
             }
         }
+    }
+
+    /**
+     * Apply the in-place operator to 'dst' and 'src' arrays where 'src' has
+     * fewer dimensions but will be broadcast to fit based on the 'src_shape'.
+     *
+     * @param[in,out] dst the destination buffer, contiguous
+     * @param[in] dst_shape the shape of the destination buffer
+     * @param[in,out] src the source buffer, contiguous
+     * @param[in] src_shape dimensions to broadcast are indicated by <=0
+     * @param[in] op a binary in-place operator e.g. a += b
+     */
+    template <typename T, typename U, class InPlaceOperator>
+        void in_place_broadcast_op(
+                  T *dst, const vector<int64_t> &dst_shape,
+            const U *src, const vector<int64_t> &src_shape,
+                          InPlaceOperator op)
+    {
+        T *dst_ptr;
+        int64_t dst_ndim = dst_shape.size();
+        int64_t dst_nd_m1 = dst_ndim-1;
+        int64_t dst_elems_prod = 1;
+        vector<int64_t> dst_elems = dst_shape;
+        vector<int64_t> dst_coords(dst_ndim);
+        vector<int64_t> dst_dims_m1(dst_ndim);
+        vector<int64_t> dst_strides(dst_ndim);
+        vector<int64_t> dst_backstrides(dst_ndim);
+
+        const U *src_ptr;
+        int64_t src_ndim = count_if(src_shape.begin(), src_shape.end(),
+                                    bind2nd(greater<int64_t>(),0));
+        int64_t src_nd_m1 = src_ndim-1;
+        int64_t src_elems_prod = 1;
+        vector<int64_t> src_elems(src_ndim);
+        vector<int64_t> src_coords(src_ndim);
+        vector<int64_t> src_dims_m1(src_ndim);
+        vector<int64_t> src_strides(src_ndim);
+        vector<int64_t> src_backstrides(src_ndim);
+
+        vector<int64_t> brd_strides(dst_ndim);
+        vector<int64_t> brd_backstrides(dst_ndim);
+
+        /* remove the invalid values from src_shape */
+        remove_copy_if(src_shape.begin(), src_shape.end(), src_elems.begin(),
+                bind2nd(less_equal<int64_t>(),0));
+
+        /* dst shape */
+        dst_elems_prod = accumulate(
+                dst_elems.begin(), dst_elems.end(), 1, multiplies<int64_t>());
+
+        /* src shape */ 
+        src_elems_prod = accumulate(
+                src_elems.begin(), src_elems.end(), 1, multiplies<int64_t>());
+
+        /* dst iterator setup */
+        for (int64_t i=dst_nd_m1; i>=0; --i) {
+            dst_coords[i] = 0;
+            dst_dims_m1[i] = dst_elems[i]-1;
+            dst_strides[i] = (i == dst_nd_m1) ? 1 : dst_strides[i+1]*dst_elems[i+1];
+            dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
+        }
+
+        /* src iterator setup */
+        for (int64_t i=src_nd_m1; i>=0; --i) {
+            src_coords[i] = 0;
+            src_dims_m1[i] = src_elems[i]-1;
+            src_strides[i] = (i == src_nd_m1) ? 1 : src_strides[i+1]*src_elems[i+1];
+            src_backstrides[i] = src_dims_m1[i]*src_strides[i];
+        }
+
+        /* copy src strides into brd (broadcast) strides as appropriate */
+        for (int64_t i=0,j=0; i<dst_ndim; ++i) {
+            if (src_shape[i] <= 0) {
+                brd_strides[i] = 0;
+                brd_backstrides[i] = 0;
+            }
+            else {
+                brd_strides[i] = src_strides[j];
+                brd_backstrides[i] = src_backstrides[j++];
+            }
+        }
+
+        dst_ptr = dst;
+        src_ptr = src;
+        for (int64_t elem=0; elem<dst_elems_prod; ++elem) {
+#if DEBUG
+            cout << elem;
+            for (int64_t i=0; i<dst_ndim; ++i) {
+                cout << " " << dst_coords[i];
+            }
+            cout << endl;
+#endif
+            op(*dst_ptr, *src_ptr);
+            for (int64_t i=dst_nd_m1; i>=0; --i) {
+                if (dst_coords[i] < dst_dims_m1[i]) {
+                    ++dst_coords[i];
+                    dst_ptr += dst_strides[i];
+                    src_ptr += brd_strides[i];
+                    break;
+                }
+                else {
+                    dst_coords[i] = 0;
+                    dst_ptr -= dst_backstrides[i];
+                    src_ptr -= brd_backstrides[i];
+                }
+            }
+        }
+
+#if DEBUG
+        for (int64_t i=0; i<src_elems[0]; ++i) {
+            for (int64_t j=0; j<src_elems[1]; ++j) {
+                cout << src[i*src_elems[1] + j] << " ";
+            }
+            cout << endl;
+        }
+#endif
     }
 
     /**

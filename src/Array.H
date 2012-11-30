@@ -556,6 +556,20 @@ class Array
         virtual Array* mul(const Array *rhs) const = 0;
 
         /**
+         * Multiplies two Arrays.
+         *
+         * The given Array is assumed to have fewer dimensions than
+         * the current Array. An explicit broadcasting shape must also be
+         * supplied. Missing dimensions are indicated by <= 0 for a given
+         * dimension index.
+         *
+         * @param[in] rhs the Array to multiply
+         * @param[in] shape the shape of the Array to multiply
+         * @return the result, as a new Array
+         */
+        virtual Array* mul(const Array *rhs, const vector<int64_t> &shape) const = 0;
+
+        /**
          * Multiplies two Arrays, in-place.
          *
          * If the given Array has fewer Dimensions, but the shape is otherwise
@@ -565,6 +579,20 @@ class Array
          * @return the result, as this Array
          */
         virtual Array* imul(const Array *rhs) = 0;
+
+        /**
+         * Multiplies two Arrays, in-place.
+         *
+         * The given Array is assumed to have fewer dimensions than
+         * the current Array. An explicit broadcasting shape must also be
+         * supplied. Missing dimensions are indicated by <= 0 for a given
+         * dimension index.
+         *
+         * @param[in] rhs the Array to multiply
+         * @param[in] shape the shape of the Array to multiply
+         * @return the result, as a new Array
+         */
+        virtual Array* imul(const Array *rhs, const vector<int64_t> &shape) = 0;
 
         /**
          * Divides two Arrays.

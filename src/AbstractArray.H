@@ -163,8 +163,14 @@ class AbstractArray : public Array
         /** @copydoc Array::mul(const Array*) const */
         virtual Array* mul(const Array *rhs) const;
 
+        /** @copydoc Array::mul(const Array*,const vector<int64_t>&) const */
+        virtual Array* mul(const Array *rhs, const vector<int64_t> &shape) const;
+
         /** @copydoc Array::imul(const Array*) */
         virtual Array* imul(const Array *rhs);
+
+        /** @copydoc Array::imul(const Array*) */
+        virtual Array* imul(const Array *rhs, const vector<int64_t> &shape);
 
         /** @copydoc Array::div(const Array*) const */
         virtual Array* div(const Array *rhs) const;
@@ -294,6 +300,12 @@ class AbstractArray : public Array
          * @todo TODO document
          */
         void operate(const Array *rhs, const int op);
+
+        /**
+         * @todo TODO document
+         */
+        void operate_broadcast(const Array *rhs, const int op,
+                const vector<int64_t> &shape);
 
         /**
          * @todo TODO document

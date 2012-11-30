@@ -426,6 +426,14 @@ Array* AbstractArray::mul(const Array *rhs) const
 }
 
 
+Array* AbstractArray::mul(const Array *rhs, const vector<int64_t> &shape) const
+{
+    Array *array = clone();
+    array->imul(rhs, shape);
+    return array;
+}
+
+
 Array* AbstractArray::div(const Array *rhs) const
 {
     Array *array = clone();
@@ -475,6 +483,13 @@ Array* AbstractArray::isub(const Array *rhs)
 Array* AbstractArray::imul(const Array *rhs)
 {
     operate(rhs, OP_MUL);
+    return this;
+}
+
+
+Array* AbstractArray::imul(const Array *rhs, const vector<int64_t> &shape)
+{
+    operate_broadcast(rhs, OP_MUL, shape);
     return this;
 }
 
@@ -666,8 +681,105 @@ void AbstractArray::operate(const Array *rhs, const int op)
         } else {
             operate_array(rhs, op);
         }
-    } else if (broadcast_check(rhs)) {
-        ERR("operate_array_broadcast not implemented");
+    } else {
+        ERR("broadcast required");
+    }
+}
+
+
+void AbstractArray::operate_broadcast(const Array *rhs, const int op,
+        const vector<int64_t> &broadcast_shape)
+{
+    int64_t ndim = get_ndim();
+    int64_t rhs_ndim = rhs->get_ndim();
+    vector<int64_t> shape = get_shape();
+    vector<int64_t> rhs_shape = rhs->get_shape();
+    vector<int64_t> local_shape = get_local_shape();
+    vector<int64_t> rhs_corresponding_shape;
+    vector<int64_t> lo;
+    vector<int64_t> hi;
+    vector<int64_t> rhs_lo;
+    vector<int64_t> rhs_hi;
+
+    dump();
+    rhs->dump();
+
+    // this method should only be called when we explicitly want broadcasting
+    ASSERT(rhs_shape != broadcast_shape);
+    ASSERT(rhs_ndim < ndim);
+
+    // check broadcast_shape compatibility with current array
+    ASSERT(broadcast_shape.size() == ndim);
+    for (int64_t i=0; i<ndim; ++i) {
+        ASSERT(broadcast_shape[i] == 0 || broadcast_shape[i] == shape[i]);
+    }
+
+    get_distribution(lo,hi);
+    rhs_lo.reserve(rhs_ndim);
+    rhs_hi.reserve(rhs_ndim);
+    rhs_corresponding_shape.reserve(ndim);
+
+    // remove parts of the shape corresponding to zeros for lo/hi bounds
+    for (int64_t i=0; i<ndim; ++i) {
+        if (broadcast_shape[i] != 0) {
+            rhs_lo.push_back(lo[i]);
+            rhs_hi.push_back(hi[i]);
+            rhs_corresponding_shape.push_back(hi[i]-lo[i]+1);
+        }
+        else {
+            rhs_corresponding_shape.push_back(0);
+        }
+    }
+    ASSERT(rhs_lo.size() == rhs_ndim);
+    ASSERT(rhs_hi.size() == rhs_ndim);
+
+    if (owns_data()) {
+        void *data = NULL;
+        const void *rhs_data = NULL;
+        DataType type = get_type();
+        DataType rhs_type = rhs->get_type();
+
+        data = access();
+        rhs_data = rhs->get(rhs_lo,rhs_hi);
+
+#define DATATYPE_EXPAND(DT_L,T_L,DT_R,T_R)                                  \
+        if (DT_L == type && DT_R == rhs_type) {                             \
+            T_L *lhs_buf = static_cast<T_L*>(data);                         \
+            const T_R *rhs_buf = static_cast<const T_R*>(rhs_data);         \
+            switch (op) {                                                   \
+                case OP_ADD: in_place_broadcast_op(                         \
+                                    lhs_buf, local_shape,                   \
+                                    rhs_buf, rhs_corresponding_shape,       \
+                                    pagoda::iadd<T_L,T_R>);                 \
+                             break;                                         \
+                case OP_MUL: in_place_broadcast_op(                         \
+                                    lhs_buf, local_shape,                   \
+                                    rhs_buf, rhs_corresponding_shape,       \
+                                    pagoda::imul<T_L,T_R>);                 \
+                             break;                                         \
+                case OP_SUB:                                                \
+                case OP_DIV:                                                \
+                case OP_MAX:                                                \
+                case OP_MIN:                                                \
+                default: ERRCODE("operation not supported", op);            \
+            }                                                               \
+        } else
+#include "DataType2_small.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", type);
+        }
+        // clean up
+#define DATATYPE_EXPAND(DT_R,T_R) \
+        if (rhs_type == DT_R) { \
+            const T_R *a = static_cast<const T_R*>(rhs_data); \
+            delete [] a; \
+        } else 
+#include "DataType.def"
+        {
+            EXCEPT(DataTypeException, "DataType not handled", rhs_type);
+        }
+
+        release_update();
     }
 }
 
