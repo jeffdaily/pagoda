@@ -32,7 +32,10 @@
 #include "Validator.H"
 #include "Variable.H"
 
+using std::bind2nd;
+using std::count_if;
 using std::exception;
+using std::greater;
 using std::map;
 using std::make_pair;
 using std::pair;
@@ -148,6 +151,8 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
         if (cmd.is_verbose()) {
             pagoda::println_zero("processing variable: " + var->get_name());
         }
+        /* TODO memory efficient impl one record at a time */
+#if 0
         if (var->has_record() && var->get_nrec() > 0) {
             int64_t nrec = var->get_nrec();
             Array *result = NULL;
@@ -196,14 +201,19 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
             delete result;
             delete array;
         }
-        else {
-            Array *result = NULL;
+        else
+#endif
+        {
+            Array *numerator = NULL;
+            Array *denominator = NULL;
             Array *array = var->read();
-            Array *mask = NULL;
-            Array *missing = NULL;
-            Array *weight = NULL;
-            vector<int64_t> dim_map_mask;
-            vector<int64_t> dim_map_weight;
+            Array *missing = array->get_mask();
+            vector<Dimension*> var_dims = var->get_dims();
+            vector<int64_t> reduced_shape = array->get_shape();
+            int64_t original_ndim = array->get_ndim();
+            bool needs_reduction = false;
+            bool weight_ok = true;
+            string the_op = op;
 
             if (cmd.is_verbose()) {
                 pagoda::println_zero("\tnon-record variable");
@@ -211,95 +221,348 @@ void pgwa_blocking(Dataset *dataset, const vector<Variable*> &vars,
 
             ASSERT(NULL != array);
 
+            // coordinate variables are always averaged regardless of OP
+            if (var->is_coordinate()) {
+                the_op = OP_AVG;
+            }
+
+            /* we need an array with the same type as the source array to hold
+             * our results a we go; this will be the denominator */
+            denominator = array->clone();
+            denominator->fill_value(1);
+
             if (var_weight) {
-                weight = var_weight->read();
-                dim_map_weight = conformity(
-                        var_weight->get_dims(), var->get_dims());
+                bool needs_transpose = false;
+                bool needs_broadcast = false;
+                vector<Dimension*> weight_dims = var_weight->get_dims();
+                vector<int64_t> T_axes;
+                int64_t T_index = 0;
+                vector<int64_t> broadcast_shape = var->get_shape();
+
+                /* Does the weight var have a subset of the same dimensions as
+                 * the current var?
+                 * While we're at it, let's construct the transpose axes as
+                 * well as the possible broadcast shape. */
+                if (weight_ok) {
+                    T_index = 0;
+                    T_axes.assign(weight_dims.size(), -1);
+                    for (int64_t i=0; i<var_dims.size(); ++i) {
+                        bool found_dim = false;
+                        Dimension *var_dim = var_dims.at(i);
+                        for (int64_t j=0; j<weight_dims.size(); ++j) {
+                            Dimension *weight_dim = weight_dims.at(j);
+                            if (Dimension::equal(weight_dim, var_dim)) {
+                                T_axes.at(j) = T_index++;
+                                found_dim = true;
+                                break;
+                            }
+                        }
+                        if (!found_dim) {
+                            broadcast_shape.at(i) = 0;
+                        }
+                    }
+                    /* Any -1 values in the transpose axes mean the weight var
+                     * dims are not a subset of the current var dims and we
+                     * skip the weight. */
+                    /* We can also check whether a transpose is needed by
+                     * looking for absense of monotonically increasing
+                     * indicies. */
+                    for (int64_t i=0; i<weight_dims.size(); ++i) {
+                        if (T_axes.at(i) == -1) {
+                            weight_ok = false;
+                            break;
+                        }
+                        else if (i > 0 && T_axes.at(i) != T_axes[i-1]+1) {
+                            needs_transpose = true;
+                        }
+                        else if (i == 0 && T_axes.at(i) != 0) {
+                            needs_transpose = true;
+                        }
+                    }
+                    /* We can also check whether a broadcasting operation is
+                     * needed by looking for zeros in the broadcast_shape. */
+                    for (int64_t i=0; i<var_dims.size(); ++i) {
+                        if (broadcast_shape.at(i) <= 0) {
+                            needs_broadcast = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (cmd.is_verbose()) {
+                    pagoda::println_zero("\tweight ok? "
+                            + pagoda::to_string(weight_ok));
+                    pagoda::println_zero("\tneeds_transpose? "
+                            + pagoda::to_string(needs_transpose));
+                    pagoda::println_zero("\tneeds_broadcast? "
+                            + pagoda::to_string(needs_broadcast));
+                    pagoda::println_zero("\tT_axes="
+                            + pagoda::vec_to_string(T_axes));
+                    pagoda::println_zero("\tbroadcast_shape="
+                            + pagoda::vec_to_string(broadcast_shape));
+                }
+
+                /* don't read weight var and process unless needed */
+                if (weight_ok) {
+                    Array *weight_maybe_transposed = NULL;
+                    Array *weight = var_weight->read();
+                    ASSERT(weight);
+                    if (needs_transpose) {
+                        weight_maybe_transposed = weight->transpose(T_axes);
+                        ASSERT(weight_maybe_transposed);
+                    }
+                    else {
+                        weight_maybe_transposed = weight;
+                    }
+                    if (needs_broadcast) {
+                        denominator->imul(weight_maybe_transposed, broadcast_shape);
+                    }
+                    else {
+                        denominator->imul(weight_maybe_transposed);
+                    }
+                    if (needs_transpose) {
+                        delete weight_maybe_transposed;
+                    }
+                    delete weight;
+                }
             }
 
             if (var_mask) {
-                Array *raw_mask = var_mask->read();
-                mask = raw_mask->get_mask();
-                dim_map_mask = conformity(
-                        var_mask->get_dims(), var->get_dims());
-            }
+                bool ok = true; /* to indicate dimension mismatches */
+                bool needs_transpose = false;
+                bool needs_broadcast = false;
+                vector<Dimension*> mask_dims = var_mask->get_dims();
+                vector<int64_t> T_axes;
+                int64_t T_index = 0;
+                vector<int64_t> broadcast_shape = var->get_shape();
 
-            if (array->has_validator()) {
-                missing = array->get_mask();
-            }
-
-            void *data = array->access();
-            void *data_mask = NULL;
-            void *data_missing = NULL;
-            void *data_weight = NULL;
-            vector<int64_t> shape_mask;
-            vector<int64_t> shape_weight;
-            if (NULL != data) {
-                vector<int64_t> lo,hi;
-                array->get_distribution(lo,hi);
-                // get corresponding portion of missing value mask
-                if (missing) {
-                    data_missing = missing->get(lo,hi);
-                }
-                // get corresponding portion of weight
-                if (weight) {
-                    get_corresponding(lo, hi, dim_map_weight, weight,
-                            data_weight, shape_weight);
-                }
-                // get corresponding portion of mask
-                if (mask) {
-                    get_corresponding(lo, hi, dim_map_mask, mask,
-                            data_mask, shape_mask);
-                }
-#if 1
-                pagoda::println_sync(STR_VEC(dim_map_weight));
-                pagoda::println_sync(STR_VEC(shape_weight));
-                pagoda::println_sync(STR_VEC(dim_map_mask));
-                pagoda::println_sync(STR_VEC(shape_mask));
-#endif
-
-                if (weight && mask && missing) {
-                    throw NotImplementedException("TODO weight mask missing");
-                }
-                else if (weight && mask) {
-                    throw NotImplementedException("TODO weight mask");
-                }
-                else if (weight && missing) {
-                    throw NotImplementedException("TODO weight missing");
-                }
-                else if (mask && missing) {
-                    throw NotImplementedException("TODO mask missing");
-                }
-                else if (weight) {
-                    float dst=0;
-                    pagoda::reduce_sum(array->get_type(), 
-                            data, array->get_local_shape(),
-                            &dst, vector<int64_t>(array->get_ndim(),0),
-                            data_weight, shape_weight);
-                    pagoda::println_sync("dst=" + pagoda::to_string(dst));
-                }
-                else if (mask) {
-                    throw NotImplementedException("TODO mask");
-                }
-                else if (missing) {
-                    throw NotImplementedException("TODO missing");
-                }
-                else {
-                    if (reduced_dims.empty() && op == OP_AVG) {
-                        ScalarArray *tally = NULL;
-
-                        result = array->reduce_add();
-                        tally = new ScalarArray(result->get_type());
-                        tally->fill_value(array->get_local_size());
-                        result->idiv(tally);
+                /* Does the mask var have a subset of the same dimensions as
+                 * the current var?
+                 * While we're at it, let's construct the transpose axes as
+                 * well as the possible broadcast shape. */
+                if (ok) {
+                    T_index = 0;
+                    T_axes.assign(mask_dims.size(), -1);
+                    for (int64_t i=0; i<var_dims.size(); ++i) {
+                        bool found_dim = false;
+                        Dimension *var_dim = var_dims.at(i);
+                        for (int64_t j=0; j<mask_dims.size(); ++j) {
+                            Dimension *mask_dim = mask_dims.at(j);
+                            if (Dimension::equal(mask_dim, var_dim)) {
+                                T_axes.at(j) = T_index++;
+                                found_dim = true;
+                                break;
+                            }
+                        }
+                        if (!found_dim) {
+                            broadcast_shape.at(i) = 0;
+                        }
+                    }
+                    /* Any -1 values in the transpose axes mean the mask var
+                     * dims are not a subset of the current var dims and we
+                     * skip the mask. */
+                    /* We can also check whether a transpose is needed by
+                     * looking for absense of monotonically increasing
+                     * indicies. */
+                    for (int64_t i=0; i<mask_dims.size(); ++i) {
+                        if (T_axes.at(i) == -1) {
+                            ok = false;
+                            break;
+                        }
+                        else if (i > 0 && T_axes.at(i) != T_axes[i-1]+1) {
+                            needs_transpose = true;
+                        }
+                        else if (i == 0 && T_axes.at(i) != 0) {
+                            needs_transpose = true;
+                        }
+                    }
+                    /* We can also check whether a broadcasting operation is
+                     * needed by looking for zeros in the broadcast_shape. */
+                    for (int64_t i=0; i<var_dims.size(); ++i) {
+                        if (broadcast_shape.at(i) <= 0) {
+                            needs_broadcast = true;
+                            break;
+                        }
                     }
                 }
+
+                if (cmd.is_verbose()) {
+                    pagoda::println_zero("\tmask ok? "
+                            + pagoda::to_string(ok));
+                    pagoda::println_zero("\tneeds_transpose? "
+                            + pagoda::to_string(needs_transpose));
+                    pagoda::println_zero("\tneeds_broadcast? "
+                            + pagoda::to_string(needs_broadcast));
+                    pagoda::println_zero("\tT_axes="
+                            + pagoda::vec_to_string(T_axes));
+                    pagoda::println_zero("\tbroadcast_shape="
+                            + pagoda::vec_to_string(broadcast_shape));
+                }
+
+                /* don't read mask var and process unless needed */
+                if (ok) {
+                    Array *mask_maybe_transposed = NULL;
+                    Array *mask = var_mask->read();
+                    ASSERT(mask);
+                    if (needs_transpose) {
+                        mask_maybe_transposed = mask->transpose(T_axes);
+                        ASSERT(mask_maybe_transposed);
+                    }
+                    else {
+                        mask_maybe_transposed = mask;
+                    }
+                    if (needs_broadcast) {
+                        denominator->imul(mask_maybe_transposed, broadcast_shape);
+                    }
+                    else {
+                        denominator->imul(mask_maybe_transposed);
+                    }
+                    if (needs_transpose) {
+                        delete mask_maybe_transposed;
+                    }
+                    delete mask;
+                }
             }
 
-            writer->write(result, var->get_name());
+            /* mask values based on missing_value attribute */
+            denominator->imul(missing);
 
-            delete result;
+            if (var_weight && weight_ok && the_op == OP_RMSSDN) {
+                the_op = OP_RMS;
+            }
+
+            /* some ops need to square the input values */
+            if (the_op == OP_AVGSQR || the_op == OP_RMS || the_op == OP_RMSSDN) {
+                array->imul(array);
+            }
+            
+            /* original array becomes the numerator */
+            array->imul(denominator);
+
+            /*
+            OP_AVG);
+            OP_SQRAVG);
+            OP_AVGSQR);
+            OP_MAX);
+            OP_MIN);
+            OP_RMS);
+            OP_RMSSDN);
+            OP_SQRT);
+            OP_TTL);
+            */
+
+            /* what's the new shape of the array based on the dimensions we are
+             * reducing? */
+            int64_t reduced_ndim = 0;
+            for (int64_t i=0; i<var_dims.size(); ++i) {
+                Dimension *dim = var_dims.at(i);
+                if (reduced_dims.empty()
+                        || reduced_dims.count(dim->get_name())) {
+                    reduced_shape[i] = 0;
+                    needs_reduction = true;
+                }
+                else {
+                    ++reduced_ndim;
+                }
+            }
+
+            if (cmd.is_verbose()) {
+                pagoda::println_zero("\treduced_shape="
+                        + pagoda::vec_to_string(reduced_shape));
+                pagoda::println_zero("\treduced_ndim="
+                        + pagoda::to_string(reduced_ndim));
+                pagoda::println_zero("\toriginal_ndim="
+                        + pagoda::to_string(original_ndim));
+                pagoda::println_zero("\tneeds_reduction="
+                        + pagoda::to_string(needs_reduction));
+            }
+
+            Array *numerator_reduction = NULL;
+            Array *denominator_reduction = NULL;
+
+            if (the_op == OP_TTL || the_op == OP_MAX || the_op == OP_MIN) {
+                /* reduce the numerator */
+                if (needs_reduction) {
+                    if (0 == reduced_ndim) {
+                        if (the_op == OP_TTL) {
+                            numerator_reduction = array->reduce_add();
+                        }
+                        else if (the_op == OP_MAX) {
+                            numerator_reduction = array->reduce_max();
+                        }
+                        else if (the_op == OP_MIN) {
+                            numerator_reduction = array->reduce_min();
+                        }
+                        else  {
+                            ASSERT(false);
+                        }
+                    }
+                    else {
+                        if (the_op == OP_TTL) {
+                            numerator_reduction = array->reduce_add(reduced_shape);
+                        }
+                        else if (the_op == OP_MAX) {
+                            numerator_reduction = array->reduce_max(reduced_shape);
+                        }
+                        else if (the_op == OP_MIN) {
+                            numerator_reduction = array->reduce_min(reduced_shape);
+                        }
+                        else  {
+                            ASSERT(false);
+                        }
+                    }
+                }
+                else {
+                    ASSERT(reduced_ndim == original_ndim);
+                    numerator_reduction = array;
+                    denominator_reduction = denominator;
+                }
+            }
+            else {
+                /* reduce the numerator and the denominator */
+                if (needs_reduction) {
+                    if (0 == reduced_ndim) {
+                        numerator_reduction = array->reduce_add();
+                        denominator_reduction = denominator->reduce_add();
+                    }
+                    else {
+                        numerator_reduction = array->reduce_add(reduced_shape);
+                        denominator_reduction = denominator->reduce_add(reduced_shape);
+                    }
+                }
+                else {
+                    ASSERT(reduced_ndim == original_ndim);
+                    numerator_reduction = array;
+                    denominator_reduction = denominator;
+                }
+
+                if (the_op == OP_RMSSDN) {
+                    ScalarArray ONE(denominator_reduction->get_type());
+                    ONE.fill_value(1);
+                    denominator_reduction->isub(&ONE);
+                }
+
+                /* then divide */
+                numerator_reduction->idiv(denominator_reduction);
+
+                if (the_op == OP_SQRAVG) {
+                    numerator_reduction->imul(numerator_reduction);
+                }
+                else if (the_op == OP_RMS || the_op == OP_RMSSDN) {
+                    numerator_reduction->ipow(0.5);
+                }
+            }
+
+            writer->write(numerator_reduction, var->get_name());
+
+            //delete result;
             delete array;
+            delete missing;
+            delete denominator;
+            if (needs_reduction) {
+                delete denominator_reduction;
+                delete numerator_reduction;
+            }
         }
     }
 }
@@ -313,7 +576,7 @@ static vector<int64_t> conformity(
 
     for (size_t i=0, i_limit=lhs.size(); i < i_limit; ++i) {
         for (size_t j=0, j_limit=rhs.size(); j < j_limit; ++j) {
-            if (Dimension::equal(lhs[i],rhs[j])) {
+            if (Dimension::equal(lhs.at(i),rhs.at(j))) {
                 result.push_back(j);
                 break;
             }
@@ -344,11 +607,11 @@ static void get_corresponding(
      * dimensions may occur in a permuted order, so we use the given dimension
      * map to get the corresponding data from the given array */
     for (size_t i=0; i<dim_map.size(); ++i) {
-        ASSERT(dim_map[i] < lo.size() && dim_map[i] >= 0);
-        alo.push_back(lo[dim_map[i]]);
-        ahi.push_back(hi[dim_map[i]]);
+        ASSERT(dim_map.at(i) < lo.size() && dim_map.at(i) >= 0);
+        alo.push_back(lo[dim_map.at(i)]);
+        ahi.push_back(hi[dim_map.at(i)]);
         if (i > 0) {
-            if (dim_map[i] < dim_map[i-1]) {
+            if (dim_map.at(i) < dim_map[i-1]) {
                 need_transpose = true;
             }
         }
@@ -369,11 +632,11 @@ static void get_corresponding(
         // the transpose function requires as input a vector indicating how to
         // reorder the axes.
         for (size_t i=0; i<dim_map.size(); ++i) {
-            helper.push_back(make_pair(dim_map[i],i));
+            helper.push_back(make_pair(dim_map.at(i),i));
         }
         sort(helper.begin(), helper.end(), sort_helper);
         for (size_t i=0; i<dim_map.size(); ++i) {
-            axes.push_back(helper[i].second);
+            axes.push_back(helper.at(i).second);
         }
 
         // allocate a buffer to store the result of the transposition
@@ -392,7 +655,7 @@ static void get_corresponding(
     pagoda::println_sync(STR_VEC(local_shape));
 #endif
     for (size_t i=0; i<dim_map.size(); ++i) {
-        shape[dim_map[i]] = local_shape[dim_map[i]];
+        shape[dim_map.at(i)] = local_shape[dim_map.at(i)];
     }
 }
 

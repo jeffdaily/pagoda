@@ -156,7 +156,8 @@ int main(int argc, char **argv)
     }
     pagoda::barrier();
 
-    g_dst = g_src->transpose(dim_permute_user, dst_reverse);
+    //g_dst = g_src->transpose(dim_permute_user, dst_reverse);
+    g_dst = g_src->transpose(dim_permute_user);
     assert(NULL != g_dst);
 
     if (0 == pagoda::me) {
@@ -185,6 +186,9 @@ int main(int argc, char **argv)
         cout << STR_ARR(g_dst->get_shape(),src_ndim) << endl;
     }
 #endif
+
+    delete g_src;
+    delete g_dst;
 
     pagoda::finalize();
     return EXIT_SUCCESS;

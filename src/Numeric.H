@@ -76,17 +76,14 @@ namespace pagoda
             const void *src, const vector<int64_t> &src_shape,
                   void *dst, const vector<int64_t> &dst_shape);
     
-    void reduce_sum(const DataType &type,
+    void reduce_max(const DataType &type,
             const void *src, const vector<int64_t> &src_shape,
-                  void *dst, const vector<int64_t> &dst_shape,
-            const void *msk, const vector<int64_t> &msk_shape);
-
-    void reduce_sum(const DataType &type, const DataType &wgt_type,
+                  void *dst, const vector<int64_t> &dst_shape);
+    
+    void reduce_min(const DataType &type,
             const void *src, const vector<int64_t> &src_shape,
-                  void *dst, const vector<int64_t> &dst_shape,
-            const void *msk, const vector<int64_t> &msk_shape,
-            const void *wgt, const vector<int64_t> &wgt_shape);
-
+                  void *dst, const vector<int64_t> &dst_shape);
+    
     template <typename T> void transpose(
             const T *src, const vector<int64_t> &shape,
                   T *dst, const vector<int64_t> &axes);
@@ -106,16 +103,13 @@ namespace pagoda
             const T *src, const vector<int64_t> &src_shape,
                   T *dst, const vector<int64_t> &dst_shape);
 
-    template <typename T, typename U> void reduce_sum(
+    template <typename T> void reduce_max(
             const T *src, const vector<int64_t> &src_shape,
-                  T *dst, const vector<int64_t> &dst_shape,
-            const U *msk, const vector<int64_t> &msk_shape);
+                  T *dst, const vector<int64_t> &dst_shape);
 
-    template <typename T, typename U, typename V> void reduce_sum(
+    template <typename T> void reduce_min(
             const T *src, const vector<int64_t> &src_shape,
-                  T *dst, const vector<int64_t> &dst_shape,
-            const U *msk, const vector<int64_t> &msk_shape,
-            const V *wgt, const vector<int64_t> &wgt_shape);
+                  T *dst, const vector<int64_t> &dst_shape);
 
     /**
      * Transpose the given array.
@@ -461,7 +455,7 @@ namespace pagoda
     }
 
     /**
-     * Reduce the given array using addition with a mask.
+     * Reduce the given array using max.
      *
      * The destination buffer is filled with the result, regardless of the
      * original values within the dst buffer i.e. the dst buffer is filled with
@@ -471,18 +465,15 @@ namespace pagoda
      * @param[in] src_shape the shape of the source buffer
      * @param[in,out] dst the destination buffer, contiguous
      * @param[in] dst_shape dimensions to reduce are indicated by <=0
-     * @param[in] msk the source buffer, contiguous
-     * @param[in] msk_shape the shape of the source buffer
      */
-    template <typename T, typename U> void reduce_sum(
+    template <typename T> void reduce_max(
             const T *src, const vector<int64_t> &src_shape,
-                  T *dst, const vector<int64_t> &dst_shape,
-            const U *msk, const vector<int64_t> &msk_shape)
+            T *dst, const vector<int64_t> &dst_shape)
     {
         const T *src_ptr;
-        int64_t  src_ndim = src_shape.size();
-        int64_t  src_nd_m1 = src_ndim-1;
-        int64_t  src_elems_prod = 1;
+        int64_t src_ndim = src_shape.size();
+        int64_t src_nd_m1 = src_ndim-1;
+        int64_t src_elems_prod = 1;
         vector<int64_t> src_elems = src_shape;
         vector<int64_t> src_coords(src_ndim);
         vector<int64_t> src_dims_m1(src_ndim);
@@ -500,28 +491,11 @@ namespace pagoda
         vector<int64_t> dst_strides(dst_ndim);
         vector<int64_t> dst_backstrides(dst_ndim);
 
-        const U *msk_ptr;
-        int64_t  msk_ndim = count_if(msk_shape.begin(), msk_shape.end(),
-                                     bind2nd(greater<int64_t>(),0));
-        int64_t  msk_nd_m1 = msk_ndim-1;
-        int64_t  msk_elems_prod = 1;
-        vector<int64_t> msk_elems(msk_ndim);
-        vector<int64_t> msk_coords(msk_ndim);
-        vector<int64_t> msk_dims_m1(msk_ndim);
-        vector<int64_t> msk_strides(msk_ndim);
-        vector<int64_t> msk_backstrides(msk_ndim);
-
-        vector<int64_t> dst_brd_strides(src_ndim);
-        vector<int64_t> dst_brd_backstrides(src_ndim);
-        vector<int64_t> msk_brd_strides(src_ndim);
-        vector<int64_t> msk_brd_backstrides(src_ndim);
+        vector<int64_t> brd_strides(src_ndim);
+        vector<int64_t> brd_backstrides(src_ndim);
 
         /* remove the invalid values from dst_shape */
         remove_copy_if(dst_shape.begin(), dst_shape.end(), dst_elems.begin(),
-                bind2nd(less_equal<int64_t>(),0));
-
-        /* remove the invalid values from msk_shape */
-        remove_copy_if(msk_shape.begin(), msk_shape.end(), msk_elems.begin(),
                 bind2nd(less_equal<int64_t>(),0));
 
         /* source shape */
@@ -535,10 +509,6 @@ namespace pagoda
         for (int i=0; i<dst_elems_prod; ++i) {
             dst[i] = 0;
         }
-
-        /* msk shape */ 
-        msk_elems_prod = accumulate(
-                msk_elems.begin(), msk_elems.end(), 1, multiplies<int64_t>());
 
         /* src iterator setup */
         for (int64_t i=src_nd_m1; i>=0; --i) {
@@ -556,41 +526,20 @@ namespace pagoda
             dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
         }
 
-        /* msk iterator setup */
-        for (int64_t i=msk_nd_m1; i>=0; --i) {
-            msk_coords[i] = 0;
-            msk_dims_m1[i] = msk_elems[i]-1;
-            msk_strides[i] = (i == msk_nd_m1) ? 1 : msk_strides[i+1]*msk_elems[i+1];
-            msk_backstrides[i] = msk_dims_m1[i]*msk_strides[i];
-        }
-
         /* copy dst strides into brd (broadcast) strides as appropriate */
         for (int64_t i=0,j=0; i<src_ndim; ++i) {
             if (dst_shape[i] <= 0) {
-                dst_brd_strides[i] = 0;
-                dst_brd_backstrides[i] = 0;
+                brd_strides[i] = 0;
+                brd_backstrides[i] = 0;
             }
             else {
-                dst_brd_strides[i] = dst_strides[j];
-                dst_brd_backstrides[i] = dst_backstrides[j++];
-            }
-        }
-
-        /* copy msk strides into brd (broadcast) strides as appropriate */
-        for (int64_t i=0,j=0; i<src_ndim; ++i) {
-            if (msk_shape[i] <= 0) {
-                msk_brd_strides[i] = 0;
-                msk_brd_backstrides[i] = 0;
-            }
-            else {
-                msk_brd_strides[i] = msk_strides[j];
-                msk_brd_backstrides[i] = msk_backstrides[j++];
+                brd_strides[i] = dst_strides[j];
+                brd_backstrides[i] = dst_backstrides[j++];
             }
         }
 
         src_ptr = src;
         dst_ptr = dst;
-        msk_ptr = msk;
         for (int64_t elem=0; elem<src_elems_prod; ++elem) {
 #if DEBUG
             cout << elem;
@@ -599,20 +548,18 @@ namespace pagoda
             }
             cout << endl;
 #endif
-            *dst_ptr += *src_ptr * *msk_ptr;
+            *dst_ptr = std::max(*dst_ptr, *src_ptr);
             for (int64_t i=src_nd_m1; i>=0; --i) {
                 if (src_coords[i] < src_dims_m1[i]) {
                     ++src_coords[i];
                     src_ptr += src_strides[i];
-                    dst_ptr += dst_brd_strides[i];
-                    msk_ptr += msk_brd_strides[i];
+                    dst_ptr += brd_strides[i];
                     break;
                 }
                 else {
                     src_coords[i] = 0;
                     src_ptr -= src_backstrides[i];
-                    dst_ptr -= dst_brd_backstrides[i];
-                    msk_ptr -= msk_brd_backstrides[i];
+                    dst_ptr -= brd_backstrides[i];
                 }
             }
         }
@@ -627,9 +574,8 @@ namespace pagoda
 #endif
     }
 
-
     /**
-     * Reduce the given array using addition with a mask and weight.
+     * Reduce the given array using min.
      *
      * The destination buffer is filled with the result, regardless of the
      * original values within the dst buffer i.e. the dst buffer is filled with
@@ -639,21 +585,15 @@ namespace pagoda
      * @param[in] src_shape the shape of the source buffer
      * @param[in,out] dst the destination buffer, contiguous
      * @param[in] dst_shape dimensions to reduce are indicated by <=0
-     * @param[in] msk the source buffer, contiguous
-     * @param[in] msk_shape the shape of the source buffer
-     * @param[in] wgt the source buffer, contiguous
-     * @param[in] wgt_shape the shape of the source buffer
      */
-    template <typename T, typename U, typename V> void reduce_sum(
+    template <typename T> void reduce_min(
             const T *src, const vector<int64_t> &src_shape,
-                  T *dst, const vector<int64_t> &dst_shape,
-            const U *msk, const vector<int64_t> &msk_shape,
-            const V *wgt, const vector<int64_t> &wgt_shape)
+            T *dst, const vector<int64_t> &dst_shape)
     {
         const T *src_ptr;
-        int64_t  src_ndim = src_shape.size();
-        int64_t  src_nd_m1 = src_ndim-1;
-        int64_t  src_elems_prod = 1;
+        int64_t src_ndim = src_shape.size();
+        int64_t src_nd_m1 = src_ndim-1;
+        int64_t src_elems_prod = 1;
         vector<int64_t> src_elems = src_shape;
         vector<int64_t> src_coords(src_ndim);
         vector<int64_t> src_dims_m1(src_ndim);
@@ -671,45 +611,11 @@ namespace pagoda
         vector<int64_t> dst_strides(dst_ndim);
         vector<int64_t> dst_backstrides(dst_ndim);
 
-        const U *msk_ptr;
-        int64_t  msk_ndim = count_if(msk_shape.begin(), msk_shape.end(),
-                                     bind2nd(greater<int64_t>(),0));
-        int64_t  msk_nd_m1 = msk_ndim-1;
-        int64_t  msk_elems_prod = 1;
-        vector<int64_t> msk_elems(msk_ndim);
-        vector<int64_t> msk_coords(msk_ndim);
-        vector<int64_t> msk_dims_m1(msk_ndim);
-        vector<int64_t> msk_strides(msk_ndim);
-        vector<int64_t> msk_backstrides(msk_ndim);
-
-        const V *wgt_ptr;
-        int64_t  wgt_ndim = count_if(wgt_shape.begin(), wgt_shape.end(),
-                                     bind2nd(greater<int64_t>(),0));
-        int64_t  wgt_nd_m1 = wgt_ndim-1;
-        int64_t  wgt_elems_prod = 1;
-        vector<int64_t> wgt_elems(wgt_ndim);
-        vector<int64_t> wgt_coords(wgt_ndim);
-        vector<int64_t> wgt_dims_m1(wgt_ndim);
-        vector<int64_t> wgt_strides(wgt_ndim);
-        vector<int64_t> wgt_backstrides(wgt_ndim);
-
-        vector<int64_t> dst_brd_strides(src_ndim);
-        vector<int64_t> dst_brd_backstrides(src_ndim);
-        vector<int64_t> msk_brd_strides(src_ndim);
-        vector<int64_t> msk_brd_backstrides(src_ndim);
-        vector<int64_t> wgt_brd_strides(src_ndim);
-        vector<int64_t> wgt_brd_backstrides(src_ndim);
+        vector<int64_t> brd_strides(src_ndim);
+        vector<int64_t> brd_backstrides(src_ndim);
 
         /* remove the invalid values from dst_shape */
         remove_copy_if(dst_shape.begin(), dst_shape.end(), dst_elems.begin(),
-                bind2nd(less_equal<int64_t>(),0));
-
-        /* remove the invalid values from msk_shape */
-        remove_copy_if(msk_shape.begin(), msk_shape.end(), msk_elems.begin(),
-                bind2nd(less_equal<int64_t>(),0));
-
-        /* remove the invalid values from wgt_shape */
-        remove_copy_if(wgt_shape.begin(), wgt_shape.end(), wgt_elems.begin(),
                 bind2nd(less_equal<int64_t>(),0));
 
         /* source shape */
@@ -723,14 +629,6 @@ namespace pagoda
         for (int i=0; i<dst_elems_prod; ++i) {
             dst[i] = 0;
         }
-
-        /* msk shape */ 
-        msk_elems_prod = accumulate(
-                msk_elems.begin(), msk_elems.end(), 1, multiplies<int64_t>());
-
-        /* wgt shape */ 
-        wgt_elems_prod = accumulate(
-                wgt_elems.begin(), wgt_elems.end(), 1, multiplies<int64_t>());
 
         /* src iterator setup */
         for (int64_t i=src_nd_m1; i>=0; --i) {
@@ -748,62 +646,20 @@ namespace pagoda
             dst_backstrides[i] = dst_dims_m1[i]*dst_strides[i];
         }
 
-        /* msk iterator setup */
-        for (int64_t i=msk_nd_m1; i>=0; --i) {
-            msk_coords[i] = 0;
-            msk_dims_m1[i] = msk_elems[i]-1;
-            msk_strides[i] = (i == msk_nd_m1) ? 1 : msk_strides[i+1]*msk_elems[i+1];
-            msk_backstrides[i] = msk_dims_m1[i]*msk_strides[i];
-        }
-
-        /* wgt iterator setup */
-        for (int64_t i=wgt_nd_m1; i>=0; --i) {
-            wgt_coords[i] = 0;
-            wgt_dims_m1[i] = wgt_elems[i]-1;
-            wgt_strides[i] = (i == wgt_nd_m1) ? 1 : wgt_strides[i+1]*wgt_elems[i+1];
-            wgt_backstrides[i] = wgt_dims_m1[i]*wgt_strides[i];
-        }
-
         /* copy dst strides into brd (broadcast) strides as appropriate */
         for (int64_t i=0,j=0; i<src_ndim; ++i) {
             if (dst_shape[i] <= 0) {
-                dst_brd_strides[i] = 0;
-                dst_brd_backstrides[i] = 0;
+                brd_strides[i] = 0;
+                brd_backstrides[i] = 0;
             }
             else {
-                dst_brd_strides[i] = dst_strides[j];
-                dst_brd_backstrides[i] = dst_backstrides[j++];
-            }
-        }
-
-        /* copy msk strides into brd (broadcast) strides as appropriate */
-        for (int64_t i=0,j=0; i<src_ndim; ++i) {
-            if (msk_shape[i] <= 0) {
-                msk_brd_strides[i] = 0;
-                msk_brd_backstrides[i] = 0;
-            }
-            else {
-                msk_brd_strides[i] = msk_strides[j];
-                msk_brd_backstrides[i] = msk_backstrides[j++];
-            }
-        }
-
-        /* copy wgt strides into brd (broadcast) strides as appropriate */
-        for (int64_t i=0,j=0; i<src_ndim; ++i) {
-            if (wgt_shape[i] <= 0) {
-                wgt_brd_strides[i] = 0;
-                wgt_brd_backstrides[i] = 0;
-            }
-            else {
-                wgt_brd_strides[i] = wgt_strides[j];
-                wgt_brd_backstrides[i] = wgt_backstrides[j++];
+                brd_strides[i] = dst_strides[j];
+                brd_backstrides[i] = dst_backstrides[j++];
             }
         }
 
         src_ptr = src;
         dst_ptr = dst;
-        msk_ptr = msk;
-        wgt_ptr = wgt;
         for (int64_t elem=0; elem<src_elems_prod; ++elem) {
 #if DEBUG
             cout << elem;
@@ -812,22 +668,18 @@ namespace pagoda
             }
             cout << endl;
 #endif
-            *dst_ptr += static_cast<T>(*src_ptr * *msk_ptr * *wgt_ptr);
+            *dst_ptr = std::min(*dst_ptr, *src_ptr);
             for (int64_t i=src_nd_m1; i>=0; --i) {
                 if (src_coords[i] < src_dims_m1[i]) {
                     ++src_coords[i];
                     src_ptr += src_strides[i];
-                    dst_ptr += dst_brd_strides[i];
-                    msk_ptr += msk_brd_strides[i];
-                    wgt_ptr += wgt_brd_strides[i];
+                    dst_ptr += brd_strides[i];
                     break;
                 }
                 else {
                     src_coords[i] = 0;
                     src_ptr -= src_backstrides[i];
-                    dst_ptr -= dst_brd_backstrides[i];
-                    msk_ptr -= msk_brd_backstrides[i];
-                    wgt_ptr -= wgt_brd_backstrides[i];
+                    dst_ptr -= brd_backstrides[i];
                 }
             }
         }

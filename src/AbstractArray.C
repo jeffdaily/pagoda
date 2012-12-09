@@ -25,7 +25,12 @@
 #include "Util.H"
 #include "Validator.H"
 
+using std::abs;
+using std::bind2nd;
+using std::count_if;
+using std::greater;
 using std::swap;
+using namespace pagoda;
 
 #define DEBUG 0
 #if DEBUG
@@ -35,7 +40,6 @@ using std::endl;
 #define STR_ARR(vec,n) pagoda::arr_to_string(vec,n,",",#vec)
 #endif
 
-using std::abs;
 
 
 AbstractArray::AbstractArray(DataType type)
@@ -245,7 +249,9 @@ Array* AbstractArray::cast(DataType new_type) const
 Array* AbstractArray::transpose(const vector<int64_t> &axes,
         Array *dst_array) const
 {
-    transpose(axes, vector<int64_t>(axes.size(),1), dst_array);
+    vector<int64_t> reverse(axes.size(),1);
+
+    return transpose(axes, reverse);
 }
 
 
@@ -653,6 +659,7 @@ bool AbstractArray::broadcast_check(const Array *rhs) const
 
 void AbstractArray::operate(const Array *rhs, const int op)
 {
+    ASSERT(rhs);
     if (rhs->is_scalar()) {
         void *val = rhs->get();
         DataType type = rhs->get_type();
@@ -700,9 +707,6 @@ void AbstractArray::operate_broadcast(const Array *rhs, const int op,
     vector<int64_t> hi;
     vector<int64_t> rhs_lo;
     vector<int64_t> rhs_hi;
-
-    dump();
-    rhs->dump();
 
     // this method should only be called when we explicitly want broadcasting
     ASSERT(rhs_shape != broadcast_shape);
@@ -794,6 +798,108 @@ Array* AbstractArray::reduce_add() const
 }
 
 
+Array* AbstractArray::operate_reduce(const int op,
+        const vector<int64_t> &reduce_shape) const
+{
+    DataType type = get_type();
+    int64_t ndim = get_ndim();
+    vector<int64_t> shape = get_shape();
+    vector<int64_t> lo(ndim);
+    vector<int64_t> hi(ndim);
+    vector<int64_t> src_reduction_shape(ndim);
+
+    Array *dst = NULL;
+    int64_t dst_ndim = count_if(reduce_shape.begin(), reduce_shape.end(),
+                                bind2nd(greater<int64_t>(),0));
+    vector<int64_t> dst_shape(dst_ndim);
+    vector<int64_t> dst_lo;
+    vector<int64_t> dst_hi;
+    vector<int64_t> dst_reduction_shape(ndim);
+
+    // this method should only be called when we explicitly want reduction
+    // and that we aren't decimating all dimensions
+    ASSERT(dst_ndim < ndim && dst_ndim > 0);
+
+    // check reduce_shape compatibility with current array
+    ASSERT(reduce_shape.size() == ndim);
+    for (int64_t i=0; i<ndim; ++i) {
+        ASSERT(reduce_shape[i] == 0 || reduce_shape[i] == shape[i]);
+    }
+
+    /* remove the invalid values from reduce_shape */
+    remove_copy_if(reduce_shape.begin(), reduce_shape.end(), dst_shape.begin(),
+            bind2nd(less_equal<int64_t>(),0));
+
+    dst = Array::create(type, dst_shape);
+    dst->get_distribution(dst_lo,dst_hi);
+
+    /* calc source lo/hi corresponding to dst distribution */
+    for (int64_t i=0,dst_index=0; i<ndim; ++i){
+        if (reduce_shape[i] == 0) {
+            lo[i] = 0;
+            hi[i] = shape[i]-1;
+            dst_reduction_shape[i] = reduce_shape[i];
+        }
+        else {
+            lo[i] = dst_lo[dst_index];
+            hi[i] = dst_hi[dst_index];
+            dst_reduction_shape[i] = dst_hi[dst_index]-dst_lo[dst_index]+1;
+            ++dst_index;
+        }
+        src_reduction_shape[i] = hi[i]-lo[i]+1;
+    }
+
+#if DEBUG
+    if (0 == pagoda::nodeid()) {
+        cout << STR_ARR(reduce_shape, ndim) << endl;
+        cout << STR_ARR(shape, ndim) << endl;
+        cout << STR_ARR(dst_shape, dst_ndim) << endl;
+    }
+    pagoda::println_sync(STR_ARR(lo, ndim));
+    pagoda::println_sync(STR_ARR(hi, ndim));
+    pagoda::println_sync(STR_ARR(src_reduction_shape, ndim));
+    pagoda::println_sync(STR_ARR(dst_lo, dst_ndim));
+    pagoda::println_sync(STR_ARR(dst_hi, dst_ndim));
+    pagoda::println_sync(STR_ARR(dst_reduction_shape, ndim));
+#endif
+
+    if (dst->owns_data()) {
+        const void *src_data = NULL;
+        void *dst_data = NULL;
+
+        src_data = get(lo,hi);
+        dst_data = dst->access();
+
+        if (op == OP_ADD) {
+            pagoda::reduce_sum(type,
+                    src_data, src_reduction_shape,
+                    dst_data, dst_reduction_shape);
+        }
+        else if (op == OP_MAX) {
+            pagoda::reduce_max(type,
+                    src_data, src_reduction_shape,
+                    dst_data, dst_reduction_shape);
+        }
+        else if (op == OP_MIN) {
+            pagoda::reduce_min(type,
+                    src_data, src_reduction_shape,
+                    dst_data, dst_reduction_shape);
+        }
+
+        pagoda::deallocate(type, src_data);
+        dst->release_update();
+    }
+
+    return dst;
+}
+
+
+Array* AbstractArray::reduce_add(const vector<int64_t> &reduce_shape) const
+{
+    return operate_reduce(OP_ADD, reduce_shape);
+}
+
+
 Array* AbstractArray::reduce_max() const
 {
     if (NULL != validator) {
@@ -804,6 +910,12 @@ Array* AbstractArray::reduce_max() const
 }
 
 
+Array* AbstractArray::reduce_max(const vector<int64_t> &reduce_shape) const
+{
+    return operate_reduce(OP_MAX, reduce_shape);
+}
+
+
 Array* AbstractArray::reduce_min() const
 {
     if (NULL != validator) {
@@ -811,6 +923,12 @@ Array* AbstractArray::reduce_min() const
     } else {
         return operate_reduce(OP_MIN);
     }
+}
+
+
+Array* AbstractArray::reduce_min(const vector<int64_t> &reduce_shape) const
+{
+    return operate_reduce(OP_MIN, reduce_shape);
 }
 
 

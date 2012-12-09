@@ -199,11 +199,20 @@ class AbstractArray : public Array
         /** @copydoc Array::reduce_add() */
         virtual Array* reduce_add() const;
 
+        /** @copydoc Array::reduce_add(const vector<int64_t>&) */
+        virtual Array* reduce_add(const vector<int64_t> &shape) const;
+
         /** @copydoc Array::reduce_max() */
         virtual Array* reduce_max() const;
 
+        /** @copydoc Array::reduce_max(const vector<int64_t>&) */
+        virtual Array* reduce_max(const vector<int64_t> &shape) const;
+
         /** @copydoc Array::reduce_min() */
         virtual Array* reduce_min() const;
+
+        /** @copydoc Array::reduce_min(const vector<int64_t>&) */
+        virtual Array* reduce_min(const vector<int64_t> &shape) const;
 
         /** @copydoc Array::set_validator(double) */
         virtual void set_validator(Validator* value);
@@ -353,6 +362,11 @@ class AbstractArray : public Array
          * @todo TODO document
          */
         Array* operate_reduce_validator(const int op) const;
+
+        /**
+         * @todo TODO document
+         */
+        Array* operate_reduce(const int op, const vector<int64_t> &shape) const;
 
         Validator *validator; /**< @todo document */
         Array *counter; /**< @todo document */

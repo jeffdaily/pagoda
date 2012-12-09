@@ -509,6 +509,17 @@ class Array
         virtual Array* reduce_add() const = 0;
 
         /**
+         * Reduces this Array by summing over the indicated dimensions.
+         *
+         * The dimensions to sum over are indicated by <= 0.
+         *
+         * @param shape the shape of the array, with <= 0 to indicate a
+         *              dimension to remove via summation
+         * @return the reduced Array
+         */
+        virtual Array* reduce_add(const vector<int64_t> &shape) const = 0;
+
+        /**
          * Reduces this Array to a single, maximum value.
          *
          * If the Array has an associated Validator it will be consulted.
@@ -516,11 +527,21 @@ class Array
         virtual Array* reduce_max() const = 0;
 
         /**
+         * Reduces this Array by maximizing over the indicated dimensions.
+         */
+        virtual Array* reduce_max(const vector<int64_t> &shape) const = 0;
+
+        /**
          * Reduces this Array to a single, minimum value.
          *
          * If the Array has an associated Validator it will be consulted.
          */
         virtual Array* reduce_min() const = 0;
+
+        /**
+         * Reduces this Array by minimizing over the indicated dimensions.
+         */
+        virtual Array* reduce_min(const vector<int64_t> &shape) const = 0;
 
         /**
          * Subtracts two Arrays.
