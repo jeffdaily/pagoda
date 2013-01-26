@@ -486,8 +486,6 @@ Dataset* GenericCommands::get_dataset()
 
 FileWriter* GenericCommands::get_output() const
 {
-printf("getoutput");
-    if (compress) printf("yes compress on\n");
     FileWriter *writer = FileWriter::open(output_filename, file_format);
 
     writer->append(append)
