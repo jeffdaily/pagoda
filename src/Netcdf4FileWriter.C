@@ -14,6 +14,7 @@
 #include "AbstractFileWriter.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
+#include "CommandException.H"
 #include "Dataset.H"
 #include "Dimension.H"
 #include "FileWriter.H"
@@ -306,6 +307,13 @@ FileWriter* Netcdf4FileWriter::overwrite(bool value)
     return this;
 }
 
+FileWriter* Netcdf4FileWriter::compress(bool value)
+{
+    if (value) {
+        EXCEPT(CommandException, "Compression option not supported for Netcdf4", -1);
+    }
+    return this;
+}
 
 void Netcdf4FileWriter::def_dim(const string &name, int64_t size)
 {

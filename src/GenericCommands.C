@@ -64,6 +64,7 @@ GenericCommands::GenericCommands()
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
     ,   reading_all_variables(false)
+    ,   compress(false)
     ,   histories()
 {
     init();
@@ -97,6 +98,7 @@ GenericCommands::GenericCommands(int argc, char **argv)
     ,   nonblocking_io(false)
     ,   reading_all_records(false)
     ,   reading_all_variables(false)
+    ,   compress(false)
     ,   histories()
 {
     init();
@@ -138,6 +140,7 @@ void GenericCommands::init()
     parser.push_back(CommandLineOption::VARIABLE);
     parser.push_back(CommandLineOption::AUXILIARY);
     parser.push_back(CommandLineOption::EXCLUDE);
+    parser.push_back(CommandLineOption::COMPRESS);
     // the following conflicts with -b in pgwa
     //parser.push_back(CommandLineOption::LATLONBOX);
 }
@@ -387,6 +390,14 @@ void GenericCommands::parse(int argc, char **argv)
     if (parser.count(CommandLineOption::ROMIO_NO_INDEP_RW)) {
         Hints::romio_no_indep_rw = parser.get_argument(CommandLineOption::ROMIO_NO_INDEP_RW);
     }
+
+    if (parser.count(CommandLineOption::COMPRESS)) {
+#if HAVE_COMPRESSION
+        compress = true;
+#else
+        throw CommandException("Your pnetcdf library does not support compression.");
+#endif
+    }
     //pagoda::println_zero("Hints\n" + Hints::to_string());
 }
 
@@ -475,12 +486,15 @@ Dataset* GenericCommands::get_dataset()
 
 FileWriter* GenericCommands::get_output() const
 {
+printf("getoutput");
+    if (compress) printf("yes compress on\n");
     FileWriter *writer = FileWriter::open(output_filename, file_format);
 
     writer->append(append)
     ->overwrite(overwrite)
     ->fixed_record_dimension(record_dimension_size)
     ->header_pad(header_pad)
+    ->compress(compress)
     ->create();
 
     return writer;
@@ -867,4 +881,9 @@ bool GenericCommands::is_reading_all_variables() const
 bool GenericCommands::is_verbose() const
 {
     return verbose;
+}
+
+bool GenericCommands::can_compress() const
+{
+    return compress;
 }

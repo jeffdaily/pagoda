@@ -200,6 +200,15 @@ AC_SUBST([have_netcdf4], [$pg_cv_netcdf4_found])
 AS_CASE([$pg_cv_pnetcdf_found:$pg_cv_netcdf4_found], [no:no],
         [AC_MSG_FAILURE([Could not locate an IO library])])
 
+COMPRESS_CPP_SAVE="$CPPFLAGS"
+CPPFLAGS="$PNETCDF_CPPFLAGS $CPPFLAGS"
+AC_CHECK_DECL([NC_COMPRESS], 
+    [AC_DEFINE([HAVE_COMPRESSION], [1], [Define to 1 if you have the 'NC_COMPRESS' symbol.])],
+    [AC_DEFINE([HAVE_COMPRESSION], [0], [Define to 1 if you have the 'NC_COMPRESS' symbol.])],
+    [#include "pnetcdf.h"])
+CPPFLAGS="$COMPRESS_CPP_FLAGS"
+
+
 AC_LANG_POP([C++])
 
 #####################################################3

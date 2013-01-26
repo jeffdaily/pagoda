@@ -42,6 +42,7 @@ class PnetcdfFileWriter : public AbstractFileWriter
         virtual FileWriter* file_format(FileFormat format);
         virtual FileWriter* append(bool value);
         virtual FileWriter* overwrite(bool value);
+        virtual FileWriter* compress(bool value);
 
         virtual void def_dim(const string &name, int64_t size);
         virtual void def_dim(Array *mask);
@@ -122,6 +123,7 @@ class PnetcdfFileWriter : public AbstractFileWriter
         FileFormat _file_format;
         bool _append;
         bool _overwrite;
+        bool _compress;
 
         map<string,int>     dim_id;
         map<string,int64_t> dim_size;

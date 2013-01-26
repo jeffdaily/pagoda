@@ -154,6 +154,7 @@ class CommandLineOption
         static CommandLineOption WEIGHTS_OF_FILES;
         static CommandLineOption WEIGHTING_VARIABLE_NAME;
         static CommandLineOption WEIGHT_MASK_COORDINATE_VARIABLES;
+        static CommandLineOption COMPRESS;
 
     protected:
         int _value;

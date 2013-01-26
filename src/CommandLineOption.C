@@ -201,6 +201,11 @@ CommandLineOption CommandLineOption::WEIGHT_MASK_COORDINATE_VARIABLES(
     'I', "wgt_msk_crd_var", false,
     "do not weight or mask coordinate variables");
 
+// Starting with no arguments as we will attempt to pick the best
+CommandLineOption CommandLineOption::COMPRESS(
+    'e', "compress", false,
+    "write compressed data");
+
 
 CommandLineOption::CommandLineOption(const int &value,
                                      const string &name,

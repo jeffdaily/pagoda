@@ -41,6 +41,7 @@ class Netcdf4FileWriter : public AbstractFileWriter
         virtual FileWriter* file_format(FileFormat format);
         virtual FileWriter* append(bool value);
         virtual FileWriter* overwrite(bool value);
+        virtual FileWriter* compress(bool value);
 
         virtual void def_dim(const string &name, int64_t size);
         virtual void def_dim(Array *mask);

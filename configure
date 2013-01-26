@@ -10440,6 +10440,23 @@ See \`config.log' for more details" "$LINENO" 5; } ;; #(
      ;;
 esac
 
+COMPRESS_CPP_SAVE="$CPPFLAGS"
+CPPFLAGS="$PNETCDF_CPPFLAGS $CPPFLAGS"
+ac_fn_cxx_check_decl "$LINENO" "NC_COMPRESS" "ac_cv_have_decl_NC_COMPRESS" "#include \"pnetcdf.h\"
+"
+if test "x$ac_cv_have_decl_NC_COMPRESS" = xyes; then :
+
+$as_echo "#define HAVE_COMPRESSION 1" >>confdefs.h
+
+else
+
+$as_echo "#define HAVE_COMPRESSION 0" >>confdefs.h
+
+fi
+
+CPPFLAGS="$COMPRESS_CPP_FLAGS"
+
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'

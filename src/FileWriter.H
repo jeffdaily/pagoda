@@ -54,6 +54,7 @@ class FileWriter
         virtual FileWriter* file_format(FileFormat value) = 0;
         virtual FileWriter* append(bool value) = 0;
         virtual FileWriter* overwrite(bool value) = 0;
+        virtual FileWriter* compress(bool value) = 0;
 
         virtual void def_dataset(Dataset *dataset) = 0;
 

@@ -16,6 +16,7 @@
 #include "Attribute.H"
 #include "Bootstrap.H"
 #include "Collectives.H"
+#include "CommandException.H"
 #include "Copy.H"
 #include "Dataset.H"
 #include "Dimension.H"
@@ -45,19 +46,21 @@ static bool is_valid_format(FileFormat format)
 
 static int file_format_to_nc_format(FileFormat format)
 {
+    int ret = 0;
     assert(is_valid_format(format));
     if (format == FF_CDF1) {
-        return 0; /* NC_FORMAT_CLASSIC is default */
+        ret = 0; /* NC_FORMAT_CLASSIC is default */
     }
     else if (format == FF_CDF2) {
-        return NC_64BIT_OFFSET;
+        ret = NC_64BIT_OFFSET;
     }
     else if (format == FF_CDF5) {
-        return NC_64BIT_DATA;
+        ret = NC_64BIT_DATA;
     }
     else {
         ERR("FileFormat not recognized");
     }
+    return ret;
 }
 
 
@@ -259,17 +262,24 @@ FileWriter* PnetcdfFileWriter::create()
             }
         }
         else if (_overwrite) {
+            int mode = file_format_to_nc_format(_file_format)|NC_CLOBBER;
+#if HAVE_COMPRESSION
+            if (_compress) {printf("compress!\n"); mode |= NC_COMPRESS; }
+#endif
             ncid = ncmpi::create(ProcessGroup::get_default().get_comm(),
-                    filename,
-                    file_format_to_nc_format(_file_format)|NC_CLOBBER, info);
+                    filename, mode, info);
         }
         else {
             ERR("file exists");
         }
     }
     else {
+            int mode = file_format_to_nc_format(_file_format);
+#if HAVE_COMPRESSION
+            if (_compress) {printf("compress!\n"); mode |= NC_COMPRESS; }
+#endif
         ncid = ncmpi::create(ProcessGroup::get_default().get_comm(), filename,
-                file_format_to_nc_format(_file_format), info);
+                mode, info);
     }
 
     open = true;
@@ -312,6 +322,12 @@ FileWriter* PnetcdfFileWriter::overwrite(bool value)
     return this;
 }
 
+
+FileWriter* PnetcdfFileWriter::compress(bool value)
+{
+    _compress = value;
+    return this;
+}
 
 void PnetcdfFileWriter::def_dim(const string &name, int64_t size)
 {
