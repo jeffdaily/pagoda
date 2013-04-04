@@ -10,6 +10,7 @@ using std::string;
 using std::vector;
 
 #include "AbstractDataset.H"
+#include "DataType.H"
 #include "FileFormat.H"
 #include "ProcessGroup.H"
 

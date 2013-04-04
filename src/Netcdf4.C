@@ -3,6 +3,7 @@
 #endif
 
 #include <netcdf.h>
+#include <netcdf_par.h>
 
 #include <cassert>
 #include <string>

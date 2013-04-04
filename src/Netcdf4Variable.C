@@ -11,6 +11,7 @@
 
 #include "Array.H"
 #include "Attribute.H"
+#include "Bootstrap.H"
 #include "Common.H"
 #include "Netcdf4Attribute.H"
 #include "Netcdf4Dataset.H"

@@ -12,8 +12,10 @@
 #include <netcdf.h>
 
 #include "AbstractFileWriter.H"
+#include "Array.H"
 #include "Attribute.H"
 #include "Bootstrap.H"
+#include "Collectives.H"
 #include "CommandException.H"
 #include "Dataset.H"
 #include "Dimension.H"
@@ -254,8 +256,13 @@ FileWriter* Netcdf4FileWriter::create()
             }
         }
         else if (_overwrite) {
+#if 0
             ncid = nc::create(filename,
                     file_format_to_nc_format(_file_format)|NC_CLOBBER,
+                    ProcessGroup::get_default().get_comm(), info);
+#endif
+            ncid = nc::create(filename,
+                    NC_MPIIO,
                     ProcessGroup::get_default().get_comm(), info);
         }
         else {
@@ -263,7 +270,7 @@ FileWriter* Netcdf4FileWriter::create()
         }
     }
     else {
-        ncid = nc::create(filename, file_format_to_nc_format(_file_format),
+        ncid = nc::create(filename, NC_MPIIO,
                 ProcessGroup::get_default().get_comm(), info);
     }
 
@@ -646,6 +653,79 @@ void Netcdf4FileWriter::write(Array *array, const string &name, int64_t record)
         if (start.size() > 1) {
             array->get_distribution(lo, hi);
             std::copy(lo.begin(), lo.end(), start.begin()+1);
+        }
+    }
+
+#define write_var(TYPE, DT) \
+    if (type == DT) { \
+        TYPE *ptr = NULL; \
+        if (array->owns_data()) { \
+            ptr = static_cast<TYPE*>(array->access()); \
+        } \
+        nc::put_vara(ncid, var_id, start, count, ptr); \
+        if (array->owns_data()) { \
+            array->release(); \
+        } \
+    } else
+    write_var(unsigned char, DataType::UCHAR)
+    write_var(signed char,   DataType::SCHAR)
+    write_var(char,          DataType::CHAR)
+    write_var(int,           DataType::INT)
+    write_var(long,          DataType::LONG)
+    write_var(float,         DataType::FLOAT)
+    write_var(double,        DataType::DOUBLE) {
+        EXCEPT(DataTypeException, "DataType not handled", type);
+    }
+#undef write_var
+}
+
+
+void Netcdf4FileWriter::iwrite(Array *array, const string &name,
+        int64_t ensemble, int64_t record)
+{
+    write(array, name, ensemble, record);
+}
+
+
+void Netcdf4FileWriter::write(Array *array, const string &name,
+        int64_t ensemble, int64_t record)
+{
+    DataType type = array->get_type();
+    vector<int64_t> array_shape = array->get_shape();
+    vector<int64_t> array_local_shape = array->get_local_shape();
+    vector<int64_t> shape = get_var_shape(name);
+    vector<size_t> start(shape.size(), 0);
+    vector<size_t> count(shape.size(), 0);
+    int var_id = get_var_id(name);
+
+    if (array_shape.size()+2 != shape.size()) {
+        ERR("array rank mismatch");
+    }
+    shape.erase(shape.begin()); // remove ensemble dimension
+    shape.erase(shape.begin()); // remove record dimension
+    if (array_shape != shape) {
+        ERR("array shape mismatch");
+    }
+
+    maybe_enddef();
+
+    if (array->owns_data()) {
+        vector<int64_t> lo;
+        vector<int64_t> hi;
+
+        ASSERT(count.size() > 1);
+        count[0] = 1;
+        count[1] = 1;
+        if (count.size() > 2) {
+            std::copy(array_local_shape.begin(), array_local_shape.end(),
+                    count.begin()+2);
+        }
+        ASSERT(start.size() > 1);
+        start[0] = ensemble;
+        start[1] = record;
+        if (start.size() > 2) {
+            array->get_distribution(lo, hi);
+            std::copy(lo.begin(), lo.end(), start.begin()+2);
         }
     }
 

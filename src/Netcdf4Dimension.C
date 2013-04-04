@@ -6,6 +6,7 @@
 
 #include <netcdf.h>
 
+#include "Array.H"
 #include "Common.H"
 #include "Dataset.H"
 #include "MaskMap.H"

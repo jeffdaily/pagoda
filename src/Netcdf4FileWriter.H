@@ -68,6 +68,8 @@ class Netcdf4FileWriter : public AbstractFileWriter
 
         virtual void write(Array *array, const string &name);
         virtual void write(Array *array, const string &name,
+                           int64_t ensemble, int64_t record);
+        virtual void write(Array *array, const string &name,
                            int64_t record);
         virtual void write(Array *array, const string &name,
                            const vector<int64_t> &start);
@@ -75,6 +77,8 @@ class Netcdf4FileWriter : public AbstractFileWriter
         virtual void iwrite(Array *array, const string &name);
         virtual void iwrite(Array *array, const string &name,
                            int64_t record);
+        virtual void iwrite(Array *array, const string &name,
+                           int64_t ensemble, int64_t record);
         virtual void iwrite(Array *array, const string &name,
                            const vector<int64_t> &start);
         virtual void wait();
