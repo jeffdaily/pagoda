@@ -133,7 +133,8 @@ void Netcdf4Dataset::init()
     int ndim;
     int nvar;
     int natt;
-    ncid = nc::open(filename, NC_NOWRITE, group.get_comm(), MPI_INFO_NULL);
+    //ncid = nc::open(filename, NC_NOWRITE, group.get_comm(), MPI_INFO_NULL);
+    ncid = nc::open(filename, NC_MPIIO, group.get_comm(), MPI_INFO_NULL);
     is_open = true;
     nc::inq(ncid, ndim, nvar, natt, udim);
     for (int attid=0; attid<natt; ++attid) {
