@@ -94,6 +94,8 @@ int main(int argc, char **argv)
     try {
         pagoda::initialize(&argc, &argv);
 
+        Variable::promote_to_float = true;
+
         cmd.parse(argc,argv);
         cmd.get_inputs_and_outputs(dataset, vars, writer);
         op = cmd.get_operator();
